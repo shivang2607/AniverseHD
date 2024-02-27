@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production"
+  },
   images: {
     remotePatterns: [
       {
@@ -23,7 +26,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'aniwatch.to',
+        hostname: 'aniwatchtv.to',
         port: '',
         pathname: '/**',
       },   

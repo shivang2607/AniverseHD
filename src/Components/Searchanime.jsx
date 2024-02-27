@@ -1,6 +1,6 @@
 import React from "react";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
-import data from "../public/anime_list.js";
+import data from "/public/anime_list.js";
 
 const Searchanime = () => {
   const handleOnSearch = (string, results) => {

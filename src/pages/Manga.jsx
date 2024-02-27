@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Container, Pagination, Loading } from "@nextui-org/react";
 import Image from "next/image";
 import axios from "axios";
-import data from "../public/manga_list";
+import data from "/public/manga_list";
 import Moviecardquery from "@/Components/Moviecardquery";
 import Movieresultcard from "@/Components/Movieresultcard";
 import styles from "../styles/Search.module.css";

@@ -52,7 +52,7 @@ const Animemodal = ({ detail }) => {
   const initalState =() =>{
     const List= JSON.parse(localStorage.getItem("userLists"));
       
-    List.completed.find((e) => e.id === Number(detail.id) && e.type2==="Anime") &&
+    List?.completed.find((e) => e.id === Number(detail.id) && e.type2==="Anime") &&
       setSelected(new Set(["Completed"]));
     List.plan.find((e) => e.id ===Number(detail.id) && e.type2==="Anime") &&
       setSelected(new Set(["Plan To Watch"]));

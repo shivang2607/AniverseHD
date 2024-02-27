@@ -6,8 +6,9 @@ import styles from "@/styles/Home.module.css";
 import Link from "next/link";
 import { Loading } from "@nextui-org/react";
 import Presscard from "@/Components/Presscard";
-import data from "../public/anime_list";
-import data2 from "../public/manga_list";
+
+import data from "/public/anime_list";
+import data2 from "/public/manga_list";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import Image from "next/image";
 import { ImSearch } from "react-icons/im";
@@ -76,7 +77,7 @@ export default function Home() {
         
 
 
-          <span style={{ display: "flex", textAlign: "left" }}>
+          <span className="" style={{ display: "flex", textAlign: "left" }}>
             {item.English}&nbsp;({item.Type})
           </span>
           {item.Premiered !== "Unknown" && (
@@ -223,7 +224,7 @@ export default function Home() {
 
                     <div className={styles.image}>
                       <Image
-                        src={"https://aniwatch.to/images/anw-min.webp"}
+                        src={"https://aniwatchtv.to/images/anw-min.webp"}
                         width={520}
                         height={450}
                         alt="NA"

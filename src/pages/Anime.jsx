@@ -3,13 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Button, Container, Pagination, Loading } from "@nextui-org/react";
 import Image from "next/image";
 import axios from "axios";
-import movies_list from "../public/movie_list";
-import Moviecardquery from "@/Components/Moviecardquery";
-import Movieresultcard from "@/Components/Movieresultcard";
+import data from "/public/anime_list";
+import Animecardquery from "@/Components/Animecardquery";
+import Animeresultcard from "@/Components/Animeresultcard";
 import styles from "../styles/Search.module.css";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 
-const Movies = () => {
+const Anime = () => {
   const [bars, setBars] = useState([{ value: "" }]);
   const [results, setResults] = useState([]);
   const [curpage, setCurpage] = useState(1);
@@ -17,23 +17,26 @@ const Movies = () => {
   const [loading, setLoading] = useState(false);
   const [ask, setAsk] = useState(false);
   const itemcount = 20;
-  const poster_array = ["/avatar2.jpg", "/moonknight.jpg", "/movie1.jpg"];
-  const [big_img, setBig_img] = useState(
-    poster_array[Math.floor(Math.random() * 3)]
-  );
-  //console.log(big_img);
 
   useEffect(() => {
     //console.log(curpage);
     setResults(recommendations.slice((curpage - 1) * 20, 20 * curpage));
     axios.get("https://animovixrecommendations.onrender.com/");
     return () => {
-      //  console.log("Cleanup function ");
+      //console.log("Cleanup function ");
     };
   }, [curpage, recommendations]);
 
+  const handleOnSearch = (string, results) => {
+    // onSearch will have as the first callback parameter
+  };
+  // data && console.log(data)
+  const handleOnHover = (result) => {
+    // the item hovered
+  };
+
   const handleOnSelect = (i, item) => {
-    // console.log(i, item);
+    //console.log(i, item);
     setBars((s) => {
       const newArr = s.slice();
       newArr[i] = item;
@@ -43,6 +46,13 @@ const Movies = () => {
     // console.log(bars)
   };
 
+  // const handleOnClear = (i)=>{
+  //   setBars(bar=>{
+  //     const res = [...bar].splice(i-1, 1);
+  //     return res
+  //   })
+  // }
+
   const handleOnFocus = () => {
     // console.log('Focused')
   };
@@ -50,7 +60,7 @@ const Movies = () => {
     return (
       <>
         <Head>
-          <title>🎬 Movies Recommendations</title>
+          <title>🎬 Anime Recommendations</title>
           <meta
             name="description"
             content="Anime and Movies Recommendation system and can also be used for recommendations based on multiple anime or movies input. It is a static website and user can use this website to get recommendations for their next Anime to watch or next Movie to watch."
@@ -60,24 +70,26 @@ const Movies = () => {
 
         <div css={{ display: "flex" }}>
           <span style={{ display: "flex", textAlign: "left" }}>
-            {item.title}&nbsp;
+            {item.English}&nbsp;({item.Type})
           </span>
-          {item.release_date !== "Unknown" && (
+          {item.Premiered !== "Unknown" && (
             <span style={{ display: "flex", textAlign: "left" }}>
-              Released in : {item.release_date.substr(0, 4)}
+              Premiered in : {item.Premiered}
             </span>
           )}
-          <span style={{ display: "flex", textAlign: "right" }}>
-            <Image
-              src={`https://image.tmdb.org/t/p/original${item.poster_path}`}
-              css={{ position: "sticky" }}
-              width={50}
-              height={65}
-              alt="N/A"
-              quality={10}
-              unoptimized={true}
-            />
-          </span>
+          {item.Image_link && (
+            <span style={{ display: "flex", textAlign: "right" }}>
+              <Image
+                src={item.Image_link}
+                css={{ position: "sticky" }}
+                width={50}
+                height={65}
+                alt="N/A"
+                quality={20}
+                unoptimized={true}
+              />
+            </span>
+          )}
         </div>
       </>
     );
@@ -108,23 +120,23 @@ const Movies = () => {
     var names = [];
     // if(bars.length===1 && !bars[0].English)window.alert("Please Select some Anime")
     for (var i = 0; i < bars.length; i++) {
-      if (bars[i].title) names.push(bars[i].title);
+      if (bars[i].English) names.push(bars[i].English);
     }
 
     var query = names.join("|");
     if (query.trim() === "") {
-      window.alert("Please Select some Movie");
+      window.alert("Please Select some Anime");
       setAsk(false);
     } else {
       setAsk(true);
       setLoading(true);
-      //console.log(query);
+      // console.log(query);
       axios
-        .post("https://animovixrecommendations.onrender.com/movies", {
+        .post("https://animovixrecommendations.onrender.com/anime", {
           names: query,
         })
         .then(function (response) {
-          // console.log(response.data);
+          //console.log(response.data);
           setRecommendations(response.data);
           setLoading(false);
           setResults(response.data.slice(0, 20));
@@ -145,15 +157,7 @@ const Movies = () => {
           {/* <Searchanime/> */}
           {bars.map((val, i) => {
             return (
-              <Container
-                key={i}
-                style={{
-                  width: "900",
-                  borderRadius: "10px",
-                  margin: "5.5rem 1.5rem",
-                }}
-                className="container"
-              >
+              <Container key={i} className={styles.reactsearch}>
                 <ReactSearchAutocomplete
                   styling={{
                     borderRadius: "5px solid white",
@@ -166,15 +170,18 @@ const Movies = () => {
                     color: "whitesmoke",
                     height: "3rem",
                   }}
-                  items={movies_list}
+                  items={data}
                   value={val}
                   id={i}
+                  onSearch={handleOnSearch}
+                  onHover={handleOnHover}
                   onSelect={(item) => handleOnSelect(i, item)}
+                  onFocus={handleOnFocus}
                   autoFocus
-                  placeholder={`Search Movie ${i + 1}...`}
+                  placeholder={`Search Anime ${i + 1}...`}
                   maxResults={4}
-                  resultStringKeyName="title"
-                  fuseOptions={{ keys: ["title"] }}
+                  resultStringKeyName="English"
+                  fuseOptions={{ keys: ["English"] }}
                   formatResult={formatResult}
                 />
               </Container>
@@ -188,7 +195,7 @@ const Movies = () => {
               auto
               onPress={addBar}
             >
-              Add Movie
+              Add Anime
             </Button>
 
             <Button
@@ -198,7 +205,7 @@ const Movies = () => {
               auto
               onPress={removeBar}
             >
-              Remove Movie
+              Remove Anime
             </Button>
           </div>
           <Container>
@@ -215,16 +222,16 @@ const Movies = () => {
               ) : (
                 `Show Recommendations`
               )}
+              {/* Show Recommendations */}
             </Button>
           </Container>
         </div>
         <Image
           className={styles.img}
-          src={big_img}
-          css={{ position: "sticky", opacity: "0.9" }}
+          src="/kakashi.jpg"
+          css={{ position: "sticky" }}
           width={500}
           height={700}
-          alt="Movie"
         />
       </div>
       {ask && (
@@ -241,7 +248,9 @@ const Movies = () => {
                 <br />
                 <div className={styles.queries}>
                   {bars.map((item, i) => {
-                    return item.title && <Moviecardquery key={i} item={item} />;
+                    return (
+                      item.English && <Animecardquery key={i} item={item} />
+                    );
                   })}
                 </div>
               </div>
@@ -264,10 +273,9 @@ const Movies = () => {
               <div className={styles.results}>
                 {results &&
                   results.map((result, i) => {
-                    return <Movieresultcard key={i} detail={result} />;
+                    return <Animeresultcard key={i} detail={result} />;
                   })}
               </div>
-
               <Pagination
                 bordered
                 shadow
@@ -296,13 +304,11 @@ const Movies = () => {
   );
 };
 
-export default Movies;
+export default Anime;
 
 export async function getStaticProps() {
-  // Call an external API endpoint to get posts.
-  // You can use any data fetching library
-  axios.post("https://animovixrecommendations.onrender.com/movies", {
-    names: "drishyam",
+  axios.post("https://animovixrecommendations.onrender.com/anime", {
+    names: "one piece",
   });
 
   return {
