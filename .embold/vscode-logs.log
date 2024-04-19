@@ -1,0 +1,116 @@
+2024-03-03 13:52:29 info: Congratulations, your extension "Embold" is now active!
+2024-03-03 13:52:29 info: tempDirectory : c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp
+2024-03-03 13:52:29 info: Extraction complete for source: c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\embold-scanner-archive.zip, destination: c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp
+2024-03-03 13:52:29 info: Extension installed on machine OS : win32
+2024-03-03 13:52:29 info: Fetched the issues from DB
+2024-03-03 13:52:29 error: ERROR checking java version : Error: Command failed: java -version
+'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 13:52:29 info: JAVA is not installed on the system,Please install JAVA (1.8 or higher version) to use embold extension'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 13:52:29 info: Java installed on machine.
+2024-03-03 13:52:30 info: Embold extension version response:{"hasSupport":false,"version":"0.1.6","changeNotes":"<div> <p>Release Date: 09 Oct, 2023 <br><span>Bug fixes and improvements.</span></p> </div>"}
+2024-03-03 13:52:30 info: Current installed embold extension version : 0.1.8
+2024-03-03 13:52:30 info: Latest embold extension version on marketplace : 0.1.6
+2024-03-03 13:52:30 info: FIle extension : js
+2024-03-03 13:52:30 info: Reading config.json file from resources
+2024-03-03 13:52:30 info: configFile :c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\config.json
+2024-03-03 13:52:30 info: EMBOLD_URL  :https://packages.embold.io/
+2024-03-03 13:52:30 info: EMBOLD_TOKEN  :eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw
+2024-03-03 13:52:30 info: Executing embold-cli command
+2024-03-03 13:52:30 info: "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp\embold-scanner-archive\bin\embold-scanner.bat" local-analyse -c "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\repository-configuration.json" -u https://packages.embold.io/ -t eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw -sh "e:\Projects and Work\AniverseHD\.embold" -l "e:\Projects and Work\AniverseHD\.embold\corona_logs" -r dummy -la  -od "e:\Projects and Work\AniverseHD\.embold" -of db -si h9pzgv1uuz
+2024-03-03 13:52:30 error: stderr: 'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 13:52:31 info: child process exited with code 9009
+2024-03-03 13:52:31 error: Error in Embold scan, Error code:9009 For more info check e:\Projects and Work\AniverseHD\.embold\corona_logs\browserstack-codequality-scanner.log
+2024-03-03 13:55:24 info: FIle extension : js
+2024-03-03 13:55:24 info: Reading config.json file from resources
+2024-03-03 13:55:24 info: configFile :c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\config.json
+2024-03-03 13:55:24 info: EMBOLD_URL  :https://packages.embold.io/
+2024-03-03 13:55:24 info: EMBOLD_TOKEN  :eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw
+2024-03-03 13:55:24 info: Executing embold-cli command
+2024-03-03 13:55:24 info: "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp\embold-scanner-archive\bin\embold-scanner.bat" local-analyse -c "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\repository-configuration.json" -u https://packages.embold.io/ -t eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw -sh "e:\Projects and Work\AniverseHD\.embold" -l "e:\Projects and Work\AniverseHD\.embold\corona_logs" -r dummy -la  -od "e:\Projects and Work\AniverseHD\.embold" -of db -si yjbwqwqvef
+2024-03-03 13:55:24 error: stderr: 'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 13:55:24 info: child process exited with code 9009
+2024-03-03 13:55:24 error: Error in Embold scan, Error code:9009 For more info check e:\Projects and Work\AniverseHD\.embold\corona_logs\browserstack-codequality-scanner.log
+2024-03-03 13:55:39 info: FIle extension : js
+2024-03-03 13:55:39 info: Reading config.json file from resources
+2024-03-03 13:55:39 info: configFile :c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\config.json
+2024-03-03 13:55:39 info: EMBOLD_URL  :https://packages.embold.io/
+2024-03-03 13:55:39 info: EMBOLD_TOKEN  :eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw
+2024-03-03 13:55:39 info: Executing embold-cli command
+2024-03-03 13:55:39 info: "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp\embold-scanner-archive\bin\embold-scanner.bat" local-analyse -c "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\repository-configuration.json" -u https://packages.embold.io/ -t eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw -sh "e:\Projects and Work\AniverseHD\.embold" -l "e:\Projects and Work\AniverseHD\.embold\corona_logs" -r dummy -la  -od "e:\Projects and Work\AniverseHD\.embold" -of db -si vmdf7wj9j8
+2024-03-03 13:55:39 error: stderr: 'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 13:55:39 info: child process exited with code 9009
+2024-03-03 13:55:39 error: Error in Embold scan, Error code:9009 For more info check e:\Projects and Work\AniverseHD\.embold\corona_logs\browserstack-codequality-scanner.log
+2024-03-03 13:55:47 info: FIle extension : js
+2024-03-03 13:55:47 info: Reading config.json file from resources
+2024-03-03 13:55:47 info: configFile :c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\config.json
+2024-03-03 13:55:47 info: EMBOLD_URL  :https://packages.embold.io/
+2024-03-03 13:55:47 info: EMBOLD_TOKEN  :eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw
+2024-03-03 13:55:47 info: Executing embold-cli command
+2024-03-03 13:55:47 info: "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp\embold-scanner-archive\bin\embold-scanner.bat" local-analyse -c "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\repository-configuration.json" -u https://packages.embold.io/ -t eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw -sh "e:\Projects and Work\AniverseHD\.embold" -l "e:\Projects and Work\AniverseHD\.embold\corona_logs" -r dummy -la  -od "e:\Projects and Work\AniverseHD\.embold" -of db -si wl75vyze0a
+2024-03-03 13:55:47 error: stderr: 'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 13:55:47 info: child process exited with code 9009
+2024-03-03 13:55:47 error: Error in Embold scan, Error code:9009 For more info check e:\Projects and Work\AniverseHD\.embold\corona_logs\browserstack-codequality-scanner.log
+2024-03-03 15:38:52 info: FIle extension : js
+2024-03-03 15:38:52 info: Reading config.json file from resources
+2024-03-03 15:38:52 info: configFile :c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\config.json
+2024-03-03 15:38:52 info: EMBOLD_URL  :https://packages.embold.io/
+2024-03-03 15:38:52 info: EMBOLD_TOKEN  :eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw
+2024-03-03 15:38:52 info: Executing embold-cli command
+2024-03-03 15:38:52 info: "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp\embold-scanner-archive\bin\embold-scanner.bat" local-analyse -c "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\repository-configuration.json" -u https://packages.embold.io/ -t eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw -sh "e:\Projects and Work\AniverseHD\.embold" -l "e:\Projects and Work\AniverseHD\.embold\corona_logs" -r dummy -la  -od "e:\Projects and Work\AniverseHD\.embold" -of db -si 2ruvzi55lpf
+2024-03-03 15:38:52 error: stderr: 'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 15:38:52 info: child process exited with code 9009
+2024-03-03 15:38:52 error: Error in Embold scan, Error code:9009 For more info check e:\Projects and Work\AniverseHD\.embold\corona_logs\browserstack-codequality-scanner.log
+2024-03-03 15:39:00 info: FIle extension : jsx
+2024-03-03 15:39:00 info: Reading config.json file from resources
+2024-03-03 15:39:00 info: configFile :c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\config.json
+2024-03-03 15:39:00 info: EMBOLD_URL  :https://packages.embold.io/
+2024-03-03 15:39:00 info: EMBOLD_TOKEN  :eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw
+2024-03-03 15:39:00 info: Executing embold-cli command
+2024-03-03 15:39:00 info: "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp\embold-scanner-archive\bin\embold-scanner.bat" local-analyse -c "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\repository-configuration.json" -u https://packages.embold.io/ -t eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw -sh "e:\Projects and Work\AniverseHD\.embold" -l "e:\Projects and Work\AniverseHD\.embold\corona_logs" -r dummy -la  -od "e:\Projects and Work\AniverseHD\.embold" -of db -si 3h5rglfba6
+2024-03-03 15:39:00 error: stderr: 'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 15:39:00 info: child process exited with code 9009
+2024-03-03 15:39:00 error: Error in Embold scan, Error code:9009 For more info check e:\Projects and Work\AniverseHD\.embold\corona_logs\browserstack-codequality-scanner.log
+2024-03-03 15:39:06 info: FIle extension : jsx
+2024-03-03 15:39:07 info: Reading config.json file from resources
+2024-03-03 15:39:07 info: configFile :c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\config.json
+2024-03-03 15:39:07 info: EMBOLD_URL  :https://packages.embold.io/
+2024-03-03 15:39:07 info: EMBOLD_TOKEN  :eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw
+2024-03-03 15:39:07 info: Executing embold-cli command
+2024-03-03 15:39:07 info: "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp\embold-scanner-archive\bin\embold-scanner.bat" local-analyse -c "c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\repository-configuration.json" -u https://packages.embold.io/ -t eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0MDA4ODY2NDA2OSwiaWF0IjoxNjQwMDg4NjY0fQ.4_lyJE2yRq21-hg6EuXfi1xAS1IFQGnBOXIHktia7JlZo6Hu6vLpov_tHBMHHD-DbtO5fyYN_vPlGpSQh1Uacw -sh "e:\Projects and Work\AniverseHD\.embold" -l "e:\Projects and Work\AniverseHD\.embold\corona_logs" -r dummy -la  -od "e:\Projects and Work\AniverseHD\.embold" -of db -si t0rsq6mq7e
+2024-03-03 15:39:07 error: stderr: 'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-03 15:39:07 info: child process exited with code 9009
+2024-03-03 15:39:07 error: Error in Embold scan, Error code:9009 For more info check e:\Projects and Work\AniverseHD\.embold\corona_logs\browserstack-codequality-scanner.log
+2024-03-05 11:58:51 info: Congratulations, your extension "Embold" is now active!
+2024-03-05 11:58:51 info: tempDirectory : c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp
+2024-03-05 11:58:55 info: Extraction complete for source: c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\resources\embold-scanner-archive.zip, destination: c:\Users\shivang\.vscode\extensions\embold-vscode.embold-0.1.8\temp
+2024-03-05 11:58:55 info: Extension installed on machine OS : win32
+2024-03-05 11:58:55 info: Fetched the issues from DB
+2024-03-05 11:58:57 error: ERROR checking java version : Error: Command failed: java -version
+'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-05 11:58:57 info: JAVA is not installed on the system,Please install JAVA (1.8 or higher version) to use embold extension'java' is not recognized as an internal or external command,
+operable program or batch file.
+
+2024-03-05 11:58:57 info: Java installed on machine.
+2024-03-05 11:58:57 info: Embold extension version response:{"hasSupport":false,"version":"0.1.6","changeNotes":"<div> <p>Release Date: 09 Oct, 2023 <br><span>Bug fixes and improvements.</span></p> </div>"}
+2024-03-05 11:58:57 info: Current installed embold extension version : 0.1.8
+2024-03-05 11:58:57 info: Latest embold extension version on marketplace : 0.1.6
