@@ -4,6 +4,9 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production"
   },
+  experimental: {
+    serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
+},
   images: {
     remotePatterns: [
       {
