@@ -16,7 +16,7 @@ export default function page() {
       // console.log(res.data)
       //   })
     
-      const searchResults = await axios.get('/api/v1/search?q=ble');
+      const searchResults = await axios.get('/api/v1/genereFilter?genres=Action,Hentai&minScore=9');
       console.log(searchResults);
   }
     f()
