@@ -2,6 +2,13 @@
 import { NextResponse } from "next/server"
 import { pipeline } from "@xenova/transformers";
 import axios from "axios";
+import { LRUCache } from "lru-cache";
+
+const options = {
+  max:200,
+  ttl: 1000*60*60*24*30,
+}
+const recommendCache = new LRUCache(options)
 
 async function encodeText(text) {
     const extractor = await pipeline("feature-extraction", "Xenova/bge-small-en-v1.5");
@@ -9,10 +16,29 @@ async function encodeText(text) {
 }
 
 
+function serializePayload(payload) {
+  const serialized = [];
+
+  // Serialize each key-value pair in the payload
+  for (const key of Object.keys(payload).sort()) {
+      serialized.push(`${key}:${JSON.stringify(payload[key])}`);
+  }
+
+  // Join the serialized key-value pairs into a single string
+  return serialized.join(',');
+}
+
 
 export async function POST(req){
   try {
-    const {positive, fKey, scorelte, scoregte, type, yeargte, yearlte, description, limit} = await req.json();
+    const payload = await req.json();
+    const key = serializePayload(payload);
+    if(recommendCache.get(key)){
+      console.log("cache hit")
+      return NextResponse.json(recommendCache.get(key));
+    }
+    console.log("cache miss")
+    const {positive, fKey, scorelte, scoregte, type, yeargte, yearlte, description, limit} = payload;
     
     if(!positive && !description){
       return NextResponse.json(
@@ -97,7 +123,8 @@ export async function POST(req){
           }
         },
       );
-
+      
+      recommendCache.set(key, recommendations.data.result);
       return NextResponse.json(recommendations.data.result);
 
 
