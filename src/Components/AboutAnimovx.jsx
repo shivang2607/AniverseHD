@@ -4,7 +4,7 @@ import styles from "../styles/AboutAnimovix.module.css"
 const AboutAnimovx = () => {
   return (
     <div className={styles.main}>
-     
+       
       <p>Welcome to Animovix, the ultimate platform built exclusively for Anime and Manga Lovers! Here, you'll find a treasure trove of awesome anime and manga recommendations tailored to your preferences. Our recommendation engine, powered by the K-Nearest Neighbors (KNN) machine learning algorithm, ensures that you get the most relevant and exciting suggestions based on your selected anime and manga choices.Our recommendation engine is trained on an extensive dataset collected <span className={styles.bold}>UNTIL NOVEMBER 2022</span>.</p>
       <h3>A Wealth of Information:</h3>
       <p className={styles.para}>At Animovix, we don't stop at just recommendations. Dive deeper into the world of anime and manga on our detailed pages, where you can explore a vast array of information. Read intriguing synopses, watch captivating trailers, and easily access watch links that direct you to Aniwatch (formerly Zoro), the go-to platform for all your anime streaming needs.</p>
