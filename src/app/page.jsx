@@ -18,6 +18,10 @@ export default function page() {
     
       // const searchResults = await axios.get('/api/v1/search?q=blea');
       // console.log(searchResults);
+
+
+      const searchResults = await axios.get('/api/v1/genereFilter?genres=Action,Hentai&minScore=9');
+      console.log(searchResults);
   }
     f()
   }, [])
