@@ -5,7 +5,9 @@ export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
   let genres = searchParams.get("genres");
   let minScore = searchParams.get("minScore");
-  console.log("score",minScore);
+  const yeargte= searchParams.get("yeargte");
+  const yearlte= searchParams.get("yearlte");
+  // console.log("yeargte", yeargte);
   genres = genres.split(",");
 
   try {
@@ -31,13 +33,21 @@ export async function GET(request) {
             {
               key: "score",
               range: {
-                "gte":  Number(minScore),
+                gte: Number(minScore) || 0,
+              },
+            },
+            {
+              key: "start_year",
+              range: {
+                gte: new Date(yeargte).getFullYear() || null,
+                lte: new Date(yearlte).getFullYear() || null,
               },
             },
           ],
         },
         with_payload: [
           "score",
+          "start_year",
           "type",
           "rating",
           "images.webp.small_image_url",

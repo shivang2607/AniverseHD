@@ -24,7 +24,7 @@ export default function page() {
       console.log(animeDetails.data); 
 
 
-      // const searchResults = await axios.get('/api/v1/genereFilter?genres=Action,Hentai&minScore=9');
+      // const searchResults = await axios.get('/api/v1/genereFilter?genres=Action,Hentai&yeargte=2000');
       // console.log(searchResults);
   }
     f()
