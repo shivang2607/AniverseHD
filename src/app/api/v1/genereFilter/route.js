@@ -39,8 +39,8 @@ export async function GET(request) {
             {
               key: "start_year",
               range: {
-                gte: new Date(yeargte).getFullYear() || null,
-                lte: new Date(yearlte).getFullYear() || null,
+                gte: Number(yeargte) || null,
+                lte: Number(yearlte) || null,
               },
             },
           ],

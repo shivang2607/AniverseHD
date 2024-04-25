@@ -24,8 +24,8 @@ export default function page() {
       console.log(animeDetails.data); 
 
 
-      // const searchResults = await axios.get('/api/v1/genereFilter?genres=Action,Hentai&yeargte=2000');
-      // console.log(searchResults);
+      const searchResults = await axios.get('/api/v1/genereFilter?genres=Action,Hentai&yeargte=2020');
+      console.log(searchResults);
   }
     f()
   }, [])
