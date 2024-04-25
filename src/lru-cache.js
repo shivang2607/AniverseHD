@@ -11,5 +11,11 @@ const recommendationOptions = {
     ttl: 1000*60*60*24*30,
   }
   
+  const animeOptions = {
+    max:300,
+    ttl: 1000*60*60*12,
+  }
+
 export const searchCache = new LRUCache(searchOptions);
 export const recommendCache = new LRUCache(recommendationOptions);
+export const animeCache = new LRUCache(animeOptions);
