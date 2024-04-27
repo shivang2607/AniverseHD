@@ -20,11 +20,11 @@ export default function page() {
       // console.log(searchResults);
 
       //for getting anime details
-      const animeDetails = await axios.get('/api/v1/anime/52588');
-      console.log(animeDetails.data); 
+      // const animeDetails = await axios.get('/api/v1/anime/52588');
+      // console.log(animeDetails.data); 
 
 
-      const searchResults = await axios.get('/api/v1/genereFilter?genres=Action,Hentai&yeargte=2020');
+      const searchResults = await axios.get('/api/v1/genereFilter?genres=Action&yeargte=2023&minScore=8.5');
       console.log(searchResults);
   }
     f()
