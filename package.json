@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mateoaranda/jikanjs": "^1.2.4",
     "@next/font": "13.1.5",
     "@nextui-org/react": "^1.0.0-beta.12",
     "@react-aria/ssr": "^3.4.1",

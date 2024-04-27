@@ -23,9 +23,9 @@ export default function page() {
       // const animeDetails = await axios.get('/api/v1/anime/52588');
       // console.log(animeDetails.data); 
 
-
-      const searchResults = await axios.get('/api/v1/genereFilter?genres=Action&yeargte=2023&minScore=8.5');
-      console.log(searchResults);
+ 
+      // const searchResults = await axios.get('/api/v1/genereFilter?genres=Action&yeargte=2023&minScore=8.5');
+      // console.log(searchResults);
   }
     f()
   }, [])
