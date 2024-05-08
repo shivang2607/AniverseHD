@@ -1,5 +1,24 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
+import { LRUCache } from "lru-cache";
+
+const options = {
+  max:500,
+  ttl: 1000*60*60*24*30,
+}
+const genreFilterCache = new LRUCache(options);
+
+function serializePayload(payload) {
+  const serialized = [];
+
+  // Serialize each key-value pair in the payload
+  for (const key of Object.keys(payload).sort()) {
+      serialized.push(`${key}:${JSON.stringify(payload[key])}`);
+  }
+
+  // Join the serialized key-value pairs into a single string
+  return serialized.join(',');
+}
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
@@ -7,8 +26,23 @@ export async function GET(request) {
   let minScore = searchParams.get("minScore");
   const yeargte= searchParams.get("yeargte");
   const yearlte= searchParams.get("yearlte");
-  // console.log("yeargte", yeargte);
+
+  const cacheObject= {
+    "genres": genres,
+    "minScore":minScore,
+    "yeargte":yeargte,
+    "yearlte":yearlte
+  }
+  const key = serializePayload(cacheObject);
+
+  if(genreFilterCache.get(key)){
+    // console.log("cache hit")
+    return NextResponse.json(genreFilterCache.get(key));
+  }
+
   genres = genres.split(",");
+
+  
 
   try {
     const results = await axios.post(
@@ -66,6 +100,7 @@ export async function GET(request) {
       }
     );
     //console.log("hett", results.data.result);
+    genreFilterCache.set(key, results.data.result);
     return NextResponse.json(results.data.result);
   } catch (error) {
     // console.log("error", error);
