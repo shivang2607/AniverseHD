@@ -1,16 +1,53 @@
-//! try to create multiple caches so that we dont have to send update payload request every time after 12 hours.
+
 
 import { NextResponse } from "next/server";
 import { LRUCache } from "lru-cache";
-import jikan from "@mateoaranda/jikanjs";
 import axios from "axios";
+import createRedisInstance from "@/lib/redis";
+import { syncQdrant } from "./syncWithJikan";
 
 const animeOptions = {
     max:300,
-    ttl: 1000*60*60*12,
+    ttl: 1000*60*60*12, //12hrs
   }
 
+const redisClient = createRedisInstance();
+
   export const animeCache = new LRUCache(animeOptions);
+
+
+export async function GET(req, {params}){
+    const id = params.id;
+    const lruCachedData = animeCache.get(`qdrant-anime-${id}`)
+     if(lruCachedData){     // data found in lrucache
+        return NextResponse.json(lruCachedData);
+     }
+    
+    const cachedResult = await redisClient.get(`qdrant-anime-${id}`);
+    if(cachedResult){       //data found in redis cache
+        const parsedCacheResult = JSON.parse(cachedResult);
+        console.log('cache hit : response sent from qdrant cached result');
+        animeCache.set(`qdrant-anime-${id}`, parsedCacheResult);
+        return NextResponse.json(parsedCacheResult);
+    }
+
+    //* if both cache got a miss, then fetch data from qdrant, check if it has sites in it if no then update with malsync , check if relations is there if no then update with jikan miscellaneous data, and everytime update data like score, rating, popularity, members,etc. and then cache the data in redis for coming 7 days and send back the response.
+
+
+    try {           
+        console.log('cache miss: response sent from qdrant api call')
+        const resPayload = await getQdrantAnime(id);
+        // console.log(resPayload);
+        const updatedData = await syncQdrant(id, resPayload, redisClient);
+        return NextResponse.json(updatedData);
+        
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json(error);
+    }
+    
+}
+
 
 async function getQdrantAnime(id){
     try {
@@ -23,90 +60,11 @@ async function getQdrantAnime(id){
                 headers: {
                     "api-key": process.env.QDRANT_API_KEY
                   }
-                })
-            animeCache.set(`qdrant-${id}`, qdrantRes?.data.result[0].payload);
-            return qdrantRes?.data.result[0].payload;
+                });
+
+        return qdrantRes?.data.result[0].payload;
         
     } catch (error) {
-        return NextResponse.json(error);
-    }
-}
-
-export async function GET(req, {params}){
-    const id = params.id;
-    const updateFlag = animeCache.get(`update-${id}`);
-    const cachedResult = animeCache.get(`qdrant-${id}`);
-    if(updateFlag){ 
-        console.log("cache hit of update Flag")
-        if(cachedResult){
-            console.log('cache hit : response sent from qdrant cached result');
-            return NextResponse.json(cachedResult);
-        }
-
-        console.log("cache miss: response sent from qdrant api call")
-        const res = await getQdrantAnime(id);
-        return NextResponse.json(res);
-    }
-
-    try {
-        
-        const resPayload = await getQdrantAnime(id);
-        const jikanResp = await jikan.loadAnime(id, 'full');
-        const jikanData = jikanResp.data;
-        let updatePayload = {
-            "aired": jikanData.aired,
-            "airing": jikanData.airing,
-            "episode_duration": jikanData.episode_duration,
-            "duration":jikanData.duration,
-            "favorites": jikanData.favorites,
-            "members": jikanData.members,
-            "popularity": jikanData.popularity,
-            "rank": jikanData.rank,
-            "rating": jikanData.rating,
-            "score": jikanData.score,
-            "scored_by": jikanData.scored_by,
-            "start_date": jikanData.start_date,
-            "start_season": jikanData.start_season,
-            "status": jikanData.status,
-
-        }
-
-        if(!(resPayload?.relations)){
-            updatePayload = {
-                ...updatePayload,
-                "images": jikanData.images,
-                "trailer": jikanData.trailer,
-                "titles": jikanData.titles,
-                "relations": jikanData.relations,
-                "theme": jikanData.theme,
-                "external": jikanData.external
-            }
-           
-        }
-        await axios.post(`${process.env.QDRANT_URL}/collections/Anime/points/payload`,
-        {
-            "payload": updatePayload,
-            "points": [Number(id)]
-          },
-         {            
-            headers: {
-                "api-key": process.env.QDRANT_API_KEY
-              }
-            })
-        // console.log("response payload update when relations is found", updatePayloadRes);
-        console.log("cache miss for anime id")
-        const responsePayload = {
-            ...jikanData,
-            "sub": resPayload.sub,
-            "dub": resPayload.dub,
-            "uncensored": resPayload.uncensored,
-        }
-        animeCache.set(`update-${id}`, "updated", {ttl: 1000*60*60*24*30});
-        console.log("response send after updating Qdrant")
-        return NextResponse.json(responsePayload);
-         
-    } catch (error) {
-        console.log(error)
         return NextResponse.json(error);
     }
 }
