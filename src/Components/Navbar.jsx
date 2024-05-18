@@ -1,185 +1,74 @@
-import React from "react";
-import { useRouter } from "next/router";
-import {
-  Navbar,
-  Link,
-  Text,
-  Avatar,
-  Dropdown,
-  useTheme,
-  Button,
-  purple,
-} from "@nextui-org/react";
-//import { Layout } from "./Layout.js";
-//import { AcmeLogo } from "./AcmeLogo.js";
+'use client'
+import { useState } from 'react';
+import Link from 'next/link';
+import { HiMenu, HiX } from 'react-icons/hi';
 
-//import {db, auth} from "../firebase/firebaseinit"
-import { useFirebase } from "../context/firebaseContext";
-import styles from "../styles/Navbar.module.css"
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-import Image from "next/image";
-
-const Bar = () => {
-  const [variant, setVariant] = React.useState("default");
-  const [activeColor, setActiveColor] = React.useState("primary");
-  const { signIn, signout, auth, getUserCookies } = useFirebase();
-  const { isDark } = useTheme();
-  const [user, setUser] = React.useState(null);
-  const router = useRouter();
-  
-  React.useEffect(() => {
-    const useData = getUserCookies();
-    setUser(useData.details);
-    //console.log("current", auth)
-    // const listener = onAuthStateChanged(auth, async (user) => {
-    //  // console.log(user);
-
-    // });
-
-    // return () => {
-    //   listener();
-    // };
-  }, []);
-
-  const variants = [
-    "default",
-    "highlight",
-    "highlight-solid",
-    "underline",
-    "highlight-rounded",
-    "highlight-solid-rounded",
-    "underline-rounded",
-  ];
-
-  const collapseItems = ["Home", "Anime", "Manga","About"];
-
-  const colors = ["primary", "secondary", "success", "warning", "error"];
   return (
-    <Navbar    
-     height={80}   
-     variant="sticky"
-    >
-      <Navbar.Toggle showIn="xs" />
-      <Navbar.Brand
-        css={{
-          "@xs": {
-            w: "12%",
-          },
-        }}
-      >
-        <Navbar.Content activeColor={activeColor} variant={variant}>
-          <Navbar.Link href="/">
-            <Image src="/logo1.png" width={200} height={50} alt="NA" />
-            {/* <Text b color="inherit" size={25} style={{textDecoration:"underline"}}>
-            ANIMOVIX
-          </Text> */}
-          </Navbar.Link>
-        </Navbar.Content>
-      </Navbar.Brand>
+    <nav className=" bg-opacity-20 backdrop-blur-sm bg-black border-b-[1px] border-b-primary-500 fixed w-full z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <h1 className="text-xl font-bold ">AniverseHD</h1>
+            </div>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-4">
+                <Link href="/" className=" hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  Home
+                </Link>
+                <Link href="/catalog" className=" hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  Catalog
+                </Link>
+                <Link href="/recommendations" className=" hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  Recommendations
+                </Link>
+                
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-16">
+          <div className="w-80">
+                  <input type="text" placeholder="Search..." className="pl-3 pr-10 py-2 w-full rounded-full  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-100 text-black " />
+                </div>
+            <button className=" bg-primary-200 text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm ">Login</button>
+            <div className="-mr-2 flex md:hidden">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
+              >
+                {isOpen ? (
+                  <HiX className="h-6 w-6" />
+                ) : (
+                  <HiMenu className="h-6 w-6" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <Navbar.Content
-        enableCursorHighlight
-        activeColor="secondary"
-        hideIn="xs"
-        variant="highlight-rounded"
-      >
-        
-        <Navbar.Link onPress={()=>{
-          router.push("/")
-        }}  >
-        <Text size={20} css={{letterSpacing:"1px"}} className={router.route==="/"?styles.active:""}> Home </Text>
-        </Navbar.Link>
-        <Navbar.Link onPress={()=>{
-          router.push("/Anime")
-        }}  >
-          <Text size={20} css={{letterSpacing:"1px"}} className={router.route==="/Anime"?styles.active:""}> Anime</Text>
-        </Navbar.Link>
-        <Navbar.Link onPress={()=>{
-          router.push("/Manga")
-        }}  >
-          <Text size={20} css={{letterSpacing:"1px"}} className={router.route==="/Manga"?styles.active:""}>Manga</Text>
-        </Navbar.Link>
-        <Navbar.Link onPress={()=>{
-          router.push("/About")
-        }} >
-          <Text size={20} css={{letterSpacing:"1px"}} className={router.route==="/About"?styles.active:""}>About</Text>
-        </Navbar.Link>
-      </Navbar.Content>
-
-      {user ? (
-        <Navbar.Content
-          css={{
-            "@xs": {
-              w: "12%",
-              jc: "flex-end",
-            },
-          }}
-        >
-          <Dropdown placement="bottom-right">
-            <Navbar.Item>
-              <Dropdown.Trigger>
-                <Avatar
-                  bordered
-                  as="button"
-                  color="secondary"
-                  size="md"
-                  src={user.photo}
-                  alt="N/A"
-                />
-              </Dropdown.Trigger>
-            </Navbar.Item>
-            <Dropdown.Menu
-              aria-label="User menu actions"
-              color="secondary"
-              // onAction={(actionKey) => console.log({ actionKey })}
-            >
-              <Dropdown.Item key="profile" css={{ height: "$18" }}>
-                <Text b color="inherit" css={{ d: "flex" }}>
-                  Signed in as
-                </Text>
-                <Text b color="inherit" css={{ d: "flex" }}>
-                  {user.name}
-                </Text>
-              </Dropdown.Item>
-
-              <Dropdown.Item  key="settings" hideIn="xs" withDivider>
-                <div onClick={()=>router.push("/Profile")}>Watch List</div>
-              </Dropdown.Item>
-              <Dropdown.Item key="help_and_feedback" withDivider>
-              <div onClick={()=>router.push("/Feedback")}>Feedback</div>
-              </Dropdown.Item>
-              <Dropdown.Item key="logout" withDivider color="error" onClick={signout}>
-                <button onClick={signout}  style={{background:"none", border:"none", width:"100%",textAlign:"left", cursor:"pointer"} }>Log Out</button>
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </Navbar.Content>
-      ) : (
-        <Navbar.Content>
-          <Navbar.Item>
-            <Button auto flat as={Link} color={activeColor} onPress={signIn}>
-              Sign In
-            </Button>
-          </Navbar.Item>
-        </Navbar.Content>
-      )}
-      <Navbar.Collapse>
-        {collapseItems.map((item, index) => (
-          <Navbar.CollapseItem key={item}>
-            <Link
-              color="inherit"
-              css={{
-                minWidth: "100%",
-              }}
-              href={item == "Home" ? "/" : "/"+item}
-            >
-              {item}
-            </Link>
-          </Navbar.CollapseItem>
-        ))}
-      </Navbar.Collapse>
-    </Navbar>
+      <div className={`${isOpen ? 'block' : 'hidden'} md:hidden`}>
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <Link href="/" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+            Home
+          </Link>
+          <Link href="/catalog" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+            Catalog
+          </Link>
+          <Link href="/recommendations" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+            Recommendations
+          </Link>
+          <div className="relative">
+            <input type="text" placeholder="Search..." className="w-full pl-3 pr-10 py-2 rounded-full text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+          </div>
+          <button className="w-full  bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium">Login</button>
+        </div>
+      </div>
+    </nav>
   );
 };
 
-export default Bar;
+export default Navbar;

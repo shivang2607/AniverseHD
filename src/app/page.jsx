@@ -1,4 +1,5 @@
 "use client"
+import ResponsiveCarousel from '@/components/Carousal';
 import axios from 'axios'
 import React, { useEffect } from 'react'
 
@@ -19,8 +20,8 @@ export default function page() {
       //   }) 
       //   console.log(res.data)
     
-      
-      const animeDetails = await axios.get('/api/v1/anime/38000');
+       
+      const animeDetails = await axios.get('/api/v1/anime/1');
       console.log(animeDetails.data); 
   
   }
@@ -29,6 +30,8 @@ export default function page() {
   
 
   return (
-    <div>page</div>
+    <div>
+      <ResponsiveCarousel/>
+    </div>
   )
 }

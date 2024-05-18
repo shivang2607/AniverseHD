@@ -20,13 +20,14 @@ export async function GET(req, {params}){
     const id = params.id;
     const lruCachedData = animeCache.get(`qdrant-anime-${id}`)
      if(lruCachedData){     // data found in lrucache
+        console.log("cache hit: response sent from lrucache")
         return NextResponse.json(lruCachedData);
      }
     
     const cachedResult = await redisClient.get(`qdrant-anime-${id}`);
     if(cachedResult){       //data found in redis cache
         const parsedCacheResult = JSON.parse(cachedResult);
-        console.log('cache hit : response sent from qdrant cached result');
+        console.log('cache hit : response sent from redis cached result');
         animeCache.set(`qdrant-anime-${id}`, parsedCacheResult);
         return NextResponse.json(parsedCacheResult);
     }
