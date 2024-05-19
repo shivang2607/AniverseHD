@@ -93,16 +93,16 @@ const ResponsiveCarousal = () => {
                   <div className="description hidden md:inline-flex w-4/5  text-base"><span className="overflow-ellipsis line-clamp-2">{anime?.synopsis}</span></div>
 
                   <div className="reroute flex md:gap-6 gap-3 items-center mt-8">
-                    <Link href="#" className="rounded-lg px-2 py-1 md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
-                    <Link href="#" className="rounded-lg px-2 py-1 md:text-base text-sm  md:gap-2 items-center flex text-primary-600 bg-cbg-300 tracking-wide">Details <FaChevronRight/></Link>
+                    <Link href="#" className="rounded-lg p-2  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
+                    <Link href="#" className="rounded-lg  p-2 md:text-base text-sm  md:gap-2 items-center flex text-primary-600 bg-cbg-300 tracking-wide">Details <FaChevronRight/></Link>
                   </div>
                 
                 
                   </div>
                 
                 
-                <div className="relative mt-auto mb-8 md:mb-12 image flex w-1/2 h-2/3 md:w-1/4 md:h-[70%]  bg-gradient-radial  from-transparent overflow-hidden rounded-md to-cbg-100/65   ">
-                <Image  src={anime.images.webp.image_url} fill className="shadow-lg  -z-10  " alt=""/>
+                <div className="relative mt-auto mb-8 md:mb-12 image flex w-1/2 h-2/3 md:w-1/4 md:h-[70%]  bg-gradient-radial  from-transparent overflow-hidden rounded-sm to-cbg-100/65   ">
+                <Image  src={anime.images.webp.large_image_url} fill className="shadow-lg  -z-10  " alt=""/>
                 </div>
                 
 
