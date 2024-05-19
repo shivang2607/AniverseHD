@@ -1,0 +1,55 @@
+import axios from "axios";
+import Bottleneck from "bottleneck";
+import { LRUCache } from "lru-cache";
+import { NextResponse } from "next/server";
+
+const animeOptions = {
+    max:10,
+    ttl: 1000*60*60*24, //24hrs
+  }
+
+
+
+  export const topCache = new LRUCache(animeOptions);
+
+const limiter = new Bottleneck({
+    minTime: 350
+  });
+
+export async function GET(req){
+    const {searchParams} = new URL(req.url);
+    const filter  = searchParams.get("filter") || "airing";
+    if(!["airing", "upcoming", "bypopularity", "favorite"].includes(filter))
+        return NextResponse.json({msg: "Unexpected filter type!"})
+    
+    try {
+        const cachedResults = topCache.get(`top-anime-${filter}`);
+        if(cachedResults){
+            console.log("data sent from lru cache ")
+            return NextResponse.json(cachedResults);
+        }
+        const results = await limiter.schedule(()=> axios.get(`https://api.jikan.moe/v4/top/anime?limit=15&filter=${filter}`));    
+        const filteredResults = results.data.data.map((anime)=>{
+            return (
+                {
+                   mal_id: anime.mal_id,
+                   images: anime.images,
+                   trailer: anime.trailer,
+                   title: anime.title,
+                   title_english: anime.title_english,
+                   type: anime.type,
+                   score: anime.score,
+                   synopsis: anime.synopsis,
+                   duration: anime.duration,
+                   episodes: anime.episodes,
+                   rating: anime.rating,
+                }
+            )
+        })
+        topCache.set(`top-anime-${filter}`,filteredResults);
+        return NextResponse.json(filteredResults);
+
+    } catch (error) {
+        return NextResponse.json(error);
+    }
+}

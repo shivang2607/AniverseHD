@@ -29,6 +29,9 @@ module.exports = {
           600 : '#89919e',
         }
       },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      }
     },
   },
   plugins: [],

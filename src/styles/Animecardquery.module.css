@@ -1,9 +1,0 @@
-@media only screen and (max-width: 600px) {
-  .qrycard {
-    display: flex;
-    position: relative;
-    width: 30vw;
-    height: 24vh;
-    margin: 2rem 0rem;
-  }
-}

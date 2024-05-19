@@ -38,7 +38,7 @@ export async function syncQdrant(id, resPayload, redisClient){
         const malSyncData = await limiter.schedule(()=> axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, {headers}));
         updatePayload = {
             ...updatePayload,
-            "Sites": malSyncData.data.Sites
+            "Sites": malSyncData?.data?.Sites
             }
         }
 
