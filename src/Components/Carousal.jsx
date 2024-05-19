@@ -4,9 +4,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
+import { FaPlayCircle, FaChevronRight } from "react-icons/fa";
+import { FaClock, FaCakeCandles } from "react-icons/fa6";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 
 const ResponsiveCarousal = () => {
   const [topAiring, setTopAiring] = useState();
@@ -21,8 +24,18 @@ const ResponsiveCarousal = () => {
     return () => {};
   }, []);
 
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+  
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+  
+    return `${month} ${day}, ${year}`;
+  }
+
   return (
-    <div className="w-full h-64 md:h-96 lg:h-[85vh]">
+    <div className="w-full h-80 md:h-96 lg:h-[85vh]">
       {topAiring && <Swiper
         className="h-full mySwiper"
         modules={[Autoplay, Pagination, Navigation]}
@@ -44,7 +57,7 @@ const ResponsiveCarousal = () => {
         }}
         navigation={true}
       >
-        {topAiring?.map((anime) => {
+        {topAiring?.map((anime, index) => {
           return (
             <SwiperSlide key={anime?.mal_id}>
               <div
@@ -54,13 +67,44 @@ const ResponsiveCarousal = () => {
                   backgroundImage: `url(${anime?.trailer?.images?.image_url || anime?.images?.webp?.small_image_url})`,
                 }}
               >
-                <div className="w-full flex justify-center items-center h-full backdrop-blur-md bg-black bg-opacity-50 ">
-                Slide 1
-                <div className="  flex w-1/5 h-2/3 drop-shadow-2xl  ">
-                <div className="relative image flex-1  bg-gradient-radial  from-transparent to-cbg-100/20  ">
-                <Image  src={anime.images.webp.image_url} fill className="shadow-lg  -z-10 " alt=""/>
+                <div className="w-full flex justify-between items-baseline h-full backdrop-blur-md bg-black bg-opacity-30 md:gap-12 gap-4 bg-gradient-to-r from-black to-transparent   md:px-28 px-4">
+                
+                <div className=" content flex flex-col mt-auto md:m-auto mb-12 text-base gap-4 md:gap-6 w-2/3">
+                  <div className="numbering text-primary-500 underline text-sm  tracking-wider md:text-base">#{index+1} Popularity</div>
+
+                  <div className="title md:text-3xl text-lg font-bold md:w-[70%]  line-clamp-2  overflow-ellipsis  leading-relaxed text-white">{anime?.title_english || anime?.title}
+                  </div>
+
+                  <div className="meta-description md:flex gap-4 md:text-base hidden ">
+                    <div className="gap-1 text-base flex justify-between items-center">
+                      <FaPlayCircle/> {anime?.type}
+                    </div>
+                    <div className="duration gap-1 text-base flex justify-between items-center">
+                      <FaClock/> {anime?.duration?.replace(' per ep', '') || 'NA'}
+                    </div>
+                    <div className="duration gap-1 text-base flex justify-between items-center">
+                      <FaCakeCandles/> {formatDate(anime?.aired?.from?.split('T')[0]) || 'NA'}
+                    </div>
+                    <div className="ratings gap-1   rounded-md bg-primary-100  text-sm px-2  flex justify-between items-center">
+                       {anime?.rating?.split(" ")[0] || 'NA'}
+                    </div>
+                  </div>
+
+                  <div className="description hidden md:inline-flex w-4/5  text-base"><span className="overflow-ellipsis line-clamp-2">{anime?.synopsis}</span></div>
+
+                  <div className="reroute flex md:gap-6 gap-3 items-center mt-8">
+                    <Link href="#" className="rounded-lg px-2 py-1 md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
+                    <Link href="#" className="rounded-lg px-2 py-1 md:text-base text-sm  md:gap-2 items-center flex text-primary-600 bg-cbg-300 tracking-wide">Details <FaChevronRight/></Link>
+                  </div>
+                
+                
+                  </div>
+                
+                
+                <div className="relative mt-auto mb-8 md:mb-12 image flex w-1/2 h-2/3 md:w-1/4 md:h-[70%]  bg-gradient-radial  from-transparent overflow-hidden rounded-md to-cbg-100/65   ">
+                <Image  src={anime.images.webp.image_url} fill className="shadow-lg  -z-10  " alt=""/>
                 </div>
-                </div>
+                
 
                 </div>
               </div>
