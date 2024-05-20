@@ -18,7 +18,9 @@ const limiter = new Bottleneck({
 
 export async function GET(req){
     const {searchParams} = new URL(req.url);
-    const filter  = searchParams.get("filter") || "airing";
+    const filter  = searchParams.get("filter") || "favorite";
+    const limit = searchParams.get("limit") || 20;
+    const page = searchParams.get("page") || 1;
     if(!["airing", "upcoming", "bypopularity", "favorite"].includes(filter))
         return NextResponse.json({msg: "Unexpected filter type!"})
     
@@ -28,7 +30,7 @@ export async function GET(req){
             console.log("data sent from lru cache ")
             return NextResponse.json(cachedResults);
         }
-        const results = await limiter.schedule(()=> axios.get(`https://api.jikan.moe/v4/top/anime?limit=15&filter=${filter}`));    
+        const results = await limiter.schedule(()=> axios.get(`https://api.jikan.moe/v4/top/anime?page=${page}&limit=${limit}&filter=${filter}`));    
         const filteredResults = results.data.data.map((anime)=>{
             return (
                 {

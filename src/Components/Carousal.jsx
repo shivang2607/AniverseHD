@@ -12,12 +12,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 const ResponsiveCarousal = () => {
-  const [topAiring, setTopAiring] = useState();
+  const [topFavorite, setTopFavorite] = useState();
 
   useEffect(() => {
     
     axios.get("/api/v1/get-top-anime").then((response) => {
-      setTopAiring(response?.data);
+      setTopFavorite(response?.data);
       console.log(response?.data);
     });
 
@@ -35,8 +35,8 @@ const ResponsiveCarousal = () => {
   }
 
   return (
-    <div className="w-full h-80 md:h-96 lg:h-[85vh]">
-      {topAiring && <Swiper
+    <div className="w-full h-80 md:h-96 lg:h-[87vh]">
+      {topFavorite && <Swiper
         className="h-full mySwiper"
         modules={[Autoplay, Pagination, Navigation]}
         style={{
@@ -48,6 +48,7 @@ const ResponsiveCarousal = () => {
         spaceBetween={30}
         slidesPerView={1}
         centeredSlides={true}
+        
         loop
         pagination={{ clickable: true }}
         autoplay={{
@@ -57,20 +58,20 @@ const ResponsiveCarousal = () => {
         }}
         navigation={true}
       >
-        {topAiring?.map((anime, index) => {
+        {topFavorite?.map((anime, index) => {
           return (
             <SwiperSlide key={anime?.mal_id}>
               <div
                 // style={{'--image-url': `url(${anime?.trailer?.images?.maximum_image_url})`}}
-                className="bg-blue-500 h-full bg-[image:var(--image-url)] flex items-center justify-center text-white text-2xl bg-cover bg-no-repeat bg-center aspect-auto"
+                className=" h-full  flex items-center justify-center text-white text-2xl bg-cover bg-no-repeat bg-center aspect-auto"
                 style={{
-                  backgroundImage: `url(${anime?.trailer?.images?.image_url || anime?.images?.webp?.small_image_url})`,
+                  backgroundImage: `url(${anime?.trailer?.images?.image_url || anime?.images?.webp?.image_url})`,
                 }}
               >
-                <div className="w-full flex justify-between items-baseline h-full backdrop-blur-md bg-black bg-opacity-30 md:gap-12 gap-4 bg-gradient-to-r from-black to-transparent   md:px-28 px-4">
+                <div className="w-full flex justify-between items-baseline h-full backdrop-blur-md bg-black bg-opacity-30 md:gap-12 gap-4 bg-gradient-to-r from-black to-transparent    md:px-28 px-4">
                 
-                <div className=" content flex flex-col mt-auto md:m-auto mb-12 text-base gap-4 md:gap-6 w-2/3">
-                  <div className="numbering text-primary-500 underline text-sm  tracking-wider md:text-base">#{index+1} Popularity</div>
+                <div className=" content flex flex-col   mt-auto md:m-auto mb-12 text-base gap-4 md:gap-6 w-2/3">
+                  <div className="numbering text-primary-500 underline text-sm  tracking-wider md:text-base">#{index+1} Favorite</div>
 
                   <div className="title md:text-3xl text-lg font-bold md:w-[70%]  line-clamp-2  overflow-ellipsis  leading-relaxed text-white">{anime?.title_english || anime?.title}
                   </div>
@@ -92,7 +93,7 @@ const ResponsiveCarousal = () => {
 
                   <div className="description hidden md:inline-flex w-4/5  text-base"><span className="overflow-ellipsis line-clamp-2">{anime?.synopsis}</span></div>
 
-                  <div className="reroute flex md:gap-6 gap-3 items-center mt-8">
+                  <div className="reroute flex md:gap-6 gap-3 items-center mt-5">
                     <Link href="#" className="rounded-lg p-2  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
                     <Link href="#" className="rounded-lg  p-2 md:text-base text-sm  md:gap-2 items-center flex text-primary-600 bg-cbg-300 tracking-wide">Details <FaChevronRight/></Link>
                   </div>
@@ -101,8 +102,8 @@ const ResponsiveCarousal = () => {
                   </div>
                 
                 
-                <div className="relative mt-auto mb-8 md:mb-12 image flex w-1/2 h-2/3 md:w-1/4 md:h-[70%]  bg-gradient-radial  from-transparent overflow-hidden rounded-sm to-cbg-100/65   ">
-                <Image  src={anime.images.webp.large_image_url} fill className="shadow-lg  -z-10  " alt=""/>
+                <div className="relative mt-auto mb-8 md:mb-12 image flex w-1/2 h-2/3 md:w-1/4 md:h-[72%]  bg-gradient-radial  from-transparent overflow-hidden rounded-sm to-cbg-100/65   ">
+                <Image  src={anime?.images?.webp?.large_image_url || anime?.images?.webp?.image_url} fill className="shadow-lg  -z-10  " alt=""/>
                 </div>
                 
 
