@@ -25,7 +25,7 @@ export async function GET(req){
         return NextResponse.json({msg: "Unexpected filter type!"})
     
     try {
-        const cachedResults = topCache.get(`top-anime-${filter}`);
+        const cachedResults = topCache.get(`top-anime-${filter}-${limit}-${page}`);
         if(cachedResults){
             console.log("data sent from lru cache ")
             return NextResponse.json(cachedResults);
@@ -49,7 +49,7 @@ export async function GET(req){
                 }
             )
         })
-        topCache.set(`top-anime-${filter}`,filteredResults);
+        topCache.set(`top-anime-${filter}-${limit}-${page}`,filteredResults);
         return NextResponse.json(filteredResults);
 
     } catch (error) {

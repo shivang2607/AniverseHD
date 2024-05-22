@@ -63,12 +63,12 @@ const ResponsiveCarousal = () => {
             <SwiperSlide key={anime?.mal_id}>
               <div
                 // style={{'--image-url': `url(${anime?.trailer?.images?.maximum_image_url})`}}
-                className=" h-full  flex items-center justify-center text-white text-2xl bg-cover bg-no-repeat bg-center aspect-auto"
+                className=" h-full  flex items-center justify-center text-white text-2xl bg-cover bg-no-repeat bg-center "
                 style={{
                   backgroundImage: `url(${anime?.trailer?.images?.image_url || anime?.images?.webp?.image_url})`,
                 }}
               >
-                <div className="w-full flex justify-between items-baseline h-full backdrop-blur-md bg-black bg-opacity-30 md:gap-12 gap-4 bg-gradient-to-r from-black to-transparent    md:px-28 px-4">
+                <div className="w-full flex justify-between items-baseline h-full backdrop-blur-sm bg-black bg-opacity-30 md:gap-12 gap-4 bg-gradient-to-r from-black to-transparent    md:px-28 px-4">
                 
                 <div className=" content flex flex-col   mt-auto md:m-auto mb-12 text-base gap-4 md:gap-6 w-2/3">
                   <div className="numbering text-primary-500 underline text-sm  tracking-wider md:text-base">#{index+1} Favorite</div>
@@ -103,7 +103,7 @@ const ResponsiveCarousal = () => {
                 
                 
                 <div className="relative mt-auto mb-8 md:mb-12 image flex w-1/2 h-2/3 md:w-1/4 md:h-[72%]  bg-gradient-radial  from-transparent overflow-hidden rounded-sm to-cbg-100/65   ">
-                <Image  src={anime?.images?.webp?.large_image_url || anime?.images?.webp?.image_url} fill className="shadow-lg  -z-10  " alt=""/>
+                <Image  src={anime?.images?.webp?.large_image_url || anime?.images?.webp?.large_image_url} fill className="shadow-lg  -z-10  " alt={anime?.title_english} />
                 </div>
                 
 

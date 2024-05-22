@@ -16,6 +16,7 @@ export async function GET(req){
     }
 
     if(cache.get(query)){
+      console.log("cache hit");
        return NextResponse.json(cache.get(query));
     }
 
@@ -34,7 +35,7 @@ export async function GET(req){
                       }
                     ]
                   },
-                  "with_payload": ["start_year", "score", "type", "rating",  "images.webp.small_image_url", "main_picture", "title_english"],
+                  "with_payload": ["start_year", "score", "type", "rating",  "images.webp.image_url", "main_picture", "title_english"],
                   "limit": 15
             },
             {
@@ -43,7 +44,7 @@ export async function GET(req){
                   }
             }
           );
-          console.log("These are results",results);
+          // console.log("These are results",results);
           cache.set(query, results.data.result);
           return NextResponse.json(results.data.result);
 

@@ -3,6 +3,7 @@ import axios from 'axios'
 import ResponsiveCarousal from '../components/Carousal'
 import React, { useEffect } from 'react'
 import TopAiringCarousal from '@/components/TopAiringCarousal'
+import RecommendationPanel from '@/components/recommendationPanel/RecommendationPanel'
 
 
 export default function page() {
@@ -39,6 +40,7 @@ export default function page() {
     <div>
       <ResponsiveCarousal/>
       <TopAiringCarousal/>
+      <RecommendationPanel/>
     </div>
   )
 }
