@@ -91,7 +91,7 @@ const ResponsiveCarousal = () => {
                     </div>
                   </div>
 
-                  <div className="description hidden md:inline-flex w-4/5  text-base"><span className="overflow-ellipsis line-clamp-2">{anime?.synopsis}</span></div>
+                  <div className="description hidden md:inline-flex w-4/5  text-base"><span className="overflow-ellipsis line-clamp-3">{anime?.synopsis}</span></div>
 
                   <div className="reroute flex md:gap-6 gap-3 items-center mt-5">
                     <Link href="#" className="rounded-lg p-2  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>

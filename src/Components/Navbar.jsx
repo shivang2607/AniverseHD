@@ -64,7 +64,11 @@ const Navbar = () => {
         </div>
         
       </div>
-      {/* //? mobile view is from below */}
+
+
+
+
+      {/* //? MOBILE VIEW IS FROM BELOW */}
       <div className={`${isOpen ? 'flex' : 'hidden'} md:hidden w-full`}>
         <div className="px-2 pt-2 pb-3 space-y-1 w-full  sm:px-1">
           <Link href="/" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
