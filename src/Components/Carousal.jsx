@@ -10,6 +10,7 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 
 const ResponsiveCarousal = () => {
   const [topFavorite, setTopFavorite] = useState();
@@ -36,7 +37,7 @@ const ResponsiveCarousal = () => {
 
   return (
     <div className="w-full h-80 md:h-96 lg:h-[87vh]">
-      {topFavorite && <Swiper
+      {topFavorite ? <Swiper
         className="h-full mySwiper"
         modules={[Autoplay, Pagination, Navigation]}
         style={{
@@ -91,10 +92,11 @@ const ResponsiveCarousal = () => {
                     </div>
                   </div>
 
-                  <div className="description hidden md:inline-flex w-4/5  text-base"><span className="overflow-ellipsis line-clamp-3">{anime?.synopsis}</span></div>
+                  <div className="description hidden md:inline-flex w-4/5  text-base"><span className="overflow-ellipsis line-clamp-2">{anime?.synopsis}</span></div>
+                  
 
                   <div className="reroute flex md:gap-6 gap-3 items-center mt-5">
-                    <Link href="#" className="rounded-lg p-2  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
+                    <Link href="#" className="rounded-lg p-2 text-nowrap  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
                     <Link href="#" className="rounded-lg  p-2 md:text-base text-sm  md:gap-2 items-center flex text-primary-600 bg-cbg-300 tracking-wide">Details <FaChevronRight/></Link>
                   </div>
                 
@@ -112,7 +114,14 @@ const ResponsiveCarousal = () => {
             </SwiperSlide>
           );
         })}
-      </Swiper>}
+      </Swiper>:
+      <div className="flex h-full w-full items-center justify-center">
+        
+      <div className="flex h-full w-full p-4 justify-center items-center">
+      <Skeleton className=" flex" containerClassName="flex-1 h-[95%]  flex"/>
+      </div>
+      </div>
+        }
     </div>
   );
 };

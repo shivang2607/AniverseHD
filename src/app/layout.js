@@ -1,6 +1,8 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
+import 'react-loading-skeleton/dist/skeleton.css'
+import { SkeletonTheme } from 'react-loading-skeleton'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,12 +17,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className='scrollbar-thumb-primary-100 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-track-cbg-200'>
+    <html lang="en" className='scrollbar-thumb-primary-200 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-track-cbg-200'>
       <link rel="icon" href="favicon.ico" sizes="any" />
       <body className={`${inter.className} bg-cbg-100 text-[#EEEEEE] tracking-wide`}>
-        
+      <SkeletonTheme baseColor="#39475b" highlightColor="#535f70" duration={1}>
           <Navbar/>
           {children}
+          </SkeletonTheme>
           {/* <Footer/> */}
       </body>
       {/* <GoogleTagManager gtmId='GTM-PBQJWMRT'/> */}
