@@ -29,7 +29,7 @@ const SearchComponent = () => {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchRes, setSearchRes] = useState();
-  const debouncedSearchTerm = useDebouncedValue(query, 300);
+  const debouncedSearchTerm = useDebouncedValue(query, 500);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -45,7 +45,7 @@ const SearchComponent = () => {
         );
 
         if (response.status === 200) {
-          console.log(response?.data);
+          // console.log(response?.data);
           setSearchRes(response?.data?.points);
           setLoading(false);
         } else {
@@ -63,7 +63,7 @@ const SearchComponent = () => {
     return () => {
       // Cancel the request when the component unmounts
       abortController.abort();
-      setLoading(true);
+      // setLoading(true);
     };
   }, [debouncedSearchTerm]);
 
@@ -73,16 +73,16 @@ const SearchComponent = () => {
 
   return (
     <>
-      <div className="h-full w-full flex gap-1 flex-col">
+      <div className="h-full w-full relative flex gap-1 flex-col">
         <input
           type="text"
           placeholder="Search..."
           value={query}
           onChange={handleChange}
-          className="text-lg tracking-wide text-gray-700 outline-primary-200 p-2 rounded-lg h-full w-full"
+          className=" tracking-wide  text-gray-700 outline-primary-200 p-2 rounded-lg h-full w-full"
         />
         {debouncedSearchTerm !== "" && (
-          <div className="h-fit p-2 w-full bg-cbg-300 max-h-[50vh] overflow-y-scroll rounded-md flex flex-col z-20 relative  text-gray-800 ">
+          <div className="absolute top-full mt-2 left-0 w-full p-2 bg-cbg-300 max-h-[30vh] md:max-h-[50vh] overflow-y-scroll rounded-md flex flex-col z-20 text-gray-800  ">
             {loading ? (
               <MagnifyingGlass
                 visible={true}
@@ -98,20 +98,39 @@ const SearchComponent = () => {
               />
             ) : (
               searchRes?.length>0 ? <> {searchRes?.map((anime) => {
-                const {title_english, images, main_picture, type, rating, score} = anime?.payload;
+                const {title_english, images, main_picture, type, rating, score, start_year} = anime?.payload;
                 return (
                   <div className="flex result-card-container   border-y-[1px] border-gray-500 scrollbar-thumb-rounded-xl scrollbar-thin hover:text-[whitesmoke] rounded-sm cursor-pointer hover:bg-cbg-400 gap-3 px-1 py-2 text-white" key={anime?.id}>
+
                       <div className="relative  h-16 w-12 flex-shrink-0">
-                      <Image className="object-cover "  src={images?.webp?.image_url || main_picture || images?.webp?.small_image_url} alt="poster image" fill={true}  sizes="(max-width: 768px) 25vw, (max-width: 1024px) 20vw, 15vw"/>
+                      <Image className="object-cover "
+                        src={images?.webp?.image_url || main_picture || images?.webp?.small_image_url} alt="poster image"
+                        fill={true}
+                        sizes="(max-width: 768px) 25vw, (max-width: 1024px) 20vw, 15vw"/>
                       </div>
+
                       <div className="flex flex-col gap-2">
-                      <span className="line-clamp-1 text-left text-ellipsis ">{title_english}</span>
+                      <span className="line-clamp-1 text-left text-ellipsis ">{title_english || "NA"}</span>
+
                       <div className="metadata flex text-xs gap-2 items-center text-sky-300">
-                        <span className="flex gap-1 "><b className="flex items-center text-gray-300">&bull;</b>{type?.toUpperCase() || "NA"}</span>
+                        <span className="flex gap-1 ">
+                          <b className="flex items-center text-gray-300">&bull;</b>
+                          {(type && type?.toUpperCase()) || "NA"}
+                        </span>
 
-                        <span className="flex gap-1  text-primary-400"><b className="flex items-center text-gray-300">&bull;</b>{score? score.toFixed(2) : "NA"}</span>
+                        <span className="flex gap-1  text-primary-400">
+                          <b className="flex items-center text-gray-300">&bull;</b>
+                          {Math.floor(start_year) || "NA"}
+                          </span>
 
-                        <span className="flex gap-1  "><b className="flex items-center text-gray-300">&bull;</b>{rating.split(" ")[0].toUpperCase() || "NA"}</span>
+                        <span className="flex gap-1  ">
+                          <b className="flex items-center text-gray-300">&bull;</b>
+                          {(rating && rating?.split(" ")[0].toUpperCase()) || "NA"}</span>
+
+                          <span className="flex gap-1  text-primary-400">
+                          <b className="flex items-center text-gray-300">&bull;</b>
+                          {score? score.toFixed(2) : "NA"}
+                          </span>
 
 
                       </div>

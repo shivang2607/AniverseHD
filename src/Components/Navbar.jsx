@@ -2,9 +2,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { HiMenu, HiX } from 'react-icons/hi';
+import SearchComponent from './recommendationPanel/SearchComponent';
+import { FaSearch } from 'react-icons/fa';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <nav className=" bg-opacity-50 backdrop-blur-sm bg-black border-b-[1px] border-b-primary-500 fixed w-full z-10">
@@ -33,7 +36,7 @@ const Navbar = () => {
 
 
           </div>
-          <div className="flex items-center gap-16">
+          <div className="flex items-center flex-row-reverse md:flex-row gap-8">
           <div className="ml-auto flex md:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
@@ -46,19 +49,24 @@ const Navbar = () => {
                 )}
               </button>
             </div>
-          <div className="w-80 md:block hidden">
-                  <input type="text" placeholder="Search..." className="pl-3 md:block hidden pr-10 py-2 md:w-full w-0 rounded-full  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-100 text-black " />
+            <div className="searchpanel flex gap-2 items-center">
+          <div className={`w-80 transition-all duration-200 transform ${searchOpen ? 'translate-x-0 opacity-100 visible' : '-translate-x-full opacity-0 invisible'} md:block hidden`}>
+                 <SearchComponent/> 
                 </div>
-            <button className=" bg-primary-200  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm ">Login</button>
+                <button onClick={()=>setSearchOpen(!searchOpen)}>
+                <FaSearch className={`${searchOpen?"text-sky-500":"text-[whitesmoke]"} md:block hidden`} size={20}/>
+                </button>
+                </div>
+            <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm ">Login</button>
            
           </div>
           
         </div>
         
       </div>
-
-      <div className={`${isOpen ? 'block' : 'hidden'} md:hidden`}>
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      {/* //? mobile view is from below */}
+      <div className={`${isOpen ? 'flex' : 'hidden'} md:hidden w-full`}>
+        <div className="px-2 pt-2 pb-3 space-y-1 w-full  sm:px-1">
           <Link href="/" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
             Home
           </Link>
@@ -68,10 +76,10 @@ const Navbar = () => {
           <Link href="/recommendations" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
             Recommendations
           </Link>
-          <div className="relative">
-            <input type="text" placeholder="Search..." className="md:w-full mx-2 w-4/5 mb-3 pl-3 pr-10 py-2 rounded-lg text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+          <div className="relative w-[80%] m-2">
+           <SearchComponent/>
           </div>
-          <button className="md:w-full  bg-primary-200 mb-3 mx-2 rounded-lg text-gray-800 w-1/6 hover:bg-primary-100 px-3 py-2  text-sm font-medium">Login</button>
+          <button className="md:w-full block bg-primary-200 !my-3  mx-2 rounded-lg text-gray-800 w-1/6 justify-center hover:bg-primary-100 px-3 py-2  text-sm font-medium">Login</button>
         </div>
       </div>
     </nav>
