@@ -15,6 +15,10 @@ export const metadata = {
 }
 
 
+//* SKELETON THEME COLORS HAS TO BE CHANGED MANUALLY EVERYTIME WHENEVER THE THEME IS CHANGED ACCORDINGLY IF NEEDED */
+
+
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className='scrollbar-thumb-primary-200 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-track-cbg-200'>

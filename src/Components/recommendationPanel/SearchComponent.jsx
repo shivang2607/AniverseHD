@@ -29,7 +29,7 @@ const SearchComponent = () => {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchRes, setSearchRes] = useState();
-  const debouncedSearchTerm = useDebouncedValue(query, 500);
+  const debouncedSearchTerm = useDebouncedValue(query, 1500);
 
   useEffect(() => {
     const abortController = new AbortController();

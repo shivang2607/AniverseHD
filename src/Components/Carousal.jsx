@@ -117,7 +117,7 @@ const ResponsiveCarousal = () => {
       </Swiper>:
       <div className="flex h-full w-full items-center justify-center">
         
-      <div className="flex h-full w-full p-4 justify-center items-center">
+      <div className="flex h-full w-full md:p-4 p-3 justify-center items-center">
       <Skeleton className=" flex" containerClassName="flex-1 h-[95%]  flex"/>
       </div>
       </div>
