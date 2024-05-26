@@ -25,7 +25,7 @@ const useDebouncedValue = (inputValue, delay) => {
   return debouncedValue;
 };
 
-const SearchComponent = () => {
+const SearchComponent = ({viewAll=true}) => {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchRes, setSearchRes] = useState();
@@ -137,7 +137,11 @@ const SearchComponent = () => {
                       </div>
                   </div>
                 )
-              }) }<Link href="#" className="w-full py-2 items-center gap-2 flex rounded-md mt-4 bg-primary-500 text-cbg-200 justify-center ">View All <FaChevronRight size={13}/></Link></>:
+              }) }
+              {
+               viewAll && <Link href="#" className="w-full py-2 items-center gap-2 flex rounded-md mt-4 bg-primary-500 text-cbg-200 justify-center ">View All <FaChevronRight size={13}/></Link>
+                
+                }</>:
               <div className="text-gray-200 flex mx-auto">No Results found !!</div>
             )}
           </div>

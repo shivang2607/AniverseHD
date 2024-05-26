@@ -95,9 +95,9 @@ export default function TopAiringCarousal() {
           <>
             {/* //?   below code is for PC screen */}
             <div className=" md:flex hidden rounded-sm overflow-hidden mx-auto md:h-[60vh] h-52 justify-between items-baseline  flex-row w-full">
-              {[...Array(5)].map((i) => {
+              {[...Array(5)].map((i, ind) => {
                 return (
-                  <div className="h-full w-[18%] flex" key={i}>
+                  <div className="h-full w-[18%] flex" key={ind}>
                     <Skeleton
                       className="flex"
                       containerClassName="flex-1 flex h-full"
