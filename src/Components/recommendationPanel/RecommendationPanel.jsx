@@ -4,7 +4,8 @@ import { GrPowerReset } from "react-icons/gr";
 import { RxReset } from "react-icons/rx"
 import { GiStarSwirl } from "react-icons/gi";
 import Link from 'next/link';
-import SharinganLoader from '../sharinganLoader';
+//import SharinganLoader from '../sharinganLoader';
+import CardComponent from './CardComponent';
 
 
 
@@ -41,12 +42,26 @@ export default function RecommendationPanel() {
               <button className='rounded-md font-semibold  text-primary-300 hover:text-primary-400  p-1 px-2 flex items-center gap-1'> <RxReset size={18}/> Reset</button>
               <button className='rounded-md hover:bg-primary-300 bg-primary-200 text-cbg-100 font-semibold p-1 px-3 flex items-center gap-1'> <GiStarSwirl  size={18}/> Recommend</button>
             </div>
-            
+           
             <div className="loading items-center gap-3 flex flex-col">
+              
+             {/***Loader 
             <div className=" w-36 h-36 mx-auto mt-8 flex ">
               <SharinganLoader/>
             </div>
-            <h3 className='text-xl text-red-500 backdrop-brightness-0 p-1 font-semibold'>Please wait...This may take a while</h3>
+            <h3 className='text-xl text-red-500 backdrop-brightness-0 p-1 font-semibold'>Please wait...This may take a while</h3>*/}
+
+            {/****************** CARD**********************/}
+            
+            <h1 className='font-semibold text-2xl items-start mb-1 '>Recommended For You</h1>
+            
+            <div className='sanya component flex space-x-3 p-1 mt-1 mb-0'>{
+              [...Array(5)].map(i=>{
+                return<CardComponent/>
+              })
+            }
+          
+            </div>
             </div>
             
 
