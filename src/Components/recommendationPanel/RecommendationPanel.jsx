@@ -3,6 +3,9 @@ import SearchComponent from './SearchComponent'
 import Link from 'next/link';
 import DescriptionBased from './DescriptionBased';
 import AnimeBased from './AnimeBased';
+//import SharinganLoader from '../sharinganLoader';
+import CardComponent from './CardComponent';
+
 
 
 export default function RecommendationPanel() {
