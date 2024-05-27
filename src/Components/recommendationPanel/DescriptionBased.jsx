@@ -36,7 +36,7 @@ export default function DescriptionBased() {
         limit: 50,
       });
       console.log(response);
-      setRecommendations(response?.data);
+      setRecommendations(response?.data?.slice(0, 5));
       setLoading(false);
     } catch (error) {
       toast.error(
@@ -133,18 +133,19 @@ export default function DescriptionBased() {
         </div>
       ) : (
         <>
-        <div className="loading items-center gap-3 mt-4 p-3 !tracking-wide flex flex-col bg-opacity-30 ">
+        {recommendations && <div className="loading items-center gap-3 mt-4 p-3 !tracking-wide flex flex-col bg-opacity-30 ">
               
              <h1 className='font-semibold text-2xl mr-auto  mb-3 '>Here are your Recommendations</h1>
              
              <div className='sanya component flex justify-between w-full'>{
-               [...Array(5)].map(i=>{
-                 return<CardComponent/>
+               recommendations?.map(anime=>{
+                 return <CardComponent key={anime?.id} anime={anime}/>
                })
              }
            
              </div>
              </div>
+}
         </>
       )}
     </div>
