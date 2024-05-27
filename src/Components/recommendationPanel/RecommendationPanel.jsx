@@ -38,7 +38,7 @@ export default function RecommendationPanel() {
           
         </div>
 
-        <div className="info flex text-sm w-[35%] italic text-gray-300 tracking-wider">
+        <div className="info flex text-sm w-[32%] italic text-gray-300 tracking-wider">
         <p>
                 Welcome to our  <b>Recommendation Panel!</b> 🌟 Ever wished for an anime
                 that matches your exact taste? Well, now you can! Just type in a

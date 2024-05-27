@@ -8,6 +8,7 @@ import { GiStarSwirl } from "react-icons/gi";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import CardComponent from "./CardComponent";
 
 export default function DescriptionBased() {
   const [description, setDescription] = useState();
@@ -15,7 +16,7 @@ export default function DescriptionBased() {
   const [recommendations, setRecommendations] = useState();
 
   const getRecommendations = async () => {
-    if (description && description?.trim() === "") {
+    if (!description || (description && description?.trim() === "")) {
       toast.error("Description cannot be empty!", {
         duration: 2000,
         id: "error",
@@ -57,12 +58,12 @@ export default function DescriptionBased() {
   };
 
   return (
-    <div className="description-block flex flex-col gap-3 pl-8 pr-16">
+    <div className="description-block flex flex-col gap-3 pl-4 pr-16">
       <textarea
         maxLength={300}
         value={description || ""}
         placeholder="Enter Description, eg: Anime with demons and monster and swords fights in it and suspense thriller action packed."
-        class=" block w-full p-2  outline-none rounded-md shadow-sm scrollbar-thin bg-cbg-200"
+        class=" block w-full p-2  outline-none rounded-md shadow-sm scrollbar-thin text-gray-800"
         onChange={(e) => setDescription(e.target.value)}
       ></textarea>
       <span className="remaininglength flex ml-auto text-xs text-gray-400 relative -translate-y-2">
@@ -131,7 +132,20 @@ export default function DescriptionBased() {
           </h3>
         </div>
       ) : (
-        <></>
+        <>
+        <div className="loading items-center gap-3 mt-4 p-3 !tracking-wide flex flex-col bg-opacity-30 ">
+              
+             <h1 className='font-semibold text-2xl mr-auto  mb-3 '>Here are your Recommendations</h1>
+             
+             <div className='sanya component flex justify-between w-full'>{
+               [...Array(5)].map(i=>{
+                 return<CardComponent/>
+               })
+             }
+           
+             </div>
+             </div>
+        </>
       )}
     </div>
   );
