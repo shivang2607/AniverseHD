@@ -108,9 +108,9 @@ export default function TopAiringCarousal() {
             </div>
 
             <div className=" flex md:hidden rounded-sm overflow-hidden mx-auto  h-52 justify-between items-baseline  flex-row w-full">
-              {[...Array(3)].map((i) => {
+              {[...Array(3)].map((i, k) => {
                 return (
-                  <div className="h-full w-[30%] flex" key={i}>
+                  <div className="h-full w-[30%] flex" key={k}>
                     <Skeleton
                       className="flex"
                       containerClassName="flex-1 flex h-full"

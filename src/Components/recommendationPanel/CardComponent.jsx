@@ -1,14 +1,16 @@
 import React from "react";
 import { FaPlay } from "react-icons/fa6";
 import Image from "next/image";
-import { BsDot } from "react-icons/bs";
+import { PiVideoFill } from "react-icons/pi";
+import { MdMovie } from "react-icons/md";
+import Link from "next/link";
 
 export default function CardComponent({ anime }) {
   const animeData = anime?.payload;
   return (
     <>
-      <div className="relative group gap-2 h-52 w-32  flex flex-col  ">
-        <div className="relative w-full h-full bg-cover overflow-hidden bg-center rounded-md">
+      <div className="relative flex-shrink-0 group gap-2 w-32 h-56  flex flex-col  ">
+        <Link  href="#" className="relative w-full h-full bg-cover overflow-hidden bg-center rounded-md">
           <Image
             className="object-cover "
             src={
@@ -34,21 +36,26 @@ export default function CardComponent({ anime }) {
           <div className="blured-on-hover flex absolute inset-0 items-center justify-center backdrop-blur-sm hover:opacity-100 opacity-0 transition-all duration-300 ease-in-out z-0">
             <FaPlay size={32} style={{ color: "#6bb0ab" }} />
           </div>
-        </div>
+        </Link>
 
         {/*******DETAILS */}
         <div className="card-content  ">
-          <h3 className="text-sm font-semibold text-gray-200  line-clamp-1 hover:text-primary-600">
+          <h3 className=" font-semibold text-gray-50 tracking-wide  line-clamp-1 hover:text-primary-600">
             {animeData?.title_english || animeData?.title}
           </h3>
-          <div className="details flex  items-center text-gray-400">
-            <p className=" text-sm">TV </p>
-            <div>
-              <BsDot size={18} />
-            </div>
-            <span className=" text-sm ">
-              {animeData?.duration?.replace(" per ep", "")}
-            </span>
+          <div className="details flex text-xs  items-center text-gray-300">
+            <p className="  flex gap-1 items-center">
+              <MdMovie size={14} className="text-green-300" />
+              TV
+            </p>
+            {animeData?.episodes && (
+              <div className="gap-1 flex items-center mx-3">
+                <div>
+                  <PiVideoFill size={14} className="text-sky-200 font-bold" />
+                </div>
+                <span className=" text-sm ">{animeData.episodes} ep</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

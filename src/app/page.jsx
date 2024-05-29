@@ -30,7 +30,7 @@ export default function page() {
       // get top anime 
       // const topAnime = await axios.get('/api/v1/get-top-anime');
       // console.log(topAnime);
-  
+      localStorage.clear();
   }
     f()
   }, [])

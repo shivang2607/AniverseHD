@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SharinganLoader from "../sharinganLoader";
 import { TypeAnimation } from "react-type-animation";
 import { Hourglass } from "react-loader-spinner";
@@ -9,11 +9,22 @@ import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import CardComponent from "./CardComponent";
+import { FaChevronRight } from "react-icons/fa6";
 
 export default function DescriptionBased() {
+  
+  
+
   const [description, setDescription] = useState();
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState();
+
+  useEffect(()=>{
+    const localDescription = localStorage.getItem("description");
+    const localRecommendations = JSON.parse(localStorage.getItem("description recommendations"));
+    setDescription(localDescription || null);
+    setRecommendations(localRecommendations?.slice(0, 5) || null);
+  }, [])
 
   const getRecommendations = async () => {
     if (!description || (description && description?.trim() === "")) {
@@ -38,6 +49,9 @@ export default function DescriptionBased() {
       console.log(response);
       setRecommendations(response?.data?.slice(0, 5));
       setLoading(false);
+      //Setting the description and recommendation results in local Storage
+      localStorage.setItem("description", description);
+      localStorage.setItem("description recommendations", JSON.stringify(response?.data));
     } catch (error) {
       toast.error(
         error?.response?.data?.error ||
@@ -55,15 +69,17 @@ export default function DescriptionBased() {
     setRecommendations();
     setLoading(false);
     setDescription();
+    localStorage.removeItem("description");
+    localStorage.removeItem("description recommendations");
   };
 
   return (
-    <div className="description-block flex flex-col gap-3 pl-4 pr-16">
+    <div className="description-block flex flex-col gap-3 px-2  md:pl-4 md:pr-16">
       <textarea
         maxLength={300}
         value={description || ""}
         placeholder="Enter Description, eg: Anime with demons and monster and swords fights in it and suspense thriller action packed."
-        class=" block w-full p-2  outline-none rounded-md shadow-sm scrollbar-thin text-gray-800"
+        className=" block w-full p-2  outline-none rounded-md shadow-sm scrollbar-thin text-gray-800" 
         onChange={(e) => setDescription(e.target.value)}
       ></textarea>
       <span className="remaininglength flex ml-auto text-xs text-gray-400 relative -translate-y-2">
@@ -109,7 +125,7 @@ export default function DescriptionBased() {
 
       {loading ? (
         <div className="loading items-center gap-3 flex flex-col">
-          <div className=" w-36 h-36 mx-auto mt-8 flex ">
+          <div className=" md:w-36 md:h-36 w-24 h-24 mx-auto mt-8 flex ">
             <SharinganLoader />
           </div>
           <h3 className="text- text-red-500 italic backdrop-brightness-0 p-1 font-semibold">
@@ -123,7 +139,7 @@ export default function DescriptionBased() {
                 2000,
                 "This may take a while, Hang tight",
                 2000,
-                "Your personalized anime list is on its way!",
+                "Your recommendations are on its way!",
                 2000,
               ]}
               speed={60}
@@ -133,17 +149,22 @@ export default function DescriptionBased() {
         </div>
       ) : (
         <>
-        {recommendations && <div className="loading items-center gap-3 mt-4 p-3 !tracking-wide flex flex-col bg-opacity-30 ">
+        {recommendations && <div className="loading items-center gap-3 mt-4 md:p-3 pb-0 !tracking-wide flex flex-col bg-opacity-30 ">
               
-             <h1 className='font-semibold text-2xl mr-auto  mb-3 '>Here are your Recommendations</h1>
+            <h1 className='font-semibold text-2xl mr-auto justify-between flex items-center w-full  mb-3 '>Here are your Recommendations
+                <Link className="flex font-semibold tracking-wide text-lg text-primary-300 hover:text-primary-600 items-center" href="#">
+                View All<FaChevronRight/>
+                </Link>
+            </h1>
              
-             <div className='sanya component flex justify-between w-full'>{
+             <div className=' component flex md:justify-between md:scrollbar-thin gap-4 overflow-x-scroll md:overflow-x-hidden md:p-0 pb-4  w-full '>{
                recommendations?.map(anime=>{
                  return <CardComponent key={anime?.id} anime={anime}/>
                })
              }
            
              </div>
+             
              </div>
 }
         </>

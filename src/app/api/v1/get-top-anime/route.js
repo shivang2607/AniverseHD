@@ -13,7 +13,7 @@ const animeOptions = {
   export const topCache = new LRUCache(animeOptions);
 
 const limiter = new Bottleneck({
-    minTime: 400
+    minTime: 333
   });
 
 export async function GET(req){
@@ -27,7 +27,7 @@ export async function GET(req){
     try {
         const cachedResults = topCache.get(`top-anime-${filter}-${limit}-${page}`);
         if(cachedResults){
-            console.log("data sent from lru cache ")
+            console.log("cache hit")
             return NextResponse.json(cachedResults);
         }
         const results = await limiter.schedule(()=> axios.get(`https://api.jikan.moe/v4/top/anime?page=${page}&limit=${limit}&filter=${filter}`));    
