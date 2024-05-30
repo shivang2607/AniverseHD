@@ -35,7 +35,6 @@ export function FirebaseProvider({ children }) {
   const [user, setCurrentUser] = useState();
 
   useEffect(() => {
-    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
@@ -43,17 +42,9 @@ export function FirebaseProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  //console.log("hyyy",user);
-
-  // useEffect(() => {
-  //   //updateLocalStorage(); 
-  // }, []);
-
-
-  const updateLocalStorage=async()=>{
-    try{
-      
-      const data= await getUserData();
+  const updateLocalStorage = async () => {
+    try {
+      const data = await getUserData();
 
       const userLists = {
         favourites: data.favourites.concat(data.Mfavourites),
@@ -64,12 +55,10 @@ export function FirebaseProvider({ children }) {
         onHold: data.onHold.concat(data.MonHold),
       };
       localStorage.setItem("userLists", JSON.stringify(userLists));
-
-    }catch(e){
+    } catch (e) {
       console.log(e);
     }
-    
-  }
+  };
 
   async function getAnime(id) {
     try {
@@ -109,204 +98,202 @@ export function FirebaseProvider({ children }) {
 
   // JUST pass flag=false for manga and flag=true for anime, 'add' and 'remove' are strings with values from [dropped,completed,plan,watching,favourites,onHold], same for anime and manga
 
-  async function updateUserLists(details, add=null, remove=null, flag = true) {
-
+  async function updateUserLists(
+    details,
+    add = null,
+    remove = null,
+    flag = true
+  ) {
     const prev = "-1";
     if (!checkUserCookies()) return false;
 
     const userLists = JSON.parse(localStorage.getItem("userLists"));
 
-    if(userLists===null){ 
+    if (userLists === null) {
       await updateLocalStorage();
-      await updateUserLists(details,add,remove,flag);
+      await updateUserLists(details, add, remove, flag);
+    } else {
+      try {
+        const ref = doc(db, "users", getUserCookies().details.email);
 
-    }else{
-    
-    try {
-      const ref = doc(db, "users", getUserCookies().details.email);
+        if (flag) {
+          const data = {
+            id: details.id,
+            imageUrl: details.main_picture,
+            title: details.title_english ? details.title_english : "NA",
+            episodes: details.episodes ? details.episodes : null,
+            synopsis: details.synopsis ? details.synopsis : "Not Available!!",
+            type: details.type ? details.type : "NA",
+            type2: "Anime",
+          };
 
-      if (flag) {   
-        const data = {
-          id: details.id,
-          imageUrl: details.main_picture,
-          title: details.title_english?details.title_english:"NA",
-          episodes: details.episodes? details.episodes:null,
-          synopsis: details.synopsis?details.synopsis:"Not Available!!",
-          type: details.type?details.type:"NA",
-          type2: "Anime",
-        };
+          if (add != null) userLists[add].push(data);
 
-        if (add != null) userLists[add].push(data);
+          if (remove != null)
+            userLists[remove].splice(
+              userLists[remove].findIndex((e) => {
+                e.type2 === "Anime" && e.id === details.id;
+              }),
+              1
+            );
 
-        if (remove != null)
-          userLists[remove].splice(
-            userLists[remove].findIndex((e) => {
-              e.type2 === "Anime" && e.id === details.id;
-            }),
-            1
-          );
+          if (remove === "favourites") {
+            await updateDoc(ref, {
+              favourites: arrayRemove(data),
+            });
+          } else if (add === "favourites") {
+            await updateDoc(ref, {
+              favourites: arrayUnion(data),
+            });
+          }
 
+          if (add === "completed") {
+            await updateDoc(ref, {
+              completed: arrayUnion(data),
+            });
+          } else if (remove === "completed") {
+            await updateDoc(ref, {
+              completed: arrayRemove(data),
+            });
+          }
 
-        if (remove === "favourites") {
-          await updateDoc(ref, {
-            favourites: arrayRemove(data),
-          });
-        } else if (add === "favourites") {
-          await updateDoc(ref, {
-            favourites: arrayUnion(data),
-          });
+          if (add === "dropped") {
+            await updateDoc(ref, {
+              dropped: arrayUnion(data),
+            });
+          } else if (remove === "dropped") {
+            await updateDoc(ref, {
+              dropped: arrayRemove(data),
+            });
+          }
+
+          if (add === "onHold") {
+            await updateDoc(ref, {
+              onHold: arrayUnion(data),
+            });
+          } else if (remove === "onHold") {
+            await updateDoc(ref, {
+              onHold: arrayRemove(data),
+            });
+          }
+
+          if (add === "plan") {
+            await updateDoc(ref, {
+              planToWatch: arrayUnion(data),
+            });
+          } else if (remove === "plan") {
+            await updateDoc(ref, {
+              planToWatch: arrayRemove(data),
+            });
+          }
+
+          if (add === "watching") {
+            await updateDoc(ref, {
+              watching: arrayUnion(data),
+            });
+          } else if (remove === "watching") {
+            await updateDoc(ref, {
+              watching: arrayRemove(data),
+            });
+          }
+          localStorage.setItem("userLists", JSON.stringify(userLists));
+        } else {
+          const data = {
+            id: details.manga_id,
+            imageUrl: details.main_picture,
+            title: details.title_english
+              ? details.title_english
+              : details.title,
+            synopsis: details.synopsis ? details.synopsis : "NOT Available",
+            chapters: details.chapters ? details.chapters : null,
+            type: details.type ? details.type : "NA",
+            type2: "Manga",
+          };
+
+          if (add != null) userLists[add].push(data);
+
+          if (remove != null)
+            userLists[remove].splice(
+              userLists[remove].findIndex((e) => {
+                e.type2 === "Manga" && e.id === details.id;
+              }),
+              1
+            );
+
+          if (remove === "favourites") {
+            await updateDoc(ref, {
+              Mfavourites: arrayRemove(data),
+            });
+          } else if (add === "favourites") {
+            await updateDoc(ref, {
+              Mfavourites: arrayUnion(data),
+            });
+          }
+
+          if (add === "completed") {
+            await updateDoc(ref, {
+              Mcompleted: arrayUnion(data),
+            });
+          } else if (remove === "completed") {
+            await updateDoc(ref, {
+              Mcompleted: arrayRemove(data),
+            });
+          }
+
+          if (add === "dropped") {
+            await updateDoc(ref, {
+              Mdropped: arrayUnion(data),
+            });
+          } else if (remove === "dropped") {
+            await updateDoc(ref, {
+              Mdropped: arrayRemove(data),
+            });
+          }
+
+          if (add === "onHold") {
+            await updateDoc(ref, {
+              MonHold: arrayUnion(data),
+            });
+          } else if (remove === "onHold") {
+            await updateDoc(ref, {
+              MonHold: arrayRemove(data),
+            });
+          }
+
+          if (add === "plan") {
+            await updateDoc(ref, {
+              MplanToRead: arrayUnion(data),
+            });
+          } else if (remove === "plan") {
+            await updateDoc(ref, {
+              MplanToRead: arrayRemove(data),
+            });
+          }
+
+          if (add === "watching") {
+            await updateDoc(ref, {
+              Mreading: arrayUnion(data),
+            });
+          } else if (remove === "watching") {
+            await updateDoc(ref, {
+              Mreading: arrayRemove(data),
+            });
+          }
+          localStorage.setItem("userLists", JSON.stringify(userLists));
         }
 
-        if (add === "completed") {
-          await updateDoc(ref, {
-            completed: arrayUnion(data),
-          });
-        } else if (remove === "completed") {
-          await updateDoc(ref, {
-            completed: arrayRemove(data),
-          });
-        }
-
-        if (add === "dropped") {
-          await updateDoc(ref, {
-            dropped: arrayUnion(data),
-          });
-        } else if (remove === "dropped") {
-          await updateDoc(ref, {
-            dropped: arrayRemove(data),
-          });
-        }
-
-        if (add === "onHold") {
-          await updateDoc(ref, {
-            onHold: arrayUnion(data),
-          });
-        } else if (remove === "onHold") {
-          await updateDoc(ref, {
-            onHold: arrayRemove(data),
-          });
-        }
-
-        if (add === "plan") {
-          await updateDoc(ref, {
-            planToWatch: arrayUnion(data),
-          });
-        } else if (remove === "plan") {
-          await updateDoc(ref, {
-            planToWatch: arrayRemove(data),
-          });
-        }
-
-        if (add === "watching") {
-          await updateDoc(ref, {
-            watching: arrayUnion(data),
-          });
-        } else if (remove === "watching") {
-          await updateDoc(ref, {
-            watching: arrayRemove(data),
-          });
-        }
-      localStorage.setItem("userLists", JSON.stringify(userLists));
-
-      } else {
-        
-        const data = {
-          id: details.manga_id,
-          imageUrl: details.main_picture,
-          title: details.title_english ? details.title_english : details.title,
-          synopsis: details.synopsis?details.synopsis:"NOT Available",
-          chapters: details.chapters?details.chapters:null,
-          type: details.type?details.type:"NA",
-          type2: "Manga",
-        };
-
-        if (add != null) userLists[add].push(data);
-
-        if (remove != null)
-          userLists[remove].splice(
-            userLists[remove].findIndex((e) => {
-              e.type2 === "Manga" && e.id === details.id;
-            }),
-            1
-          );
-        
-
-        if (remove === "favourites") {
-          await updateDoc(ref, {
-            Mfavourites: arrayRemove(data),
-          });
-        } else if (add === "favourites") {
-          await updateDoc(ref, {
-            Mfavourites: arrayUnion(data),
-          });
-        }
-
-        if (add === "completed") {
-          await updateDoc(ref, {
-            Mcompleted: arrayUnion(data),
-          });
-        } else if (remove === "completed") {
-          await updateDoc(ref, {
-            Mcompleted: arrayRemove(data),
-          });
-        }
-
-        if (add === "dropped") {
-          await updateDoc(ref, {
-            Mdropped: arrayUnion(data),
-          });
-        } else if (remove === "dropped") {
-          await updateDoc(ref, {
-            Mdropped: arrayRemove(data),
-          });
-        }
-
-        if (add === "onHold") {
-          await updateDoc(ref, {
-            MonHold: arrayUnion(data),
-          });
-        } else if (remove === "onHold") {
-          await updateDoc(ref, {
-            MonHold: arrayRemove(data),
-          });
-        }
-
-        if (add === "plan") {
-          await updateDoc(ref, {
-            MplanToRead: arrayUnion(data),
-          });
-        } else if (remove === "plan") {
-          await updateDoc(ref, {
-            MplanToRead: arrayRemove(data),
-          });
-        }
-
-        if (add === "watching") {
-          await updateDoc(ref, {
-            Mreading: arrayUnion(data),
-          });
-        } else if (remove === "watching") {
-          await updateDoc(ref, {
-            Mreading: arrayRemove(data),
-          });
-        }
-        localStorage.setItem("userLists", JSON.stringify(userLists));
+        return true;
+        //console.log("done");
+      } catch (error) {
+        console.log(error);
       }
-
-      return true;
-      //console.log("done");
-    } catch (error) {
-      console.log(error);
     }
-
-  }
   }
 
   async function getUserData() {
     try {
-      
       if (!checkUserCookies()) return false;
-    //  console.log("cookies",getUserCookies());
+      //  console.log("cookies",getUserCookies());
 
       const docRef = doc(db, "users", getUserCookies().details.email);
 
@@ -362,7 +349,7 @@ export function FirebaseProvider({ children }) {
           plan: [],
           onHold: [],
         };
-       
+
         localStorage.setItem("userLists", JSON.stringify(userLists));
 
         Cookies.set(
@@ -376,7 +363,7 @@ export function FirebaseProvider({ children }) {
           { expires: 20 }
         );
       } else {
-        const data= checkUser.data();
+        const data = checkUser.data();
         const userLists = {
           favourites: data.favourites.concat(data.Mfavourites),
           completed: data.completed.concat(data.Mcompleted),
@@ -385,7 +372,7 @@ export function FirebaseProvider({ children }) {
           plan: data.planToWatch.concat(data.MplanToRead),
           onHold: data.onHold.concat(data.MonHold),
         };
-       
+
         localStorage.setItem("userLists", JSON.stringify(userLists));
         Cookies.set(
           "user",
@@ -446,7 +433,6 @@ export function FirebaseProvider({ children }) {
     isReply = false
   ) => {
     //needs to be updated
-    
 
     if (user == null) return false;
 
@@ -455,7 +441,6 @@ export function FirebaseProvider({ children }) {
         // console.log("Please Provide commendId and replyId !!");
         return null;
       }
-      
 
       if (user == null) return false;
 
@@ -546,23 +531,24 @@ export function FirebaseProvider({ children }) {
     return false;
   }
 
- async  function submitFeedback(starCnt, feed=""){
-  if(starCnt===null)return;
-  const {name, email} = getUserCookies().details;
-  const promise = new Promise((resolve, reject)=>{
-    try {
-      resolve(setDoc(doc(db, "feedback", email),{
-        name,
-        stars:starCnt,
-        feedback:feed,
-        sumbittedAt: serverTimestamp(),
-      }));
-    } catch (error) {
-      console.log("This is error",error)
-      reject(error)
-    }
-
-  })
+  async function submitFeedback(starCnt, feed = "") {
+    if (starCnt === null) return;
+    const { name, email } = getUserCookies().details;
+    const promise = new Promise((resolve, reject) => {
+      try {
+        resolve(
+          setDoc(doc(db, "feedback", email), {
+            name,
+            stars: starCnt,
+            feedback: feed,
+            sumbittedAt: serverTimestamp(),
+          })
+        );
+      } catch (error) {
+        console.log("This is error", error);
+        reject(error);
+      }
+    });
     return promise;
   }
 
