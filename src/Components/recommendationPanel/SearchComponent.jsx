@@ -25,11 +25,11 @@ const useDebouncedValue = (inputValue, delay) => {
   return debouncedValue;
 };
 
-const SearchComponent = () => {
+const SearchComponent = ({viewAll=true}) => {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchRes, setSearchRes] = useState();
-  const debouncedSearchTerm = useDebouncedValue(query, 500);
+  const debouncedSearchTerm = useDebouncedValue(query, 1500);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -82,7 +82,7 @@ const SearchComponent = () => {
           className=" tracking-wide  text-gray-700 outline-primary-200 p-2 rounded-lg h-full w-full"
         />
         {debouncedSearchTerm !== "" && (
-          <div className="absolute top-full mt-2 left-0 w-full p-2 bg-cbg-300 max-h-[30vh] md:max-h-[50vh] overflow-y-scroll rounded-md flex flex-col z-20 text-gray-800  ">
+          <div className="absolute !scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thin scrollbar-track-rounded-full top-full mt-2 left-0 w-full p-2 bg-cbg-300 max-h-[30vh] md:max-h-[50vh] overflow-y-scroll  rounded-md flex flex-col z-20 text-gray-800  ">
             {loading ? (
               <MagnifyingGlass
                 visible={true}
@@ -100,7 +100,7 @@ const SearchComponent = () => {
               searchRes?.length>0 ? <> {searchRes?.map((anime) => {
                 const {title_english, images, main_picture, type, rating, score, start_year} = anime?.payload;
                 return (
-                  <div className="flex result-card-container   border-y-[1px] border-gray-500 scrollbar-thumb-rounded-xl scrollbar-thin hover:text-[whitesmoke] rounded-sm cursor-pointer hover:bg-cbg-400 gap-3 px-1 py-2 text-white" key={anime?.id}>
+                  <div className="flex result-card-container   border-y-[1px] border-gray-500  hover:text-[whitesmoke] rounded-sm cursor-pointer hover:bg-cbg-400 gap-3 px-1 py-2 text-white" key={anime?.id}>
 
                       <div className="relative  h-16 w-12 flex-shrink-0">
                       <Image className="object-cover "
@@ -137,7 +137,11 @@ const SearchComponent = () => {
                       </div>
                   </div>
                 )
-              }) }<Link href="#" className="w-full py-2 items-center gap-2 flex rounded-md mt-4 bg-primary-500 text-cbg-200 justify-center ">View All <FaChevronRight size={13}/></Link></>:
+              }) }
+              {
+               viewAll && <Link href="#" className="w-full py-2 items-center gap-2 flex rounded-md mt-4 bg-primary-500 text-cbg-200 justify-center ">View All <FaChevronRight size={13}/></Link>
+                
+                }</>:
               <div className="text-gray-200 flex mx-auto">No Results found !!</div>
             )}
           </div>

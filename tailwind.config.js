@@ -31,6 +31,7 @@ module.exports = {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'recommendation-box-banner': "url('/anime-all-characters-1.webp')"
       }
     },
   },

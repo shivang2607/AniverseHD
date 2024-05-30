@@ -35,7 +35,7 @@ export async function GET(req){
                       }
                     ]
                   },
-                  "with_payload": ["start_year", "score", "type", "rating",  "images.webp.image_url", "main_picture", "title_english"],
+                  "with_payload": ["start_year", "score", "type", "rating",  "images.webp", "main_picture", "title_english"],
                   "limit": 10
             },
             {

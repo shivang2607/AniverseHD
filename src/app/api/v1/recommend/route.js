@@ -91,7 +91,7 @@ export async function POST(req){
               "positive": positives,
               "strategy": "average_vector",
               "using": "fast-bge-small-en",
-              "with_payload": ["title", "title_english", "score", "start_year", "type", "rating"],
+              "with_payload": ["title", "title_english", "score", "start_year", "type", "rating", "duration", "images.webp", "main_picture", "episodes"],
               "filter":{
             [filterKey] :[
               {
