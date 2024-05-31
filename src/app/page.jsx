@@ -4,6 +4,7 @@ import ResponsiveCarousal from '../components/Carousal'
 import React, { useEffect } from 'react'
 import TopAiringCarousal from '@/components/TopAiringCarousal'
 import RecommendationPanel from '@/components/recommendationPanel/RecommendationPanel'
+import AllTop from '@/components/AllTop'
 
 
 export default function page() {
@@ -41,6 +42,7 @@ export default function page() {
       <ResponsiveCarousal/>
       <TopAiringCarousal/>
       <RecommendationPanel/>
+      <AllTop/>
     </div>
   )
 }

@@ -78,7 +78,7 @@ export default function DescriptionBased() {
       <textarea
         maxLength={300}
         value={description || ""}
-        placeholder="Enter Description, eg: Anime with demons and monster and swords fights in it and suspense thriller action packed."
+        placeholder="Enter Description, eg: Anime with demons and monster set in old era with sword fights."
         className=" block w-full p-2  outline-none rounded-md shadow-sm scrollbar-thin text-gray-800" 
         onChange={(e) => setDescription(e.target.value)}
       ></textarea>
@@ -125,7 +125,7 @@ export default function DescriptionBased() {
 
       {loading ? (
         <div className="loading items-center gap-3 flex flex-col">
-          <div className=" md:w-36 md:h-36 w-24 h-24 mx-auto mt-8 flex ">
+          <div className=" md:w-28 md:h-28 w-24 h-24 mx-auto mt-8 flex ">
             <SharinganLoader />
           </div>
           <h3 className="text- text-red-500 italic backdrop-brightness-0 p-1 font-semibold">

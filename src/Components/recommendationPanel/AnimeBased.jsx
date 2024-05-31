@@ -136,7 +136,7 @@ export default function AnimeBased() {
 
         {loading ? (
         <div className="loading items-center gap-3 flex flex-col">
-          <div className=" md:w-36 md:h-36 w-24 h-24 mx-auto mt-8 flex ">
+          <div className=" md:w-28 md:h-28 w-24 h-24 mx-auto mt-8 flex ">
             <SharinganLoader />
           </div>
           <h3 className="text- text-red-500 italic backdrop-brightness-0 p-1 font-semibold">
