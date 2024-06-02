@@ -39,21 +39,21 @@ export default function CardComponent({ anime }) {
         </Link>
 
         {/*******DETAILS */}
-        <div className="card-content  ">
+        <div className="card-content w-full  ">
           <h3 className=" font-semibold text-gray-50 tracking-wide  line-clamp-1 hover:text-primary-600">
             {animeData?.title_english || animeData?.title}
           </h3>
-          <div className="details flex text-xs  items-center text-gray-300">
+          <div className="details flex text-xs  items-center w-full justify-between text-gray-300">
             <p className="  flex gap-1 items-center">
               <MdMovie size={14} className="text-green-300" />
-              TV
+              {animeData?.type?.toUpperCase() || "NA"}
             </p>
             {animeData?.episodes && (
-              <div className="gap-1 flex items-center mx-3">
+              <div className="gap-1 flex items-center mx-2">
                 <div>
                   <PiVideoFill size={14} className="text-sky-200 font-bold" />
                 </div>
-                <span className=" text-sm ">{animeData.episodes} ep</span>
+                <span className=" text-sm text-nowrap">{animeData.episodes ? `${animeData?.episodes} ep`  :  "NA"} </span>
               </div>
             )}
           </div>

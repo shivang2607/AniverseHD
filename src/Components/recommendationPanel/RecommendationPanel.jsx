@@ -23,8 +23,8 @@ export default function RecommendationPanel() {
           </button>
         </span>
       </h1>
-      <div className="w-full bg-recommendation-box-banner bg-cover bg-center  bg-no-repeat h-fit">
-        <div className="panel bg-gradient-to-l backdrop-blur-sm   md:from-cbg-100 to-transparent shadow-md w-full h-fit s   flex flex-col p-4 md:px-6 px-2 bg-opacity-50 bg-black">
+      <div className="w-full bg-recommendation-box-banner bg-cover bg-center  bg-no-repeat h-fit min-h-[30vh]">
+        <div className="panel bg-gradient-to-l backdrop-blur-sm   md:from-cbg-100 to-transparent shadow-md w-full h-fit min-h-[30vh]   flex flex-col p-4 md:px-6 px-2 bg-opacity-50 bg-black">
           <div className="toggle flex md:w-[30%] w-[80%] mx-auto overflow-hidden  rounded-lg">
             <button
               className={`w-1/2 items-center flex justify-center text-white  p-2 ${

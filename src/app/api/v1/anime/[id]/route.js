@@ -70,14 +70,14 @@ async function getQdrantAnime(id){
         if(qdrantRes?.data?.result.length===0){
             const resultBhaai = await addQdrantAnime(id, redisClient);
             const obj = {
-                add: 1,
+                add: true,
                 resultBhaai
             };
             // console.log(payload);
             return obj;
         }
 
-        return {add: 0, payload : qdrantRes?.data.result[0].payload};
+        return {add: false, payload : qdrantRes?.data.result[0].payload};
         
     } catch (error) {
         return NextResponse.json(error);

@@ -33,7 +33,7 @@ export default function AnimeBased() {
     
 
     const handleAnimeSelect = (anime)=>{
-        console.log(anime);
+        // console.log(anime);
         setSelectedAnime(anime);
     }
 
@@ -80,8 +80,8 @@ export default function AnimeBased() {
 
   return (
     <div className='md:px-8 px-2 '>
-        <div className="flex w-full justify-between md:pr-3">
-        <div className='flex flex-col gap-8 md:w-[74%] w-[70%]'>
+        <div className="flex w-full justify-between gap-2 md:pr-3">
+        <div className='flex flex-col gap-8 md:w-[74%] w-full '>
             <div className="search flex w-full h-10 gap-4">
                 <RecommendationSearchComponent onAnimeSelect={handleAnimeSelect}/>
             </div>

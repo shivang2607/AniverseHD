@@ -13,7 +13,7 @@ const animeOptions = {
   export const topCache = new LRUCache(animeOptions);
 
 const limiter = new Bottleneck({
-    minTime: 333
+    minTime: 500
   });
 
 export async function GET(req){
