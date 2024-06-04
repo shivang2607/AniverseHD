@@ -14,7 +14,7 @@ export default function TopAiringCarousal() {
 
   useEffect(() => {
     axios.get("/api/v1/get-top-anime?filter=airing").then((response) => {
-      setTopAiring(response?.data);
+      setTopAiring(response?.data?.data);
     });
   }, []);
 

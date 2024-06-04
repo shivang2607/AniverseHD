@@ -9,7 +9,7 @@ import { PiVideoFill } from "react-icons/pi";
 import { PiDotOutlineFill } from "react-icons/pi";
 import Skeleton from "react-loading-skeleton";
 
-const TopAnimeSection = ({ title, data }) => (
+const TopAnimeSection = ({ title, data, category }) => (
   <div className="top-anime-section flex w-full md:w-1/4 flex-col gap-3">
     <h2 className="text-primary-500 text-lg font-semibold tracking-wide">
       {title}
@@ -62,7 +62,7 @@ const TopAnimeSection = ({ title, data }) => (
             </div>
           ))}
           <Link
-            href="#"
+            href={`/top/${category}`}
             className="hover:text-primary-300 w-fit flex items-center gap-1 my-2"
           >
             View More <FaChevronRight />
@@ -85,31 +85,42 @@ export default function AllTop() {
   const [favorite, setFavorite] = useState();
   const [upcoming, setUpcoming] = useState();
 
-  useEffect(() => {
-    const fetchData = async (filter, stateSetter) => {
-      try {
-        const response = await axios.get(
-          `/api/v1/get-top-anime?filter=${filter}`
-        );
-        stateSetter(response?.data?.slice(0, 5));
-      } catch (error) {
-        console.error(`Error fetching ${filter} data:`, error);
+
+  const fetchData = async (filter, stateSetter, retryCount = 3) => {
+    try {
+      const response = await axios.get(`/api/v1/get-top-anime?filter=${filter}`);
+      if (Array.isArray(response?.data?.data) && response.data?.data?.length > 0) {
+        stateSetter(response.data.data.slice(0, 5));
+        return;
+      } else if (retryCount > 0) {
+        fetchData(filter, stateSetter, retryCount - 1);
+      } else {
         stateSetter([]);
       }
-    };
-
+    } catch (error) {
+      console.error(`Error fetching ${filter} data:`, error);
+      if (retryCount > 0) {
+        fetchData(filter, stateSetter, retryCount - 1);
+      } else {
+        stateSetter([]);
+      }
+    }
+  };
+  
+  useEffect(() => {
     fetchData("airing", setAiring);
-    fetchData("upcoming", setUpcoming);
     fetchData("bypopularity", setPopular);
-    fetchData("favorite", setFavorite); 
+    fetchData("favorite", setFavorite);
+    fetchData("upcoming", setUpcoming);
   }, []);
+  
 
   return (
     <div className="my-14 p-4 w-full flex flex-col md:flex-row gap-6">
-      <TopAnimeSection title="Top Airing" data={airing} />
-      <TopAnimeSection title="Top Popular" data={popular} />
-      <TopAnimeSection title="Top Favorite" data={favorite} />
-      <TopAnimeSection title="Top Upcoming" data={upcoming} />
+      <TopAnimeSection title="Top Airing" data={airing} category={"airing"}/>
+      <TopAnimeSection title="Top Popular" data={popular} category={"bypopularity"}/>
+      <TopAnimeSection title="Top Favorite" data={favorite} category={"favorite"}/>
+      <TopAnimeSection title="Top Upcoming" data={upcoming} category={"upcoming"} />
     </div>
   );
 }

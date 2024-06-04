@@ -49,8 +49,10 @@ export async function GET(req){
                 }
             )
         })
-        topCache.set(`top-anime-${filter}-${limit}-${page}`,filteredResults);
-        return NextResponse.json(filteredResults);
+        const responseData = {totalPages:results.data?.pagination?.last_visible_page, data:filteredResults}
+        
+        topCache.set(`top-anime-${filter}-${limit}-${page}`,responseData);
+        return NextResponse.json(responseData);
 
     } catch (error) {
         return NextResponse.json(error);

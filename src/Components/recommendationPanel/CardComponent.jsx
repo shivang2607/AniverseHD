@@ -34,7 +34,7 @@ export default function CardComponent({ anime }) {
             </div>
           </div>
           <div className="blured-on-hover flex absolute inset-0 items-center justify-center backdrop-blur-sm hover:opacity-100 opacity-0 transition-all duration-150 ease-in-out z-0">
-            <FaPlay size={32} style={{ color: "#6bb0ab" }} />
+            <FaPlay size={32} className='text-primary-400' />
           </div>
         </Link>
 
