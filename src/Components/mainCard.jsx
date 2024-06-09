@@ -15,8 +15,8 @@ export default function MainCard({anime}) {
         <div className="image relative rounded-md overflow-hidden  h-full w-full ">
             <Image 
             fill 
-            src={anime?.images?.webp?.large_image_url || anime?.images?.webp?.large_image_url}
-            alt={anime?.title_english}
+            src={anime?.images?.webp?.large_image_url || anime?.images?.webp?.large_image_url || anime?.main_picture}
+            alt={anime?.title_english || "Anime title"}
             className='object-cover '
             />
         </div>
@@ -29,14 +29,14 @@ export default function MainCard({anime}) {
                 e.stopPropagation();
                 console.log("Shivang");
             }}><PiBookmarkSimpleBold/></button>
-                <div className="flex ml-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">{anime?.rating?.split(" ")[0] || 'NA'}</div>
+                <div className="flex ml-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">{anime?.rating?.split(" ")[0].toUpperCase() || 'NA'}</div>
                 </div>
                 <div className="absolute  play hover:opacity-100 opacity-0 flex h-full w-full items-center justify-center ">
                     <FaPlay size={50} className='text-primary-400 opacity-85'  />
                 </div>
                 <div className="flex mt-auto m-2 gap-1 text-xs">
                     <div className="score bg-sky-700 text-gray-200 font-semibold px-1   rounded-sm">{anime?.score?.toFixed(2) || "NA"}</div>
-                    <div className="bg-primary-300 text-cbg-100 font-semibold px-1  rounded-sm">{Math.floor(anime?.aired?.prop?.from?.year) || "NA"}</div>
+                    <div className="bg-primary-300 text-cbg-100 font-semibold px-1  rounded-sm">{Math.floor(anime?.aired?.prop?.from?.year || anime?.start_year) || "NA"}</div>
                 </div>
             </div>
 
@@ -56,7 +56,7 @@ export default function MainCard({anime}) {
                   <IoMdTimer  className=" font-bold" />
                 </div>
                 <span className=" text-sm text-nowrap">
-                    {anime?.duration}
+                    {anime?.duration || anime?.episode_duration?.split(" ")[2]}
                     {/* {animeData.episodes ? `${animeData?.episodes} ep`  :  "NA"} */}
                  </span>
               </div>

@@ -73,7 +73,7 @@ export async function POST(req){
           
           let embeddings = null;
           let positives = positive || []
-          let updatedType = ["TV", "tv", "Movie", "movie", "ONA", "ona"]
+          let updatedType = ["TV", "tv", "Movie", "movie", "ONA", "ona", "special", "specials", "Special", "Specials"]
           
           if (description && description?.trim()!==""){
             embeddings = await encodeText(description || "Naruto Shippuden");
@@ -91,7 +91,7 @@ export async function POST(req){
               "positive": positives,
               "strategy": "average_vector",
               "using": "fast-bge-small-en",
-              "with_payload": ["title", "title_english", "score", "start_year", "type", "rating", "duration", "images.webp", "main_picture", "episodes"],
+              "with_payload": ["title", "title_english", "score", "start_year", "type", "rating", "duration", "images.webp", "main_picture", "episodes", "episode_duration"],
               "filter":{
             [filterKey] :[
               {

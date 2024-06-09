@@ -4,7 +4,6 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { Suspense } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 
@@ -40,6 +39,7 @@ export default function Top({params}) {
           }
         };
         fetchData();
+
         return(()=>{
           setData();
         })
@@ -111,13 +111,13 @@ export default function Top({params}) {
             <>
             <div className="content w-full h-full grid md:grid-cols-5 gap-4 grid-cols-2 md:gap-6">
               {data ? data.map((item, index) => (
-                <MainCard key={index} anime={item} />
+                <MainCard key={item.mal_id} anime={item} />
               ))
             :
             
-              [...Array(10)].map(i=>{
+              [...Array(10)].map((i, idx)=>{
                 return (
-                  <div className='md:mb-4 w-full h-80 md:h-96  rounded-md  flex flex-col  hover:shadow-m overflow-hidden' key = {i}>
+                  <div key={idx} className='md:mb-4 w-full h-80 md:h-96  rounded-md  flex flex-col  hover:shadow-m overflow-hidden' >
                     <Skeleton  className='flex h-full w-full' containerClassName='my-4 w-full  h-full pb-3 rounded-md  flex flex-1'/>
                   </div>
                 )

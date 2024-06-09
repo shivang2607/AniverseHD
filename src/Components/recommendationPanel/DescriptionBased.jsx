@@ -10,9 +10,15 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import CardComponent from "./CardComponent";
 import { FaChevronRight } from "react-icons/fa6";
+import useRecommendationStore from "../utils/store";
 
 export default function DescriptionBased() {
   
+  const { setStoreRecommendations, setSelectedAnime, setStoreDescription} = useRecommendationStore(state=>({
+    setStoreRecommendations : state.setRecommendations,
+    setSelectedAnime : state.setQueryAnime,
+    setStoreDescription : state.setDescription,
+  }))
   
 
   const [description, setDescription] = useState();
@@ -20,8 +26,8 @@ export default function DescriptionBased() {
   const [recommendations, setRecommendations] = useState();
 
   useEffect(()=>{
-    const localDescription = localStorage.getItem("description");
-    const localRecommendations = JSON.parse(localStorage.getItem("description recommendations"));
+    const localDescription = sessionStorage.getItem("description");
+    const localRecommendations = JSON.parse(sessionStorage.getItem("description recommendations"));
     setDescription(localDescription || null);
     setRecommendations(localRecommendations?.slice(0, 5) || null);
   }, [])
@@ -44,14 +50,13 @@ export default function DescriptionBased() {
     try {
       const response = await axios.post("/api/v1/recommend", {
         description,
-        limit: 50,
+        limit: 100,
       });
-      console.log(response);
-      setRecommendations(response?.data?.slice(0, 5));
+      setRecommendations(response?.data);
       setLoading(false);
       //Setting the description and recommendation results in local Storage
-      localStorage.setItem("description", description);
-      localStorage.setItem("description recommendations", JSON.stringify(response?.data));
+      sessionStorage.setItem("description", description);
+      sessionStorage.setItem("description recommendations", JSON.stringify(response?.data));
     } catch (error) {
       toast.error(
         error?.response?.data?.error ||
@@ -69,9 +74,15 @@ export default function DescriptionBased() {
     setRecommendations();
     setLoading(false);
     setDescription();
-    localStorage.removeItem("description");
-    localStorage.removeItem("description recommendations");
+    sessionStorage.removeItem("description");
+    sessionStorage.removeItem("description recommendations");
   };
+
+  const handleViewAll = ()=>{
+    setStoreRecommendations(recommendations);
+    setStoreDescription(description);
+    setSelectedAnime([]);
+  }
 
   return (
     <div className="description-block flex flex-col gap-3 px-2  md:pl-4 md:pr-16">
@@ -152,13 +163,13 @@ export default function DescriptionBased() {
         {recommendations && <div className="loading items-center gap-3 mt-4 md:p-3 pb-0 !tracking-wide flex flex-col bg-opacity-30 ">
               
             <h1 className='font-semibold text-2xl mr-auto justify-between flex items-center w-full  mb-3 '>Here are your Recommendations
-                <Link className="flex font-semibold tracking-wide text-lg text-primary-300 hover:text-primary-600 items-center" href="#">
+                <Link onClick={handleViewAll} className="flex font-semibold tracking-wide text-lg text-primary-300 hover:text-primary-600 items-center" href="/recommendations">
                 View All<FaChevronRight/>
                 </Link>
             </h1>
              
              <div className=' component flex md:justify-between md:scrollbar-thin gap-4 overflow-x-scroll md:overflow-x-hidden md:p-0 pb-4  w-full '>{
-               recommendations?.map(anime=>{
+               recommendations?.slice(0, 5)?.map(anime=>{
                  return <CardComponent key={anime?.id} anime={anime}/>
                })
              }
