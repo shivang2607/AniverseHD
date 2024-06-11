@@ -1,10 +1,16 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { demographics, genres, themes } from "./genre-themes-list";
 
 const recommendationStore = (set, get) => ({
   recommendations: [],
   description: "",
   queryAnime: [],
+  selectedGenre : genres.map(g=>g.value),
+  selectedTheme : themes.map(t=>t.value),
+  selectedDemographics : demographics.map(d=>d.value),
+
+
   setRecommendations: (recommend) => {
     set((state) => ({
       recommendations: recommend,
@@ -20,11 +26,30 @@ const recommendationStore = (set, get) => ({
       queryAnime: Array.isArray(anime) ? anime : [anime],
     }));
   },
+  setSelectedGenre: (selectedGenre)=> {
+    set(state=>({
+      selectedGenre: Array.isArray(selectedGenre)? selectedGenre : [...state.selectedGenre, selectedGenre],
+    }))
+  },
+  setSelectedTheme: (selectedTheme)=> {
+    set(state=>({
+      selectedTheme: Array.isArray(selectedTheme)? selectedTheme : [...state.selectedTheme, selectedTheme],
+    }))
+  },
+  setSelectedDemographics: (selectedDemo)=> {
+    set(state=>({
+      selectedDemographics: Array.isArray(selectedDemo)? selectedDemo : [...state.selectedDemographics, selectedDemo],
+    }))
+  },
   reset : ()=>{
     set(state=>({
         recommendations : [],
         description : "",
-        queryAnime : []
+        queryAnime : [],
+        selectedGenre : genres.map(g=>g.value),
+        selectedTheme : themes.map(t=>t.value),
+        selectedDemographics : demographics.map(d=>d.value),
+
     }))
   }
 });

@@ -4,8 +4,11 @@ import Link from 'next/link';
 import { HiMenu, HiX } from 'react-icons/hi';
 import SearchComponent from './recommendationPanel/SearchComponent';
 import { FaSearch } from 'react-icons/fa';
+import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
+
+  const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
@@ -13,6 +16,8 @@ const Navbar = () => {
   const [isScrollingUp, setIsScrollingUp] = useState(false);
 
   const handleScroll = () => {
+
+    if(['/recommendations'].some(path=>path===currentPath))return;
     const currentScrollY = window.scrollY;
 
     if (currentScrollY > lastScrollY && !isScrollingUp) {
@@ -37,7 +42,7 @@ const Navbar = () => {
 
   return (
     <nav
-    className={`fixed bg-opacity-50 backdrop-blur-sm bg-black border-b-[1px] border-b-primary-500 w-full z-50 transition-transform duration-300 ${
+    className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"} bg-opacity-50 backdrop-blur-sm bg-black border-b-[1px] border-b-primary-500 w-full z-50 transition-transform duration-300 ${
       showNavbar ? 'translate-y-0' : '-translate-y-full'
     }`}
   >

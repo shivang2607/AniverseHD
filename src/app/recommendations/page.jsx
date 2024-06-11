@@ -40,7 +40,7 @@ export default function Recommendation() {
         id: "error",
       });
       return;
-    } else if (description?.trim().split(" ").length < 5) {
+    } else if (!(selectedAnimeList.length) && description?.trim().split(" ").length < 5) {
       toast.error("Description should have at least 5 words!", {
         id: "word-limit-error",
       });
@@ -236,7 +236,7 @@ export default function Recommendation() {
         })}
       </div>
 
-      {recommendations && <div className="pagination gap-4 flex w-full justify-center">
+      {recommendations.length > 0 &&  <div className="pagination gap-4 flex w-full justify-center">
       <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev-1)}>
                 <FaChevronLeft/>
         </button>
