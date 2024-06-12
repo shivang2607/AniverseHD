@@ -44,8 +44,8 @@ export default function MultipleSelect({ options, selectedOptions, setSelectedOp
                 {buttonLabel} <FaChevronRight className={`${isOpen?"rotate-90":"rotate-0"} duration-200 transition-all`}/>
             </button>
             {isOpen && 
-                <div ref={dropdownRef} className='absolute my-8 self-center text-sm z-10 bg-gray-700 w-72 rounded-lg p-2'>
-                    <div className='flex flex-col gap-3'>
+                <div ref={dropdownRef} className='absolute my-8 max-h-96 overflow-y-scroll scrollbar-none  self-center text-sm z-10 bg-gray-700 py-4 w-72 rounded-lg p-2'>
+                    <div className='flex flex-col py-2 gap-3'>
                         <button className='self-start rounded-lg border-[1.5px] border-fuchsia-300 px-2 text-sm text-fuchsia-300  py-1' onClick={()=>setSelectedOptions(options.map(op=>op.value))}>Select All</button>
 
                         {showSearchPanel && <input type="text" className='text-primary-300 outline-none rounded-lg px-2 py-1 w-full bg-cbg-300' placeholder="Search" onChange={e=>setSearchText(e.target.value)} />}

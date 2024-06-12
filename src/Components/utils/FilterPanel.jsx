@@ -70,7 +70,7 @@ export default function FilterPanel() {
     <div className=" py-2  z-0 bg-cbg-200 ml-2  items-start   right-0 w-[25%] ">
       <h1 className="w-full justify-center text-2xl flex my-4 bg-cbg-100 text-pretty text-primary-400 font-bold tracking-wide py-2 ">Filters</h1>
       <div className=" h-fit  top-0 relative  scrollbar-thin flex flex-col gap-6 p-2">
-      <h1 className="flex items-center text-xl font-semibold tracking-wide text-sky-300 flex-wrap">
+      <h1 className="flex items-center  text-xl font-semibold tracking-wide text-sky-300 flex-wrap">
         Results should match
         <select
           value={matchType}
@@ -84,9 +84,9 @@ export default function FilterPanel() {
       </h1>
 
       <div className="type flex gap-2 flex-col">
-        <h1 className="text-lg font-semibold text-primary-600">Type</h1>
+        <h1 className="text-lg px-2 font-semibold text-primary-600">Type</h1>
 
-        <div className="checkboxes flex flex-col gap-4 text-sm w-full">
+        <div className="checkboxes px-2 flex flex-col gap-4 text-sm w-full">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -151,8 +151,8 @@ export default function FilterPanel() {
           </div>
         </div>
 
-        <RangeSlider heading={"Score Range"}/>
-        <RangeSlider heading={"Starting Year Range"} min={1930} max={new Date().getFullYear()} step={5}/>
+        <RangeSlider heading={"Score Range"} minInit={6.5} decimalPrecision={1}/>
+        <RangeSlider heading={"Starting Year Range"}  min={1960} max={new Date().getFullYear()} step={5}/>
         
         <div className="genre my-4 flex flex-col gap-4 p-4 bg-cbg-100 rounded-md">
           <MultipleSelect 
