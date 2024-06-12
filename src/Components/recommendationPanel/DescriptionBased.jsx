@@ -14,9 +14,9 @@ import useRecommendationStore from "../utils/store";
 
 export default function DescriptionBased() {
   
-  const { setStoreRecommendations, setSelectedAnime, setStoreDescription} = useRecommendationStore(state=>({
+  const {resetStore, setStoreRecommendations, setSelectedAnimeList, setStoreDescription} = useRecommendationStore(state=>({
+    resetStore: state.reset,
     setStoreRecommendations : state.setRecommendations,
-    setSelectedAnime : state.setQueryAnime,
     setStoreDescription : state.setDescription,
   }))
   
@@ -79,9 +79,10 @@ export default function DescriptionBased() {
   };
 
   const handleViewAll = ()=>{
+    resetStore();
     setStoreRecommendations(recommendations);
     setStoreDescription(description);
-    setSelectedAnime([]);
+    
   }
 
   return (

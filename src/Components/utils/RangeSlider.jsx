@@ -8,18 +8,18 @@ export default function RangeSlider({
   min = 0,
   max = 10,
   decimalPrecision = 0,
-  minInit = min,
-  maxInit = max,
   step = 0.5,
-  score = true,
+  range,
+  setRange,
 }) {
-  const [range, setRange] = useState([minInit, maxInit]);
+  
 
   const handleRangeChange = (values) => {
     setRange([
       values[0].toFixed(decimalPrecision),
       values[1].toFixed(decimalPrecision),
     ]);
+    
   };
 
   return (

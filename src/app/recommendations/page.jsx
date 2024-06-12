@@ -3,7 +3,6 @@ import MainCard from "@/components/mainCard";
 import RecommendationSearchComponent from "@/components/recommendationPanel/SearchComponentRecommendation";
 import SharinganLoader from "@/components/sharinganLoader";
 import useRecommendationStore from "@/components/utils/store";
-import axios from "axios";
 import Image from "next/image";
 import React from "react";
 import { useState } from "react";
@@ -18,56 +17,10 @@ import { TypeAnimation } from "react-type-animation";
 export default function Recommendation() {
 
 
-  const {queryAnime, recommendations, setRecommendations, description, setDescription, reset} = useRecommendationStore(state=>({
-    queryAnime : state.queryAnime,
-    recommendations : state.recommendations,
-    setRecommendations : state.setRecommendations,
-    description : state.description,
-    setDescription : state.setDescription,
-    reset : state.reset,
-  }))
+  const {loading, setLoading, selectedAnimeList, setSelectedAnimeList, recommendations, description, setDescription, reset, getRecommendations} = useRecommendationStore(state=>state);
 
 
-  const [selectedAnimeList, setSelectedAnimeList] = useState(queryAnime);
-  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-
-
-  const getRecommendations = async () => {
-    if ((!description || (description && description?.trim() === "")) && selectedAnimeList.length===0) {
-      toast.error("Please Select Anime or write description!", {
-        duration: 2000,
-        id: "error",
-      });
-      return;
-    } else if (!(selectedAnimeList.length) && description?.trim().split(" ").length < 5) {
-      toast.error("Description should have at least 5 words!", {
-        id: "word-limit-error",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.post("/api/v1/recommend", {
-        positive: selectedAnimeList.map(anime=>anime.id),
-        description,
-        limit: 100,
-      });
-      setRecommendations(response?.data);
-      setLoading(false);
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.error ||
-          error?.message ||
-          "Something Went Wrong",
-        {
-          id: "catch-error",
-        }
-      );
-      setLoading(false);
-    }
-  };
 
   const handleReset = () => {
     setLoading(false);
@@ -85,15 +38,15 @@ export default function Recommendation() {
         return;
       }
     
-    setSelectedAnimeList((prev) => [...prev, anime]);
+    setSelectedAnimeList([...selectedAnimeList, anime]);
   }
 
   const handleRemoveAnime = (anime) => {
-    setSelectedAnimeList((prev) => prev.filter((obj) => obj.id !== anime.id));
+    setSelectedAnimeList(selectedAnimeList.filter((obj) => obj.id !== anime.id));
   };
 
   return (
-    <div className="w-[73%] flex flex-col gap-4 py-4 ">
+    <div className="w-[73%] flex flex-col gap-4 py-4 mx-4">
       <div className="heading flex flex-col gap-2 p-4  rounded-lg shadow-lg">
         <h1 className="text-2xl text-primary-500 font-bold tracking-wide">
           Discover Your Next Favorite Anime!
@@ -172,7 +125,7 @@ export default function Recommendation() {
       <div className="grid grid-cols-2 ga w-[30%] gap-4">
         {selectedAnimeList?.map(anime=>{
             return(
-                <div className="selected-card  h-fit flex flex-row-reverse gap-2 rounded-md">
+                <div key={anime.id} className="selected-card  h-fit flex flex-row-reverse gap-2 rounded-md">
                 <button className='absolute z-10 rounded-full border-[1px] border-cbg-100 translate-x-1 -translate-y-1 bg-primary-600 p-1' onClick={()=>handleRemoveAnime(anime)}><IoMdClose className='text-cbg-100'/></button>
                 <div className="image relative md:w-32 rounded-md md:h-40 h-32 w-24 object-cover overflow-hidden">
                     <Image fill  src={anime?.payload?.images?.webp?.image_url || anime?.payload?.main_picture} alt={anime?.payload?.title_english}/>
@@ -232,7 +185,7 @@ export default function Recommendation() {
       {/* //!main cards mapping  */}
       <div className="results grid grid-cols-4 gap-4 mt-12">
         {recommendations?.slice((page-1)*20, page*20)?.map(anime=>{
-          return <MainCard anime={anime.payload}/>
+          return <MainCard anime={anime.payload} key={anime.id}/>
         })}
       </div>
 
