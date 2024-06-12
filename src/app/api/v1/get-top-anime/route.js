@@ -30,7 +30,7 @@ export async function GET(req){
             console.log("cache hit")
             return NextResponse.json(cachedResults);
         }
-        const results = await limiter.schedule(()=> axios.get(`https://api.jikan.moe/v4/top/anime?page=${page}&limit=${limit}&filter=${filter}`));    
+        const results = await limiter.schedule(()=> axios.get(`https://api.jikan.moe/v4/top/anime?page=${page}&limit=${limit}&filter=${filter}&sfw=true`));    
         const filteredResults = results.data.data.map((anime)=>{
             return (
                 {

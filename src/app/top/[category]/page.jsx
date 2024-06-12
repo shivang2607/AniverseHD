@@ -110,8 +110,8 @@ export default function Top({params}) {
           {/* <Suspense fallback={<Skeleton className='flex h-full w-full' containerClassName='flex flex-1 w-[90vw] h-[30vh]'/>}>  */}
             <>
             <div className="content w-full h-full grid md:grid-cols-5 gap-4 grid-cols-2 md:gap-6">
-              {data ? data.map((item, index) => (
-                <MainCard key={item.mal_id} anime={item} />
+              {Array.isArray(data) ? data.map((item, index) => (
+                <MainCard key={index} anime={item} />
               ))
             :
             
