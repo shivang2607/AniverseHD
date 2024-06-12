@@ -11,7 +11,7 @@ export default function RecommendationPanel() {
 
   return (
     <div className=" flex-col flex gap-4 md:mt-16 mt-8 mb-4 ">
-      <h1 className="text-primary-5 items-center justify-between flex md:px-4 px-2 font-semibold text-2xl tracking-wide">
+      <h1 className="text-primary-500 items-center justify-between flex md:px-4 px-2 font-semibold text-2xl tracking-wide">
         Recommendations Box{" "}
         <span className={`relative opacity-90 text-4xl  mr-3 md:hidden flex `}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full text-primary-500 bg-primary-500  opacity-75"></span>
@@ -23,8 +23,8 @@ export default function RecommendationPanel() {
           </button>
         </span>
       </h1>
-      <div className="w-full bg-recommendation-box-banner bg-cover bg-center  bg-no-repeat h-fit">
-        <div className="panel bg-gradient-to-l backdrop-blur-sm   md:from-cbg-100 to-transparent shadow-md w-full h-fit s   flex flex-col p-4 md:px-6 px-2 bg-opacity-50 bg-black">
+      <div className="w-full bg-recommendation-box-banner bg-cover bg-center  bg-no-repeat h-fit min-h-[30vh]">
+        <div className="panel bg-gradient-to-l backdrop-blur-sm   md:from-cbg-100 to-transparent shadow-md w-full h-fit min-h-[30vh]   flex flex-col p-4 md:px-6 px-2 bg-opacity-50 bg-black">
           <div className="toggle flex md:w-[30%] w-[80%] mx-auto overflow-hidden  rounded-lg">
             <button
               className={`w-1/2 items-center flex justify-center text-white  p-2 ${

@@ -33,27 +33,27 @@ export default function CardComponent({ anime }) {
               {Math.floor(animeData?.start_year) || "NA"}
             </div>
           </div>
-          <div className="blured-on-hover flex absolute inset-0 items-center justify-center backdrop-blur-sm hover:opacity-100 opacity-0 transition-all duration-300 ease-in-out z-0">
-            <FaPlay size={32} style={{ color: "#6bb0ab" }} />
+          <div className="blured-on-hover flex absolute inset-0 items-center justify-center backdrop-blur-sm hover:opacity-100 opacity-0 transition-all duration-150 ease-in-out z-0">
+            <FaPlay size={32} className='text-primary-400' />
           </div>
         </Link>
 
         {/*******DETAILS */}
-        <div className="card-content  ">
+        <div className="card-content w-full  ">
           <h3 className=" font-semibold text-gray-50 tracking-wide  line-clamp-1 hover:text-primary-600">
             {animeData?.title_english || animeData?.title}
           </h3>
-          <div className="details flex text-xs  items-center text-gray-300">
+          <div className="details flex text-xs  items-center w-full justify-between text-gray-300">
             <p className="  flex gap-1 items-center">
               <MdMovie size={14} className="text-green-300" />
-              TV
+              {animeData?.type?.toUpperCase() || "NA"}
             </p>
             {animeData?.episodes && (
-              <div className="gap-1 flex items-center mx-3">
+              <div className="gap-1 flex items-center mx-2">
                 <div>
                   <PiVideoFill size={14} className="text-sky-200 font-bold" />
                 </div>
-                <span className=" text-sm ">{animeData.episodes} ep</span>
+                <span className=" text-sm text-nowrap">{animeData.episodes ? `${animeData?.episodes} ep`  :  "NA"} </span>
               </div>
             )}
           </div>

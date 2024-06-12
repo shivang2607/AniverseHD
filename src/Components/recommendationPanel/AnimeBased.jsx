@@ -13,27 +13,34 @@ import axios from 'axios';
 import CardComponent from './CardComponent';
 import Link from 'next/link';
 import { FaChevronRight } from 'react-icons/fa6';
+import useRecommendationStore from '../utils/store';
 
 export default function AnimeBased() {
 
+  const { setStoreRecommendations, setStoreSelectedAnime, setDescription} = useRecommendationStore(state=>({
+    setStoreRecommendations : state.setRecommendations,
+    setStoreSelectedAnime : state.setQueryAnime,
+    setDescription : state.setDescription,
+  }))
     
     
 
     const [selectedAnime, setSelectedAnime] = useState();
     const [loading, setLoading] = useState(false);
-    const [recommendations, setRecommendations] = useState();
+    const [recommendations, setRecommendations] = useState([]);
 
 
     useEffect(()=>{
-      const localAnime = JSON.parse(localStorage.getItem("anime"));
-      const localRecommendations = JSON.parse(localStorage.getItem("anime recommendations"));
+      const localAnime = JSON.parse(sessionStorage.getItem("anime"));
+      console.log(localAnime);
+      const localRecommendations = JSON.parse(sessionStorage.getItem("anime recommendations"));
       setSelectedAnime(localAnime || null);
       setRecommendations(localRecommendations?.slice(0, 5) || null);
     }, [])
     
 
     const handleAnimeSelect = (anime)=>{
-        console.log(anime);
+        // console.log(anime);
         setSelectedAnime(anime);
     }
 
@@ -50,13 +57,13 @@ export default function AnimeBased() {
       try {
         const response = await axios.post("/api/v1/recommend", {
           positive: [selectedAnime?.id],
-          limit: 50,
+          limit: 100,
         });
         // console.log(response);
-        setRecommendations(response?.data?.slice(0, 5));
+        setRecommendations(response?.data);
         setLoading(false);
-        localStorage.setItem("anime", JSON.stringify(selectedAnime));
-        localStorage.setItem("anime recommendations", JSON.stringify(response?.data));
+        sessionStorage.setItem("anime", JSON.stringify(selectedAnime));
+        sessionStorage.setItem("anime recommendations", JSON.stringify(response?.data));
       } catch (error) {
         toast.error(
           error?.response?.data?.error ||
@@ -74,14 +81,20 @@ export default function AnimeBased() {
         setSelectedAnime();
         setLoading(false);
         setRecommendations();
-        localStorage.removeItem("anime");
-        localStorage.removeItem("anime recommendations");
+        sessionStorage.removeItem("anime");
+        sessionStorage.removeItem("anime recommendations");
+    }
+
+    const handleViewAll = ()=>{
+      setStoreRecommendations(recommendations);
+      setStoreSelectedAnime(selectedAnime);
+      setDescription("");
     }
 
   return (
     <div className='md:px-8 px-2 '>
-        <div className="flex w-full justify-between md:pr-3">
-        <div className='flex flex-col gap-8 md:w-[74%] w-[70%]'>
+        <div className="flex w-full justify-between gap-2 md:pr-3">
+        <div className='flex flex-col gap-8 md:w-[74%] w-full '>
             <div className="search flex w-full h-10 gap-4">
                 <RecommendationSearchComponent onAnimeSelect={handleAnimeSelect}/>
             </div>
@@ -136,7 +149,7 @@ export default function AnimeBased() {
 
         {loading ? (
         <div className="loading items-center gap-3 flex flex-col">
-          <div className=" md:w-36 md:h-36 w-24 h-24 mx-auto mt-8 flex ">
+          <div className=" md:w-28 md:h-28 w-24 h-24 mx-auto mt-8 flex ">
             <SharinganLoader />
           </div>
           <h3 className="text- text-red-500 italic backdrop-brightness-0 p-1 font-semibold">
@@ -159,16 +172,18 @@ export default function AnimeBased() {
           </h3>
         </div>
       ) : (
-        <>{recommendations && <div className="loading items-center gap-3 mt-4 md:p-3 pb-0 !tracking-wide flex flex-col bg-opacity-30 ">
+        <>{recommendations?.length > 0 && <div className="loading items-center gap-3 mt-4 md:p-3 pb-0 !tracking-wide flex flex-col bg-opacity-30 ">
               
               <h1 className='font-semibold text-2xl mr-auto justify-between flex items-center w-full  mb-3 '>Here are your Recommendations
-                <Link  className="flex font-semibold tracking-wide text-lg text-primary-300 hover:text-primary-600 items-center" href="#">
-                View All<FaChevronRight/>
-                </Link>
+              <Link href="/recommendations"  onClick={handleViewAll} className="flex font-semibold tracking-wide text-lg text-primary-300 hover:text-primary-600 items-center">
+                
+                  View All <FaChevronRight />
+                
+              </Link>
               </h1>
         
         <div className=' component flex md:justify-between gap-4 md:scrollbar-thin  overflow-x-scroll md:overflow-x-hidden md:p-0 pb-4  w-full '>{
-          recommendations?.map(anime=>{
+          recommendations?.slice(0, 5)?.map(anime=>{
             return <CardComponent key={anime?.id} anime={anime}/>
           })
         }

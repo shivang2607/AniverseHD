@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa6";
 import { MagnifyingGlass } from "react-loader-spinner";
-import Skeleton from "react-loading-skeleton";
 
 //* custom hook for debouncing
 const useDebouncedValue = (inputValue, delay) => {

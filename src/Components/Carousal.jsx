@@ -18,8 +18,8 @@ const ResponsiveCarousal = () => {
   useEffect(() => {
     
     axios.get("/api/v1/get-top-anime").then((response) => {
-      setTopFavorite(response?.data);
-      console.log(response?.data);
+      setTopFavorite(response?.data.data);
+      console.log(response?.data.data);
     });
 
     return () => {};

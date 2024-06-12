@@ -1,9 +1,10 @@
 import Bottleneck from "bottleneck";
 import axios from "axios";
 import jikan from "@mateoaranda/jikanjs";
-import { headers } from "next/headers";
+
 
 export async function syncQdrant(id, resPayload, redisClient){
+    // console.log(resPayload)
     const jikanResp = await jikan.loadAnime(id, 'full');
 
     const limiter = new Bottleneck({
@@ -27,11 +28,14 @@ export async function syncQdrant(id, resPayload, redisClient){
         "start_date": jikanData.start_date,
         "start_season": jikanData.start_season,
         "status": jikanData.status,
+        "title_english": jikanData.title_english || jikanData.title
         
     }
+    //https://cors-anywhere.herokuapp.com/ (old proxy)
+    // cors.sh , (other proxy , only needed in development phase)
     
-    if(!(resPayload?.Sites)){
-        const corsProxyUrl = process.env.ENV==='DEV' ? 'https://cors-anywhere.herokuapp.com/': '';
+    if(!(resPayload.Sites)){
+        const corsProxyUrl = process.env.ENV==='DEV' ? 'https://api.allorigins.win/raw?url=': '';
         const headers = {
             'Origin': '*'
         }
@@ -40,6 +44,7 @@ export async function syncQdrant(id, resPayload, redisClient){
             ...updatePayload,
             "Sites": malSyncData?.data?.Sites
             }
+            // console.log(malSyncData)
         }
 
         if(!(resPayload?.relations)){
