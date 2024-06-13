@@ -15,7 +15,7 @@ export default function MainCard({anime}) {
         <div className="image relative rounded-md overflow-hidden  h-full w-full ">
             <Image 
             fill 
-            src={anime?.images?.webp?.large_image_url || anime?.images?.webp?.large_image_url || anime?.main_picture}
+            src={anime?.main_picture || anime?.images?.webp?.large_image_url || anime?.images?.webp?.large_image_url  }
             alt={anime?.title_english || "Anime title"}
             className='object-cover '
             />
@@ -27,7 +27,6 @@ export default function MainCard({anime}) {
             <button className="flex mr-auto m-2 px-1 rounded-sm  text-fuchsia-400 z-20 text-2xl font-bold" onClick={e=>{
                 e.preventDefault();
                 e.stopPropagation();
-                console.log("Shivang");
             }}><PiBookmarkSimpleBold/></button>
                 <div className="flex ml-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">{anime?.rating?.split(" ")[0].toUpperCase() || 'NA'}</div>
                 </div>

@@ -33,7 +33,9 @@ export async function POST(req){
   try {
     const payload = await req.json();
     const key = serializePayload(payload);
-    const {positive, fKey, scorelte, scoregte, type, yeargte, yearlte, description, limit} = payload;
+    const {positive, fKey, scorelte, scoregte, type, yeargte, yearlte, description, selectedGenre, selectedTheme, selectedDemographics, limit} = payload;
+
+    // console.log(selectedGenre ,selectedTheme, selectedDemographics);
     
     if(!positive && !description){
       return NextResponse.json(
@@ -52,7 +54,6 @@ export async function POST(req){
               { status: 400 })
             }
             if(description && description.split(" ").length <5){
-              console.log(description.split())
               return NextResponse.json(
                 { error: 'description should have at least 5 words!!' },
                 { status: 400 })
@@ -73,7 +74,7 @@ export async function POST(req){
           
           let embeddings = null;
           let positives = positive || []
-          let updatedType = ["TV", "tv", "Movie", "movie", "ONA", "ona", "special", "specials", "Special", "Specials"]
+          let updatedType = ["TV", "tv", "Movie", "movie", "ONA", "ona", "special", "specials", "TV Special", "Special", "Specials"]
           
           if (description && description?.trim()!==""){
             embeddings = await encodeText(description || "Naruto Shippuden");
@@ -81,6 +82,10 @@ export async function POST(req){
           }
           if(Array.isArray(type) && type.length>0){
             updatedType = type.concat(type.map(value => value.toLowerCase()));
+            if (type.includes("special")) {
+              updatedType.push("TV Special");
+            }
+            
           }
           
           const filterKey = fKey || "must";
@@ -92,38 +97,76 @@ export async function POST(req){
               "strategy": "average_vector",
               "using": "fast-bge-small-en",
               "with_payload": ["title", "title_english", "score", "start_year", "type", "rating", "duration", "images.webp", "main_picture", "episodes", "episode_duration"],
-              "filter":{
-            [filterKey] :[
-              {
-                "key": "score",
-                "range": {
-                    "gte": scoregte || 6.5,
-                    "lte" : scorelte || null,
-                }
+              "filter": {
+                "must": [
+                  {
+                    [filterKey]: [
+                      {
+                        "key": "score",
+                        "range": {
+                          "gte": Number(scoregte) || 6.5,
+                          "lte": Number(scorelte) || null
+                        }
+                      },
+                      {
+                        "should": [
+                          {
+                            "key": "start_year",
+                            "range": {
+                              "gte": Number(yeargte) || null,
+                              "lte": Number(yearlte) || null
+                            }
+                          },
+                          {
+                            "key": "year",
+                            "range": {
+                              "gte": Number(yeargte) || null,
+                              "lte": Number(yearlte) || null
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "key": "type",
+                    "match": {
+                      "any": updatedType
+                    }
+                  },
+                  {
+                    "should": [
+                      {
+                        "key": "genres",
+                        "match": {
+                          "any": selectedGenre
+                        }
+                      },
+                      {
+                        "key": "themes",
+                        "match": {
+                          "any": selectedTheme
+                        }
+                      },
+                      {
+                        "key": "demographics",
+                        "match": {
+                          "any": selectedDemographics
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "limit": limit || 100
             },
             {
-              "key": "start_year",
-              "range": {
-                  "gte": yeargte || null,
-                  "lte" : yearlte || null,
+              headers: {
+                "api-key": process.env.QDRANT_API_KEY
               }
-          },
-          {
-            "key": "type",
-            "match": {
-              "any": updatedType
             }
-          }
-            ]
-          },
-          "limit": limit || 50
-        },
-        {
-          headers: {
-            "api-key": process.env.QDRANT_API_KEY
-          }
-        },
-      );
+          );
+          
       
       recommendCache.set(key, recommendations.data.result);
       return NextResponse.json(recommendations.data.result);

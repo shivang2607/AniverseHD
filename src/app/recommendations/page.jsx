@@ -17,10 +17,10 @@ import { TypeAnimation } from "react-type-animation";
 export default function Recommendation() {
 
 
-  const {loading, setLoading, selectedAnimeList, setSelectedAnimeList, recommendations, description, setDescription, reset, getRecommendations} = useRecommendationStore(state=>state);
+  const {loading, setLoading, page, setPage, selectedAnimeList, setSelectedAnimeList, recommendations, description, setDescription, reset, getRecommendations} = useRecommendationStore(state=>state);
 
 
-  const [page, setPage] = useState(1);
+  
 
   const handleReset = () => {
     setLoading(false);
@@ -168,19 +168,7 @@ export default function Recommendation() {
     <div className="flex flex-col gap-8">
 
 
-      {/* {recommendations && <div className="pagination gap-4 flex w-full justify-center mt-12">
-      <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev-1)}>
-                <FaChevronLeft/>
-        </button>
-        {[1, 2, 3, 4, 5].map((pg, key)=>{
-          return (
-            <button key={key} className={`px-2   font-bold rounded-md ${pg==page?"text-primary-100":"text-gray-500"}`} onClick={()=>setPage(pg)}>{pg}</button>
-          )
-        })}
-        <button disabled={page==5} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev+1)}>
-                <FaChevronRight/>
-        </button>
-      </div>} */}
+      
 
       {/* //!main cards mapping  */}
       <div className="results grid grid-cols-4 gap-4 mt-12">
@@ -190,7 +178,7 @@ export default function Recommendation() {
       </div>
 
       {recommendations.length > 0 &&  <div className="pagination gap-4 flex w-full justify-center">
-      <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev-1)}>
+      <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page-1)}>
                 <FaChevronLeft/>
         </button>
         {[1, 2, 3, 4, 5].map((pg, key)=>{
@@ -198,7 +186,7 @@ export default function Recommendation() {
             <button key={key} className={`px-2   font-bold rounded-md ${pg==page?"text-primary-100":"text-gray-500"}`} onClick={()=>setPage(pg)}>{pg}</button>
           )
         })}
-        <button disabled={page==5} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev+1)}>
+        <button disabled={page==5} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page+1)}>
                 <FaChevronRight/>
         </button>
       </div>}

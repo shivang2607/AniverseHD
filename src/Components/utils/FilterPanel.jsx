@@ -6,10 +6,13 @@ import { colorsList, demographics, genres, themes } from "./genre-themes-list";
 import { ImCancelCircle } from "react-icons/im";
 import toast, { Toaster } from "react-hot-toast";
 import useRecommendationStore from "./store";
+import { MdElectricBolt } from "react-icons/md";
+import { Hourglass } from "react-loader-spinner";
 
 export default function FilterPanel() {
   const {
     matchType,
+    loading,
     setMatchType,
     checkboxes,
     setCheckboxes,
@@ -23,6 +26,7 @@ export default function FilterPanel() {
     setSelectedTheme,
     setSelectedDemographics,
     selectedDemographics,
+    getRecommendations
   } = useRecommendationStore((state) => state);
 
  
@@ -257,7 +261,21 @@ export default function FilterPanel() {
               })}
             </div>
           </div>
+
         </div>
+          <button disabled={loading} className="button w-1/2  font-semibold italic flex items-center justify-center self-center text-xl rounded-md bg-primary-400 text-cbg-200 py-1 " onClick={getRecommendations}>
+          {loading ? (
+            <Hourglass
+              visible={true}
+              wrapperClass="h-5 "
+              colors={["#041C32", "#421fa3"]}
+            />
+          ) : (
+            <>
+             Go <MdElectricBolt />
+            </>
+          )}
+          </button>
       </div>
       <Toaster
         toastOptions={{

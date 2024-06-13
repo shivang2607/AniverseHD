@@ -6,6 +6,7 @@ import axios from "axios";
 
 const recommendationStore = (set, get) => ({
   loading: false,
+  page : 1,
   recommendations: [],
   description: "",
   selectedAnimeList: [],
@@ -26,8 +27,19 @@ const recommendationStore = (set, get) => ({
 
   setLoading: (val) => set({ loading: val }),
 
+  setPage: (pg)=> set({page: pg}),
+
   getRecommendations: async () => {
-    const { description, selectedAnimeList } = get();
+    const {matchType, checkboxes, description, selectedAnimeList, scoreRange, yearRange, selectedGenre, selectedTheme, selectedDemographics } = get();
+    
+    const {tv, movie, ona, ova, specials} = checkboxes;
+    let type = [];
+    if(tv) type.push("TV");
+    if(movie) type.push("Movie");
+    if(ona) type.push("ONA");
+    if(ova) type.push("OVA");
+    if(specials) type.push("special");
+
     const descriptionTrimmed = description?.trim();
     const hasValidDescription = descriptionTrimmed && descriptionTrimmed.split(" ").length >= 5;
 
@@ -50,11 +62,20 @@ const recommendationStore = (set, get) => ({
       const response = await axios.post("/api/v1/recommend", {
         positive: selectedAnimeList.map(anime => anime.id),
         description,
-        limit: 100,
+        fKey: matchType,
+        type,
+        selectedGenre,
+        selectedTheme,
+        selectedDemographics,
+        scoregte: scoreRange[0],
+        scorelte: scoreRange[1],
+        yeargte: yearRange[0],
+        yearlte: yearRange[1],
       });
 
       set({
         recommendations: response?.data,
+        page: 1,
         loading: false,
       });
     } catch (error) {
