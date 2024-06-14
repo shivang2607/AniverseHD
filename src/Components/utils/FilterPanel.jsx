@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import RangeSlider from "./RangeSlider";
 import MultipleSelect from "./MultipleSelect";
 import { colorsList, demographics, genres, themes } from "./genre-themes-list";
@@ -8,9 +8,12 @@ import toast, { Toaster } from "react-hot-toast";
 import useRecommendationStore from "./store";
 import { MdElectricBolt } from "react-icons/md";
 import { Hourglass } from "react-loader-spinner";
+import { IoMdCloseCircle } from "react-icons/io";
 
 export default function FilterPanel() {
   const {
+    isFilterOpen,
+    toggleFilterOpen,
     matchType,
     loading,
     setMatchType,
@@ -62,9 +65,9 @@ export default function FilterPanel() {
   };
 
   return (
-    <div className=" py-2  z-0 bg-cbg-200 ml-2  items-start   right-0 w-[25%] ">
-      <h1 className="w-full justify-center text-2xl flex my-4 bg-cbg-100 text-pretty text-primary-400 font-bold tracking-wide py-2 ">
-        Filters
+    <div className={`py-2  md:z-0 z-20 bg-cbg-200 ml-2  items-start md:static  top-0 md:h-fit fixed h-screen overflow-y-scroll md:overflow-auto  backdrop-blur-sm ${isFilterOpen? "translate-x-0":"-translate-x-full"}  w-3/4 transition-all ease-in duration-300 -left-2 md:translate-x-0  md:right-0 md:w-[25%] `} >
+      <h1 className="w-full justify-center items-center  px-2 text-2xl flex my-4 bg-cbg-100 text-pretty text-primary-400 font-bold tracking-wide py-2 ">
+        Filters <button className="ml-auto self-end md:hidden flex items-center text-3xl my-auto" onClick={toggleFilterOpen}><IoMdCloseCircle/></button>
       </h1>
       <div className=" h-fit  top-0 relative  scrollbar-thin flex flex-col gap-6 p-2">
         <h1 className="flex items-center  text-xl font-semibold tracking-wide text-sky-300 flex-wrap">

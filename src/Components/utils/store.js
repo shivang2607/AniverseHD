@@ -10,6 +10,7 @@ const recommendationStore = (set, get) => ({
   recommendations: [],
   description: "",
   selectedAnimeList: [],
+  isFilterOpen: false,
   matchType: "must",
   checkboxes: {
     all: true,
@@ -94,6 +95,8 @@ const recommendationStore = (set, get) => ({
   setDescription: (desc) => set({ description: desc }),
 
   setSelectedAnimeList: (animeList) => set({ selectedAnimeList: animeList }),
+
+  toggleFilterOpen : ()=>set(state=>({isFilterOpen: !(state.isFilterOpen)})),
 
   setMatchType: (type) => set({ matchType: type }),
 

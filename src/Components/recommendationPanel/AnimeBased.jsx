@@ -14,6 +14,7 @@ import CardComponent from './CardComponent';
 import Link from 'next/link';
 import { FaChevronRight } from 'react-icons/fa6';
 import useRecommendationStore from '../utils/store';
+import { demographics, genres, themes } from '../utils/genre-themes-list';
 
 export default function AnimeBased() {
 
@@ -33,7 +34,7 @@ export default function AnimeBased() {
 
     useEffect(()=>{
       const localAnime = JSON.parse(sessionStorage.getItem("anime"));
-      console.log(localAnime);
+      // console.log(localAnime);
       const localRecommendations = JSON.parse(sessionStorage.getItem("anime recommendations"));
       setSelectedAnime(localAnime || null);
       setRecommendations(localRecommendations?.slice(0, 5) || null);
@@ -58,7 +59,9 @@ export default function AnimeBased() {
       try {
         const response = await axios.post("/api/v1/recommend", {
           positive: [selectedAnime?.id],
-          limit: 100,
+          selectedGenre: genres.map(g => g.value),
+          selectedTheme: themes.map(t => t.value),
+          selectedDemographics: demographics.map(d => d.value),
         });
         // console.log(response);
         setRecommendations(response?.data);

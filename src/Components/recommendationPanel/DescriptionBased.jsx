@@ -11,6 +11,7 @@ import axios from "axios";
 import CardComponent from "./CardComponent";
 import { FaChevronRight } from "react-icons/fa6";
 import useRecommendationStore from "../utils/store";
+import { demographics, genres, themes } from "../utils/genre-themes-list";
 
 export default function DescriptionBased() {
   
@@ -50,7 +51,9 @@ export default function DescriptionBased() {
     try {
       const response = await axios.post("/api/v1/recommend", {
         description,
-        limit: 100,
+        selectedGenre: genres.map(g => g.value),
+        selectedTheme: themes.map(t => t.value),
+        selectedDemographics: demographics.map(d => d.value),
       });
       setRecommendations(response?.data);
       setLoading(false);
