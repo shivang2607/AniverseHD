@@ -16,13 +16,22 @@ const ResponsiveCarousal = () => {
   const [topFavorite, setTopFavorite] = useState();
 
   useEffect(() => {
+    // Check if data exists in session storage
+    const sessionData = sessionStorage.getItem("topAnimeData");
+    if (sessionData) {
+      setTopFavorite(JSON.parse(sessionData));
+      return;
+    } 
+      axios.get("/api/v1/get-top-anime")
+        .then((response) => {
+          const data = response?.data.data;
+          setTopFavorite(data);
+          sessionStorage.setItem("topAnimeData", JSON.stringify(data));
+        })
+        .catch((error) => {
+          console.error("Error fetching top anime:", error);
+        });
     
-    axios.get("/api/v1/get-top-anime").then((response) => {
-      setTopFavorite(response?.data.data);
-      console.log(response?.data.data);
-    });
-
-    return () => {};
   }, []);
 
   function formatDate(dateString) {

@@ -5,12 +5,13 @@ import jikan from "@mateoaranda/jikanjs";
 
 export async function syncQdrant(id, resPayload, redisClient){
     // console.log(resPayload)
-    const jikanResp = await jikan.loadAnime(id, 'full');
-
+    
     const limiter = new Bottleneck({
         minTime: 666
-      });
-
+    });
+    
+    // const jikanResp = await limiter.schedule(()=>jikan.loadAnime(id, 'full')); //use when not using caching
+    const jikanResp = await jikan.loadAnime(id, 'full');
     
     const jikanData = jikanResp.data;
     let updatePayload = {
@@ -28,13 +29,14 @@ export async function syncQdrant(id, resPayload, redisClient){
         "start_date": jikanData.start_date,
         "start_season": jikanData.start_season,
         "status": jikanData.status,
-        "title_english": jikanData.title_english || jikanData.title
+        "title_english": jikanData.title_english || jikanData.title,
         
     }
     //https://cors-anywhere.herokuapp.com/ (old proxy)
     // cors.sh , (other proxy , only needed in development phase)
-    
+    // console.log(resPayload.Sites);
     if(!(resPayload.Sites)){
+        // console.log("HI")
         const corsProxyUrl = process.env.ENV==='DEV' ? 'https://api.allorigins.win/raw?url=': '';
         const headers = {
             'Origin': '*'
@@ -44,6 +46,7 @@ export async function syncQdrant(id, resPayload, redisClient){
             ...updatePayload,
             "Sites": malSyncData?.data?.Sites
             }
+            // console.log(updatePayload.Sites);
             // console.log(malSyncData)
         }
 
@@ -73,10 +76,13 @@ export async function syncQdrant(id, resPayload, redisClient){
         console.log("cache miss for anime id")
         const responsePayload = {
             ...jikanData,
-           "Sites": updatePayload.Sites
+            "genres": jikanData.genres.map(genre=>genre.name),
+            "themes": jikanData.themes.map(theme=>theme.name),
+            "demographics": jikanData.demographics?.map(demo=>demo.name),
+            "Sites": updatePayload.Sites || resPayload?.Sites
         }
         redisClient.set(`qdrant-anime-${id}`, JSON.stringify(responsePayload) , 'EX', 60*60*24*7);  //*7 days
         console.log("response send after updating Qdrant")
-        // console.log(responsePayload)
+        // console.log(responsePayload.Sites);
         return responsePayload;
 }
