@@ -1,0 +1,32 @@
+import axios from "axios";
+import { LRUCache } from "lru-cache";
+import { NextResponse } from "next/server";
+
+const options = {
+    max: 500,
+    ttl: 1000*60*60*24*7 //7 days
+}
+
+const serverCache = new LRUCache(options);
+
+export async function GET(req, {params}){
+    const episodeId = params.episodeId;
+    const searchParams = req.nextUrl.searchParams;
+    const ep = searchParams.get('ep');
+    console.log(episodeId, ep);
+    const cachedData = serverCache.get(`zoro-server-${episodeId}-${ep}`);
+
+    if(cachedData)
+        return NextResponse.json(cachedData);
+
+    try {
+        const res = await axios.get(`${process.env.ANIWATCH_SCRAPER_URL}/anime/servers?episodeId=${episodeId}?ep=${ep}`);
+        cachedData.set(`zoro-server-${episodeId}-${ep}`, res?.data);
+        return NextResponse.json(res?.data);
+
+        
+    } catch (error) {
+        // console.log(error);
+        return NextResponse.json({...error.response.data, status: error.response.status});
+    }
+}
