@@ -13,7 +13,7 @@ export default function page() {
   useEffect(()=>{
     
     async function f(){
-      
+    // const res2 = await axios.get('api/v1/anime/270');
     const res = await axios.get('/api/v1/watch/19');
       console.log("response for watch anime api : ", res.data);
       const streamingData = await axios.get(`/api/v1/gogo/stream/${res.data.gogoSub.episodes[0].id}`);
