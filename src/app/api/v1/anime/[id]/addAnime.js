@@ -46,6 +46,9 @@ export async function addQdrantAnime(id, redisClient){
     if(malSyncData?.data?.Sites?.Gogoanime || malSyncData?.data?.Sites?.Zoro){
         payload = {
             ...payload,
+            "genres": jikanResp.genres.map(genre=>genre.name),
+            "themes": jikanResp.themes.map(theme=>theme.name),
+            "demographics": jikanResp.demographics?.map(demo=>demo.name),
             "Sites": malSyncData?.data?.Sites
         }
         // console.log(payload);

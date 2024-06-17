@@ -71,17 +71,30 @@ export async function GET(request) {
               },
             },
             {
-              key: "start_year",
-              range: {
-                gte: Number(yeargte) || null,
-                lte: Number(yearlte) || null,
+              "should": [
+                {
+                  "key": "start_year",
+                  "range": {
+                      "gte": Number(yeargte) || null,
+                      "lte" : Number(yearlte) || null,
+                  }
               },
+              {
+                "key": "year",
+                "range": {
+                    "gte": Number(yeargte) || null,
+                    "lte" : Number(yearlte) || null,
+                }
+            },
+
+              ]
             },
           ],
         },
         with_payload: [
           "score",
           "start_year",
+          "year",
           "type",
           "rating",
           "images.webp.small_image_url",

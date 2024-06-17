@@ -3,71 +3,24 @@ import MainCard from "@/components/mainCard";
 import RecommendationSearchComponent from "@/components/recommendationPanel/SearchComponentRecommendation";
 import SharinganLoader from "@/components/sharinganLoader";
 import useRecommendationStore from "@/components/utils/store";
-import axios from "axios";
 import Image from "next/image";
 import React from "react";
-import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { GiStarSwirl } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
 import { RxReset } from "react-icons/rx";
 import { Hourglass } from "react-loader-spinner";
+import { MdFilterList, MdFilterListOff } from "react-icons/md";
 import { TypeAnimation } from "react-type-animation";
 
 export default function Recommendation() {
 
 
-  const {queryAnime, recommendations, setRecommendations, description, setDescription, reset} = useRecommendationStore(state=>({
-    queryAnime : state.queryAnime,
-    recommendations : state.recommendations,
-    setRecommendations : state.setRecommendations,
-    description : state.description,
-    setDescription : state.setDescription,
-    reset : state.reset,
-  }))
+  const {loading, isFilterOpen, toggleFilterOpen, setLoading, page, setPage, selectedAnimeList, setSelectedAnimeList, recommendations, description, setDescription, reset, getRecommendations} = useRecommendationStore(state=>state);
 
 
-  const [selectedAnimeList, setSelectedAnimeList] = useState(queryAnime);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-
-
-  const getRecommendations = async () => {
-    if ((!description || (description && description?.trim() === "")) && selectedAnimeList.length===0) {
-      toast.error("Please Select Anime or write description!", {
-        duration: 2000,
-        id: "error",
-      });
-      return;
-    } else if (!(selectedAnimeList.length) && description?.trim().split(" ").length < 5) {
-      toast.error("Description should have at least 5 words!", {
-        id: "word-limit-error",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.post("/api/v1/recommend", {
-        positive: selectedAnimeList.map(anime=>anime.id),
-        description,
-        limit: 100,
-      });
-      setRecommendations(response?.data);
-      setLoading(false);
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.error ||
-          error?.message ||
-          "Something Went Wrong",
-        {
-          id: "catch-error",
-        }
-      );
-      setLoading(false);
-    }
-  };
+  
 
   const handleReset = () => {
     setLoading(false);
@@ -85,16 +38,20 @@ export default function Recommendation() {
         return;
       }
     
-    setSelectedAnimeList((prev) => [...prev, anime]);
+    setSelectedAnimeList([...selectedAnimeList, anime]);
   }
 
   const handleRemoveAnime = (anime) => {
-    setSelectedAnimeList((prev) => prev.filter((obj) => obj.id !== anime.id));
+    setSelectedAnimeList(selectedAnimeList.filter((obj) => obj.id !== anime.id));
   };
 
   return (
-    <div className="w-[73%] flex flex-col gap-4 py-4 ">
-      <div className="heading flex flex-col gap-2 p-4  rounded-lg shadow-lg">
+    <div className="md:w-[73%] w-[100vw] flex flex-col gap-4 py-4 mx-4">
+      
+      <div className={`fixed h-screen w-screen top-0 z-20 backdrop-blur-sm ${isFilterOpen?"visible":"hidden"}`}></div>
+
+
+      <div className="heading flex flex-col gap-2 md:p-4  rounded-lg shadow-lg">
         <h1 className="text-2xl text-primary-500 font-bold tracking-wide">
           Discover Your Next Favorite Anime!
         </h1>
@@ -107,8 +64,8 @@ export default function Recommendation() {
         </span>
       </div>
 
-      <div className="input-box flex justify-between w-full h-fit">
-        <div className="inputfields w-[65%] p-2">
+      <div className="input-box flex md:flex-row flex-col justify-between w-full h-fit">
+        <div className="inputfields md:w-[65%] w-full p-2">
           <div className="search flex w-full h-10 gap-4">
             <RecommendationSearchComponent onAnimeSelect={handleAnimeSelect} />
           </div>
@@ -169,10 +126,10 @@ export default function Recommendation() {
 
 
       {/* //! below  content is for cards beside the input fields */}
-      <div className="grid grid-cols-2 ga w-[30%] gap-4">
+      <div className="grid md:grid-cols-2 w-full md:m-0 md:my-8 my-4 grid-cols-4 md:w-[30%] gap-4">
         {selectedAnimeList?.map(anime=>{
             return(
-                <div className="selected-card  h-fit flex flex-row-reverse gap-2 rounded-md">
+                <div key={anime.id} className="selected-card  h-fit flex flex-row-reverse gap-2 rounded-md">
                 <button className='absolute z-10 rounded-full border-[1px] border-cbg-100 translate-x-1 -translate-y-1 bg-primary-600 p-1' onClick={()=>handleRemoveAnime(anime)}><IoMdClose className='text-cbg-100'/></button>
                 <div className="image relative md:w-32 rounded-md md:h-40 h-32 w-24 object-cover overflow-hidden">
                     <Image fill  src={anime?.payload?.images?.webp?.image_url || anime?.payload?.main_picture} alt={anime?.payload?.title_english}/>
@@ -215,29 +172,28 @@ export default function Recommendation() {
     <div className="flex flex-col gap-8">
 
 
-      {/* {recommendations && <div className="pagination gap-4 flex w-full justify-center mt-12">
-      <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev-1)}>
-                <FaChevronLeft/>
-        </button>
-        {[1, 2, 3, 4, 5].map((pg, key)=>{
-          return (
-            <button key={key} className={`px-2   font-bold rounded-md ${pg==page?"text-primary-100":"text-gray-500"}`} onClick={()=>setPage(pg)}>{pg}</button>
-          )
-        })}
-        <button disabled={page==5} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev+1)}>
-                <FaChevronRight/>
-        </button>
-      </div>} */}
+      
 
       {/* //!main cards mapping  */}
-      <div className="results grid grid-cols-4 gap-4 mt-12">
+      <span className={` relative opacity-90 z-30  text-[2.8rem] right-2 justify-center items-center self-end  mr-3 md:hidden flex `}>
+          
+          <button
+            className="relative inline-flex  rounded-full  "
+            onClick={toggleFilterOpen}
+          >
+            {isFilterOpen ? <MdFilterListOff className=" text-primary-500" /> : <MdFilterList className=" text-primary-500" />}
+          </button>
+        </span>
+
+
+      <div className="results grid grid-cols-2 md:grid-cols-4 gap-4 md:mt-12">
         {recommendations?.slice((page-1)*20, page*20)?.map(anime=>{
-          return <MainCard anime={anime.payload}/>
+          return <MainCard anime={anime.payload} key={anime.id}/>
         })}
       </div>
 
       {recommendations.length > 0 &&  <div className="pagination gap-4 flex w-full justify-center">
-      <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev-1)}>
+      <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page-1)}>
                 <FaChevronLeft/>
         </button>
         {[1, 2, 3, 4, 5].map((pg, key)=>{
@@ -245,7 +201,7 @@ export default function Recommendation() {
             <button key={key} className={`px-2   font-bold rounded-md ${pg==page?"text-primary-100":"text-gray-500"}`} onClick={()=>setPage(pg)}>{pg}</button>
           )
         })}
-        <button disabled={page==5} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(prev=>prev+1)}>
+        <button disabled={page==5} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page+1)}>
                 <FaChevronRight/>
         </button>
       </div>}

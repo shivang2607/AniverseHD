@@ -11,12 +11,13 @@ import axios from "axios";
 import CardComponent from "./CardComponent";
 import { FaChevronRight } from "react-icons/fa6";
 import useRecommendationStore from "../utils/store";
+import { demographics, genres, themes } from "../utils/genre-themes-list";
 
 export default function DescriptionBased() {
   
-  const { setStoreRecommendations, setSelectedAnime, setStoreDescription} = useRecommendationStore(state=>({
+  const {resetStore, setStoreRecommendations, setSelectedAnimeList, setStoreDescription} = useRecommendationStore(state=>({
+    resetStore: state.reset,
     setStoreRecommendations : state.setRecommendations,
-    setSelectedAnime : state.setQueryAnime,
     setStoreDescription : state.setDescription,
   }))
   
@@ -50,7 +51,9 @@ export default function DescriptionBased() {
     try {
       const response = await axios.post("/api/v1/recommend", {
         description,
-        limit: 100,
+        selectedGenre: genres.map(g => g.value),
+        selectedTheme: themes.map(t => t.value),
+        selectedDemographics: demographics.map(d => d.value),
       });
       setRecommendations(response?.data);
       setLoading(false);
@@ -79,9 +82,10 @@ export default function DescriptionBased() {
   };
 
   const handleViewAll = ()=>{
+    resetStore();
     setStoreRecommendations(recommendations);
     setStoreDescription(description);
-    setSelectedAnime([]);
+    
   }
 
   return (
