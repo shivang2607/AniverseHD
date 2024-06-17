@@ -29,6 +29,7 @@ export async function GET(req, { params }) {
   }
   
   const scrapeUrl = process.env.SCRAPER_URL;
+  const aniwatchScrapeUrl = process.env.ANIWATCH_SCRAPER_URL;
 
   try {
     const animeData = await getAnime(id);
@@ -51,9 +52,9 @@ export async function GET(req, { params }) {
 
       Object.keys(animeData?.Sites?.Zoro).map(async (key) => {
         const id = animeData.Sites.Zoro[key].url.split("/").pop();
-        const res = await axios.get(`${scrapeUrl}/anime/zoro/info?id=${id}`);
-        if (res.data.episodes.length > maxEpisode) {
-          maxEpisode = res.data.episodes.length;
+        const res = await axios.get(`${aniwatchScrapeUrl}/anime/episodes/${id}`);
+        if (res.data?.totalEpisodes > maxEpisode) {
+          maxEpisode = res.data?.totalEpisodes;
           zoroEps = res.data;
         }
       })
@@ -73,9 +74,7 @@ export async function GET(req, { params }) {
     const finalResponse = {
         zoro:{
             episodes : zoroEps?.episodes,
-            hasSub: zoroEps?.hasSub,
-            totalEpisodes: zoroEps?.totalEpisodes,
-            subOrDub: zoroEps?.subOrDub,            
+            totalEpisodes: zoroEps?.totalEpisodes,          
         },
         gogoSub:{
             episodes: gogoEpsSub?.data?.episodes,

@@ -48,14 +48,14 @@ export default function CardComponent({ anime }) {
               <MdMovie size={14} className="text-green-300" />
               {animeData?.type?.toUpperCase() || "NA"}
             </p>
-            {animeData?.episodes && (
-              <div className="gap-1 flex items-center mx-2">
+            
+              <div className="gap-1 flex w-full mr-auto justify-start flex-1 fl items-center ml-2">
                 <div>
                   <PiVideoFill size={14} className="text-sky-200 font-bold" />
                 </div>
-                <span className=" text-sm text-nowrap">{animeData.episodes ? `${animeData?.episodes} ep`  :  "NA"} </span>
+                <span className=" text-xs  text-nowrap overflow-ellipsis">{animeData.episodes ? `${animeData?.episodes} ep`  :  "NA"} </span>
               </div>
-            )}
+            
           </div>
         </div>
       </div>

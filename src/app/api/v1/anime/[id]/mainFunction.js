@@ -14,6 +14,10 @@ const redisClient = createRedisInstance();
   export const animeCache = new LRUCache(animeOptions);
 
 export default async function getAnime(id){
+
+    // ! only uncomment below line when you need to clear the redis cache, PS: dont deploy without commenting this
+    // await redisClient.flushall();
+
     const lruCachedData = animeCache.get(`qdrant-anime-${id}`)
      if(lruCachedData){     // data found in lrucache
         console.log("cache hit: response sent from lrucache")

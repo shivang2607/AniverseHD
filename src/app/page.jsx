@@ -14,7 +14,7 @@ export default function page() {
     
     async function f(){
       
-    const res = await axios.get('/api/v1/watch/1535');
+    const res = await axios.get('/api/v1/watch/55701');
       console.log("response for watch anime api : ", res.data);
     }
     f()
