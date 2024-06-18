@@ -10,8 +10,10 @@ export async function syncQdrant(id, resPayload) {
         minTime: 666
     });
 
-    // const jikanResp = await limiter.schedule(() => jikan.loadAnime(id, 'full')); // Use when not using caching
-    const jikanResp = await jikan.loadAnime(id, 'full');
+    const jikanLimiter = new Bottleneck({minTime: 500})
+
+    const jikanResp = await jikanLimiter.schedule(() => jikan.loadAnime(id, 'full')); // Use when not using caching
+    // const jikanResp = await jikan.loadAnime(id, 'full');
     
     const jikanData = jikanResp.data;
     let updatePayload = {

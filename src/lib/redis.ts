@@ -1,30 +1,28 @@
 import Redis from 'ioredis';
 import { redisUrl } from './configuration';
 
-const redisClient = new Redis(redisUrl);
-
-//* below is the strategy for the retry attempt of connecting 
-// {
-//   retryStrategy: (times) => {
-//     const delay = Math.min(times * 50, 2000);
-//     return delay;
-//   },
-// }
+const redisClient = new Redis(redisUrl, {
+  connectTimeout: 20000,  // 20 seconds timeout for initial connection
+  retryStrategy: (times) => {
+    const delay = Math.min(times * 50, 2000);
+    return delay;
+  },
+});
 
 redisClient.on('error', (err) => {
   console.error('Redis error:', err);
 });
 
 redisClient.on('connect', () => {
-  console.log('Connected to Redis');
+  // console.log('Connected to Redis');
 });
 
 redisClient.on('end', () => {
   console.warn('Redis connection closed');
 });
 
-redisClient.on('reconnecting', (params) => {
-  console.log(`Attempting to reconnect to Redis (attempt #${params.attempt})`);
+redisClient.on('reconnecting', (times) => {
+  // console.log(`Attempting to reconnect to Redis (attempt #${times})`);
 });
 
 let lastActiveTime = Date.now();
