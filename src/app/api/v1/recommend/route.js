@@ -89,35 +89,23 @@ export async function POST(req){
             
           }
 
-          if(Array.isArray(ratings) && ratings.length>0){
-            updatedRatings = [];
-            ratings.forEach(rating => {
-              if(rating==="g"){
-                updatedRatings.push("g");
-                updatedRatings.push("G");
-                updatedRatings.push("G - All Ages");
-              }
-              else if(rating==="pg"){
-                updatedRatings.push("pg");
-                updatedRatings.push("PG");
-              }
-              else if(rating==="pg_13"){
-                updatedRatings.push("pg_13");
-                updatedRatings.push("PG-13 - Teens 13 or older");
-              }
-              else if(rating==="r"){
-                updatedRatings.push("r");
-                updatedRatings.push("R");
-                updatedRatings.push("R - 17+ (violence & profanity)");
-              }
-              else if(rating==="r+"){
-                updatedRatings.push("r+");
-                updatedRatings.push("R+");
-                updatedRatings.push("R+ - Mild Nudity");
-              }
-            });
-           
-          }
+          if (Array.isArray(ratings) && ratings.length > 0) {
+            const ratingMap = {
+                "g": ["g", "G", "G - All Ages"],
+                "pg": ["pg", "PG"],
+                "pg_13": ["pg_13", "PG-13 - Teens 13 or older"],
+                "r": ["r", "R", "R - 17+ (violence & profanity)"],
+                "r+": ["r+", "R+", "R+ - Mild Nudity"]
+            };
+        
+            updatedRatings = ratings.reduce((acc, rating) => {
+                if (ratingMap[rating]) {
+                    acc.push(...ratingMap[rating]);
+                }
+                return acc;
+            }, []);
+        }
+        
 
           // console.log(updatedRatings);
           
