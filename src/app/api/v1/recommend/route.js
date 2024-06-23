@@ -33,7 +33,7 @@ export async function POST(req){
   try {
     const payload = await req.json();
     const key = serializePayload(payload);
-    const {positive, fKey, scorelte, scoregte, type, yeargte, yearlte, description, selectedGenre, selectedTheme, selectedDemographics, limit} = payload;
+    const {positive, fKey, scorelte, scoregte, type, yeargte, yearlte, description, selectedGenre, selectedTheme, selectedDemographics, limit, ratings} = payload;
 
     // console.log(selectedGenre ,selectedTheme, selectedDemographics);
     
@@ -75,6 +75,7 @@ export async function POST(req){
           let embeddings = null;
           let positives = positive || []
           let updatedType = ["TV", "tv", "Movie", "movie", "ONA", "ona", "special", "specials", "TV Special", "Special", "Specials"]
+          let updatedRatings = ["g", "G - All Ages", "pg", "PG", "pg_13", "r", "R", "R+", "r+", "R+ - Mild Nudity", "R - 17+ (violence & profanity)", "PG-13 - Teens 13 or older" ]
           
           if (description && description?.trim()!==""){
             embeddings = await encodeText(description || "Naruto Shippuden");
@@ -87,6 +88,38 @@ export async function POST(req){
             }
             
           }
+
+          if(Array.isArray(ratings) && ratings.length>0){
+            updatedRatings = [];
+            ratings.forEach(rating => {
+              if(rating==="g"){
+                updatedRatings.push("g");
+                updatedRatings.push("G");
+                updatedRatings.push("G - All Ages");
+              }
+              else if(rating==="pg"){
+                updatedRatings.push("pg");
+                updatedRatings.push("PG");
+              }
+              else if(rating==="pg_13"){
+                updatedRatings.push("pg_13");
+                updatedRatings.push("PG-13 - Teens 13 or older");
+              }
+              else if(rating==="r"){
+                updatedRatings.push("r");
+                updatedRatings.push("R");
+                updatedRatings.push("R - 17+ (violence & profanity)");
+              }
+              else if(rating==="r+"){
+                updatedRatings.push("r+");
+                updatedRatings.push("R+");
+                updatedRatings.push("R+ - Mild Nudity");
+              }
+            });
+           
+          }
+
+          // console.log(updatedRatings);
           
           const filterKey = fKey || "must";
           
@@ -132,6 +165,12 @@ export async function POST(req){
                     "key": "type",
                     "match": {
                       "any": updatedType
+                    }
+                  },
+                  {
+                    "key": "rating",
+                    "match": {
+                      "any": updatedRatings
                     }
                   },
                   {

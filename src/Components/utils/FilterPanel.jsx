@@ -19,6 +19,8 @@ export default function FilterPanel() {
     setMatchType,
     checkboxes,
     setCheckboxes,
+    ratings,
+    setRatings,
     scoreRange,
     setScoreRange,
     yearRange,
@@ -31,6 +33,8 @@ export default function FilterPanel() {
     selectedDemographics,
     getRecommendations
   } = useRecommendationStore((state) => state);
+
+
 
  
 
@@ -55,6 +59,33 @@ export default function FilterPanel() {
     } else {
       setCheckboxes({
         ...checkboxes,
+        [name]: false,
+      });
+    }
+  };
+
+
+  const handleRatingChange = (event) => {
+    const { name, checked } = event.target;
+
+    if (name === "all" && checked) {
+      setRatings({
+        all : true,
+        g: false,
+        pg: false,
+        pg_13: false,
+        r: false,
+        rplus : false,
+      });
+    } else if (name !== "all" && checked) {
+      setRatings({
+        ...ratings,
+        all: false,
+        [name]: true,
+      });
+    } else {
+      setRatings({
+        ...ratings,
         [name]: false,
       });
     }
@@ -147,6 +178,73 @@ export default function FilterPanel() {
                   className="form-checkbox h-3 w-3 text-primary-600 border-gray-300 rounded-lg focus:ring-primary-500"
                 />
                 <span className="text-primary-700">Specials</span>
+              </label>
+            </div>
+          </div>
+
+          <h1 className="text-lg px-2 mt-6 font-semibold text-primary-600">Rating</h1>
+
+          <div className="checkboxes px-2 flex flex-col gap-4 text-sm w-full">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="all"
+                checked={ratings.all}
+                onChange={handleRatingChange}
+                className="form-checkbox h-3 w-3 text-primary-600 border-gray-300 rounded-lg focus:ring-primary-500"
+              />
+              <span className="text-primary-700">All</span>
+            </label>
+            <div className="typesoptions grid grid-cols-2 gap-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="g"
+                  checked={ratings.g}
+                  onChange={handleRatingChange}
+                  className="form-checkbox h-3 w-3 text-primary-600 border-gray-300 rounded-lg focus:ring-primary-500"
+                />
+                <span className="text-primary-700">G</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="pg"
+                  checked={ratings.pg}
+                  onChange={handleRatingChange}
+                  className="form-checkbox h-3 w-3 text-primary-600 border-gray-300 rounded-lg focus:ring-primary-500"
+                />
+                <span className="text-primary-700">PG</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="pg_13"
+                  checked={ratings.pg_13}
+                  onChange={handleRatingChange}
+                  className="form-checkbox h-3 w-3 text-primary-600 border-gray-300 rounded-lg focus:ring-primary-500"
+                />
+                <span className="text-primary-700">PG-13</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="r"
+                  checked={ratings.r}
+                  onChange={handleRatingChange}
+                  className="form-checkbox h-3 w-3 text-primary-600 border-gray-300 rounded-lg focus:ring-primary-500"
+                />
+                <span className="text-primary-700">R</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="rplus"
+                  checked={ratings.rplus}
+                  onChange={handleRatingChange}
+                  className="form-checkbox h-3 w-3 text-primary-600 border-gray-300 rounded-lg focus:ring-primary-500"
+                />
+                <span className="text-primary-700">R+</span>
               </label>
             </div>
           </div>
