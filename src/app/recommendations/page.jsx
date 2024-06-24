@@ -19,6 +19,7 @@ export default function Recommendation() {
 
   const {loading, isFilterOpen, toggleFilterOpen, setLoading, page, setPage, selectedAnimeList, setSelectedAnimeList, recommendations, description, setDescription, reset, getRecommendations} = useRecommendationStore(state=>state);
 
+  const totalPages = Math.ceil(recommendations?.length / 20);
 
   
 
@@ -192,16 +193,16 @@ export default function Recommendation() {
         })}
       </div>
 
-      {recommendations.length > 0 &&  <div className="pagination gap-4 flex w-full justify-center">
+      {recommendations?.length > 0 &&  <div className="pagination gap-4 flex w-full justify-center">
       <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page-1)}>
                 <FaChevronLeft/>
         </button>
-        {[1, 2, 3, 4, 5].map((pg, key)=>{
+        {[...Array(totalPages)].map((pg, key)=>{
           return (
-            <button key={key} className={`px-2   font-bold rounded-md ${pg==page?"text-primary-100":"text-gray-500"}`} onClick={()=>setPage(pg)}>{pg}</button>
+            <button key={key} className={`px-2   font-bold rounded-md ${key+1==page?"text-primary-100":"text-gray-500"}`} onClick={()=>setPage(key+1)}>{key+1}</button>
           )
         })}
-        <button disabled={page==5} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page+1)}>
+        <button disabled={page==totalPages} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page+1)}>
                 <FaChevronRight/>
         </button>
       </div>}
