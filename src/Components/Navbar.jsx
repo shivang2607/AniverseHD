@@ -40,6 +40,10 @@ const Navbar = () => {
     };
   }, [lastScrollY, isScrollingUp]);
 
+  useEffect(() => {
+    setShowNavbar(true);
+  }, [currentPath]);
+
   return (
     <nav
     className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"} bg-opacity-50 backdrop-blur-sm bg-black border-b-[1px] border-b-primary-500 w-full z-50 transition-transform duration-300 ${

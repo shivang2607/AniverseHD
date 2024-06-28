@@ -64,7 +64,7 @@ export default function TopAiringCarousal() {
                   <SwiperSlide key={anime?.mal_id} className="">
                     <div className="md:h-[60vh] h-52 gap-1 items-baseline flex flex-col">
                       <Link
-                        href="#"
+                        href={`/anime/${anime?.mal_id}`}
                         className="relative flex rounded-sm overflow-hidden transition-all duration-500 md:bg-gradient-radial hover:bg-none from-transparent object-cover to-cbg-100/45 h-full  w-full"
                       >
                         <Image

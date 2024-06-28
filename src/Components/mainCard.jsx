@@ -11,7 +11,7 @@ export default function MainCard({anime}) {
   return (
     
     <div className='image-container  my-1 w-full  h-fit pb-3 rounded-md  flex flex-col  hover:shadow-m overflow-hidden'>
-    <Link href="#" className=' flex relative flex-col gap-2 h-72  rounded-md overflow-hidden duration-300 transition-all w-full   '>
+    <Link href={`/anime/${anime?.mal_id}`} className=' flex relative flex-col gap-2 h-72  rounded-md overflow-hidden duration-300 transition-all w-full   '>
         <div className="image relative rounded-md overflow-hidden  h-full w-full ">
             <Image 
             fill 
@@ -42,7 +42,7 @@ export default function MainCard({anime}) {
         </div>
     </Link>
     <div className="metacontent flex flex-col gap- p-2">
-    <Link href="#" className="title text-lg tracking-wide font-semibold line-clamp-1 text-gray-200">{anime?.title_english || anime?.title || "NA"}</Link>
+    <Link href={`/anime/${anime?.mal_id}`} className="title text-lg tracking-wide font-semibold line-clamp-1 text-gray-200">{anime?.title_english || anime?.title || "NA"}</Link>
     <div className="details flex text-sm  items-center w-full gap-2 text-gray-400">
             <p className="  flex gap-1 items-center">
               <MdMovie  className="" />

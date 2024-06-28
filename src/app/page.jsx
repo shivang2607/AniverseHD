@@ -27,7 +27,7 @@ export default function page() {
       console.log("zoro streaming data:", streamingZoro?.data);
 
     }
-    f()
+    // f()
   }, [])
   
 

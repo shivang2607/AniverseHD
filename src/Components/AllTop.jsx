@@ -22,7 +22,7 @@ const TopAnimeSection = ({ title, data, category }) => (
               key={key}
               className="flex gap-6 py-3 px-2 border-b-[1px] border-cbg-300"
             >
-              <Link href="#">
+              <Link href={`/anime/${anime?.mal_id}`}>
                 <div className="image relative -z-10 w-14 flex-shrink-0 h-20">
                   <Image
                     fill
@@ -37,7 +37,7 @@ const TopAnimeSection = ({ title, data, category }) => (
               </Link>
               <div className="content flex flex-col h-full gap-2 py-1 ">
                 <Link
-                  href="#"
+                  href={`/anime/${anime?.mal_id}`}
                   className="name hover:text-primary-600 text-sm font-bold w-3/4 tracking-wide line-clamp-2"
                 >
                   {anime?.title_english || anime?.title}

@@ -99,7 +99,10 @@ const SearchComponent = ({viewAll=true}) => {
               searchRes?.length>0 ? <> {searchRes?.map((anime) => {
                 const {title_english, images, main_picture, type, rating, score, start_year} = anime?.payload;
                 return (
-                  <div className="flex result-card-container   border-y-[1px] border-gray-500  hover:text-[whitesmoke] rounded-sm cursor-pointer hover:bg-cbg-400 gap-3 px-1 py-2 text-white" key={anime?.id}>
+                  <Link href={`/anime/${anime.id}`} onClick={()=>{
+                    setQuery("");
+                    setSearchRes(null);
+                  }} className="flex result-card-container   border-y-[1px] border-gray-500  hover:text-[whitesmoke] rounded-sm cursor-pointer hover:bg-cbg-400 gap-3 px-1 py-2 text-white" key={anime?.id}>
 
                       <div className="relative  h-16 w-12 flex-shrink-0">
                       <Image className="object-cover "
@@ -134,7 +137,7 @@ const SearchComponent = ({viewAll=true}) => {
 
                       </div>
                       </div>
-                  </div>
+                  </Link>
                 )
               }) }
               {
