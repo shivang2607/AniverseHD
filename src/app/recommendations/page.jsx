@@ -189,7 +189,7 @@ export default function Recommendation() {
 
       <div className="results grid grid-cols-2 md:grid-cols-4 gap-4 md:mt-12">
         {recommendations?.slice((page-1)*20, page*20)?.map(anime=>{
-          return <MainCard anime={anime.payload} key={anime.id}/>
+          return <MainCard anime={({...(anime.payload), mal_id: anime.id})} key={anime.id}/>
         })}
       </div>
 

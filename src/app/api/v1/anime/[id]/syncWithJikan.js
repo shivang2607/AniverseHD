@@ -49,8 +49,8 @@ export async function syncQdrant(id, resPayload) {
             ...updatePayload,
             "Sites": malSyncData?.data?.Sites
         };
-        console.log(updatePayload.Sites);
-        console.log(malSyncData);
+        // console.log(updatePayload.Sites);
+        // console.log(malSyncData);
     }
 
     if (!(resPayload?.relations)) {
@@ -69,9 +69,9 @@ export async function syncQdrant(id, resPayload) {
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
     if (!(resPayload?.gif_images) || !(resPayload?.gif_images?.last_updated) || (Date.now() - new Date(resPayload.gif_images.last_updated).getTime()) > oneWeek) {
         const giphy_keys = process.env.GIPHY_API_KEYS.split('|') || [];
-
-        const searchTerm = jikanData?.rank <= 500 ? `Anime : ${(jikanData?.title_english || jikanData?.title || '').substring(0, 42)}` : "Anime girls"; // Truncate to 50 characters
-        const searchLimit =  jikanData?.rank <= 500 ? 10 : 50;
+        const rank = jikanData?.rank || 1000;
+        const searchTerm = rank <= 300 ? `Anime : ${(jikanData?.title_english || jikanData?.title || '').substring(0, 42)}` : "Anime girls"; // Truncate to 50 characters
+        const searchLimit =  rank <= 300 ? 10 : 50;
     
         for (const key of giphy_keys) {
             const gf = new GiphyFetch(key);

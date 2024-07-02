@@ -18,8 +18,27 @@ const useAnimeStore = create((set, get) => ({
     setWithExpiry(`anime_${id}`, animeData, 60 * 60 * 1000); // 60 minutes TTL
     return animeData;
   },
+
   getAnimeById: (id) => {
     return get().anime[id];
+  },
+
+  getRecommendationsById: async(id)=>{
+    const cachedRecommendations = getWithExpiry(`suggested_${id}`);
+    if (cachedRecommendations) {
+      return cachedRecommendations;
+    }
+    try {
+      const response = await axios.post("/api/v1/recommend", {
+        positive: [Number(id)],
+        limit: 18
+      });
+     setWithExpiry(`suggested_${id}`, response?.data, 60 * 60 * 1000); // 60 minutes TTL 
+     return response?.data;
+
+    } catch (error) {
+      return null;
+    }
   }
 }));
 

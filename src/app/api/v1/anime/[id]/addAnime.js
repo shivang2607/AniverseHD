@@ -41,13 +41,17 @@ export async function addQdrantAnime(id) {
     const malSyncData = await limiter.schedule(() => axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, { headers }));
 
     let payload = jikanResp;
+    payload = {
+        ...payload,
+        "genres": jikanResp.genres.map(genre => genre.name),
+        "themes": jikanResp.themes.map(theme => theme.name),
+        "demographics": jikanResp.demographics?.map(demo => demo.name),
+
+    }
 
     if (malSyncData?.data?.Sites?.Gogoanime || malSyncData?.data?.Sites?.Zoro) {
         payload = {
             ...payload,
-            "genres": jikanResp.genres.map(genre => genre.name),
-            "themes": jikanResp.themes.map(theme => theme.name),
-            "demographics": jikanResp.demographics?.map(demo => demo.name),
             "Sites": malSyncData?.data?.Sites
         };
     }

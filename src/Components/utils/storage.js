@@ -22,4 +22,33 @@ export const getWithExpiry = (key) => {
     };
     localStorage.setItem(key, JSON.stringify(item));
   };
+
+
+
+
+  //below is for session storage
+
+  export const getSessionWithExpiry = (key) => {
+    const itemStr = sessionStorage.getItem(key);
+    if (!itemStr) {
+      return null;
+    }
+    const item = JSON.parse(itemStr);
+    const now = new Date();
+  
+    if (now.getTime() > item.expiry) {
+      sessionStorage.removeItem(key);
+      return null;
+    }
+    return item.value;
+  };
+
+  export const setSessionWithExpiry = (key, value, ttl) => {
+    const now = new Date();
+    const item = {
+      value,
+      expiry: now.getTime() + ttl,
+    };
+    sessionStorage.setItem(key, JSON.stringify(item));
+  };
   

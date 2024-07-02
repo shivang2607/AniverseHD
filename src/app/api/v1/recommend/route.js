@@ -110,6 +110,91 @@ export async function POST(req){
           // console.log(updatedRatings);
           
           const filterKey = fKey || "must";
+
+
+          const buildFilterObject = () => {
+            const filterObject = {
+              "must": [
+                {
+                  [filterKey]: [
+                    {
+                      "key": "score",
+                      "range": {
+                        "gte": Number(scoregte) || 6.5,
+                        "lte": Number(scorelte) || null
+                      }
+                    },
+                    {
+                      "should": [
+                        {
+                          "key": "start_year",
+                          "range": {
+                            "gte": Number(yeargte) || null,
+                            "lte": Number(yearlte) || null
+                          }
+                        },
+                        {
+                          "key": "year",
+                          "range": {
+                            "gte": Number(yeargte) || null,
+                            "lte": Number(yearlte) || null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "key": "type",
+                  "match": {
+                    "any": updatedType
+                  }
+                },
+                {
+                  "key": "rating",
+                  "match": {
+                    "any": updatedRatings
+                  }
+                }
+              ]
+            };
+          
+            // Conditionally add genres, themes, and demographics
+            const shouldConditions = [];
+            if (selectedGenre) {
+              shouldConditions.push({
+                "key": "genres",
+                "match": {
+                  "any": selectedGenre
+                }
+              });
+            }
+            if (selectedTheme) {
+              shouldConditions.push({
+                "key": "themes",
+                "match": {
+                  "any": selectedTheme
+                }
+              });
+            }
+            if (selectedDemographics) {
+              shouldConditions.push({
+                "key": "demographics",
+                "match": {
+                  "any": selectedDemographics
+                }
+              });
+            }
+          
+            if (shouldConditions.length > 0) {
+              filterObject.must.push({ "should": shouldConditions });
+            }
+          
+            return filterObject;
+          };
+          
+          const filterObject = buildFilterObject();
+          
           
           const recommendations = await axios.post(
             `${process.env.QDRANT_URL}/collections/Anime/points/recommend`,
@@ -117,74 +202,75 @@ export async function POST(req){
               "positive": positives,
               "strategy": "average_vector",
               "using": "fast-bge-small-en",
-              "with_payload": ["title", "title_english", "score", "start_year", "type", "rating", "duration", "images.webp", "main_picture", "episodes", "episode_duration"],
-              "filter": {
-                "must": [
-                  {
-                    [filterKey]: [
-                      {
-                        "key": "score",
-                        "range": {
-                          "gte": Number(scoregte) || 6.5,
-                          "lte": Number(scorelte) || null
-                        }
-                      },
-                      {
-                        "should": [
-                          {
-                            "key": "start_year",
-                            "range": {
-                              "gte": Number(yeargte) || null,
-                              "lte": Number(yearlte) || null
-                            }
-                          },
-                          {
-                            "key": "year",
-                            "range": {
-                              "gte": Number(yeargte) || null,
-                              "lte": Number(yearlte) || null
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "key": "type",
-                    "match": {
-                      "any": updatedType
-                    }
-                  },
-                  {
-                    "key": "rating",
-                    "match": {
-                      "any": updatedRatings
-                    }
-                  },
-                  {
-                    "should": [
-                      {
-                        "key": "genres",
-                        "match": {
-                          "any": selectedGenre
-                        }
-                      },
-                      {
-                        "key": "themes",
-                        "match": {
-                          "any": selectedTheme
-                        }
-                      },
-                      {
-                        "key": "demographics",
-                        "match": {
-                          "any": selectedDemographics
-                        }
-                      }
-                    ]
-                  }
-                ]
-              },
+              "with_payload": [ "title", "title_english", "score", "start_year", "type", "rating", "duration", "images.webp", "main_picture", "episodes", "episode_duration"],
+              "filter": filterObject,
+              // "filter": {
+              //   "must": [
+              //     {
+              //       [filterKey]: [
+              //         {
+              //           "key": "score",
+              //           "range": {
+              //             "gte": Number(scoregte) || 6.5,
+              //             "lte": Number(scorelte) || null
+              //           }
+              //         },
+              //         {
+              //           "should": [
+              //             {
+              //               "key": "start_year",
+              //               "range": {
+              //                 "gte": Number(yeargte) || null,
+              //                 "lte": Number(yearlte) || null
+              //               }
+              //             },
+              //             {
+              //               "key": "year",
+              //               "range": {
+              //                 "gte": Number(yeargte) || null,
+              //                 "lte": Number(yearlte) || null
+              //               }
+              //             }
+              //           ]
+              //         }
+              //       ]
+              //     },
+              //     {
+              //       "key": "type",
+              //       "match": {
+              //         "any": updatedType
+              //       }
+              //     },
+              //     {
+              //       "key": "rating",
+              //       "match": {
+              //         "any": updatedRatings
+              //       }
+              //     },
+              //     {
+              //       "should": [
+              //         {
+              //           "key": "genres",
+              //           "match": {
+              //             "any": selectedGenre
+              //           }
+              //         },
+              //         {
+              //           "key": "themes",
+              //           "match": {
+              //             "any": selectedTheme
+              //           }
+              //         },
+              //         {
+              //           "key": "demographics",
+              //           "match": {
+              //             "any": selectedDemographics
+              //           }
+              //         }
+              //       ]
+              //     }
+              //   ]
+              // },
               "limit": limit || 100
             },
             {

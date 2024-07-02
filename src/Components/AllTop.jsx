@@ -8,6 +8,7 @@ import { MdSportsScore } from "react-icons/md";
 import { PiVideoFill } from "react-icons/pi";
 import { PiDotOutlineFill } from "react-icons/pi";
 import Skeleton from "react-loading-skeleton";
+import { getSessionWithExpiry, setSessionWithExpiry } from "./utils/storage";
 
 const TopAnimeSection = ({ title, data, category }) => (
   <div className="top-anime-section flex w-full md:w-1/4 flex-col gap-3">
@@ -88,9 +89,15 @@ export default function AllTop() {
 
   const fetchData = async (filter, stateSetter, retryCount = 3) => {
     try {
+      const cachedData = getSessionWithExpiry(`top_${filter}`);
+      if (cachedData) {
+        stateSetter(cachedData.slice(0, 5));
+        return;
+      }
       const response = await axios.get(`/api/v1/get-top-anime?filter=${filter}`);
       if (Array.isArray(response?.data?.data) && response.data?.data?.length > 0) {
         stateSetter(response.data.data.slice(0, 5));
+        setSessionWithExpiry(`top_${filter}`, response.data.data, 60 * 60 * 1000 * 24) //24 hrs
         return;
       } else if (retryCount > 0) {
         fetchData(filter, stateSetter, retryCount - 1);

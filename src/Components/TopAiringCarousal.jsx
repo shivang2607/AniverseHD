@@ -8,13 +8,20 @@ import Image from "next/image";
 import axios from "axios";
 import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
+import { getSessionWithExpiry, setSessionWithExpiry } from "./utils/storage";
 
 export default function TopAiringCarousal() {
   const [topAiring, setTopAiring] = useState();
 
   useEffect(() => {
+    const cachedData = getSessionWithExpiry('top_airing');
+    if(cachedData){
+      setTopAiring(cachedData);
+      return;
+    }
     axios.get("/api/v1/get-top-anime?filter=airing").then((response) => {
       setTopAiring(response?.data?.data);
+      setSessionWithExpiry('top_airing', response?.data?.data, 60 * 60 * 1000 * 24); //24hrs
     });
   }, []);
 
