@@ -42,6 +42,7 @@ const Navbar = () => {
 
   useEffect(() => {
     setShowNavbar(true);
+    setIsOpen(false);
   }, [currentPath]);
 
   return (
@@ -81,9 +82,10 @@ const Navbar = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
               >
+                
                 {isOpen ? (
                   <HiX className="h-6 w-6" />
-                ) : (
+                 ) : (
                   <HiMenu className="h-6 w-6" />
                 )}
               </button>

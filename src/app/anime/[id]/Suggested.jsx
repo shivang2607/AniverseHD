@@ -16,9 +16,9 @@ export default function Suggested({id}) {
         })();
     }, []);
   return (
-    <div className='flex flex-col px-8 gap-4 my-16'>
+    <div className='flex flex-col md:px-8 px-4 gap-4 my-16'>
         <h1 className='text-primary-400 font-semibold tracking-wide text-2xl'>You may also like</h1>
-        <div className='grid grid-cols-5 gap-4'>
+        <div className='grid md:grid-cols-5 grid-cols-2 gap-4'>
         {suggestions?.map(anime=>{
             return (
                 <MainCard anime={({...(anime.payload), mal_id: anime.id})} key={anime.id}/>

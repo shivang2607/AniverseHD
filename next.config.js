@@ -10,6 +10,10 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: "https",
+        hostname: "**",
+      },
+      {
         protocol: 'https',
         hostname: 'cdn.myanimelist.net',
         port: '',
@@ -36,6 +40,12 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'aniwatchtv.to',
+        port: '',
+        pathname: '/**',
+      },   
+      {
+        protocol: 'https',
+        hostname: 'media2.giphy.com',
         port: '',
         pathname: '/**',
       },   

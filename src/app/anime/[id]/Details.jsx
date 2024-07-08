@@ -38,10 +38,6 @@ export default function Details({anime}) {
             value: anime?.aired?.string || "?"
         },
         {
-            label: "Broadcast",
-            value: anime?.broadcast?.string || "?"
-        },
-        {
             label: "Rank",
             value: anime?.rank || "?"
         },
@@ -87,16 +83,16 @@ export default function Details({anime}) {
         // },
     ]
   return (
-    <div className='flex flex-col  rounded shadow-sky-500 my-2 w-1/5 pr-4 px-2' 
+    <div className='flex flex-col  rounded shadow-sky-500 my-2 md:w-1/5 w-full pr-4 px-2' 
     // style={{ boxShadow: '4px 0 10px -2px #0ea5e9' }}
     >
         <h1 className='text-2xl font-semibold tracking-wide my-2 mb-8'>Details</h1>
 
-        <div className="content flex flex-col gap-3">
+        <div className="content md:flex md:flex-col grid grid-cols-2  md:gap-3 gap-4">
         {
             details?.map(det=>{
                 return ( 
-                <div key={det.label} className="inline-flex gap-3 text-xs w-full items-start">
+                <div key={det.label} className="inline-flex gap-1 md:gap-3 md:text-xs text-sm w-full items-start">
                     <span className='font-semibold text-primary-500 flex-none'>{det.label}:</span>
                     <span className='text-gray-300'>{det.value}</span>
                 </div>
