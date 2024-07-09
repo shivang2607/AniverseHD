@@ -71,7 +71,7 @@ export async function syncQdrant(id, resPayload) {
         const giphy_keys = process.env.GIPHY_API_KEYS.split('|') || [];
         const rank = jikanData?.rank || 1000;
         const searchTerm = rank <= 300 ? `Anime : ${(jikanData?.title_english || jikanData?.title || '').substring(0, 42)}` : "Anime girls"; // Truncate to 50 characters
-        const searchLimit =  rank <= 300 ? 10 : 50;
+        const searchLimit =  rank <= 300 ? 5 : 30;
     
         for (const key of giphy_keys) {
             const gf = new GiphyFetch(key);
