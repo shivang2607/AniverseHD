@@ -31,10 +31,10 @@ export default function MultipleSelect({ options, selectedOptions, setSelectedOp
 
 
     const handleSelectedOptions = (sel)=>{
-        if(selectedOptions.length===1){
-            toast.error(`${buttonLabel} cannot be empty!`);
-            return;
-        }
+        // if(selectedOptions.length===1){
+        //     toast.error(`${buttonLabel} cannot be empty!`);
+        //     return;
+        // }
         setSelectedOptions(selectedOptions.filter(s => s !== sel));
     }
 

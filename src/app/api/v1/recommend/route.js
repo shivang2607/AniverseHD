@@ -161,7 +161,7 @@ export async function POST(req){
           
             // Conditionally add genres, themes, and demographics
             const shouldConditions = [];
-            if (selectedGenre) {
+            if (Array.isArray(selectedGenre) && selectedGenre.length > 0) {
               shouldConditions.push({
                 "key": "genres",
                 "match": {
@@ -169,7 +169,7 @@ export async function POST(req){
                 }
               });
             }
-            if (selectedTheme) {
+            if (Array.isArray(selectedTheme) && selectedTheme.length > 0) {
               shouldConditions.push({
                 "key": "themes",
                 "match": {
@@ -177,7 +177,7 @@ export async function POST(req){
                 }
               });
             }
-            if (selectedDemographics) {
+            if (Array.isArray(selectedDemographics) && selectedDemographics.length > 0) {
               shouldConditions.push({
                 "key": "demographics",
                 "match": {

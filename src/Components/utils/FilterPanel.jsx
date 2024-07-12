@@ -96,7 +96,7 @@ export default function FilterPanel() {
   };
 
   return (
-    <div className={`py-2  md:z-0 z-20 bg-cbg-200 ml-2  items-start md:static  top-0 md:h-fit fixed h-screen overflow-y-scroll md:overflow-auto  backdrop-blur-sm ${isFilterOpen? "translate-x-0":"-translate-x-full"}  w-3/4 transition-all ease-in duration-300 -left-2 md:translate-x-0  md:right-0 md:w-[25%] `} >
+    <div className={`py-2  md:z-0 z-20 bg-cbg-200 ml-2  items-start md:static  top-0 md:h-fit fixed h-screen overflow-y-scroll md:scrollbar-thin md:overflow-auto  backdrop-blur-sm ${isFilterOpen? "translate-x-0":"-translate-x-full"}  w-3/4 transition-all ease-in duration-300 -left-2 md:translate-x-0  md:right-0 md:w-[25%] `} >
       <h1 className="w-full justify-center items-center  px-2 text-2xl flex my-4 bg-cbg-100 text-pretty text-primary-400 font-bold tracking-wide py-2 ">
         Filters <button className="ml-auto self-end md:hidden flex items-center text-3xl my-auto" onClick={toggleFilterOpen}><IoMdCloseCircle/></button>
       </h1>
@@ -271,7 +271,7 @@ export default function FilterPanel() {
               setSelectedOptions={setSelectedGenre}
               buttonLabel={"Genres"}
             />
-            <div className="flex flex-wrap gap-2 text-[0.70rem]">
+            <div className="flex flex-wrap gap-2 text-[0.70rem]  max-h-86 overflow-y-scroll md:scrollbar-thin scrollbar-track-transparent">
               {selectedGenre?.map((sel, idx) => {
                 return (
                   <button
@@ -282,10 +282,10 @@ export default function FilterPanel() {
                       borderColor: colorsList[idx % colorsList.length],
                     }}
                     onClick={() => {
-                      if (selectedGenre.length === 1) {
-                        toast.error(`Genres cannot be empty!`);
-                        return;
-                      }
+                      // if (selectedGenre.length === 1) {
+                      //   toast.error(`Genres cannot be empty!`);
+                      //   return;
+                      // }
                       setSelectedGenre(selectedGenre.filter((s) => s !== sel));
                     }}
                   >
@@ -296,7 +296,7 @@ export default function FilterPanel() {
             </div>
           </div>
 
-          <div className="genre my-4 flex flex-col gap-4 p-4 bg-cbg-100 rounded-md">
+          <div className="genre my-4 flex flex-col gap-4 p-4 bg-cbg-100 rounded-md ">
             <MultipleSelect
               options={themes}
               selectedOptions={selectedTheme}
@@ -304,7 +304,7 @@ export default function FilterPanel() {
               buttonLabel={"Themes"}
               showSearchPanel={true}
             />
-            <div className="flex flex-wrap gap-2 text-[0.70rem]">
+            <div className="flex flex-wrap gap-2 text-[0.70rem] max-h-80 overflow-y-scroll md:scrollbar-thin scrollbar-track-transparent">
               {selectedTheme?.map((sel, idx) => {
                 return (
                   <button
@@ -315,10 +315,10 @@ export default function FilterPanel() {
                       borderColor: colorsList[idx % colorsList.length],
                     }}
                     onClick={() => {
-                      if (selectedTheme.length === 1) {
-                        toast.error(`Themes cannot be empty!`);
-                        return;
-                      }
+                      // if (selectedTheme.length === 1) {
+                      //   toast.error(`Themes cannot be empty!`);
+                      //   return;
+                      // }
                       setSelectedTheme(selectedTheme.filter((s) => s !== sel));
                     }}
                   >
@@ -329,7 +329,7 @@ export default function FilterPanel() {
             </div>
           </div>
 
-          <div className="genre my-4 flex flex-col gap-4 p-4 bg-cbg-100 rounded-md">
+          <div className="demographics my-4 flex flex-col gap-4 p-4 bg-cbg-100 rounded-md">
             <MultipleSelect
               options={demographics}
               selectedOptions={selectedDemographics}
@@ -347,10 +347,10 @@ export default function FilterPanel() {
                       borderColor: colorsList[idx % colorsList.length],
                     }}
                     onClick={() => {
-                      if (selectedDemographics.length === 1) {
-                        toast.error(`Demographics cannot be empty!`);
-                        return;
-                      }
+                      // if (selectedDemographics.length === 1) {
+                      //   toast.error(`Demographics cannot be empty!`);
+                      //   return;
+                      // }
                       setSelectedDemographics(
                         selectedDemographics.filter((s) => s !== sel)
                       );

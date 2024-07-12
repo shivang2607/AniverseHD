@@ -193,7 +193,7 @@ export default function Recommendation() {
         })}
       </div>
 
-      {recommendations?.length > 0 &&  <div className="pagination gap-4 flex w-full justify-center">
+      {recommendations?.length > 0 ?  <div className="pagination gap-4 flex w-full justify-center">
       <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page-1)}>
                 <FaChevronLeft/>
         </button>
@@ -205,7 +205,16 @@ export default function Recommendation() {
         <button disabled={page==totalPages} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page+1)}>
                 <FaChevronRight/>
         </button>
-      </div>}
+      </div>
+      :
+      recommendations!==null && 
+      <>
+
+      <div className="flex flex-col gap-2 self-center items-center justify-center">
+          <img src={`rnf-${Math.floor(Math.random() * 4) + 1}.png`} className="w-1/3 mx-auto" alt="No results found"/>
+          <h1 className="text-3xl text-sky-500 font-semibold tracking-wide">No Results Found :/</h1>
+      </div>
+      </>}
     </div>
     
       }

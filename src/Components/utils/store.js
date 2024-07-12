@@ -7,7 +7,7 @@ import axios from "axios";
 const recommendationStore = (set, get) => ({
   loading: false,
   page : 1,
-  recommendations: [],
+  recommendations: null,
   description: "",
   selectedAnimeList: [],
   isFilterOpen: false,
@@ -30,9 +30,9 @@ const recommendationStore = (set, get) => ({
   },
   scoreRange: [6.5, 10],
   yearRange: [1960, new Date().getFullYear()],
-  selectedGenre: genres.map(g => g.value),
-  selectedTheme: themes.map(t => t.value),
-  selectedDemographics: demographics.map(d => d.value),
+  selectedGenre: [] || genres.map(g => g.value),
+  selectedTheme: [] || themes.map(t => t.value),
+  selectedDemographics: [] || demographics.map(d => d.value),
 
   setLoading: (val) => set({ loading: val }),
 
@@ -138,7 +138,7 @@ const recommendationStore = (set, get) => ({
   }),
 
   reset: () => set({
-    recommendations: [],
+    recommendations: null,
     description: "",
     selectedAnimeList: [],
     matchType: "must",
@@ -160,9 +160,9 @@ const recommendationStore = (set, get) => ({
     },
     scoreRange: [6.5, 10],
     yearRange: [1960, new Date().getFullYear()],
-    selectedGenre: genres.map(g => g.value),
-    selectedTheme: themes.map(t => t.value),
-    selectedDemographics: demographics.map(d => d.value),
+    selectedGenre: [] || genres.map(g => g.value),
+    selectedTheme: [] || themes.map(t => t.value),
+    selectedDemographics: [] || demographics.map(d => d.value),
   }),
 });
 
