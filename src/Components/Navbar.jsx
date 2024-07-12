@@ -5,6 +5,7 @@ import { HiMenu, HiX } from 'react-icons/hi';
 import SearchComponent from './recommendationPanel/SearchComponent';
 import { FaSearch } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 const Navbar = () => {
 
@@ -55,7 +56,12 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex w-full items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-xl font-bold ">AniverseHD</h1>
+              <Link href="/">
+              <div className="logo relative w-40 h-7"> 
+                <Image src="/logo-primary.png" quality={100} priority fill alt="AniverseHD" className="text-xl font-bold "/>
+              </div>
+              </Link>
+              {/* <h1 className="text-xl font-bold ">AniverseHD</h1> */}
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
