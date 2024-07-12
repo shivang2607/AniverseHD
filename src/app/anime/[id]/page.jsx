@@ -171,7 +171,7 @@ export default function Anime({ params }) {
           <Image src={anime.gif_images?.original?.webp ||
                       anime.gif_images?.fixed_height?.webp ||
                       anime.gif_images?.fixed_width?.webp 
-          } alt={anime.title_english || anime.title} fill className=''/>
+          } alt={anime.title_english || anime.title} fill className='' unoptimized/>
               </div>
 
     

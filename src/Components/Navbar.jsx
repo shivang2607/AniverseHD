@@ -57,7 +57,7 @@ const Navbar = () => {
           <div className="flex w-full items-center">
             <div className="flex-shrink-0">
               <Link href="/">
-              <div className="logo relative w-40 h-7"> 
+              <div className="logo relative w-52 h-10"> 
                 <Image src="/logo-primary.png" quality={100} priority fill alt="AniverseHD" className="text-xl font-bold "/>
               </div>
               </Link>
