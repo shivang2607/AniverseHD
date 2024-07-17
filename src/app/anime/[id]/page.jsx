@@ -27,8 +27,8 @@ export default function Anime({ params }) {
 
   useEffect(() => {
     console.log("response anime data", anime);
-    if (!params.id || anime) return;
-    fetchAnime(params.id);
+    if (!(params.id) || anime) return;
+    params?.id && fetchAnime(params.id);
 
     
     // setRelations(filteredRelations);
