@@ -7,7 +7,7 @@ import axios from "axios";
 const recommendationStore = (set, get) => ({
   loading: false,
   page : 1,
-  recommendations: [],
+  recommendations: null,
   description: "",
   selectedAnimeList: [],
   isFilterOpen: false,
@@ -20,26 +20,42 @@ const recommendationStore = (set, get) => ({
     ova: false,
     specials: false,
   },
+  ratings : {
+    all : true,
+    g: false,
+    pg: false,
+    pg_13: false,
+    r: false,
+    rplus : false,
+  },
   scoreRange: [6.5, 10],
   yearRange: [1960, new Date().getFullYear()],
-  selectedGenre: genres.map(g => g.value),
-  selectedTheme: themes.map(t => t.value),
-  selectedDemographics: demographics.map(d => d.value),
+  selectedGenre: [] || genres.map(g => g.value),
+  selectedTheme: [] || themes.map(t => t.value),
+  selectedDemographics: [] || demographics.map(d => d.value),
 
   setLoading: (val) => set({ loading: val }),
 
   setPage: (pg)=> set({page: pg}),
 
   getRecommendations: async () => {
-    const {matchType, checkboxes, description, selectedAnimeList, scoreRange, yearRange, selectedGenre, selectedTheme, selectedDemographics } = get();
+    const {matchType, checkboxes, description, selectedAnimeList, scoreRange, yearRange, selectedGenre, selectedTheme, selectedDemographics, ratings } = get();
     
     const {tv, movie, ona, ova, specials} = checkboxes;
+    const {g, pg, pg_13, r , rplus} = ratings;
     let type = [];
     if(tv) type.push("TV");
     if(movie) type.push("Movie");
     if(ona) type.push("ONA");
     if(ova) type.push("OVA");
     if(specials) type.push("special");
+
+    let newRatings = [];
+    if(g) newRatings.push("g");
+    if(pg) newRatings.push("pg");
+    if(pg_13) newRatings.push("pg_13");
+    if(r) newRatings.push("r");
+    if(rplus) newRatings.push("r+");
 
     const descriptionTrimmed = description?.trim();
     const hasValidDescription = descriptionTrimmed && descriptionTrimmed.split(" ").length >= 5;
@@ -72,6 +88,7 @@ const recommendationStore = (set, get) => ({
         scorelte: scoreRange[1],
         yeargte: yearRange[0],
         yearlte: yearRange[1],
+        ratings: newRatings
       });
 
       set({
@@ -102,6 +119,8 @@ const recommendationStore = (set, get) => ({
 
   setCheckboxes: (newObj) => set({ checkboxes: newObj }),
 
+  setRatings: (newObj) => set({ratings: newObj}),
+
   setScoreRange: (newRange) => set({ scoreRange: newRange }),
 
   setYearRange: (newRange) => set({ yearRange: newRange }),
@@ -119,7 +138,7 @@ const recommendationStore = (set, get) => ({
   }),
 
   reset: () => set({
-    recommendations: [],
+    recommendations: null,
     description: "",
     selectedAnimeList: [],
     matchType: "must",
@@ -131,11 +150,19 @@ const recommendationStore = (set, get) => ({
       ova: false,
       specials: false,
     },
+    ratings :  {
+      all : true,
+      g: false,
+      pg: false,
+      pg_13: false,
+      r: false,
+      rplus : false,
+    },
     scoreRange: [6.5, 10],
     yearRange: [1960, new Date().getFullYear()],
-    selectedGenre: genres.map(g => g.value),
-    selectedTheme: themes.map(t => t.value),
-    selectedDemographics: demographics.map(d => d.value),
+    selectedGenre: [] || genres.map(g => g.value),
+    selectedTheme: [] || themes.map(t => t.value),
+    selectedDemographics: [] || demographics.map(d => d.value),
   }),
 });
 
@@ -147,3 +174,4 @@ const useRecommendationStore = create(
 );
 
 export default useRecommendationStore;
+

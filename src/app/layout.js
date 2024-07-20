@@ -3,6 +3,7 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { SkeletonTheme } from 'react-loading-skeleton'
+import Footer from '@/components/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,7 +29,7 @@ export default function RootLayout({ children }) {
           <Navbar/>
           {children}
           </SkeletonTheme>
-          {/* <Footer/> */}
+          <Footer/>
       </body>
       {/* <GoogleTagManager gtmId='GTM-PBQJWMRT'/> */}
     </html>

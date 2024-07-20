@@ -8,13 +8,20 @@ import Image from "next/image";
 import axios from "axios";
 import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
+import { getSessionWithExpiry, setSessionWithExpiry } from "./utils/storage";
 
 export default function TopAiringCarousal() {
   const [topAiring, setTopAiring] = useState();
 
   useEffect(() => {
+    const cachedData = getSessionWithExpiry('top_airing');
+    if(cachedData){
+      setTopAiring(cachedData);
+      return;
+    }
     axios.get("/api/v1/get-top-anime?filter=airing").then((response) => {
       setTopAiring(response?.data?.data);
+      setSessionWithExpiry('top_airing', response?.data?.data, 60 * 60 * 1000 * 24); //24hrs
     });
   }, []);
 
@@ -64,7 +71,7 @@ export default function TopAiringCarousal() {
                   <SwiperSlide key={anime?.mal_id} className="">
                     <div className="md:h-[60vh] h-52 gap-1 items-baseline flex flex-col">
                       <Link
-                        href="#"
+                        href={`/anime/${anime?.mal_id}`}
                         className="relative flex rounded-sm overflow-hidden transition-all duration-500 md:bg-gradient-radial hover:bg-none from-transparent object-cover to-cbg-100/45 h-full  w-full"
                       >
                         <Image

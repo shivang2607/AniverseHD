@@ -8,6 +8,7 @@ import { MdSportsScore } from "react-icons/md";
 import { PiVideoFill } from "react-icons/pi";
 import { PiDotOutlineFill } from "react-icons/pi";
 import Skeleton from "react-loading-skeleton";
+import { getSessionWithExpiry, setSessionWithExpiry } from "./utils/storage";
 
 const TopAnimeSection = ({ title, data, category }) => (
   <div className="top-anime-section flex w-full md:w-1/4 flex-col gap-3">
@@ -22,7 +23,7 @@ const TopAnimeSection = ({ title, data, category }) => (
               key={key}
               className="flex gap-6 py-3 px-2 border-b-[1px] border-cbg-300"
             >
-              <Link href="#">
+              <Link href={`/anime/${anime?.mal_id}`}>
                 <div className="image relative -z-10 w-14 flex-shrink-0 h-20">
                   <Image
                     fill
@@ -37,7 +38,7 @@ const TopAnimeSection = ({ title, data, category }) => (
               </Link>
               <div className="content flex flex-col h-full gap-2 py-1 ">
                 <Link
-                  href="#"
+                  href={`/anime/${anime?.mal_id}`}
                   className="name hover:text-primary-600 text-sm font-bold w-3/4 tracking-wide line-clamp-2"
                 >
                   {anime?.title_english || anime?.title}
@@ -88,9 +89,15 @@ export default function AllTop() {
 
   const fetchData = async (filter, stateSetter, retryCount = 3) => {
     try {
+      const cachedData = getSessionWithExpiry(`top_${filter}`);
+      if (cachedData) {
+        stateSetter(cachedData.slice(0, 5));
+        return;
+      }
       const response = await axios.get(`/api/v1/get-top-anime?filter=${filter}`);
       if (Array.isArray(response?.data?.data) && response.data?.data?.length > 0) {
         stateSetter(response.data.data.slice(0, 5));
+        setSessionWithExpiry(`top_${filter}`, response.data.data, 60 * 60 * 1000 * 24) //24 hrs
         return;
       } else if (retryCount > 0) {
         fetchData(filter, stateSetter, retryCount - 1);

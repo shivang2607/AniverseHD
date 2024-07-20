@@ -19,6 +19,7 @@ export default function Recommendation() {
 
   const {loading, isFilterOpen, toggleFilterOpen, setLoading, page, setPage, selectedAnimeList, setSelectedAnimeList, recommendations, description, setDescription, reset, getRecommendations} = useRecommendationStore(state=>state);
 
+  const totalPages = Math.ceil(recommendations?.length / 20);
 
   
 
@@ -188,23 +189,32 @@ export default function Recommendation() {
 
       <div className="results grid grid-cols-2 md:grid-cols-4 gap-4 md:mt-12">
         {recommendations?.slice((page-1)*20, page*20)?.map(anime=>{
-          return <MainCard anime={anime.payload} key={anime.id}/>
+          return <MainCard anime={({...(anime.payload), mal_id: anime.id})} key={anime.id}/>
         })}
       </div>
 
-      {recommendations.length > 0 &&  <div className="pagination gap-4 flex w-full justify-center">
+      {recommendations?.length > 0 ?  <div className="pagination gap-4 flex w-full justify-center">
       <button disabled={page==1} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page-1)}>
                 <FaChevronLeft/>
         </button>
-        {[1, 2, 3, 4, 5].map((pg, key)=>{
+        {[...Array(totalPages)].map((pg, key)=>{
           return (
-            <button key={key} className={`px-2   font-bold rounded-md ${pg==page?"text-primary-100":"text-gray-500"}`} onClick={()=>setPage(pg)}>{pg}</button>
+            <button key={key} className={`px-2   font-bold rounded-md ${key+1==page?"text-primary-100":"text-gray-500"}`} onClick={()=>setPage(key+1)}>{key+1}</button>
           )
         })}
-        <button disabled={page==5} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page+1)}>
+        <button disabled={page==totalPages} className="px-2 py-1 mx-5 text-primary-100 text-xl rounded disabled:text-gray-500" onClick={()=>setPage(page+1)}>
                 <FaChevronRight/>
         </button>
-      </div>}
+      </div>
+      :
+      recommendations!==null && 
+      <>
+
+      <div className="flex flex-col gap-2 self-center items-center justify-center">
+          <img src={`rnf-${Math.floor(Math.random() * 4) + 1}.png`} className="w-1/3 mx-auto" alt="No results found"/>
+          <h1 className="text-3xl text-sky-500 font-semibold tracking-wide">No Results Found :/</h1>
+      </div>
+      </>}
     </div>
     
       }

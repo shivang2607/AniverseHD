@@ -5,6 +5,7 @@ import { HiMenu, HiX } from 'react-icons/hi';
 import SearchComponent from './recommendationPanel/SearchComponent';
 import { FaSearch } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 const Navbar = () => {
 
@@ -40,6 +41,11 @@ const Navbar = () => {
     };
   }, [lastScrollY, isScrollingUp]);
 
+  useEffect(() => {
+    setShowNavbar(true);
+    setIsOpen(false);
+  }, [currentPath]);
+
   return (
     <nav
     className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"} bg-opacity-50 backdrop-blur-sm bg-black border-b-[1px] border-b-primary-500 w-full z-50 transition-transform duration-300 ${
@@ -50,7 +56,12 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex w-full items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-xl font-bold ">AniverseHD</h1>
+              <Link href="/">
+              <div className="logo relative w-52 h-10"> 
+                <Image src="/logo-primary.png" quality={100} priority fill alt="AniverseHD" className="text-xl font-bold "/>
+              </div>
+              </Link>
+              {/* <h1 className="text-xl font-bold ">AniverseHD</h1> */}
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
@@ -77,9 +88,10 @@ const Navbar = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
               >
+                
                 {isOpen ? (
                   <HiX className="h-6 w-6" />
-                ) : (
+                 ) : (
                   <HiMenu className="h-6 w-6" />
                 )}
               </button>
