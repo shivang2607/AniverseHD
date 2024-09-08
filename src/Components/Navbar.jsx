@@ -6,6 +6,10 @@ import SearchComponent from './recommendationPanel/SearchComponent';
 import { FaSearch } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import SignInGooglePopUp from '@/app/firebase/SignIn/SignInGooglePopUp';
+import CreateWatchList from '@/app/firebase/Profile/WatchList/CreateWatchList';
+import GetUserData from '@/app/firebase/Profile/GetUserData';
+import CreateNewProfile from '@/app/firebase/Profile/CreateNewProfile';
 
 const Navbar = () => {
 
@@ -15,6 +19,17 @@ const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
+
+  const handleSignIn= async()=>{
+    await SignInGooglePopUp();
+    const data=await  GetUserData();
+    if(data.data===null)
+      CreateNewProfile();
+  }
+  const handleTest=()=>{
+    console.log("sendig req");
+    CreateWatchList("TEest","public");
+  }
 
   const handleScroll = () => {
 
@@ -104,8 +119,8 @@ const Navbar = () => {
                 <FaSearch className={`${searchOpen?"text-sky-500":"text-[whitesmoke]"} md:block hidden`} size={20}/>
                 </button>
                 </div>
-            <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm ">Login</button>
-           
+            <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleSignIn}>Login</button>
+            <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleTest}>test</button>
           </div>
           
         </div>
@@ -130,7 +145,7 @@ const Navbar = () => {
           <div className="relative w-[80%] m-2">
            <SearchComponent/>
           </div>
-          <button className="md:w-full block bg-primary-200 !my-3  mx-2 rounded-lg text-gray-800 w-1/6 justify-center hover:bg-primary-100 px-3 py-2  text-sm font-medium">Login</button>
+          <button className="md:w-full block bg-primary-200 !my-3  mx-2 rounded-lg text-gray-800 w-1/6 justify-center hover:bg-primary-100 px-3 py-2  text-sm font-medium" onClick={handleSignIn}>Login</button>
         </div>
       </div>
     </nav>
