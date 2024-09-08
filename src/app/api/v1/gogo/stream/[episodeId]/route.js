@@ -14,16 +14,18 @@ export async function GET(req, {params}){
     const searchParams = req.nextUrl.searchParams;
     const server = searchParams.get('server');
 
-    console.log(server, episodeId);
-    const cachedData = gogoCache.get(`gogo-${episodeId}-${server}`);
+    // console.log(server, episodeId);
+    const cachedData = gogoCache.get(`gogo-${episodeId}`);
     if(cachedData){
         console.log("Cache hit for Gogo streaming api");
         return NextResponse.json(cachedData);
     }
 
     try {
-        const res = await axios.get(`${process.env.SCRAPER_URL}/anime/gogoanime/watch/${episodeId}`, {params: {server} });
-        gogoCache.set(`gogo-${episodeId}-${server}`, res?.data);
+        // console.log("shivang")
+        const res = await axios.get(`${process.env.SCRAPER_URL}/anime/gogoanime/watch/${episodeId}`);
+        // console.log(res?.data);
+        gogoCache.set(`gogo-${episodeId}`, res?.data);
         return NextResponse.json(res.data);
 
     } catch (error) {

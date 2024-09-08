@@ -14,36 +14,37 @@ export async function GET(req, { params }) {
   const searchParams = req.nextUrl.searchParams;
   const ep = searchParams.get("ep");
   const server = searchParams.get("server");
-  const category = searchParams.get("category") || "sub";
+  // const category = searchParams.get("category") || "sub";
 
   const episodeId = `${id}?ep=${ep}`;
 
-  console.log(server, episodeId);
+  // console.log(server, episodeId);
 
 
   const cachedData = zoroCache.get(
-    `zoro-${episodeId}-${server}-${category}`
+    `zoro-${episodeId}-${server}`
   );
   if (cachedData) {
-    console.log("Cache hit for Zoro streaming api");
+    // console.log("Cache hit for Zoro streaming api");
     return NextResponse.json(cachedData);
   }
 
   try {
-    console.log(`${process.env.ANIWATCH_SCRAPER_URL}/anime/episode-srcs?id=${episodeId}&server=${server}&category=${category}`);
+    console.log(`${process.env.ANIWATCH_SCRAPER_URL}/anime/episode-srcs?id=${episodeId}&server=${server}`);
     const res = await axios.get(
-      `${process.env.ANIWATCH_SCRAPER_URL}/anime/episode-srcs?id=${episodeId}`,
-      {
-        params: {   
-          server,
-          category,
-        },
-      }
+      `${process.env.ANIWATCH_SCRAPER_URL}/anime/episode-srcs?id=${episodeId}?server=${server}`,
+      // {
+      //   params: {   
+      //     server,
+      //   },
+      // }
     );
-    zoroCache.set(`zoro-${episodeId}-${server}-${category}`, res?.data);
+    // console.log(res?.data);
+    zoroCache.set(`zoro-${episodeId}-${server}`, res?.data);
     return NextResponse.json(res.data);
 
   } catch (error) {
+    console.log(error);
     return NextResponse.json({
       ...error.response.data,
       status: error.response.status,
