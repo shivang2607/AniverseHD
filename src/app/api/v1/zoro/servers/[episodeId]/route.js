@@ -20,13 +20,15 @@ export async function GET(req, {params}){
         return NextResponse.json(cachedData);
 
     try {
+        // console.log(`${process.env.ANIWATCH_SCRAPER_URL}/anime/servers?episodeId=${episodeId}?ep=${ep}`)
         const res = await axios.get(`${process.env.ANIWATCH_SCRAPER_URL}/anime/servers?episodeId=${episodeId}?ep=${ep}`);
-        cachedData.set(`zoro-server-${episodeId}-${ep}`, res?.data);
+        serverCache.set(`zoro-server-${episodeId}-${ep}`, res?.data);
+        // console.log(res?.data);
         return NextResponse.json(res?.data);
 
         
     } catch (error) {
-        // console.log(error);
+        console.log(error);
         return NextResponse.json({...error.response.data, status: error.response.status});
     }
 }
