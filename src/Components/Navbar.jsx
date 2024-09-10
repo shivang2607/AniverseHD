@@ -7,9 +7,10 @@ import { FaSearch } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import SignInGooglePopUp from '@/app/firebase/SignIn/SignInGooglePopUp';
-import CreateWatchList from '@/app/firebase/Profile/WatchList/CreateWatchList';
+import CreateWatchList from '@/app/firebase/WatchList/CreateWatchList';
 import GetUserData from '@/app/firebase/Profile/GetUserData';
 import CreateNewProfile from '@/app/firebase/Profile/CreateNewProfile';
+import UpdateName from '@/app/firebase/Profile/UpdateName';
 
 const Navbar = () => {
 
@@ -23,12 +24,13 @@ const Navbar = () => {
   const handleSignIn= async()=>{
     await SignInGooglePopUp();
     const data=await  GetUserData();
-    if(data.data===null)
-      CreateNewProfile();
+   
+    
   }
-  const handleTest=()=>{
+  const  handleTest=async()=>{
     console.log("sendig req");
-    CreateWatchList("TEest","public");
+   const res=await UpdateName("abhiii_kun");
+   console.log(res,"response updste name")
   }
 
   const handleScroll = () => {

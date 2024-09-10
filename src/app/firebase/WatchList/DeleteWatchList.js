@@ -1,26 +1,25 @@
 import { auth, db } from "../firebaseinit";
 import { doc, getDoc } from "firebase/firestore";
 import Cookies from "js-cookie";
-import CreateNewProfile from "./CreateNewProfile";
+import GetWatchList from "./GetWatchListById";
 
-export default async function GetUserData() {
+export default async function DeleteWatchList(watchListId) {
   try {
     // Check if user cookies exist
-    if (!getUserCookies()) {
+    const userData= getUserCookies();
+
+    if (!userData) {
       return { status: 'error', message: 'User not authenticated.' };
     }
-  
-    const docRef = doc(db, "users", getUserCookies().details.email);
+    
+   const res= await GetWatchList(watchListId);
+   if(res.userEmail===userData.details.email){
+    await deleteDoc(doc(db, "watchlist", watchListId));
+   }else{
+    return { status: 'error', message: "Not authorised user." };
+   }
 
-    const data = await getDoc(docRef);
-
-    // Check if the document exists
-    if (data.exists()) {
-      return { status: 'success', data: data.data() };
-    } else {
-      await CreateNewProfile();
-      return await GetUserData();
-    }
+   return {status:"success"};
   } catch (error) {
     return { status: 'error', message: error.message, error };
   }

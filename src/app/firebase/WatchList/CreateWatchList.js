@@ -13,15 +13,15 @@ export default async function CreateWatchList(watchlistName, type) {
     }
     const docRef = doc(collection(db, "watchlists"));
     await setDoc(docRef, {
-      userEmail: getUserCookies().details.email,
+      ownerEmail: getUserCookies().details.email,
       watchListName: watchlistName,
       type:type,
       id:docRef.id,
+      isSpecialRecent:false
     });
 
-    console.log("done"); 
+    return { status: "success"};   
   } catch (error) {
-    console.log("err",error);
     return { status: "error", message: error.message, error };
   }
 }

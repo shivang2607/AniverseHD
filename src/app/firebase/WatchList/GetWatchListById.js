@@ -2,12 +2,12 @@ import { auth, db } from "../firebaseinit";
 import { doc, getDoc } from "firebase/firestore";
 import Cookies from "js-cookie";
 
-export default async function DeleteWatchList(watchlistName) {
+export default async function GetWatchListById(watchlistId) {
   try {
     // Check if user cookies exist
-    if (!getUserCookies()) {
-      return { status: 'error', message: 'User not authenticated.' };
-    }
+    // if (!getUserCookies()) {
+    //   return { status: 'error', message: 'User not authenticated.' };
+    // }
     
     
   } catch (error) {

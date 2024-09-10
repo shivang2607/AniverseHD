@@ -1,5 +1,6 @@
 import { auth, db } from "../firebaseinit";
 import { doc, getDoc } from "firebase/firestore";
+import {ref,uploadBytes ,getDownloadURL} from "firebase/storage";
 import Cookies from "js-cookie";
 
 export default async function UpdateImage(blob) {
