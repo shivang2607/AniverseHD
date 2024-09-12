@@ -5,9 +5,9 @@ import {
   signOut,
 } from "firebase/auth";
 
-import { auth } from "../firebaseinit";
+import { auth } from "../utils/firebaseinit";
 import Cookies from "js-cookie";
-import GetUserData from "../Profile/GetUserData";
+import { errorStr } from "@/utils/constants";
 
 export default async function SignInGooglePopUp() {
   try {
@@ -29,15 +29,15 @@ export default async function SignInGooglePopUp() {
         email: result.user.email,
         name: result.user.displayName,
         photo: result.user.photoURL,
+        uid: result.user.uid,
       }),
       { expires: 20 }
     );
     // window.location.reload();
-
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
     const credential = GoogleAuthProvider.credentialFromError(error);
-    return { status: 'error', message: error.message, error };
+    return { error, status: errorStr};
   }
 }

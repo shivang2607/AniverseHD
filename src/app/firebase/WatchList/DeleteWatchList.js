@@ -1,35 +1,31 @@
-import { auth, db } from "../firebaseinit";
+import { auth, db } from "../utils/firebaseinit";
 import { doc, getDoc } from "firebase/firestore";
-import Cookies from "js-cookie";
-import GetWatchList from "./GetWatchListById";
+import  { GetWatchListInfoById } from "./GetWatchListById";
+import getUserAuth from "../utils/GetCurrentUserAuth";
+import { NotAuthenticatedUser, NotAuthorisedUser, success, errorStr } from "@/utils/constants";
 
-export default async function DeleteWatchList(watchListId) {
+export default async function DeleteWatchList(watchlistId) {
   try {
     // Check if user cookies exist
-    const userData= getUserCookies();
+    const userData = getUserAuth();
 
     if (!userData) {
-      return { status: 'error', message: 'User not authenticated.' };
+      throw new Error(NotAuthenticatedUser);
     }
-    
-   const res= await GetWatchList(watchListId);
-   if(res.userEmail===userData.details.email){
-    await deleteDoc(doc(db, "watchlist", watchListId));
-   }else{
-    return { status: 'error', message: "Not authorised user." };
-   }
 
-   return {status:"success"};
+    const watchlistInfo= await GetWatchListInfoById(watchlistId);
+    if(watchlistInfo.status!==success) throw watchlistInfo.error;
+
+
+    if(watchlistInfo.data.ownerUid===userData.details.uid && watchlistInfo.data.isSpecialRecent===false){
+      await deleteDoc(doc(db, "watchlists", watchlistId));
+    }else{
+      if(watchlistInfo.data.ownerUid!==userData.details.uid) throw new Error(NotAuthorisedUser);
+      else throw new Error("Special Watchlist Recent Cannot be deleted");
+    }
+
+    return { status: success };
   } catch (error) {
-    return { status: 'error', message: error.message, error };
+    return { error, status: errorStr };
   }
-}
-
-function getUserCookies() {
-  const user = Cookies.get("user");
-  if (user) {
-    const details = JSON.parse(user);
-    return { details };
-  }
-  return false;
 }

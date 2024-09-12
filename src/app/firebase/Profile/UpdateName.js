@@ -1,29 +1,21 @@
-import { auth, db } from "../firebaseinit";
-import { doc,updateDoc } from "firebase/firestore";
-import Cookies from "js-cookie";
+import { auth, db } from "../utils/firebaseinit";
+import { doc, updateDoc } from "firebase/firestore";
+import getUserAuth from "../utils/GetCurrentUserAuth";
+import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";
 
 export default async function UpdateName(userName) {
   try {
     // Check if user cookies exist
-    const userData = getUserCookies();
+    const userData = getUserAuth();
     if (!userData) {
-      return { status: "error", message: "User not authenticated." };
+      throw new Error(NotAuthenticatedUser);
     }
-    await updateDoc(doc(db, "users", userData.details.email), {
-        username: userName,
-      });
-      
-    return { status: "success"};
-  } catch (error) {
-    return { status: "error", message: error.message, error };
-  }
-}
+    await updateDoc(doc(db, "users", userData.details.uid), {
+      username: userName,
+    });
 
-function getUserCookies() {
-  const user = Cookies.get("user");
-  if (user) {
-    const details = JSON.parse(user);
-    return { details };
+    return { status: success };
+  } catch (error) {
+    return { error, status: errorStr };
   }
-  return false;
 }

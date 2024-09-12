@@ -1,4 +1,4 @@
-import { auth, db } from "../app/firebase/firebaseinit";
+import { auth, db } from "../app/firebase/utils/firebaseinit";
 import Cookies from "js-cookie";
 import { useContext, useState, createContext, useEffect } from "react";
 import {

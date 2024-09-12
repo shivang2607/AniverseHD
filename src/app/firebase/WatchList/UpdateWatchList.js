@@ -1,25 +1,32 @@
-import { auth, db } from "../firebaseinit";
+import { auth, db } from "../utils/firebaseinit";
 import { doc, getDoc } from "firebase/firestore";
-import Cookies from "js-cookie";
+import getUserAuth from "../utils/GetCurrentUserAuth";
+import { GetWatchListInfoById } from "./GetWatchListById";
+import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";
 
-export default async function UpdateWatchList(watchlistName,anime,addOrRemove) {
+export async function AddToWatchList(
+  watchlistId,
+  anime
+) {
   try {
     // Check if user cookies exist
-    if (!getUserCookies()) {
-      return { status: 'error', message: 'User not authenticated.' };
+    if (!watchlistId || !anime) {
+      throw new Error("Missing Params in AddtoWatchList Function");
     }
+    const userData = getUserAuth();
+    if (!userData) {
+      throw new Error(NotAuthenticatedUser);
+    }
+
+    const watchlistInfo= await GetWatchListInfoById(watchlistId);
+    if(watchlistInfo.status!==success) throw watchlistInfo.error;
     
     
+
+   
+
   } catch (error) {
-    return { status: 'error', message: error.message, error };
+    return { error, status: errorStr };
   }
 }
 
-function getUserCookies() {
-  const user = Cookies.get("user");
-  if (user) {
-    const details = JSON.parse(user);
-    return { details };
-  }
-  return false;
-}

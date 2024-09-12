@@ -11,6 +11,9 @@ import CreateWatchList from '@/app/firebase/WatchList/CreateWatchList';
 import GetUserData from '@/app/firebase/Profile/GetUserData';
 import CreateNewProfile from '@/app/firebase/Profile/CreateNewProfile';
 import UpdateName from '@/app/firebase/Profile/UpdateName';
+import { auth } from '@/app/firebase/utils/firebaseinit';
+import  GetWatchListById  from '@/app/firebase/WatchList/GetWatchListById';
+
 
 const Navbar = () => {
 
@@ -23,14 +26,15 @@ const Navbar = () => {
 
   const handleSignIn= async()=>{
     await SignInGooglePopUp();
-    const data=await  GetUserData();
-   
     
+   const data= await GetUserData();
+   
+   console.log("response",data);
   }
   const  handleTest=async()=>{
-    console.log("sendig req");
-   const res=await UpdateName("abhiii_kun");
-   console.log(res,"response updste name")
+  //   console.log("sendig req");
+  const data=await GetWatchListById("39csNRhdwhcHMja1tDnk");
+  console.log("response",data);
   }
 
   const handleScroll = () => {

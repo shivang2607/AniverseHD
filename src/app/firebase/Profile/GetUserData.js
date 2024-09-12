@@ -1,36 +1,34 @@
-import { auth, db } from "../firebaseinit";
+import { db } from "../utils/firebaseinit";
 import { doc, getDoc } from "firebase/firestore";
-import Cookies from "js-cookie";
-import CreateNewProfile from "./CreateNewProfile";
+import {CreateNewProfile} from "./CreateNewProfile";
+import getUserAuth from "../utils/GetCurrentUserAuth";
+import { getUserInfoCached, setUserInfoCached } from "../utils/SessionStorage";
+import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";
 
 export default async function GetUserData() {
   try {
     // Check if user cookies exist
-    if (!getUserCookies()) {
-      return { status: 'error', message: 'User not authenticated.' };
-    }
-  
-    const docRef = doc(db, "users", getUserCookies().details.email);
+    const userData = getUserAuth();
+    if (!userData) throw new Error(NotAuthenticatedUser);
+
+    const cachedUserInfo=getUserInfoCached();
+    if(cachedUserInfo!=null) return { status: success, data: cachedUserInfo };
+
+    const docRef = doc(db, "users", userData.details.uid);
 
     const data = await getDoc(docRef);
 
     // Check if the document exists
     if (data.exists()) {
-      return { status: 'success', data: data.data() };
+      setUserInfoCached(data.data());
+      return { status: success, data: data.data() };
     } else {
-      await CreateNewProfile();
+      const resp = await CreateNewProfile();
+      if (resp && resp.status != success) throw resp.error;
+
       return await GetUserData();
     }
   } catch (error) {
-    return { status: 'error', message: error.message, error };
+    return { error, status: errorStr };
   }
-}
-
-function getUserCookies() {
-  const user = Cookies.get("user");
-  if (user) {
-    const details = JSON.parse(user);
-    return { details };
-  }
-  return false;
 }

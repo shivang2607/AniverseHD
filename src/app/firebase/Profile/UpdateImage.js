@@ -1,32 +1,19 @@
-import { auth, db } from "../firebaseinit";
-import { doc, getDoc } from "firebase/firestore";
-import {ref,uploadBytes ,getDownloadURL} from "firebase/storage";
-import Cookies from "js-cookie";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import getUserAuth from "../utils/GetCurrentUserAuth";
+import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";
 
 export default async function UpdateImage(blob) {
   try {
     // Check if user cookies exist
-    if (!getUserCookies()) {
-      return { status: "error", message: "User not authenticated." };
+    const userData = getUserAuth();
+    if (!userData) {
+      throw new Error(NotAuthenticatedUser);
     }
-    const imagePathRef = ref(
-      storage,
-      `/profileImage/${userData.details.email}`
-    );
+    const imagePathRef = ref(storage, `/profileImage/${userData.details.uid}`);
     const snap = await uploadBytes(imagePathRef, blob);
-    const url = await getDownloadURL(snap.ref);
 
-    return { status: "success", url:url};
+    return { status: success };
   } catch (error) {
-    return { status: "error", message: error.message, error };
+    return { error, status: errorStr };
   }
-}
-
-function getUserCookies() {
-  const user = Cookies.get("user");
-  if (user) {
-    const details = JSON.parse(user);
-    return { details };
-  }
-  return false;
 }

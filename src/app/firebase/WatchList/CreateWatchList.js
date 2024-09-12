@@ -1,36 +1,37 @@
-import { auth, db } from "@/app/firebase/firebaseinit";
-import { doc, getDoc, writeBatch,collection, addDoc,setDoc } from "firebase/firestore";
-import Cookies from "js-cookie";
+import { auth, db } from "@/app/firebase/utils/firebaseinit";
+import {
+  doc,
+  getDoc,
+  writeBatch,
+  collection,
+  addDoc,
+  setDoc,
+} from "firebase/firestore";
+import getUserAuth from "../utils/GetCurrentUserAuth";
+import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";
 
 export default async function CreateWatchList(watchlistName, type) {
   try {
     // Check if user cookies exist
-    if(!watchlistName || !type){
-      return { status: "error", message: "required params not passed" };
+    if (!watchlistName || !type) {
+      throw new Error("Missing Params");
     }
-    if (!getUserCookies()) {
-      return { status: "error", message: "User not authenticated." };
+    const userData = getUserAuth();
+    if (!userData) {
+      throw new Error(NotAuthenticatedUser);
     }
     const docRef = doc(collection(db, "watchlists"));
     await setDoc(docRef, {
-      ownerEmail: getUserCookies().details.email,
+      ownerEmail: userData.details.email,
+      ownerUid: userData.details.uid,
       watchListName: watchlistName,
-      type:type,
-      id:docRef.id,
-      isSpecialRecent:false
+      type: type,
+      isSpecialRecent: false,
+      id: docRef.id,
     });
 
-    return { status: "success"};   
+    return { status: success };
   } catch (error) {
-    return { status: "error", message: error.message, error };
+    return { error, status: errorStr };
   }
-}
-
-function getUserCookies() {
-  const user = Cookies.get("user");
-  if (user) {
-    const details = JSON.parse(user);
-    return { details };
-  }
-  return false;
 }
