@@ -1,4 +1,10 @@
-export async function createBlobFromImageUrl(imageUrl) {
+class customError extends Error {
+  constructor(message, response = null) {
+    super(message); // Call the parent class constructor to set the message
+    if (response != null) this.response = response; // Add the custom property (response)
+  }
+}
+export default async function createBlobFromImageUrl(imageUrl) {
     try {
       // Fetch the image from the URL
       const response = await fetch(imageUrl);

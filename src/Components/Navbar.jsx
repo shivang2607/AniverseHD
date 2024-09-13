@@ -9,10 +9,10 @@ import Image from 'next/image';
 import SignInGooglePopUp from '@/app/firebase/SignIn/SignInGooglePopUp';
 import CreateWatchList from '@/app/firebase/WatchList/CreateWatchList';
 import GetUserData from '@/app/firebase/Profile/GetUserData';
-import CreateNewProfile from '@/app/firebase/Profile/CreateNewProfile';
-import UpdateName from '@/app/firebase/Profile/UpdateName';
 import { auth } from '@/app/firebase/utils/firebaseinit';
 import  GetWatchListById  from '@/app/firebase/WatchList/GetWatchListById';
+import DeleteWatchListById from '@/app/firebase/WatchList/DeleteWatchList';
+import UpdateName from '@/app/firebase/Profile/UpdateName';
 
 
 const Navbar = () => {
@@ -33,7 +33,7 @@ const Navbar = () => {
   }
   const  handleTest=async()=>{
   //   console.log("sendig req");
-  const data=await GetWatchListById("39csNRhdwhcHMja1tDnk");
+  const data=await CreateWatchList("Retro","private");
   console.log("response",data);
   }
 

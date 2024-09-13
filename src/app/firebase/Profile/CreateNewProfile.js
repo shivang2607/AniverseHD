@@ -7,24 +7,20 @@ import {
   serverTimestamp,
   collection,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import Cookies from "js-cookie";
 import getUserAuth from "../utils/GetCurrentUserAuth";
-import { createBlobFromImageUrl } from "../../../utils/CreateBlobFromImageUrl";
 import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";
-class customError extends Error {
-  constructor(message, response = null) {
-    super(message); // Call the parent class constructor to set the message
-    if (response != null) this.response = response; // Add the custom property (response)
-  }
-}
+import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage";
+
 export default async function CreateNewProfile() {
   try {
     const userData = getUserAuth();
     if (!userData) throw new Error(NotAuthenticatedUser);
 
     //Uploading profile Image to firebase storage
-    const resp = await uploadImageToStorage(userData.details.photo);
+    const resp = await uploadImageToFirebaseStorage(
+      userData.details.photo,
+      `/profileImage/${userData.details.uid}`
+    );
 
     if (resp.status != success) throw resp.error;
 
@@ -71,19 +67,3 @@ async function createWatchListInBatch(batch, watchListName, type, userData) {
     id: docRef.id,
   });
 }
-async function uploadImageToStorage(imageUrl) {
-  try {
-    const resp = await createBlobFromImageUrl(imageUrl);
-
-    if (resp.status != success) throw resp.error;
-
-    const imagePathRef = ref(storage, `/profileImage/${userData.details.uid}`);
-    const snap = await uploadBytes(imagePathRef, resp.blob);
-    const urlResp = await getDownloadURL(snap.ref);
-    // You now have a Blob object you can use (e.g., upload, download, etc.)
-    return { status: success, url: urlResp };
-  } catch (error) {
-    return { error, status: errorStr };
-  }
-}
-

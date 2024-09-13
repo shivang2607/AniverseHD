@@ -1,6 +1,6 @@
 import { db } from "../utils/firebaseinit";
 import { doc, getDoc } from "firebase/firestore";
-import {CreateNewProfile} from "./CreateNewProfile";
+import CreateNewProfile from "./CreateNewProfile";
 import getUserAuth from "../utils/GetCurrentUserAuth";
 import { getUserInfoCached, setUserInfoCached } from "../utils/SessionStorage";
 import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";

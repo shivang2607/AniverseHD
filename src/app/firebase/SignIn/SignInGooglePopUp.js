@@ -21,7 +21,7 @@ export default async function SignInGooglePopUp() {
     const result = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
     const token = credential.accessToken;
-
+    sessionStorage.clear()
     Cookies.set(
       "user",
       JSON.stringify({
