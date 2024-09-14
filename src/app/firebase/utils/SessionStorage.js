@@ -1,3 +1,5 @@
+import { Constant_Var_userwatchListsSessionStorage } from "@/utils/constants";
+
 export const getUserInfoCached = () => {
   const userData = sessionStorage.getItem("user");
 
@@ -20,14 +22,14 @@ export const updateUserName =(name)=>{
 }
 
 export const getUserWatchlistsCached = () => {
-  const userWatchlists = sessionStorage.getItem("userwatchLists");
+  const userWatchlists = sessionStorage.getItem(Constant_Var_userwatchListsSessionStorage);
 
   if (userWatchlists != null) return JSON.parse(userWatchlists);
   else return null;
 };
 
 export const setUserWatchlistsCached = (watchLists) => {
-  sessionStorage.setItem("userwatchLists", JSON.stringify(watchLists));
+  sessionStorage.setItem(Constant_Var_userwatchListsSessionStorage, JSON.stringify(watchLists));
 };
 
 export const addAnimeToUserWatchListCahed = (watchListId,anime) => {

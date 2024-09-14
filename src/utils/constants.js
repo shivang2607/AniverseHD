@@ -1,5 +1,10 @@
-export const NotAuthorisedUser="Not authorised user.";
-export const NotAuthenticatedUser="User not authenticated.";
+export const Constant_Var_NotAuthorisedUser="Not authorised user.";
+export const Constant_Var_NotAuthenticatedUser="User not authenticated.";
 export const success="success";
-export const errorStr="error";
+export const Constant_Var_success="success";
+export const Constant_Var_error="error";
+export const Constant_Var_firestoreUsers="users";
+export const Constant_Var_firestoreWatchLists="users";
 export let Constant_Var_RecentWatchlistSize=4;
+export const Constant_Var_userwatchListsSessionStorage="userwatchLists";
+export const Constant_Var_watchListsFirestoreCollection="watchLists";

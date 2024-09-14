@@ -11,9 +11,10 @@ import getUserAuth from "../utils/GetCurrentUserAuth";
 import { GetWatchListInfoById } from "./GetWatchListById";
 import {
   Constant_Var_RecentWatchlistSize,
-  errorStr,
-  NotAuthenticatedUser,
-  success,
+  Constant_Var_error,
+  Constant_Var_NotAuthenticatedUser,
+  Constant_Var_success,
+  Constant_Var_watchListsFirestoreCollection,
 } from "@/utils/constants";
 import {
   addAnimeToUserWatchListCahed,
@@ -51,19 +52,19 @@ export async function AddAnimeToWatchList(
     }
     const userData = getUserAuth();
     if (!userData) {
-      throw new Error(NotAuthenticatedUser);
+      throw new Error(Constant_Var_NotAuthenticatedUser);
     }
 
     const watchListInfo = await GetWatchListInfoById(watchListId);
-    if (watchListInfo.status !== success) throw watchListInfo.error;
+    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.error;
 
     if (watchListInfo.data.ownerUid === userData.details.uid) {
       if (watchListInfo.data.isSpecialRecent) {
         const resp = await HandleRecentExcessAnime(watchListId);
-        if (resp.status != success) throw resp.error;
+        if (resp.status != Constant_Var_success) throw resp.error;
       }
 
-      const docRef = doc(db, "watchLists", watchListId, "animeList", animeId);
+      const docRef = doc(db, Constant_Var_watchListsFirestoreCollection, watchListId, "animeList", animeId);
       const animeObject = {
         animeId: animeId,
         animeName: animeName,
@@ -80,13 +81,13 @@ export async function AddAnimeToWatchList(
 
       addAnimeToUserWatchListCahed(watchListId, animeObject);
 
-      return { status: success };
+      return { status: Constant_Var_success };
     } else {
       if (watchListInfo.data.ownerUid !== userData.details.uid)
-        throw new Error(NotAuthorisedUser);
+        throw new Error(Constant_Var_Constant_Var_Constant_Var_Constant_Var_NotAuthorisedUser);
     }
   } catch (error) {
-    return { error, status: errorStr };
+    return { error, status: Constant_Var_error };
   }
 }
 
@@ -107,12 +108,12 @@ async function HandleRecentExcessAnime(watchListId) {
         watchListId,
         earliestAnime.animeId
       );
-      if (resp.status != success) throw resp.error;
+      if (resp.status != Constant_Var_success) throw resp.error;
     }
 
-    return { status: success };
+    return { status: Constant_Var_success };
   } catch (error) {
-    return { error, status: errorStr };
+    return { error, status: Constant_Var_error };
   }
 }
 export async function RemoveAnimeFromWatchList(watchListId, animeId) {
@@ -123,23 +124,23 @@ export async function RemoveAnimeFromWatchList(watchListId, animeId) {
     }
     const userData = getUserAuth();
     if (!userData) {
-      throw new Error(NotAuthenticatedUser);
+      throw new Error(Constant_Var_NotAuthenticatedUser);
     }
 
     const watchListInfo = await GetWatchListInfoById(watchListId);
-    if (watchListInfo.status !== success) throw watchListInfo.error;
+    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.error;
 
     if (watchListInfo.data.ownerUid === userData.details.uid) {
-      const docRef = doc(db, "watchLists", watchListId, "animeList", animeId);
+      const docRef = doc(db, Constant_Var_watchListsFirestoreCollection, watchListId, "animeList", animeId);
       await deleteDoc(docRef);
 
       removeAnimeFromUserWatchListCahed(watchListId, animeId);
-      return { status: success };
+      return { status: Constant_Var_success };
     } else {
-      throw new Error(NotAuthorisedUser);
+      throw new Error(Constant_Var_Constant_Var_Constant_Var_Constant_Var_NotAuthorisedUser);
     }
   } catch (error) {
-    return { error, status: errorStr };
+    return { error, status: Constant_Var_error };
   }
 }
 
@@ -151,27 +152,27 @@ export async function UpdatePublicPrivateWatchList(watchListId, type) {
     }
     const userData = getUserAuth();
     if (!userData) {
-      throw new Error(NotAuthenticatedUser);
+      throw new Error(Constant_Var_NotAuthenticatedUser);
     }
 
     const watchListInfo = await GetWatchListInfoById(watchListId);
-    if (watchListInfo.status !== success) throw watchListInfo.error;
+    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.error;
 
     if (
       watchListInfo.data.ownerUid === userData.details.uid &&
       watchListInfo.data.isSpecialRecent === false
     ) {
-      const docRef = doc(db, "watchLists", watchListId);
+      const docRef = doc(db, Constant_Var_watchListsFirestoreCollection, watchListId);
       await updateDoc(docRef, {
         type: type,
       });
-      return { status: success };
+      return { status: Constant_Var_success };
     } else {
       if (watchListInfo.data.ownerUid !== userData.details.uid)
-        throw new Error(NotAuthorisedUser);
+        throw new Error(Constant_Var_Constant_Var_Constant_Var_Constant_Var_NotAuthorisedUser);
       else throw new Error("Special Watchlist:-Recent Cannot be deleted");
     }
   } catch (error) {
-    return { error, status: errorStr };
+    return { error, status: Constant_Var_error };
   }
 }

@@ -8,7 +8,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
-import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";
+import { Constant_Var_error, Constant_Var_NotAuthenticatedUser, Constant_Var_success, Constant_Var_watchListsFirestoreCollection } from "@/utils/constants";
 import { addUserWatchlistCached } from "../utils/SessionStorage";
 
 export default async function CreateWatchList(watchListName, type) {
@@ -19,9 +19,9 @@ export default async function CreateWatchList(watchListName, type) {
     }
     const userData = getUserAuth();
     if (!userData) {
-      throw new Error(NotAuthenticatedUser);
+      throw new Error(Constant_Var_NotAuthenticatedUser);
     }
-    const docRef = doc(collection(db, "watchLists"));
+    const docRef = doc(collection(db, Constant_Var_watchListsFirestoreCollection));
     await setDoc(docRef, {
       ownerEmail: userData.details.email,
       ownerUid: userData.details.uid,
@@ -40,8 +40,8 @@ export default async function CreateWatchList(watchListName, type) {
       animeList: [],
     };
     addUserWatchlistCached(watchList);
-    return { status: success };
+    return { status: Constant_Var_success };
   } catch (error) {
-    return { error, status: errorStr };
+    return { error, status: Constant_Var_error };
   }
 }

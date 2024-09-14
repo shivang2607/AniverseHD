@@ -8,13 +8,13 @@ import {
   collection,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
-import { errorStr, NotAuthenticatedUser, success } from "@/utils/constants";
+import { Constant_Var_error, Constant_Var_firestoreUsers, Constant_Var_NotAuthenticatedUser,Constant_Var_success, Constant_Var_watchListsFirestoreCollection} from "@/utils/constants";
 import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage";
 
 export default async function CreateNewProfile() {
   try {
     const userData = getUserAuth();
-    if (!userData) throw new Error(NotAuthenticatedUser);
+    if (!userData) throw new Error(Constant_Var_NotAuthenticatedUser);
 
     //Uploading profile Image to firebase storage
     const resp = await uploadImageToFirebaseStorage(
@@ -22,13 +22,13 @@ export default async function CreateNewProfile() {
       `/profileImage/${userData.details.uid}`
     );
 
-    if (resp.status != success) throw resp.error;
+    if (resp.status != Constant_Var_success) throw resp.error;
 
     const photoURL = resp.url;
 
     const batch = writeBatch(db);
 
-    batch.set(doc(db, "users", userData.details.uid), {
+    batch.set(doc(db, Constant_Var_firestoreUsers, userData.details.uid), {
       dateJoined: serverTimestamp(),
       userName: userData.details.name,
       email: userData.details.email,
@@ -50,14 +50,14 @@ export default async function CreateNewProfile() {
 
     await batch.commit();
 
-    return { status: success };
+    return { status: Constant_Var_success };
     //do not save watchLists in users collection, only save them in public collection
   } catch (error) {
-    return { error, status: errorStr };
+    return { error, status: Constant_Var_error };
   }
 }
 async function createWatchListInBatch(batch, watchListName, type, userData) {
-  const docRef = doc(collection(db, "watchLists"));
+  const docRef = doc(collection(db, Constant_Var_watchListsFirestoreCollection));
   batch.set(docRef, {
     ownerEmail: userData.details.email,
     ownerUid: userData.details.uid,

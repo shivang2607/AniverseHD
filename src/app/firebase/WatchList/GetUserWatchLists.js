@@ -8,7 +8,7 @@ import {
   where,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
-import { NotAuthenticatedUser, success, errorStr } from "@/utils/constants";
+import { Constant_Var_NotAuthenticatedUser, Constant_Var_success, Constant_Var_error, Constant_Var_watchListsFirestoreCollection } from "@/utils/constants";
 import { getUserWatchlistsCached, setUserWatchlistsCached } from "../utils/SessionStorage";
 
 export default async function GetUserWatchLists() {
@@ -16,14 +16,14 @@ export default async function GetUserWatchLists() {
     // Check if user cookies exist
     const userData = getUserAuth();
     if (!userData) {
-      throw new Error(NotAuthenticatedUser);
+      throw new Error(Constant_Var_NotAuthenticatedUser);
     }
 
     const cachedUserWatchlists=getUserWatchlistsCached();
-    if(cachedUserWatchlists!=null) return { status: success, data: cachedUserWatchlists };
+    if(cachedUserWatchlists!=null) return { status: Constant_Var_success, data: cachedUserWatchlists };
     
     const watchListquery = query(
-      collection(db, "watchLists"),
+      collection(db, Constant_Var_watchListsFirestoreCollection),
       where("ownerUid", "==", userData.details.uid)
     );
     let userwatchLists = await getDocs(watchListquery);
@@ -36,7 +36,7 @@ export default async function GetUserWatchLists() {
       // Get watchList metadata
       watchListMetadata.push(item.data());
       // Fetch the animeList subcollection for each watchList
-      const collectionRef = collection(db, "watchLists", item.data().id, "animeList");
+      const collectionRef = collection(db, Constant_Var_watchListsFirestoreCollection, item.data().id, "animeList");
       promises.push(getDocs(collectionRef));
     });
 
@@ -52,8 +52,8 @@ export default async function GetUserWatchLists() {
     });
 
     setUserWatchlistsCached(result);
-    return { status: success, data: result };
+    return { status: Constant_Var_success, data: result };
   } catch (error) {
-    return { error, status: errorStr };
+    return { error, status: Constant_Var_error };
   }
 }
