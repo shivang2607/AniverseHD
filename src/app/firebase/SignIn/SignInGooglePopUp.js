@@ -8,6 +8,7 @@ import {
 import { auth } from "../utils/firebaseinit";
 import Cookies from "js-cookie";
 import { errorStr } from "@/utils/constants";
+import { useRouter } from "next/router";
 
 export default async function SignInGooglePopUp() {
   try {
@@ -33,6 +34,9 @@ export default async function SignInGooglePopUp() {
       }),
       { expires: 20 }
     );
+
+    const router=useRouter();
+    router.push('/profile');
     // window.location.reload();
   } catch (error) {
     const errorCode = error.code;

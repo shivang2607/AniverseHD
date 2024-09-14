@@ -3,7 +3,7 @@ import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
 import { NotAuthenticatedUser, success , errorStr} from "@/utils/constants";
 
-export default async function GetWatchListById(watchlistId) {
+export default async function GetWatchListById(watchListId) {
   try {
     // Check if user cookies exist
     const userData = getUserAuth();
@@ -11,24 +11,24 @@ export default async function GetWatchListById(watchlistId) {
       throw new Error(NotAuthenticatedUser);
     }
     
-    let watchlistInfo = await GetWatchListInfoById(watchlistId);
+    let watchListInfo = await GetWatchListInfoById(watchListId);
    
-    if(watchlistInfo.status!==success) throw watchlistInfo.error;
+    if(watchListInfo.status!==success) throw watchListInfo.error;
 
-    //Checking if the watchlist is public or current user is the owner
-    if(watchlistInfo.data.ownerUid===userData.details.uid || watchlistInfo.data.type==="public"){
-        const collectionRef= collection(db, "watchlists",watchlistId,"animelist");
-        const animelist=await getDocs(collectionRef);
+    //Checking if the watchList is public or current user is the owner
+    if(watchListInfo.data.ownerUid===userData.details.uid || watchListInfo.data.type==="public"){
+        const collectionRef= collection(db, "watchLists",watchListId,"animeList");
+        const animeList=await getDocs(collectionRef);
         let animeListArr=[];
 
-        animelist.forEach((anime)=>{
+        animeList.forEach((anime)=>{
           animeListArr.push(anime.data());
         });
 
-        let result={...watchlistInfo.data, animeList:animeListArr};
+        let result={...watchListInfo.data, animeList:animeListArr};
         return { status: success, data: result };
       }else{
-        throw new Error(`Private Watchlist`);
+        throw new Error(`Private WatchList`);
       }
    
 
@@ -37,20 +37,20 @@ export default async function GetWatchListById(watchlistId) {
   }
 }
 
-export const GetWatchListInfoById= async (watchlistId)=>{
+export const GetWatchListInfoById= async (watchListId)=>{
   try {
     // Check if user cookies exist
     const userData = getUserAuth();
     if (!userData) {
       throw new Error(NotAuthenticatedUser);
     }
-    const docRef = doc(db, "watchlists",watchlistId);
+    const docRef = doc(db, "watchLists",watchListId);
     const dataWatchlist = await getDoc(docRef);
    
     if(dataWatchlist.exists()){
         return { status: success, data: dataWatchlist.data()};
     }else{
-      throw new Error(`Watchlist with id=${watchlistId} does not exists`);
+      throw new Error(`Watchlist with id=${watchListId} does not exists`);
     }
 
   } catch (error) {

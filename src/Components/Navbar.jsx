@@ -13,6 +13,9 @@ import { auth } from '@/app/firebase/utils/firebaseinit';
 import  GetWatchListById  from '@/app/firebase/WatchList/GetWatchListById';
 import DeleteWatchListById from '@/app/firebase/WatchList/DeleteWatchList';
 import UpdateName from '@/app/firebase/Profile/UpdateName';
+import GetUserWatchLists from '@/app/firebase/WatchList/GetUserWatchLists';
+import { AddAnimeToWatchList, RemoveAnimeFromWatchList, UpdatePublicPrivateWatchList } from '@/app/firebase/WatchList/UpdateWatchList';
+import { addAnimeToUserWatchListCahed } from '@/app/firebase/utils/SessionStorage';
 
 
 const Navbar = () => {
@@ -27,14 +30,22 @@ const Navbar = () => {
   const handleSignIn= async()=>{
     await SignInGooglePopUp();
     
-   const data= await GetUserData();
+   let data= await GetUserData();
+   
    
    console.log("response",data);
+
+  //  const data= await GetUserData();
+   
+   
+  //  console.log("response",data);
   }
   const  handleTest=async()=>{
   //   console.log("sendig req");
-  const data=await CreateWatchList("Retro","private");
-  console.log("response",data);
+  let data= await GetUserWatchLists();
+  console.log("response getwatchlistById",data);
+
+
   }
 
   const handleScroll = () => {

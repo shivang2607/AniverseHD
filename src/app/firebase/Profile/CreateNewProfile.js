@@ -30,13 +30,13 @@ export default async function CreateNewProfile() {
 
     batch.set(doc(db, "users", userData.details.uid), {
       dateJoined: serverTimestamp(),
-      username: userData.details.name,
+      userName: userData.details.name,
       email: userData.details.email,
       photoUrl: photoURL,
       uid: userData.details.uid,
     });
 
-    const watchlists = [
+    const watchLists = [
       "Recent",
       "Dropped",
       "Favourite",
@@ -44,20 +44,20 @@ export default async function CreateNewProfile() {
       "Plan To Watch",
       "Completed",
     ];
-    watchlists.forEach((listName) => {
+    watchLists.forEach((listName) => {
       createWatchListInBatch(batch, listName, "private", userData);
     });
 
     await batch.commit();
 
     return { status: success };
-    //do not save watchlists in users collection, only save them in public collection
+    //do not save watchLists in users collection, only save them in public collection
   } catch (error) {
     return { error, status: errorStr };
   }
 }
 async function createWatchListInBatch(batch, watchListName, type, userData) {
-  const docRef = doc(collection(db, "watchlists"));
+  const docRef = doc(collection(db, "watchLists"));
   batch.set(docRef, {
     ownerEmail: userData.details.email,
     ownerUid: userData.details.uid,

@@ -8,8 +8,9 @@ import {
   success,
   errorStr,
 } from "@/utils/constants";
+import { deleteUserWatchlistCached } from "../utils/SessionStorage";
 
-export default async function DeleteWatchListById(watchlistId) {
+export default async function DeleteWatchListById(watchListId) {
   try {
     // Check if user cookies exist
     const userData = getUserAuth();
@@ -17,17 +18,18 @@ export default async function DeleteWatchListById(watchlistId) {
     if (!userData) {
       throw new Error(NotAuthenticatedUser);
     }
-    const watchlistInfo = await GetWatchListInfoById(watchlistId);
-    if (watchlistInfo.status !== success) throw watchlistInfo.error;
+    const watchListInfo = await GetWatchListInfoById(watchListId);
+    if (watchListInfo.status !== success) throw watchListInfo.error;
 
     if (
-      watchlistInfo.data.ownerUid === userData.details.uid &&
-      watchlistInfo.data.isSpecialRecent === false
+      watchListInfo.data.ownerUid === userData.details.uid &&
+      watchListInfo.data.isSpecialRecent === false
     ) {
-      let response = await deleteDoc(doc(db, "watchlists", watchlistId));
+      let response = await deleteDoc(doc(db, "watchLists", watchListId));
+      deleteUserWatchlistCached(watchListId);
       return { status: success, response: response };
     } else {
-      if (watchlistInfo.data.ownerUid !== userData.details.uid)
+      if (watchListInfo.data.ownerUid !== userData.details.uid)
         throw new Error(NotAuthorisedUser);
       else throw new Error("Special Watchlist:-Recent Cannot be deleted");
     }
