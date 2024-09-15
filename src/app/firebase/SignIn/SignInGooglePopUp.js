@@ -1,13 +1,11 @@
 import {
-  onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
-  signOut,
 } from "firebase/auth";
 
 import { auth } from "../utils/firebaseinit";
 import Cookies from "js-cookie";
-import { Constant_Var_error } from "@/utils/constants";
+import { Constant_Var_error, Constant_Var_success } from "@/utils/constants";
 import { useRouter } from "next/router";
 
 export default async function SignInGooglePopUp() {
@@ -34,14 +32,12 @@ export default async function SignInGooglePopUp() {
       }),
       { expires: 20 }
     );
-
-    const router=useRouter();
-    router.push('/profile');
+    return {status:Constant_Var_success, response:null};
     // window.location.reload();
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
     const credential = GoogleAuthProvider.credentialFromError(error);
-    return { error, status: Constant_Var_error};
+    return { response: error, status: Constant_Var_error };
   }
 }

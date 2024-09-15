@@ -2,7 +2,7 @@
 import MainCard from "@/components/mainCard";
 import RecommendationSearchComponent from "@/components/recommendationPanel/SearchComponentRecommendation";
 import SharinganLoader from "@/components/sharinganLoader";
-import useRecommendationStore from "@/components/utils/store";
+import useRecommendationStore from "@/Components/utils/store";
 import Image from "next/image";
 import React from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -57,9 +57,9 @@ export default function Recommendation() {
           Discover Your Next Favorite Anime!
         </h1>
         <span className="content  text-fuchsia-200 text-sm italic">
-          Describe what you're in the mood for or select a few of your favorite
+          Describe what you&apos;re in the mood for or select a few of your favorite
           shows. Our system will find anime that matches your tastes. Whether
-          you're into action, heartwarming tales, or something unique, we've got
+          you&apos;re into action, heartwarming tales, or something unique, we&apos;ve got
           you covered! Mixing different genres might lead to unexpected, but
           exciting, results. Dive in and explore! 🎉
         </span>

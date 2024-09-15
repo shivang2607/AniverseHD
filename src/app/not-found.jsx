@@ -7,8 +7,8 @@ export default function NotFound() {
       <img src='/nfi.png' alt="Page not found" className=' rounded-md md:w-[75%] w-[90%] my-4 overflow-hidden opacity-85'/>
       <h1 className='relative z-10  text-4xl text-gray-200  font-semibold  '>Page not found :(</h1>
       <Link href="/" className="redirect flex flex-col gap-2 my-8">
-        <div className='relative h-44 w-56 flex justify-center items-center mx-auto'>
-        <Image src="/redirect character.png" alt="<" fill className='flex'/>
+        <div className='relative h-44 w-80 flex justify-center items-center mx-auto'>
+        <Image src="/redirect character.png" alt="<" fill className='flex w-full'/>
         </div>
         <div className='font-semibold flex mx-auto items-center justify-center'>Go Back to Home Page</div>
       </Link>

@@ -13,10 +13,10 @@ export default async function GetWatchListById(watchListId) {
     
     let watchListInfo = await GetWatchListInfoById(watchListId);
    
-    if(watchListInfo.status!==Constant_Var_success) throw watchListInfo.error;
+    if(watchListInfo.status!==Constant_Var_success) throw watchListInfo.response;
 
     //Checking if the watchList is public or current user is the owner
-    if(watchListInfo.data.ownerUid===userData.details.uid || watchListInfo.data.type==="public"){
+    if(watchListInfo.response.ownerUid===userData.details.uid || watchListInfo.response.type==="public"){
         const collectionRef= collection(db, Constant_Var_watchListsFirestoreCollection,watchListId,"animeList");
         const animeList=await getDocs(collectionRef);
         let animeListArr=[];
@@ -25,15 +25,15 @@ export default async function GetWatchListById(watchListId) {
           animeListArr.push(anime.data());
         });
 
-        let result={...watchListInfo.data, animeList:animeListArr};
-        return { status: Constant_Var_success, data: result };
+        let result={...watchListInfo.response, animeList:animeListArr};
+        return { status: Constant_Var_success, response: result };
       }else{
         throw new Error(`Private WatchList`);
       }
    
 
   } catch (error) {
-    return { error, status: Constant_Var_error };
+    return { response: error, status: Constant_Var_error };
   }
 }
 
@@ -48,12 +48,12 @@ export const GetWatchListInfoById= async (watchListId)=>{
     const dataWatchlist = await getDoc(docRef);
    
     if(dataWatchlist.exists()){
-        return { status: Constant_Var_success, data: dataWatchlist.data()};
+        return { status: Constant_Var_success, response: dataWatchlist.data()};
     }else{
       throw new Error(`Watchlist with id=${watchListId} does not exists`);
     }
 
   } catch (error) {
-    return { error, status: Constant_Var_error };
+    return { response: error, status: Constant_Var_error };
   }
 }

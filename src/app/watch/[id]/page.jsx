@@ -5,14 +5,14 @@ import { useEffect } from "react";
 import {
   getSessionWithExpiry,
   setSessionWithExpiry,
-} from "@/components/utils/storage";
+} from "@/Components/utils/storage";
 import { IoMdAdd } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { useSearchParams } from "next/navigation";
-import useStreamStore from "@/components/utils/streamStore";
+import useStreamStore from "@/Components/utils/streamStore";
 
-export default function page({ params }) {
+export default function Page({ params }) {
   const searchParams = useSearchParams();
   const zoroId = searchParams.get("z-id") || null;
   const gogoSubId = searchParams.get("g-sub-id") || null;

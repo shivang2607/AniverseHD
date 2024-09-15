@@ -1,30 +1,38 @@
-import { auth, db, storage } from "../utils/firebaseinit";
+import { auth, db} from "../utils/firebaseinit";
 import {
   doc,
-  getDoc,
-  setDoc,
   writeBatch,
   serverTimestamp,
   collection,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
-import { Constant_Var_error, Constant_Var_firestoreUsers, Constant_Var_NotAuthenticatedUser,Constant_Var_success, Constant_Var_watchListsFirestoreCollection} from "@/utils/constants";
+import { Constant_Var_error, Constant_Var_firestoreUsers, Constant_Var_NotAuthenticatedUser,Constant_Var_profileCreationAlradyUnderProgress,Constant_Var_success, Constant_Var_watchListsFirestoreCollection} from "@/utils/constants";
 import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage";
 
+// Global variable to track if a profile is being created, avoid race condition
+let isProfileBeingCreated = false;
+
 export default async function CreateNewProfile() {
-  try {
+  try {  
     const userData = getUserAuth();
     if (!userData) throw new Error(Constant_Var_NotAuthenticatedUser);
 
+    if (isProfileBeingCreated) throw new Error(Constant_Var_profileCreationAlradyUnderProgress);
+
+    isProfileBeingCreated = true;
     //Uploading profile Image to firebase storage
     const resp = await uploadImageToFirebaseStorage(
-      userData.details.photo,
-      `/profileImage/${userData.details.uid}`
+      `/profileImage/${userData.details.uid}`,
+      userData.details.photo
     );
+    const coverResp= await uploadImageToFirebaseStorage(`/coverImage/${userData.details.uid}`,"https://cdn.pixabay.com/photo/2015/08/23/09/22/banner-902589_640.jpg");
 
-    if (resp.status != Constant_Var_success) throw resp.error;
 
-    const photoURL = resp.url;
+    if (resp.status === Constant_Var_error) throw resp.response;
+    if (coverResp.status === Constant_Var_error) throw coverResp.response;
+
+    const photoURL = resp.response;
+    const coverURL= coverResp.response;
 
     const batch = writeBatch(db);
 
@@ -33,6 +41,7 @@ export default async function CreateNewProfile() {
       userName: userData.details.name,
       email: userData.details.email,
       photoUrl: photoURL,
+      coverUrl:coverURL,
       uid: userData.details.uid,
     });
 
@@ -50,10 +59,12 @@ export default async function CreateNewProfile() {
 
     await batch.commit();
 
-    return { status: Constant_Var_success };
+    isProfileBeingCreated = false;
+    return { status: Constant_Var_success, response: null };
     //do not save watchLists in users collection, only save them in public collection
   } catch (error) {
-    return { error, status: Constant_Var_error };
+    isProfileBeingCreated = false;
+    return { response: error, status: Constant_Var_error };
   }
 }
 async function createWatchListInBatch(batch, watchListName, type, userData) {

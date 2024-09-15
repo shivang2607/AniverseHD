@@ -1,15 +1,13 @@
 import { auth, db } from "../utils/firebaseinit";
 import {
   collection,
-  doc,
-  getDoc,
   getDocs,
   query,
   where,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
 import { Constant_Var_NotAuthenticatedUser, Constant_Var_success, Constant_Var_error, Constant_Var_watchListsFirestoreCollection } from "@/utils/constants";
-import { getUserWatchlistsCached, setUserWatchlistsCached } from "../utils/SessionStorage";
+import { getUserWatchlistsCached, setUserWatchlistsCached } from "../utils/CacheStorage";
 
 export default async function GetUserWatchLists() {
   try {
@@ -20,7 +18,7 @@ export default async function GetUserWatchLists() {
     }
 
     const cachedUserWatchlists=getUserWatchlistsCached();
-    if(cachedUserWatchlists!=null) return { status: Constant_Var_success, data: cachedUserWatchlists };
+    if(cachedUserWatchlists!=null) return { status: Constant_Var_success, response: cachedUserWatchlists };
     
     const watchListquery = query(
       collection(db, Constant_Var_watchListsFirestoreCollection),
@@ -52,8 +50,8 @@ export default async function GetUserWatchLists() {
     });
 
     setUserWatchlistsCached(result);
-    return { status: Constant_Var_success, data: result };
+    return { status: Constant_Var_success, response: result };
   } catch (error) {
-    return { error, status: Constant_Var_error };
+    return { response: error, status: Constant_Var_error };
   }
 }

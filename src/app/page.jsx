@@ -7,7 +7,7 @@ import RecommendationPanel from '@/components/recommendationPanel/Recommendation
 import AllTop from '@/components/AllTop'
 
 
-export default function page() {
+export default function Page() {
  
   
   useEffect(()=>{

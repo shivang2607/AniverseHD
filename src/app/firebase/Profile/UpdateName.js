@@ -14,8 +14,8 @@ export default async function UpdateName(userName) {
       username: userName,
     });
 
-    return { status: Constant_Var_success };
+    return { status: Constant_Var_success, response: null };
   } catch (error) {
-    return { error, status: Constant_Var_error };
+    return { response: error, status: Constant_Var_error };
   }
 }

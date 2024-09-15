@@ -1,20 +1,39 @@
 import { Constant_Var_error, Constant_Var_success } from "@/utils/constants";
-import createBlobFromImageUrl  from "@/utils/CreateBlobFromImageUrl";
+import createBlobFromImageUrl from "@/utils/CreateBlobFromImageUrl";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "./firebaseinit";
 
-export default async function uploadImageToFirebaseStorage(imageUrl, path) {
-    try {
-      const resp = await createBlobFromImageUrl(imageUrl);
-  
-      if (resp.status != Constant_Var_success) throw resp.error;
-  
-      const imagePathRef = ref(storage, path);
-      const snap = await uploadBytes(imagePathRef, resp.blob);
-      const urlResp = await getDownloadURL(snap.ref);
-      // You now have a Blob object you can use (e.g., upload, download, etc.)
-      return { status: Constant_Var_success, url: urlResp };
-    } catch (error) {
-      return { error, status: Constant_Var_error };
+export default async function uploadImageToFirebaseStorage(path, imageUrl = false, blob = false) {
+  try {
+    // Ensure either imageUrl or blob is provided
+    if (!imageUrl && !blob) {
+      throw new Error('Please provide either imageUrl or Blob.');
     }
+
+    const imagePathRef = ref(storage, path);
+
+    // Handle Blob upload
+    if (blob) {
+      const snap = await uploadBytes(imagePathRef, blob);
+      const downloadURL = await getDownloadURL(snap.ref);
+      return { status: Constant_Var_success, response: downloadURL };
+    }
+
+    // Handle imageUrl upload
+    if (imageUrl) {
+      const resp = await createBlobFromImageUrl(imageUrl);
+
+      // Check if blob creation was successful
+      if (resp.status !== Constant_Var_success) {
+        throw new Error(resp.response);
+      }
+
+      const snap = await uploadBytes(imagePathRef, resp.blob);
+      const downloadURL = await getDownloadURL(snap.ref);
+      return { status: Constant_Var_success, response: downloadURL };
+    }
+  } catch (error) {
+    // Return error response
+    return { status: Constant_Var_error, response: error };
   }
+}

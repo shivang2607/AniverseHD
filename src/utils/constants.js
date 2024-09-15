@@ -8,3 +8,5 @@ export const Constant_Var_firestoreWatchLists="users";
 export let Constant_Var_RecentWatchlistSize=4;
 export const Constant_Var_userwatchListsSessionStorage="userwatchLists";
 export const Constant_Var_watchListsFirestoreCollection="watchLists";
+export const Constant_Var_userDoesNotExists="User Does Not Exists";
+export const Constant_Var_profileCreationAlradyUnderProgress="Profile Creation Alrady Under Progress";

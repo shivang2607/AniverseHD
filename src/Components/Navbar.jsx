@@ -1,52 +1,38 @@
 'use client'
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'
 import { HiMenu, HiX } from 'react-icons/hi';
 import SearchComponent from './recommendationPanel/SearchComponent';
 import { FaSearch } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import SignInGooglePopUp from '@/app/firebase/SignIn/SignInGooglePopUp';
-import CreateWatchList from '@/app/firebase/WatchList/CreateWatchList';
-import GetUserData from '@/app/firebase/Profile/GetUserData';
-import { auth } from '@/app/firebase/utils/firebaseinit';
-import  GetWatchListById  from '@/app/firebase/WatchList/GetWatchListById';
-import DeleteWatchListById from '@/app/firebase/WatchList/DeleteWatchList';
-import UpdateName from '@/app/firebase/Profile/UpdateName';
-import GetUserWatchLists from '@/app/firebase/WatchList/GetUserWatchLists';
-import { AddAnimeToWatchList, RemoveAnimeFromWatchList, UpdatePublicPrivateWatchList } from '@/app/firebase/WatchList/UpdateWatchList';
-import { addAnimeToUserWatchListCahed } from '@/app/firebase/utils/SessionStorage';
+import { Constant_Var_success } from '@/utils/constants';
 
 
 const Navbar = () => {
 
+  const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
+  const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
 
   const handleSignIn= async()=>{
-    await SignInGooglePopUp();
+   
+    const res=await SignInGooglePopUp();
     
-   let data= await GetUserData();
-   
-   
-   console.log("response",data);
+    if(res.status===Constant_Var_success){
+       router.push('/profile');
+    }else{
 
-  //  const data= await GetUserData();
-   
-   
-  //  console.log("response",data);
+    }
   }
-  const  handleTest=async()=>{
-  //   console.log("sendig req");
-  let data= await GetUserWatchLists();
-  console.log("response getwatchlistById",data);
 
-
-  }
 
   const handleScroll = () => {
 
@@ -61,12 +47,19 @@ const Navbar = () => {
       setShowNavbar(true);
     }
 
+    if (window.scrollY > 1) {
+      setIsBackgroundVisible(true);
+    } else {
+      setIsBackgroundVisible(false);
+    }
+
     setIsScrollingUp(currentScrollY < lastScrollY);
     setLastScrollY(currentScrollY);
   };
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
+    router.prefetch("/profile");
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -80,9 +73,9 @@ const Navbar = () => {
 
   return (
     <nav
-    className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"} bg-opacity-50 backdrop-blur-sm bg-black border-b-[1px] border-b-primary-500 w-full z-50 transition-transform duration-300 ${
+    className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"}  backdrop-blur-sm bg-black py-3 border-b-[0px] border-b-primary-100 w-full z-50 transition-transform duration-300 ${
       showNavbar ? 'translate-y-0' : '-translate-y-full'
-    }`}
+    } ${isBackgroundVisible?'bg-opacity-50':'bg-opacity-0'}`}
   >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -97,13 +90,13 @@ const Navbar = () => {
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <Link href="/" className=" hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                <Link href="/"  className=" hover:text-white px-3  rounded-md text-md font-light">
                   Home
                 </Link>
-                <Link href="/catalog" className=" hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                <Link href="/catalog" className=" hover:text-white px-3  rounded-md text-md font-light">
                   Catalog
                 </Link>
-                <Link href="/recommendations" className=" hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                <Link href="/recommendations"  className=" hover:text-white px-3  rounded-md text-md font-light">
                   Recommendations
                 </Link>
                 
@@ -136,8 +129,8 @@ const Navbar = () => {
                 <FaSearch className={`${searchOpen?"text-sky-500":"text-[whitesmoke]"} md:block hidden`} size={20}/>
                 </button>
                 </div>
-            <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleSignIn}>Login</button>
-            <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleTest}>test</button>
+            <button className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-8 py-2.5 rounded-xl text-md " onClick={handleSignIn}>Login</button>
+            {/* <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleTest}>test</button> */}
           </div>
           
         </div>
@@ -150,13 +143,13 @@ const Navbar = () => {
       {/* //? MOBILE VIEW IS FROM BELOW */}
       <div className={`${isOpen ? 'flex' : 'hidden'} md:hidden w-full`}>
         <div className="px-2 pt-2 pb-3 space-y-1 w-full  sm:px-1">
-          <Link href="/" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+          <Link href="/" className=" hover:text-white block px-3  rounded-md text-base font-medium">
             Home
           </Link>
-          <Link href="/catalog" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+          <Link href="/catalog" className=" hover:text-white block px-3 rounded-md text-base font-medium">
             Catalog
           </Link>
-          <Link href="/recommendations" className=" hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+          <Link href="/recommendations" className=" hover:text-white block px-3 rounded-md text-base font-medium">
             Recommendations
           </Link>
           <div className="relative w-[80%] m-2">

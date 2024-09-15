@@ -1,15 +1,12 @@
 import { auth, db } from "@/app/firebase/utils/firebaseinit";
 import {
   doc,
-  getDoc,
-  writeBatch,
   collection,
-  addDoc,
   setDoc,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
 import { Constant_Var_error, Constant_Var_NotAuthenticatedUser, Constant_Var_success, Constant_Var_watchListsFirestoreCollection } from "@/utils/constants";
-import { addUserWatchlistCached } from "../utils/SessionStorage";
+import { addUserWatchlistCached } from "../utils/CacheStorage";
 
 export default async function CreateWatchList(watchListName, type) {
   try {
@@ -40,8 +37,8 @@ export default async function CreateWatchList(watchListName, type) {
       animeList: [],
     };
     addUserWatchlistCached(watchList);
-    return { status: Constant_Var_success };
+    return { status: Constant_Var_success , response:null};
   } catch (error) {
-    return { error, status: Constant_Var_error };
+    return { response: error, status: Constant_Var_error };
   }
 }

@@ -72,13 +72,13 @@ export default function RecommendationPanel() {
                   <b>Recommend</b> button, and voilà—our magic algorithm will
                   find you anime with the most similar vibes and storylines.
                   <br /> <br />
-                  But wait, there's more! For even more awesome features and
+                  But wait, there&apos;s more! For even more awesome features and
                   filters, be sure to visit our full{" "}
                   <Link href="/recommendations" className="text-fuchsia-400">
                     {" "}
                     Recommendation Page{" "}
                   </Link>
-                  . It's a treasure trove for anime lovers like you. 🎉
+                  . It&apos;s a treasure trove for anime lovers like you. 🎉
                   <br /> <br />
                   <b className="underline">Pro Tip:</b> While our system is
                   pretty smart, typing gibberish might lead to some...

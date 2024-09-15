@@ -1,5 +1,5 @@
 import { auth, db } from "../utils/firebaseinit";
-import { deleteDoc, doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc} from "firebase/firestore";
 import { GetWatchListInfoById } from "./GetWatchListById";
 import getUserAuth from "../utils/GetCurrentUserAuth";
 import {
@@ -9,7 +9,7 @@ import {
   Constant_Var_error,
   Constant_Var_watchListsFirestoreCollection,
 } from "@/utils/constants";
-import { deleteUserWatchlistCached } from "../utils/SessionStorage";
+import { deleteUserWatchlistCached } from "../utils/CacheStorage";
 
 export default async function DeleteWatchListById(watchListId) {
   try {
@@ -20,21 +20,21 @@ export default async function DeleteWatchListById(watchListId) {
       throw new Error(Constant_Var_NotAuthenticatedUser);
     }
     const watchListInfo = await GetWatchListInfoById(watchListId);
-    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.error;
+    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
 
     if (
-      watchListInfo.data.ownerUid === userData.details.uid &&
-      watchListInfo.data.isSpecialRecent === false
+      watchListInfo.response.ownerUid === userData.details.uid &&
+      watchListInfo.response.isSpecialRecent === false
     ) {
       let response = await deleteDoc(doc(db, Constant_Var_watchListsFirestoreCollection, watchListId));
       deleteUserWatchlistCached(watchListId);
       return { status: Constant_Var_success, response: response };
     } else {
-      if (watchListInfo.data.ownerUid !== userData.details.uid)
+      if (watchListInfo.response.ownerUid !== userData.details.uid)
         throw new Error(Constant_Var_NotAuthorisedUser);
       else throw new Error("Special Watchlist:-Recent Cannot be deleted");
     }
   } catch (error) {
-    return { error, status: Constant_Var_error };
+    return { response: error, status: Constant_Var_error };
   }
 }
