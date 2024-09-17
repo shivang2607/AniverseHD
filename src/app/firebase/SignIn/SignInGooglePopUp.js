@@ -32,7 +32,7 @@ export default async function SignInGooglePopUp() {
       }),
       { expires: 20 }
     );
-    return {status:Constant_Var_success, response:null};
+    return {status:Constant_Var_success, response:result.user.uid};
     // window.location.reload();
   } catch (error) {
     const errorCode = error.code;

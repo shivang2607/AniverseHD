@@ -11,9 +11,11 @@ import { GetWatchListInfoById } from "./GetWatchListById";
 import {
   Constant_Var_RecentWatchlistSize,
   Constant_Var_error,
-  Constant_Var_NotAuthenticatedUser,
+  Constant_Var_errorMessage_notAuthenticatedUser,
   Constant_Var_success,
-  Constant_Var_watchListsFirestoreCollection,
+  Constant_Var_firebase_collectionName_watchLists,
+  Constant_Var_errorMessage_missingParams,
+  Constant_Var_firebase_collectionName_animeList,
 } from "@/utils/constants";
 import {
   addAnimeToUserWatchListCahed,
@@ -47,15 +49,16 @@ export async function AddAnimeToWatchList(
       !animeStartYear ||
       !animeType
     ) {
-      throw new Error("Missing Params in AddtoWatchList Function");
+      throw new Error(Constant_Var_errorMessage_missingParams);
     }
-    const userData = getUserAuth();
+    const userData = await getUserAuth();
     if (!userData) {
-      throw new Error(Constant_Var_NotAuthenticatedUser);
+      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
 
     const watchListInfo = await GetWatchListInfoById(watchListId);
-    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
+    if (watchListInfo.status !== Constant_Var_success)
+      throw watchListInfo.response;
 
     if (watchListInfo.response.ownerUid === userData.details.uid) {
       if (watchListInfo.response.isSpecialRecent) {
@@ -63,7 +66,13 @@ export async function AddAnimeToWatchList(
         if (resp.status != Constant_Var_success) throw resp.response;
       }
 
-      const docRef = doc(db, Constant_Var_watchListsFirestoreCollection, watchListId, "animeList", animeId);
+      const docRef = doc(
+        db,
+        Constant_Var_firebase_collectionName_watchLists,
+        watchListId,
+        Constant_Var_firebase_collectionName_animeList,
+        animeId
+      );
       const animeObject = {
         animeId: animeId,
         animeName: animeName,
@@ -83,7 +92,9 @@ export async function AddAnimeToWatchList(
       return { status: Constant_Var_success, response: null };
     } else {
       if (watchListInfo.response.ownerUid !== userData.details.uid)
-        throw new Error(Constant_Var_Constant_Var_Constant_Var_Constant_Var_NotAuthorisedUser);
+        throw new Error(
+          Constant_Var_Constant_Var_Constant_Var_Constant_Var_errorMessage_notAuthorisedUser
+        );
     }
   } catch (error) {
     return { response: error, status: Constant_Var_error };
@@ -93,6 +104,8 @@ export async function AddAnimeToWatchList(
 async function HandleRecentExcessAnime(watchListId) {
   //  No need of try and Catch as there are no custom throw errors here
   try {
+    if (!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
+
     const watchLists = await GetUserWatchLists();
     let recentAnimeList = null;
     watchLists.response.forEach((element) => {
@@ -110,33 +123,43 @@ async function HandleRecentExcessAnime(watchListId) {
       if (resp.status != Constant_Var_success) throw resp.response;
     }
 
-    return { status: Constant_Var_success, response:null };
+    return { status: Constant_Var_success, response: null };
   } catch (error) {
     return { response: error, status: Constant_Var_error };
   }
 }
+
 export async function RemoveAnimeFromWatchList(watchListId, animeId) {
   try {
     // Check if user cookies exist
     if (!watchListId || !animeId) {
-      throw new Error("Missing Params in RemoveAnimeFromWatchList Function");
+      throw new Error(Constant_Var_errorMessage_missingParams);
     }
-    const userData = getUserAuth();
+    const userData = await getUserAuth();
     if (!userData) {
-      throw new Error(Constant_Var_NotAuthenticatedUser);
+      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
 
     const watchListInfo = await GetWatchListInfoById(watchListId);
-    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
+    if (watchListInfo.status !== Constant_Var_success)
+      throw watchListInfo.response;
 
     if (watchListInfo.response.ownerUid === userData.details.uid) {
-      const docRef = doc(db, Constant_Var_watchListsFirestoreCollection, watchListId, "animeList", animeId);
+      const docRef = doc(
+        db,
+        Constant_Var_firebase_collectionName_watchLists,
+        watchListId,
+        Constant_Var_firebase_collectionName_animeList,
+        animeId
+      );
       await deleteDoc(docRef);
 
       removeAnimeFromUserWatchListCahed(watchListId, animeId);
-      return { status: Constant_Var_success, response:null };
+      return { status: Constant_Var_success, response: null };
     } else {
-      throw new Error(Constant_Var_Constant_Var_Constant_Var_Constant_Var_NotAuthorisedUser);
+      throw new Error(
+        Constant_Var_Constant_Var_Constant_Var_Constant_Var_errorMessage_notAuthorisedUser
+      );
     }
   } catch (error) {
     return { response: error, status: Constant_Var_error };
@@ -149,26 +172,33 @@ export async function UpdatePublicPrivateWatchList(watchListId, type) {
     if (!watchListId || !type) {
       throw new Error("Missing Params in AddtoWatchList Function");
     }
-    const userData = getUserAuth();
+    const userData = await getUserAuth();
     if (!userData) {
-      throw new Error(Constant_Var_NotAuthenticatedUser);
+      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
 
     const watchListInfo = await GetWatchListInfoById(watchListId);
-    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
+    if (watchListInfo.status !== Constant_Var_success)
+      throw watchListInfo.response;
 
     if (
       watchListInfo.response.ownerUid === userData.details.uid &&
       watchListInfo.response.isSpecialRecent === false
     ) {
-      const docRef = doc(db, Constant_Var_watchListsFirestoreCollection, watchListId);
+      const docRef = doc(
+        db,
+        Constant_Var_firebase_collectionName_watchLists,
+        watchListId
+      );
       await updateDoc(docRef, {
         type: type,
       });
-      return { status: Constant_Var_success , response:null};
+      return { status: Constant_Var_success, response: null };
     } else {
       if (watchListInfo.response.ownerUid !== userData.details.uid)
-        throw new Error(Constant_Var_Constant_Var_Constant_Var_Constant_Var_NotAuthorisedUser);
+        throw new Error(
+          Constant_Var_Constant_Var_Constant_Var_Constant_Var_errorMessage_notAuthorisedUser
+        );
       else throw new Error("Special Watchlist:-Recent Cannot be deleted");
     }
   } catch (error) {

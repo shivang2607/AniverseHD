@@ -1,13 +1,21 @@
-import { Constant_Var_error, Constant_Var_success } from "@/utils/constants";
+import {
+  Constant_Var_error,
+  Constant_Var_errorMessage_missingParams,
+  Constant_Var_success,
+} from "@/utils/constants";
 import createBlobFromImageUrl from "@/utils/CreateBlobFromImageUrl";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "./firebaseinit";
 
-export default async function uploadImageToFirebaseStorage(path, imageUrl = false, blob = false) {
+export default async function uploadImageToFirebaseStorage(
+  path,
+  imageUrl = false,
+  blob = false
+) {
   try {
     // Ensure either imageUrl or blob is provided
     if (!imageUrl && !blob) {
-      throw new Error('Please provide either imageUrl or Blob.');
+      throw new Error(Constant_Var_errorMessage_missingParams);
     }
 
     const imagePathRef = ref(storage, path);
@@ -24,11 +32,9 @@ export default async function uploadImageToFirebaseStorage(path, imageUrl = fals
       const resp = await createBlobFromImageUrl(imageUrl);
 
       // Check if blob creation was successful
-      if (resp.status !== Constant_Var_success) {
-        throw new Error(resp.response);
-      }
-
-      const snap = await uploadBytes(imagePathRef, resp.blob);
+      if (resp.status !== Constant_Var_success) throw resp.response;
+      
+      const snap = await uploadBytes(imagePathRef, resp.response);
       const downloadURL = await getDownloadURL(snap.ref);
       return { status: Constant_Var_success, response: downloadURL };
     }

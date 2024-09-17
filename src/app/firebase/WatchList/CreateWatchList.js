@@ -5,20 +5,20 @@ import {
   setDoc,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
-import { Constant_Var_error, Constant_Var_NotAuthenticatedUser, Constant_Var_success, Constant_Var_watchListsFirestoreCollection } from "@/utils/constants";
+import { Constant_Var_error, Constant_Var_errorMessage_missingParams, Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success, Constant_Var_firebase_collectionName_watchLists } from "@/utils/constants";
 import { addUserWatchlistCached } from "../utils/CacheStorage";
 
 export default async function CreateWatchList(watchListName, type) {
   try {
     // Check if user cookies exist
     if (!watchListName || !type) {
-      throw new Error("Missing Params");
+      throw new Error(Constant_Var_errorMessage_missingParams);
     }
-    const userData = getUserAuth();
+    const userData = await getUserAuth();
     if (!userData) {
-      throw new Error(Constant_Var_NotAuthenticatedUser);
+      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
-    const docRef = doc(collection(db, Constant_Var_watchListsFirestoreCollection));
+    const docRef = doc(collection(db, Constant_Var_firebase_collectionName_watchLists));
     await setDoc(docRef, {
       ownerEmail: userData.details.email,
       ownerUid: userData.details.uid,

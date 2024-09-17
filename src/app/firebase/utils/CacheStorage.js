@@ -1,83 +1,104 @@
-import { Constant_Var_userwatchListsSessionStorage } from "@/utils/constants";
+import {
+  Constant_Var_sessionStorage_key_loggedInUser,
+  Constant_Var_sessionStorage_key_loggedInWatchLists,
+} from "@/utils/constants";
 
 export const getUserInfoCached = () => {
-  const userData = sessionStorage.getItem("user");
+  const userData = sessionStorage.getItem(
+    Constant_Var_sessionStorage_key_loggedInUser
+  );
 
   if (userData != null) return JSON.parse(userData);
   else return null;
 };
 
 export const setUserInfoCached = (userData) => {
-    // console.log("setting data",userData);
-  sessionStorage.setItem("user", JSON.stringify(userData));
+  // console.log("setting data",userData);
+  sessionStorage.setItem(
+    Constant_Var_sessionStorage_key_loggedInUser,
+    JSON.stringify(userData)
+  );
 };
-
-export const updateUserName =(name)=>{
+export const changeUserNameCached = (userName)=>{
   let userData= getUserInfoCached();
-
-  if(userData==null) return;
-
-  userData.userName=name;
+  userData.details.userName=userName;
   setUserInfoCached(userData);
 }
 
+export const updateUserName = (name) => {
+  let userData = getUserInfoCached();
+
+  if (userData == null) return;
+
+  userData.userName = name;
+  setUserInfoCached(userData);
+};
+
 export const getUserWatchlistsCached = () => {
-  const userWatchlists = sessionStorage.getItem(Constant_Var_userwatchListsSessionStorage);
+  const userWatchlists = sessionStorage.getItem(
+    Constant_Var_sessionStorage_key_loggedInWatchLists
+  );
 
   if (userWatchlists != null) return JSON.parse(userWatchlists);
   else return null;
 };
 
 export const setUserWatchlistsCached = (watchLists) => {
-  sessionStorage.setItem(Constant_Var_userwatchListsSessionStorage, JSON.stringify(watchLists));
+  sessionStorage.setItem(
+    Constant_Var_sessionStorage_key_loggedInWatchLists,
+    JSON.stringify(watchLists)
+  );
 };
 
-export const addAnimeToUserWatchListCahed = (watchListId,anime) => {
+export const addAnimeToUserWatchListCahed = (watchListId, anime) => {
   let watchLists = getUserWatchlistsCached();
 
-  if(watchLists==null) return;
+  if (watchLists == null) return;
 
-  watchLists=watchLists.map((item)=>{
-    if(item.id==watchListId){
-     let exists= item.animeList.some(item => item.animeId===anime.animeId);
-  
-     !exists && item.animeList.push(anime);
+  watchLists = watchLists.map((item) => {
+    if (item.id == watchListId) {
+      let exists = item.animeList.some(
+        (item) => item.animeId === anime.animeId
+      );
+
+      !exists && item.animeList.push(anime);
 
       return item;
-    }else return item;
+    } else return item;
   });
 
   setUserWatchlistsCached(watchLists);
 };
 
-export const removeAnimeFromUserWatchListCahed = (watchListId,animeId) => {
+export const removeAnimeFromUserWatchListCahed = (watchListId, animeId) => {
   let watchLists = getUserWatchlistsCached();
 
-  if(watchLists==null) return;
+  if (watchLists == null) return;
 
-  watchLists=watchLists.map((item)=>{
-    if(item.id==watchListId){
-      item.animeList= item.animeList.filter(anime=>{ return anime.animeId!==animeId});
+  watchLists = watchLists.map((item) => {
+    if (item.id == watchListId) {
+      item.animeList = item.animeList.filter((anime) => {
+        return anime.animeId !== animeId;
+      });
       return item;
-    }else return item;
+    } else return item;
   });
 
   setUserWatchlistsCached(watchLists);
 };
 
+export const addUserWatchlistCached = (watchList) => {
+  let watchLists = getUserWatchlistsCached();
+  if (watchLists == null) return;
+  watchLists.push(watchList);
+  setUserWatchlistsCached(watchLists);
+};
 
-export const addUserWatchlistCached=(watchList)=>{
-    let watchLists= getUserWatchlistsCached();
-    if(watchLists==null) return;
-    watchLists.push(watchList);
-    setUserWatchlistsCached(watchLists);
-}
-
-export const deleteUserWatchlistCached=(watchListId)=>{
-  let watchLists= getUserWatchlistsCached();
-  if(watchLists==null) return;
-  watchLists=watchLists.filter(list=>{
-    return list.id!==watchListId;
+export const deleteUserWatchlistCached = (watchListId) => {
+  let watchLists = getUserWatchlistsCached();
+  if (watchLists == null) return;
+  watchLists = watchLists.filter((list) => {
+    return list.id !== watchListId;
   });
   setUserWatchlistsCached(watchLists);
-}
+};

@@ -1,19 +1,20 @@
-import { ref, uploadBytes} from "firebase/storage";
 import getUserAuth from "../utils/GetCurrentUserAuth";
-import { Constant_Var_error, Constant_Var_NotAuthenticatedUser, Constant_Var_success } from "@/utils/constants";
-import { storage } from "../utils/firebaseinit";
+import { Constant_Var_error, Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success } from "@/utils/constants";
+import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage";
 
-export default async function UpdateCoverImage(blob) {
+export default async function UpdateCoverImage(blob=false, imageUrl=false) {
   try {
     // Check if user cookies exist
-    const userData = getUserAuth();
+    const userData = await getUserAuth();
     if (!userData) {
-      throw new Error(Constant_Var_NotAuthenticatedUser);
+      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
-    const imagePathRef = ref(storage, `/coverImage/${userData.details.uid}`);
-           await uploadBytes(imagePathRef, blob);
+    
+   const resp= await uploadImageToFirebaseStorage(`/coverImage/${userData.details.uid}`,imageUrl,blob);
 
-    return { status: Constant_Var_success, response: null };
+   if(resp.status===Constant_Var_error) throw resp.response;
+
+   return { status: Constant_Var_success, response: resp.response };
   } catch (error) {
     return { response: error, status: Constant_Var_error };
   }

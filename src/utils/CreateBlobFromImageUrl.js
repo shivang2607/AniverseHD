@@ -15,8 +15,8 @@ export default async function createBlobFromImageUrl(imageUrl) {
       const blob = await response.blob();
   
       // You now have a Blob object you can use (e.g., upload, download, etc.)
-      return { status: "success", blob: blob };
+      return { status: "success", response: blob };
     } catch (error) {
-      return { error, status: "error" };
+      return { response:error, status: "error" };
     }
   }

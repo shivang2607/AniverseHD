@@ -5,24 +5,17 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import getUserAuth from "../utils/GetCurrentUserAuth";
-import { Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success, Constant_Var_error, Constant_Var_firebase_collectionName_watchLists, Constant_Var_errorMessage_noWatchListExists, Constant_Var_firebase_collectionName_animeList, Constant_Var_firebase_fieldName_ownerUid } from "@/utils/constants";
-import { getUserWatchlistsCached, setUserWatchlistsCached } from "../utils/CacheStorage";
+import {Constant_Var_success, Constant_Var_error, Constant_Var_firebase_collectionName_watchLists, Constant_Var_firebase_fieldName_ownerUid, Constant_Var_firebase_fieldValue_public, Constant_Var_firebase_fieldName_type, Constant_Var_errorMessage_missingParams, Constant_Var_firebase_collectionName_animeList } from "@/utils/constants";
 
-export default async function GetUserWatchLists() {
+export default async function GetOtherUserWatchLists(userId) {
   try {
-    // Check if user cookies exist
-    const userData = await getUserAuth();
-    if (!userData) {
-      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
-    }
 
-    const cachedUserWatchlists=getUserWatchlistsCached();
-    if(cachedUserWatchlists!=null) return { status: Constant_Var_success, response: cachedUserWatchlists };
+    if(!userId) throw new Error(Constant_Var_errorMessage_missingParams);
     
     const watchListquery = query(
       collection(db, Constant_Var_firebase_collectionName_watchLists),
-      where(Constant_Var_firebase_fieldName_ownerUid, "==", userData.details.uid)
+      where(Constant_Var_firebase_fieldName_ownerUid, "==", userId), 
+      where(Constant_Var_firebase_fieldName_type,"==",Constant_Var_firebase_fieldValue_public)
     );
     let userwatchLists = await getDocs(watchListquery);
 
@@ -38,10 +31,6 @@ export default async function GetUserWatchLists() {
       promises.push(getDocs(collectionRef));
     });
 
-
-   // handeling case if user Profile not created yet
-     if(promises.length==0) throw new Error(Constant_Var_errorMessage_noWatchListExists);
-
     // Wait for all animeList queries to resolve
     const animeListResponses = await Promise.all(promises);
 
@@ -53,7 +42,6 @@ export default async function GetUserWatchLists() {
       };
     });
 
-    setUserWatchlistsCached(result);
     return { status: Constant_Var_success, response: result };
   } catch (error) {
     return { response: error, status: Constant_Var_error };

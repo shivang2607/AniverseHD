@@ -3,22 +3,25 @@ import { deleteDoc, doc} from "firebase/firestore";
 import { GetWatchListInfoById } from "./GetWatchListById";
 import getUserAuth from "../utils/GetCurrentUserAuth";
 import {
-  Constant_Var_NotAuthenticatedUser,
-  Constant_Var_NotAuthorisedUser,
+  Constant_Var_errorMessage_notAuthenticatedUser,
+  Constant_Var_errorMessage_notAuthorisedUser,
   Constant_Var_success,
   Constant_Var_error,
-  Constant_Var_watchListsFirestoreCollection,
+  Constant_Var_firebase_collectionName_watchLists,
+  Constant_Var_errorMessage_missingParams,
 } from "@/utils/constants";
 import { deleteUserWatchlistCached } from "../utils/CacheStorage";
 
 export default async function DeleteWatchListById(watchListId) {
   try {
+    if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
     // Check if user cookies exist
-    const userData = getUserAuth();
+    const userData = await getUserAuth();
 
     if (!userData) {
-      throw new Error(Constant_Var_NotAuthenticatedUser);
+      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
+    
     const watchListInfo = await GetWatchListInfoById(watchListId);
     if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
 
@@ -26,14 +29,16 @@ export default async function DeleteWatchListById(watchListId) {
       watchListInfo.response.ownerUid === userData.details.uid &&
       watchListInfo.response.isSpecialRecent === false
     ) {
-      let response = await deleteDoc(doc(db, Constant_Var_watchListsFirestoreCollection, watchListId));
+      let response = await deleteDoc(doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId));
       deleteUserWatchlistCached(watchListId);
       return { status: Constant_Var_success, response: response };
+
     } else {
       if (watchListInfo.response.ownerUid !== userData.details.uid)
-        throw new Error(Constant_Var_NotAuthorisedUser);
+        throw new Error(Constant_Var_errorMessage_notAuthorisedUser);
       else throw new Error("Special Watchlist:-Recent Cannot be deleted");
     }
+
   } catch (error) {
     return { response: error, status: Constant_Var_error };
   }

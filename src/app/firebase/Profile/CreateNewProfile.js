@@ -1,4 +1,4 @@
-import { auth, db} from "../utils/firebaseinit";
+import { db } from "../utils/firebaseinit";
 import {
   doc,
   writeBatch,
@@ -6,18 +6,28 @@ import {
   collection,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetCurrentUserAuth";
-import { Constant_Var_error, Constant_Var_firestoreUsers, Constant_Var_NotAuthenticatedUser,Constant_Var_profileCreationAlradyUnderProgress,Constant_Var_success, Constant_Var_watchListsFirestoreCollection} from "@/utils/constants";
+import {
+  Constant_Var_error,
+  Constant_Var_firebase_collectionName_users,
+  Constant_Var_errorMessage_notAuthenticatedUser,
+  Constant_Var_errorMessage_profileCreationAlradyUnderProgress,
+  Constant_Var_success,
+  Constant_Var_firebase_collectionName_watchLists,
+  Constant_Var_firebase_fieldValue_private,
+} from "@/utils/constants";
 import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage";
 
 // Global variable to track if a profile is being created, avoid race condition
 let isProfileBeingCreated = false;
 
 export default async function CreateNewProfile() {
-  try {  
-    const userData = getUserAuth();
-    if (!userData) throw new Error(Constant_Var_NotAuthenticatedUser);
+  try {
+    const userData = await getUserAuth();
+    if (!userData)
+      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
 
-    if (isProfileBeingCreated) throw new Error(Constant_Var_profileCreationAlradyUnderProgress);
+    if (isProfileBeingCreated)
+      throw new Error(Constant_Var_errorMessage_profileCreationAlradyUnderProgress);
 
     isProfileBeingCreated = true;
     //Uploading profile Image to firebase storage
@@ -25,25 +35,31 @@ export default async function CreateNewProfile() {
       `/profileImage/${userData.details.uid}`,
       userData.details.photo
     );
-    const coverResp= await uploadImageToFirebaseStorage(`/coverImage/${userData.details.uid}`,"https://cdn.pixabay.com/photo/2015/08/23/09/22/banner-902589_640.jpg");
 
+    const coverResp = await uploadImageToFirebaseStorage(
+      `/coverImage/${userData.details.uid}`,
+      "https://cdn.pixabay.com/photo/2015/08/23/09/22/banner-902589_640.jpg"
+    );
 
     if (resp.status === Constant_Var_error) throw resp.response;
     if (coverResp.status === Constant_Var_error) throw coverResp.response;
 
     const photoURL = resp.response;
-    const coverURL= coverResp.response;
+    const coverURL = coverResp.response;
 
     const batch = writeBatch(db);
 
-    batch.set(doc(db, Constant_Var_firestoreUsers, userData.details.uid), {
-      dateJoined: serverTimestamp(),
-      userName: userData.details.name,
-      email: userData.details.email,
-      photoUrl: photoURL,
-      coverUrl:coverURL,
-      uid: userData.details.uid,
-    });
+    batch.set(
+      doc(db, Constant_Var_firebase_collectionName_users, userData.details.uid),
+      {
+        dateJoined: serverTimestamp(),
+        userName: userData.details.name,
+        email: userData.details.email,
+        photoUrl: photoURL,
+        coverUrl: coverURL,
+        uid: userData.details.uid,
+      }
+    );
 
     const watchLists = [
       "Recent",
@@ -54,7 +70,7 @@ export default async function CreateNewProfile() {
       "Completed",
     ];
     watchLists.forEach((listName) => {
-      createWatchListInBatch(batch, listName, "private", userData);
+      createWatchListInBatch(batch, listName, Constant_Var_firebase_fieldValue_private, userData);
     });
 
     await batch.commit();
@@ -67,8 +83,11 @@ export default async function CreateNewProfile() {
     return { response: error, status: Constant_Var_error };
   }
 }
+
 async function createWatchListInBatch(batch, watchListName, type, userData) {
-  const docRef = doc(collection(db, Constant_Var_watchListsFirestoreCollection));
+  const docRef = doc(
+    collection(db, Constant_Var_firebase_collectionName_watchLists)
+  );
   batch.set(docRef, {
     ownerEmail: userData.details.email,
     ownerUid: userData.details.uid,

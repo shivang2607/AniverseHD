@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 
-export default function getUserAuth() {
+export default async function getUserAuth() {
   const user = Cookies.get("user");
   if (user) {
     const details = JSON.parse(user);

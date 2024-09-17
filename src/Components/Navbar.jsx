@@ -9,6 +9,8 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import SignInGooglePopUp from '@/app/firebase/SignIn/SignInGooglePopUp';
 import { Constant_Var_success } from '@/utils/constants';
+import UpdateCoverImage from '@/app/firebase/Profile/UpdateCoverImage';
+import UpdateProfileImage from '@/app/firebase/Profile/UpdateProfileImage';
 
 
 const Navbar = () => {
@@ -27,10 +29,14 @@ const Navbar = () => {
     const res=await SignInGooglePopUp();
     
     if(res.status===Constant_Var_success){
-       router.push('/profile');
+       router.push(`/profile/${res.response}`);
     }else{
 
     }
+    // const res1= await UpdateCoverImage(false,"/cover_test2.png");
+    // const res2= await UpdateProfileImage(false,"/profile_test.jpg");
+
+    // console.log(res1);
   }
 
 
@@ -73,9 +79,9 @@ const Navbar = () => {
 
   return (
     <nav
-    className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"}  backdrop-blur-sm bg-black py-3 border-b-[0px] border-b-primary-100 w-full z-50 transition-transform duration-300 ${
+    className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"} py-1 border-b-[1px] border-b-primary-100 w-full z-50 transition-transform duration-300 backdrop-blur-sm ${
       showNavbar ? 'translate-y-0' : '-translate-y-full'
-    } ${isBackgroundVisible?'bg-opacity-50':'bg-opacity-0'}`}
+    } ${isBackgroundVisible?'bg-black/30':'bg-opacity-0'}`}
   >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -103,9 +109,6 @@ const Navbar = () => {
               </div>
             </div>
 
-           
-
-
           </div>
           <div className="flex items-center flex-row-reverse md:flex-row gap-8">
           <div className="ml-auto flex md:hidden">
@@ -113,7 +116,6 @@ const Navbar = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
               >
-                
                 {isOpen ? (
                   <HiX className="h-6 w-6" />
                  ) : (
@@ -129,7 +131,7 @@ const Navbar = () => {
                 <FaSearch className={`${searchOpen?"text-sky-500":"text-[whitesmoke]"} md:block hidden`} size={20}/>
                 </button>
                 </div>
-            <button className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-8 py-2.5 rounded-xl text-md " onClick={handleSignIn}>Login</button>
+            <button className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md " onClick={handleSignIn}>Login</button>
             {/* <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleTest}>test</button> */}
           </div>
           
