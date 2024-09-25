@@ -79,7 +79,7 @@ const Navbar = () => {
 
   return (
     <nav
-    className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"} py-1 border-b-[1px] border-b-primary-100 w-full z-50 transition-transform duration-300 backdrop-blur-sm ${
+    className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"} py-1 border-b-[1px] border-b-primary-100 w-full z-20 transition-transform duration-300 backdrop-blur-sm ${
       showNavbar ? 'translate-y-0' : '-translate-y-full'
     } ${isBackgroundVisible?'bg-black/30':'bg-opacity-0'}`}
   >

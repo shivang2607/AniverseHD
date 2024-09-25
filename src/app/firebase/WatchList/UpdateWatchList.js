@@ -21,7 +21,7 @@ import {
   addAnimeToUserWatchListCahed,
   removeAnimeFromUserWatchListCahed,
 } from "../utils/CacheStorage";
-import GetUserWatchLists from "./GetUserWatchLists";
+import GetUserWatchLists from "./GetLoggedUserWatchListsInfo";
 
 export async function AddAnimeToWatchList(
   watchListId,
@@ -73,6 +73,7 @@ export async function AddAnimeToWatchList(
         Constant_Var_firebase_collectionName_animeList,
         animeId
       );
+
       const animeObject = {
         animeId: animeId,
         animeName: animeName,
@@ -85,6 +86,7 @@ export async function AddAnimeToWatchList(
         animeLength: animeLength,
         timestamp: Timestamp.now(),
       };
+      
       await setDoc(docRef, animeObject);
 
       addAnimeToUserWatchListCahed(watchListId, animeObject);

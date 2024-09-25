@@ -14,6 +14,7 @@ import {
   Constant_Var_success,
   Constant_Var_firebase_collectionName_watchLists,
   Constant_Var_firebase_fieldValue_private,
+  Constant_Array_firebase_profileImageArr,
 } from "@/utils/constants";
 import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage";
 
@@ -27,18 +28,21 @@ export default async function CreateNewProfile() {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
 
     if (isProfileBeingCreated)
-      throw new Error(Constant_Var_errorMessage_profileCreationAlradyUnderProgress);
+      throw new Error(
+        Constant_Var_errorMessage_profileCreationAlradyUnderProgress
+      );
 
     isProfileBeingCreated = true;
+
     //Uploading profile Image to firebase storage
     const resp = await uploadImageToFirebaseStorage(
       `/profileImage/${userData.details.uid}`,
-      userData.details.photo
+      getRandomProfileImageUrl()
     );
 
     const coverResp = await uploadImageToFirebaseStorage(
       `/coverImage/${userData.details.uid}`,
-      "https://cdn.pixabay.com/photo/2015/08/23/09/22/banner-902589_640.jpg"
+      "/cover_test.png"
     );
 
     if (resp.status === Constant_Var_error) throw resp.response;
@@ -70,7 +74,12 @@ export default async function CreateNewProfile() {
       "Completed",
     ];
     watchLists.forEach((listName) => {
-      createWatchListInBatch(batch, listName, Constant_Var_firebase_fieldValue_private, userData);
+      createWatchListInBatch(
+        batch,
+        listName,
+        Constant_Var_firebase_fieldValue_private,
+        userData
+      );
     });
 
     await batch.commit();
@@ -89,11 +98,23 @@ async function createWatchListInBatch(batch, watchListName, type, userData) {
     collection(db, Constant_Var_firebase_collectionName_watchLists)
   );
   batch.set(docRef, {
-    ownerEmail: userData.details.email,
     ownerUid: userData.details.uid,
     watchListName: watchListName,
     type: type,
     isSpecialRecent: watchListName === "Recent",
     id: docRef.id,
+    count:0,
   });
+}
+
+function getRandomProfileImageUrl() {
+  // Generate a random index between 0 and the length of the array - 1
+  const randomIndex = Math.floor(
+    Math.random() * Constant_Array_firebase_profileImageArr.length
+  );
+
+  // Select the image at the random index
+  const selectedImage = Constant_Array_firebase_profileImageArr[randomIndex];
+
+  return selectedImage; // You can return or use this selected image as needed
 }

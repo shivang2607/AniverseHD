@@ -4,7 +4,8 @@ export const Constant_Var_error = "error";
 export let Constant_Var_RecentWatchlistSize = 4;
 
 // # Session Storage Variables #
-export const Constant_Var_sessionStorage_key_loggedInWatchLists = "userwatchLists";
+export const Constant_Var_sessionStorage_key_userWatchListsInfo  = "userwatchLists";
+export const Constant_Var_sessionStorage_key_watchListInfo = "watchListInfo";
 export const Constant_Var_sessionStorage_key_loggedInUser = "user";
 
 
@@ -31,6 +32,11 @@ export const Constant_Var_errorMessage_profileCreationAlradyUnderProgress =
   "Profile Creation Alrady Under Progress";
 export const Constant_Var_errorMessage_noWatchListExists= "No watchlist Exists";
 export const Constant_Var_errorMessage_userDoesNotExistWithThisId =
-  "User Does Not Exist";
+  "User Does Not Exist with Id";
+export const Constant_Var_errorMessage_loggedInUserDoesNostExistsYet =
+  "Logged In User Does Not Exist Yet";
 export const Constant_Var_errorMessage_missingParams = "Missing params";
 export const Constant_Var_errorMessage_privateWatchList = "Private WatchList";
+
+// # Starter user Profile Images Array #
+export  const Constant_Array_firebase_profileImageArr=["/userProfileImage1.jpg"," /userProfileImage2.png","/userProfileImage3.jpg","/userProfileImage4.webp","/userProfileImage5.jpg","/userProfileImage6.jpg","/userProfileImage7.jpg","/userProfileImage7.jpg"];

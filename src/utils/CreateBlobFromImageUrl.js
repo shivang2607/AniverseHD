@@ -9,7 +9,7 @@ export default async function createBlobFromImageUrl(imageUrl) {
       // Fetch the image from the URL
       const response = await fetch(imageUrl);
       if (!response.ok)
-        throw new customError("Error fetching Gmail photo URL", response);
+        throw new customError("Error fetching photo URL", response);
   
       // Convert the response to a Blob
       const blob = await response.blob();

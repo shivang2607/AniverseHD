@@ -19,24 +19,25 @@ export default async function CreateWatchList(watchListName, type) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
     const docRef = doc(collection(db, Constant_Var_firebase_collectionName_watchLists));
+
     await setDoc(docRef, {
-      ownerEmail: userData.details.email,
       ownerUid: userData.details.uid,
       watchListName: watchListName,
       type: type,
       isSpecialRecent: false,
       id: docRef.id,
+      count:0,
     });
-    const watchList = {
-      ownerEmail: userData.details.email,
+
+    const watchListInfo = {
       ownerUid: userData.details.uid,
       watchListName: watchListName,
       type: type,
       isSpecialRecent: false,
       id: docRef.id,
-      animeList: [],
+      count:0,
     };
-    addUserWatchlistCached(watchList);
+    addUserWatchlistCached(watchListInfo,docRef.id,userData.details.uid);
     return { status: Constant_Var_success , response:null};
   } catch (error) {
     return { response: error, status: Constant_Var_error };

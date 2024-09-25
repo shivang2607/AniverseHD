@@ -12,7 +12,7 @@ export default async function UpdateName(userName) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
     await updateDoc(doc(db, Constant_Var_firebase_collectionName_users, userData.details.uid), {
-      username: userName,
+      userName: userName,
     });
     changeUserNameCached(userName);
     

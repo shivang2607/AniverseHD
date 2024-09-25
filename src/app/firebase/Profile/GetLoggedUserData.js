@@ -8,6 +8,8 @@ import {
   Constant_Var_firebase_collectionName_users,
   Constant_Var_errorMessage_notAuthenticatedUser,
   Constant_Var_success,
+  Constant_Var_errorMessage_userDoesNotExistWithThisId,
+  Constant_Var_errorMessage_loggedInUserDoesNostExistsYet,
 } from "@/utils/constants";
 
 export default async function GetLoggedUserData() {
@@ -32,12 +34,9 @@ export default async function GetLoggedUserData() {
       const userData = data.data();
       setUserInfoCached(userData);
       return { status: Constant_Var_success, response: userData };
+    }else{
+      throw new Error(Constant_Var_errorMessage_loggedInUserDoesNostExistsYet);
     }
-
-    const resp = await CreateNewProfile();
-    if (resp.status !== Constant_Var_success) throw resp.response;
-
-    return await GetLoggedUserData();
   } catch (error) {
     return { status: Constant_Var_error, response: error };
   }
