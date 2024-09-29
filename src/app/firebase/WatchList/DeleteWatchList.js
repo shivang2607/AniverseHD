@@ -1,7 +1,7 @@
 import { auth, db } from "../utils/firebaseinit";
 import { deleteDoc, doc} from "firebase/firestore";
 import { GetWatchListInfoById } from "./GetWatchListById";
-import getUserAuth from "../utils/GetCurrentUserAuth";
+import getUserAuth from "../utils/GetUserAuth";
 import {
   Constant_Var_errorMessage_notAuthenticatedUser,
   Constant_Var_errorMessage_notAuthorisedUser,
@@ -22,12 +22,12 @@ export default async function DeleteWatchListById(watchListId) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
     
-    const watchListInfo = await GetWatchListInfoById(watchListId);
+    const watchListInfo = await GetWatchListInfoById(watchListId,false);
     if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
 
     if (
       watchListInfo.response.ownerUid === userData.details.uid &&
-      watchListInfo.response.isSpecialRecent === false
+      watchListInfo.response.isSpecialStarter === false
     ) {
       let response = await deleteDoc(doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId));
       deleteUserWatchlistCached(watchListId);

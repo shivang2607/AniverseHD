@@ -1,6 +1,6 @@
 import {db } from "../utils/firebaseinit";
 import { doc, updateDoc } from "firebase/firestore";
-import getUserAuth from "../utils/GetCurrentUserAuth";
+import getUserAuth from "../utils/GetUserAuth";
 import { Constant_Var_error, Constant_Var_firebase_collectionName_users, Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success } from "@/utils/constants";
 import { changeUserNameCached } from "../utils/CacheStorage";
 

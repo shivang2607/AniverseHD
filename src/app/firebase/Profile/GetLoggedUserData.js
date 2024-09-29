@@ -1,7 +1,7 @@
 import { db } from "../utils/firebaseinit";
 import { doc, getDoc } from "firebase/firestore";
 import CreateNewProfile from "./CreateNewProfile";
-import getUserAuth from "../utils/GetCurrentUserAuth";
+import getUserAuth from "../utils/GetUserAuth";
 import { getUserInfoCached, setUserInfoCached } from "../utils/CacheStorage";
 import {
   Constant_Var_error,

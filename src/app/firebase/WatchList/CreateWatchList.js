@@ -3,10 +3,12 @@ import {
   doc,
   collection,
   setDoc,
+  Timestamp,
 } from "firebase/firestore";
-import getUserAuth from "../utils/GetCurrentUserAuth";
+import getUserAuth from "../utils/GetUserAuth";
 import { Constant_Var_error, Constant_Var_errorMessage_missingParams, Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success, Constant_Var_firebase_collectionName_watchLists } from "@/utils/constants";
 import { addUserWatchlistCached } from "../utils/CacheStorage";
+import WatchListModel from "../DocumentModels/WatchListModel";
 
 export default async function CreateWatchList(watchListName, type) {
   try {
@@ -29,14 +31,14 @@ export default async function CreateWatchList(watchListName, type) {
       count:0,
     });
 
-    const watchListInfo = {
+    const watchListInfo = WatchListModel({
       ownerUid: userData.details.uid,
       watchListName: watchListName,
       type: type,
-      isSpecialRecent: false,
+      isSpecialStarter: false,
       id: docRef.id,
-      count:0,
-    };
+    });
+    
     addUserWatchlistCached(watchListInfo,docRef.id,userData.details.uid);
     return { status: Constant_Var_success , response:null};
   } catch (error) {

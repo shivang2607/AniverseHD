@@ -6,7 +6,7 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import getUserAuth from "../utils/GetCurrentUserAuth";
+import getUserAuth from "../utils/GetUserAuth";
 import { GetWatchListInfoById } from "./GetWatchListById";
 import {
   Constant_Var_RecentWatchlistSize,

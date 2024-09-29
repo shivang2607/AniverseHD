@@ -1,5 +1,5 @@
 import { ref, uploadBytes } from "firebase/storage";
-import getUserAuth from "../utils/GetCurrentUserAuth";
+import getUserAuth from "../utils/GetUserAuth";
 import {
   Constant_Var_error,
   Constant_Var_errorMessage_notAuthenticatedUser,

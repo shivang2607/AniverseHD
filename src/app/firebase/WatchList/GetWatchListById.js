@@ -1,6 +1,6 @@
 import { auth, db } from "../utils/firebaseinit";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import getUserAuth from "../utils/GetCurrentUserAuth";
+import getUserAuth from "../utils/GetUserAuth";
 import {
   Constant_Var_errorMessage_notAuthenticatedUser,
   Constant_Var_success,
@@ -11,32 +11,29 @@ import {
   Constant_Var_firebase_collectionName_animeList,
   Constant_Var_errorMessage_privateWatchList,
 } from "@/utils/constants";
+import {
+  getWatchListInfoByIdInfoCached,
+  setWatchListInfoByIdInfoCached,
+} from "../utils/CacheStorage";
 
-export default async function GetWatchListById(watchListId) {
+export default async function GetWatchListById(watchListId,offset,count) {
   try {
-    if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
-    
-    // Check if user cookies exist
-    const userData = await getUserAuth();
-    if (!userData) {
-      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
-    }
+    if (!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
 
-    let watchListInfo = await GetWatchListInfoById(watchListId, userData);
+    let watchListInfo = await GetWatchListInfoById(watchListId);
 
-    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
+    if (watchListInfo.status !== Constant_Var_success)
+      throw watchListInfo.response;
 
     //Checking if the watchList is public or current user is the owner
-    if (
-      watchListInfo.response.ownerUid === userData.details.uid ||
-      watchListInfo.response.type === Constant_Var_firebase_fieldValue_public
-    ) {
+    if (watchListInfo.response.type === Constant_Var_firebase_fieldValue_public) {  
       const collectionRef = collection(
         db,
         Constant_Var_firebase_collectionName_watchLists,
         watchListId,
         Constant_Var_firebase_collectionName_animeList
       );
+      // query(collectionRef, orderBy("createdAt"), startAt(offset));
       const animeList = await getDocs(collectionRef);
       let animeListArr = [];
 
@@ -47,20 +44,31 @@ export default async function GetWatchListById(watchListId) {
       let result = { ...watchListInfo.response, animeList: animeListArr };
       return { status: Constant_Var_success, response: result };
     } else {
-      throw new Error(Constant_Var_errorMessage_privateWatchList);
+      // Check if user cookies exist
+      const userData = await getUserAuth();
+      if (!userData) {
+        throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
+      }
+
+      if (watchListInfo.response.ownerUid === userData.details.uid) {
+
+      } else {
+        throw new Error(Constant_Var_errorMessage_privateWatchList);
+      }
     }
   } catch (error) {
     return { response: error, status: Constant_Var_error };
   }
 }
 
-export const GetWatchListInfoById = async (watchListId,userData1=null) => {
+export const GetWatchListInfoById = async (watchListId, getFromCache = true) => {
   try {
     // Check if user cookies exist
-    const userData = userData1? userData1 :await getUserAuth();
-    if (!userData) {
-      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
-    }
+    const cachedWatchListInfo = getWatchListInfoByIdInfoCached(watchListId);
+
+    if (cachedWatchListInfo != null && getFromCache)
+      return { status: Constant_Var_success, response: cachedWatchListInfo };
+
     const docRef = doc(
       db,
       Constant_Var_firebase_collectionName_watchLists,
@@ -69,6 +77,7 @@ export const GetWatchListInfoById = async (watchListId,userData1=null) => {
     const dataWatchlist = await getDoc(docRef);
 
     if (dataWatchlist.exists()) {
+      setWatchListInfoByIdInfoCached(dataWatchlist.data(), watchListId);
       return { status: Constant_Var_success, response: dataWatchlist.data() };
     } else {
       throw new Error(`Watchlist with id=${watchListId} does not exists`);

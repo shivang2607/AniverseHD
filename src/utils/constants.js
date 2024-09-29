@@ -40,3 +40,14 @@ export const Constant_Var_errorMessage_privateWatchList = "Private WatchList";
 
 // # Starter user Profile Images Array #
 export  const Constant_Array_firebase_profileImageArr=["/userProfileImage1.jpg"," /userProfileImage2.png","/userProfileImage3.jpg","/userProfileImage4.webp","/userProfileImage5.jpg","/userProfileImage6.jpg","/userProfileImage7.jpg","/userProfileImage7.jpg"];
+
+
+// #Default Watchlists #
+export const starterWatchLists = [
+  "Recent",
+  "Dropped",
+  "Favourite",
+  "On Hold",
+  "Plan To Watch",
+  "Completed",
+];

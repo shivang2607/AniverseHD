@@ -4,8 +4,9 @@ import {
   writeBatch,
   serverTimestamp,
   collection,
+  Timestamp,
 } from "firebase/firestore";
-import getUserAuth from "../utils/GetCurrentUserAuth";
+import getUserAuth from "../utils/GetUserAuth";
 import {
   Constant_Var_error,
   Constant_Var_firebase_collectionName_users,
@@ -15,8 +16,11 @@ import {
   Constant_Var_firebase_collectionName_watchLists,
   Constant_Var_firebase_fieldValue_private,
   Constant_Array_firebase_profileImageArr,
+  starterWatchLists,
 } from "@/utils/constants";
 import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage";
+import UserProfileModel from "../DocumentModels/UserProfileModel";
+import WatchListModel from "../DocumentModels/WatchListModel";
 
 // Global variable to track if a profile is being created, avoid race condition
 let isProfileBeingCreated = false;
@@ -36,12 +40,12 @@ export default async function CreateNewProfile() {
 
     //Uploading profile Image to firebase storage
     const resp = await uploadImageToFirebaseStorage(
-      `/profileImage/${userData.details.uid}`,
+      `/profileImage/${userData.details.uid}${new Date().getTime()}`,
       getRandomProfileImageUrl()
     );
 
     const coverResp = await uploadImageToFirebaseStorage(
-      `/coverImage/${userData.details.uid}`,
+      `/coverImage/${userData.details.uid}${new Date().getTime()}`,
       "/cover_test.png"
     );
 
@@ -53,32 +57,30 @@ export default async function CreateNewProfile() {
 
     const batch = writeBatch(db);
 
+    // Creating user profile
+    const userProfileDocument = UserProfileModel({
+      uid: userData.details.uid,
+      name: userData.details.name,
+      email: userData.details.email,
+      photoURL: photoURL,
+      coverURL: coverURL,
+    });
+
     batch.set(
       doc(db, Constant_Var_firebase_collectionName_users, userData.details.uid),
-      {
-        dateJoined: serverTimestamp(),
-        userName: userData.details.name,
-        email: userData.details.email,
-        photoUrl: photoURL,
-        coverUrl: coverURL,
-        uid: userData.details.uid,
-      }
+      userProfileDocument
     );
 
-    const watchLists = [
-      "Recent",
-      "Dropped",
-      "Favourite",
-      "On Hold",
-      "Plan To Watch",
-      "Completed",
-    ];
+    //Creating default watchlists for User
+
+    const watchLists = starterWatchLists;
     watchLists.forEach((listName) => {
       createWatchListInBatch(
         batch,
         listName,
         Constant_Var_firebase_fieldValue_private,
-        userData
+        userData,
+        true
       );
     });
 
@@ -93,18 +95,26 @@ export default async function CreateNewProfile() {
   }
 }
 
-async function createWatchListInBatch(batch, watchListName, type, userData) {
+async function createWatchListInBatch(
+  batch,
+  watchListName,
+  type,
+  userData,
+  isSpecialStarter
+) {
   const docRef = doc(
     collection(db, Constant_Var_firebase_collectionName_watchLists)
   );
-  batch.set(docRef, {
+
+  const watchListDocument = WatchListModel({
     ownerUid: userData.details.uid,
     watchListName: watchListName,
     type: type,
-    isSpecialRecent: watchListName === "Recent",
-    id: docRef.id,
-    count:0,
+    isSpecialStarter: isSpecialStarter,
+    id:docRef.id,
   });
+
+  batch.set(docRef, watchListDocument);
 }
 
 function getRandomProfileImageUrl() {

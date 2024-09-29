@@ -89,7 +89,7 @@ const EditUserProfileModal = ({
       console.log("Image Uploaded Succesfully", resp.response);
     } else {
       //error toast
-      setCoverImage({ ...profileImage, file: null });
+      setCoverImage({ ...coverImage, file: null });
       console.log(resp.response, "error");
     }
     reloadUserInfo();
@@ -221,6 +221,7 @@ const EditUserProfileModal = ({
                     height={200}
                     className="w-[100%] h-32 object-cover object-center"
                     alt=""
+                    priority
                   />
                 </div>
                 {coverError && (
@@ -312,8 +313,9 @@ const EditUserProfileModal = ({
         )}
       </div>
       {loading && (
+        //full Screen Loader
         <div className="fixed inset-0 z-40 bg-white/30 backdrop-blur-sm text-black items-center">
-          Loading
+          ..Loading
         </div>
       )}
     </div>
