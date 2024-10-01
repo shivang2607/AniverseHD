@@ -16,21 +16,13 @@ export default async function CreateWatchList(watchListName, type) {
     if (!watchListName || !type) {
       throw new Error(Constant_Var_errorMessage_missingParams);
     }
+
     const userData = await getUserAuth();
     if (!userData) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
+
     const docRef = doc(collection(db, Constant_Var_firebase_collectionName_watchLists));
-
-    await setDoc(docRef, {
-      ownerUid: userData.details.uid,
-      watchListName: watchListName,
-      type: type,
-      isSpecialRecent: false,
-      id: docRef.id,
-      count:0,
-    });
-
     const watchListInfo = WatchListModel({
       ownerUid: userData.details.uid,
       watchListName: watchListName,
@@ -38,8 +30,11 @@ export default async function CreateWatchList(watchListName, type) {
       isSpecialStarter: false,
       id: docRef.id,
     });
-    
+
+    await setDoc(docRef, watchListInfo);
+
     addUserWatchlistCached(watchListInfo,docRef.id,userData.details.uid);
+    
     return { status: Constant_Var_success , response:null};
   } catch (error) {
     return { response: error, status: Constant_Var_error };
