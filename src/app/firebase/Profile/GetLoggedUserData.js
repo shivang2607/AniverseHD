@@ -32,7 +32,7 @@ export default async function GetLoggedUserData() {
 
     if (data.exists()) {
       const userData = data.data();
-      setUserInfoCached(userData);
+      setUserInfoCached({userData:userData});
       return { status: Constant_Var_success, response: userData };
     }else{
       throw new Error(Constant_Var_errorMessage_loggedInUserDoesNostExistsYet);

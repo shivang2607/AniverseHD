@@ -24,9 +24,9 @@ export default async function GetLoggedUserWatchListsInfo() {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
 
-    const cachedUserWatchlists = getUserWatchListsInfoCached(
-      userData.details.uid
-    );
+    const cachedUserWatchlists = getUserWatchListsInfoCached({
+      userId:userData.details.uid
+    });
 
     if (cachedUserWatchlists != null) 
       return { status: Constant_Var_success, response :cachedUserWatchlists };
@@ -69,12 +69,12 @@ export default async function GetLoggedUserWatchListsInfo() {
     //   });
     
     const result = userwatchLists.docs.map((doc) => {
-      setWatchListInfoByIdInfoCached(doc.data(), doc.id);
+      setWatchListInfoByIdInfoCached({watchListInfo:doc.data(),watchListId: doc.id});
       return doc.data();
     });
 
     if (result.length > 0) 
-      setUserWatchListsInfoCached(result, userData.details.uid);
+      setUserWatchListsInfoCached({watchLists:result,userId: userData.details.uid});
 
     return { status: Constant_Var_success, response: result };
   } catch (error) {

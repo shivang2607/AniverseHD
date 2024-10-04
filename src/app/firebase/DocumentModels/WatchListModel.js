@@ -24,6 +24,7 @@ function WatchListModel({ ownerUid, watchListName, type, isSpecialStarter, id })
     id: id,
     createdAt: Timestamp.now(), // Firestore timestamp
     count: 0, // Initial count of items in the watchlist
+    animeList:[]
   };
 
   return document; // Return the object that can be sent to Firestore

@@ -14,7 +14,7 @@ export default async function UpdateName(userName) {
     await updateDoc(doc(db, Constant_Var_firebase_collectionName_users, userData.details.uid), {
       userName: userName,
     });
-    changeUserNameCached(userName);
+    changeUserNameCached({userName:userName});
     
     return { status: Constant_Var_success, response: null };
   } catch (error) {

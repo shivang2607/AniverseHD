@@ -35,7 +35,7 @@ export default async function UpdateCoverImage(blob = false, imageUrl = false) {
     );
 
     const oldData = getUserInfoCached();
-    changeCoverUrlCached(resp.response);
+    changeCoverUrlCached({coverUrl:resp.response});
     const respDelete = await DeleteImageFromFirebaseStorage(oldData.coverUrl);
 
     if (respDelete.status === Constant_Var_error) throw respDelete.response;

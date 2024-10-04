@@ -16,12 +16,14 @@ import {
   Constant_Var_firebase_collectionName_watchLists,
   Constant_Var_errorMessage_missingParams,
   Constant_Var_firebase_collectionName_animeList,
+  starterWatchLists,
 } from "@/utils/constants";
 import {
-  addAnimeToUserWatchListCahed,
-  removeAnimeFromUserWatchListCahed,
+  addAnimeToUserWatchListCached,
+  removeAnimeFromUserWatchListCached,
 } from "../utils/CacheStorage";
-import GetUserWatchLists from "./GetLoggedUserWatchListsInfo";
+import GetLoggedUserWatchListsInfo from "./GetLoggedUserWatchListsInfo";
+import AnimeModel from "../DocumentModels/AnimeModel";
 
 export async function AddAnimeToWatchList(
   watchListId,
@@ -56,12 +58,12 @@ export async function AddAnimeToWatchList(
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
 
-    const watchListInfo = await GetWatchListInfoById(watchListId);
-    if (watchListInfo.status !== Constant_Var_success)
-      throw watchListInfo.response;
+    const watchListInfo = await GetLoggedUserWatchListsInfo(watchListId);
+
+    if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
 
     if (watchListInfo.response.ownerUid === userData.details.uid) {
-      if (watchListInfo.response.isSpecialRecent) {
+      if (watchListInfo.response.isSpecialRecent && watchListInfo.response.watchListName==starterWatchLists[0]) {
         const resp = await HandleRecentExcessAnime(watchListId);
         if (resp.status != Constant_Var_success) throw resp.response;
       }
@@ -74,7 +76,7 @@ export async function AddAnimeToWatchList(
         animeId
       );
 
-      const animeObject = {
+      const animeObject = AnimeModel( {
         animeId: animeId,
         animeName: animeName,
         animePhoto: animePhoto,
@@ -83,13 +85,12 @@ export async function AddAnimeToWatchList(
         animeScore: animeScore,
         animeAgeRating: animeAgeRating,
         animeStartYear: animeStartYear,
-        animeLength: animeLength,
-        timestamp: Timestamp.now(),
-      };
+        animeLength:animeLength
+      });
       
       await setDoc(docRef, animeObject);
 
-      addAnimeToUserWatchListCahed(watchListId, animeObject);
+      addAnimeToUserWatchListCached({watchListId:watchListId,anime: animeObject});
 
       return { status: Constant_Var_success, response: null };
     } else {
@@ -103,21 +104,20 @@ export async function AddAnimeToWatchList(
   }
 }
 
+// Not updated for new cache designs and new watchlist format
 async function HandleRecentExcessAnime(watchListId) {
   //  No need of try and Catch as there are no custom throw errors here
   try {
     if (!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
 
-    const watchLists = await GetUserWatchLists();
+    const watchLists = await GetLoggedUserWatchListsInfo();
     let recentAnimeList = null;
     watchLists.response.forEach((element) => {
       if (element.id === watchListId) recentAnimeList = element.animeList;
     });
 
-    if (recentAnimeList.length >= Constant_Var_RecentWatchlistSize) {
-      const earliestAnime = recentAnimeList.reduce((earliest, current) => {
-        return current.timestamp < earliest.timestamp ? current : earliest;
-      });
+    if (recentAnimeList.animeIdList.length >= Constant_Var_RecentWatchlistSize) {
+      // Get the earliest anime in watchlist and return its id
       const resp = await RemoveAnimeFromWatchList(
         watchListId,
         earliestAnime.animeId
@@ -131,11 +131,15 @@ async function HandleRecentExcessAnime(watchListId) {
   }
 }
 
-export async function RemoveAnimeFromWatchList(watchListId, animeId) {
+export async function RemoveAnimeFromWatchList(watchListId, animeId, batch=false) {
   try {
     // Check if user cookies exist
     if (!watchListId || !animeId) {
       throw new Error(Constant_Var_errorMessage_missingParams);
+    }
+
+    if(batch){
+      
     }
     const userData = await getUserAuth();
     if (!userData) {
@@ -156,7 +160,7 @@ export async function RemoveAnimeFromWatchList(watchListId, animeId) {
       );
       await deleteDoc(docRef);
 
-      removeAnimeFromUserWatchListCahed(watchListId, animeId);
+      removeAnimeFromUserWatchListCached({watchListId:watchListId, animeId:animeId});
       return { status: Constant_Var_success, response: null };
     } else {
       throw new Error(

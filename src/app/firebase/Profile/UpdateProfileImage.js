@@ -38,7 +38,7 @@ export default async function UpdateProfileImage(
     );
 
     const oldData=getUserInfoCached();
-    changePhotoUrlCached(resp.response);
+    changePhotoUrlCached({photoUrl:resp.response});
     const respDelete = await DeleteImageFromFirebaseStorage(oldData.photoUrl);
 
     if(respDelete.status===Constant_Var_error) throw respDelete.response;

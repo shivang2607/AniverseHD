@@ -1,132 +1,215 @@
 import {
   Constant_Var_sessionStorage_key_loggedInUser,
   Constant_Var_sessionStorage_key_userWatchListsInfo,
-  Constant_Var_sessionStorage_key_watchListInfo,
+  Constant_Var_sessionStorage_key_watchListAnimeListById,
+  Constant_Var_sessionStorage_key_watchListInfoById,
 } from "@/utils/constants";
+
+/** Misscelanious  */
+const getSessionStorageParsedItem = (key) => {
+  const item = sessionStorage.getItem(key);
+  return item ? JSON.parse(item) : null;
+};
+
+const findWatchListIndex = ({userWatchLists, watchListId}) => {
+  return userWatchLists.findIndex(watchList => watchList.watchListId === watchListId);
+};
+ 
 
 /** User Profile INfo */
 export const getUserInfoCached = () => {
-  const userData = sessionStorage.getItem(
-    Constant_Var_sessionStorage_key_loggedInUser
-  );
+  const userData = getSessionStorageParsedItem( Constant_Var_sessionStorage_key_loggedInUser)
 
-  if (userData != null) return JSON.parse(userData);
-  else return null;
+  return userData;
 };
 
-export const setUserInfoCached = (userData) => {
+export const setUserInfoCached = ({userData}) => {
   // console.log("setting data",userData);
   sessionStorage.setItem(
     Constant_Var_sessionStorage_key_loggedInUser,
     JSON.stringify(userData)
   );
 };
-export const changeUserNameCached = (userName) => {
+
+export const changeUserNameCached = ({userName}) => {
   let userData = getUserInfoCached();
+  if(!userData) return;
+
   userData.userName = userName;
-  setUserInfoCached(userData);
+  setUserInfoCached({userData:userData});
 };
 
-export const changeCoverUrlCached = (coverUrl) => {
+export const changeCoverUrlCached = ({coverUrl}) => {
   let userData = getUserInfoCached();
+  if(!userData) return;
+
   userData.coverUrl = coverUrl;
   setUserInfoCached(userData);
 };
 
-export const changePhotoUrlCached = (photoUrl) => {
+export const changePhotoUrlCached = ({photoUrl}) => {
   let userData = getUserInfoCached();
+  if(!userData) return;
+  
   userData.photoUrl = photoUrl;
   setUserInfoCached(userData);
 };
 
-/** User WatchLists Info */
-export const getUserWatchListsInfoCached = (userId) => {
-  const userWatchlists = sessionStorage.getItem(
-    `${Constant_Var_sessionStorage_key_userWatchListsInfo}\\${userId}`
-  );
 
-  if (userWatchlists != null) return JSON.parse(userWatchlists);
-  else return null;
+/** User WatchLists Info */
+export const getUserWatchListsInfoCached = ({userId}) => {
+  const userWatchlists = getSessionStorageParsedItem( `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`);
+
+  return userWatchlists;
 };
 
-export const setUserWatchListsInfoCached = (watchLists, userId) => {
+export const setUserWatchListsInfoCached = ({watchLists, userId}) => {
   sessionStorage.setItem(
-    `${Constant_Var_sessionStorage_key_userWatchListsInfo}\\${userId}`,
+    `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`,
     JSON.stringify(watchLists)
   );
 };
 
-export const getWatchListInfoByIdInfoCached = (watchListId) => {
-  const watchlistInfo = sessionStorage.getItem(
-    `${Constant_Var_sessionStorage_key_watchListInfo}\\${watchListId}`
-  );
 
-  if (watchlistInfo != null) return JSON.parse(watchlistInfo);
-  else return null;
+/** WatchListInfo By Id */
+export const getWatchListInfoByIdInfoCached = ({watchListId}) => {
+  const watchlistInfo = getSessionStorageParsedItem(`${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`);
+
+  return watchlistInfo;
 };
 
-export const setWatchListInfoByIdInfoCached = (watchListInfo, watchListId) => {
+export const setWatchListInfoByIdInfoCached = ({watchListInfo, watchListId}) => {
   sessionStorage.setItem(
-    `${Constant_Var_sessionStorage_key_watchListInfo}\\${watchListId}`,
+    `${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`,
     JSON.stringify(watchListInfo)
   );
 };
 
-export const removeWatchListInfoByIdInfoCached = (watchListId) => {
+export const removeWatchListInfoByIdInfoCached = ({watchListId}) => {
   sessionStorage.removeItem(
-    `${Constant_Var_sessionStorage_key_watchListInfo}\\${watchListId}`
+    `${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`
   );
 };
 
-/** User watchList Anime list */
-//to be created
 
-export const addAnimeToUserWatchListCahed = (watchListId, anime) => {
-  // let watchLists = getUserWatchlistsCached();
-  // if (watchLists == null) return;
-  // watchLists = watchLists.map((item) => {
-  //   if (item.id == watchListId) {
-  //     let exists = item.animeList.some(
-  //       (item) => item.animeId === anime.animeId
-  //     );
-  //     !exists && item.animeList.push(anime);
-  //     return item;
-  //   } else return item;
-  // });
-  // setUserWatchlistsCached(watchLists);
+
+/** User watchList Anime list By WatchList Id */
+export const getWatchListAnimeListByIdCached=({watchListId})=>{
+  const watchlistAnimeList = getSessionStorageParsedItem( `${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`) 
+  
+  return watchlistAnimeList;
+}
+
+export const setWatchListAnimeListByIdCached=({watchlistAnimeList,watchListId})=>{
+  sessionStorage.setItem(
+    `${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`,
+    JSON.stringify(watchlistAnimeList)
+  );
+}
+
+export const addAnimeToUserWatchListCached = ({watchListId, anime,userId}) => {
+ let watchListInfo= getWatchListInfoByIdInfoCached({watchListId:watchListId});
+ let userWatchLists= getUserWatchListsInfoCached({userId:userId})
+ let watchListAnimeList= getWatchListAnimeListByIdCached({watchListId:watchListId});
+ 
+ // Check if anime already exists in the watchListAnimeList
+  const animeExistsInWatchList = watchListAnimeList && watchListAnimeList.some(item => item.animeId === anime.animeId);
+  
+  // Adding whole anime data to WatchListAnimeListBYId cache if it does not exist
+  if (!animeExistsInWatchList) {
+    if (watchListAnimeList) {
+      watchListAnimeList.unshift(anime);
+    } else {
+      watchListAnimeList = [anime]; // If it doesn't exist, initialize the array
+    }
+    setWatchListAnimeListByIdCached({watchlistAnimeList: watchListAnimeList, watchListId: watchListId});
+  }
+
+  // Check if animeId already exists in watchListInfo
+  const animeExistsInWatchListInfo = watchListInfo && watchListInfo?.animeList.some(item => item.animeId === anime.animeId);
+
+   // Adding only animeId and timestamp to watchListInfo By Id cache
+ if (!animeExistsInWatchListInfo) {
+      watchListInfo.animeList.unshift({animeId: anime.animeId, addedAt: anime.addedAt});
+      setWatchListInfoByIdInfoCached({watchListInfo: watchListInfo, watchListId: watchListId});
+  }
+
+ //adding only animeid and timestamp to watchListInfo in user watchLists cache
+ if(userWatchLists){
+  let ind=findWatchListIndex({userWatchLists:userWatchLists,watchListId:watchListId});
+
+  if(ind!=-1) userWatchLists[ind]=watchListInfo;
+
+  setUserWatchListsInfoCached({watchLists:userWatchLists,userId:userId});
+ }
+ return;
 };
 
-export const removeAnimeFromUserWatchListCahed = (watchListId, animeId) => {
-  // let watchLists = getUserWatchlistsCached();
-  // if (watchLists == null) return;
-  // watchLists = watchLists.map((item) => {
-  //   if (item.id == watchListId) {
-  //     item.animeList = item.animeList.filter((anime) => {
-  //       return anime.animeId !== animeId;
-  //     });
-  //     return item;
-  //   } else return item;
-  // });
-  // setUserWatchlistsCached(watchLists);
+export const addAnimeToWatchListByIdCachedInBatch = ({watchListId, animeList}) => {
+  let watchListAnimeList= getWatchListAnimeListByIdCached({watchListId:watchListId});
+  
+  if(watchListAnimeList){
+   watchListAnimeList=watchListAnimeList.concat(animeList);
+  }else{
+    watchListAnimeList=animeList;
+  }
+
+  setWatchListAnimeListByIdCached({watchlistAnimeList:watchListAnimeList,watchListId:watchListId});
+  return;
+ };
+
+export const removeAnimeFromUserWatchListCached = ({watchListId, animeId,userId}) => {
+  let watchListInfo = getWatchListInfoByIdInfoCached({watchListId:watchListId});
+  let userWatchLists = getUserWatchListsInfoCached({ userId:userId });
+  let watchListAnimeList = getWatchListAnimeListByIdCached({watchListId:watchListId});
+
+  // Remove anime from WatchListAnimeListById cache
+  if (watchListAnimeList) {
+    watchListAnimeList = watchListAnimeList.filter(anime => anime.animeId !== animeId);
+    setWatchListAnimeListByIdCached({watchlistAnimeList:watchListAnimeList, watchListId:watchListId});
+  }
+
+  // Remove animeId from watchListInfo in user watchLists cache
+  if (userWatchLists) {
+    let ind=findWatchListIndex({userWatchLists:userWatchLists,watchListId:watchListId});
+
+    if (ind !== -1) {
+      userWatchLists[ind].animeList = userWatchLists[ind].animeList.filter(
+        anime => anime.animeId !== animeId
+      );
+    }
+
+    setUserWatchListsInfoCached({watchLists:userWatchLists,userId:userId});
+  }
+
+  // Remove animeId from watchListInfo by Id cache
+  if (watchListInfo) {
+    watchListInfo.animeList = watchListInfo.animeList.filter(
+      anime => anime.animeId !== animeId
+    );
+    setWatchListInfoByIdInfoCached({watchListInfo:watchListInfo, watchListId:watchListId});
+  }
+
+  return;
 };
+
 
 /**user watchlist alteration   issue, not adding in session storage when new watchlist is created*/
-export const addUserWatchlistCached = (watchListInfo, watchListId, userId) => {
-  let userWatchLists = getUserWatchListsInfoCached(userId);
-  if (!userWatchLists) return;
+export const addUserWatchlistCached = ({watchListInfo, watchListId, userId}) => {
+  let userWatchLists = getUserWatchListsInfoCached({userId:userId}) || [];
   
   userWatchLists.push(watchListInfo);
-  setUserWatchListsInfoCached(userWatchLists, userId);
-  setWatchListInfoByIdInfoCached(watchListInfo, watchListId);
+  setUserWatchListsInfoCached({watchLists:userWatchLists,userId:userId});
+  setWatchListInfoByIdInfoCached({watchListInfo:watchListInfo, watchListId:watchListId});
 };
 
-export const deleteUserWatchlistCached = (watchListId) => {
-  let userWatchLists = getUserWatchListsInfoCached(userId);
+export const deleteUserWatchlistCached = ({watchListId,userId}) => {
+  let userWatchLists = getUserWatchListsInfoCached({userId:userId});
   if (!userWatchLists) return;
 
   userWatchLists = userWatchLists.filter((list) => {
     return list.id !== watchListId;
   });
-  setUserWatchListsInfoCached(userWatchLists, userId);
-  removeWatchListInfoByIdInfoCached(watchListId);
+  setUserWatchListsInfoCached({watchLists:userWatchLists, userId:userId});
+  removeWatchListInfoByIdInfoCached({watchListId:watchListId});
 };

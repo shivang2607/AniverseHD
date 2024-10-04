@@ -6,14 +6,16 @@ import {
   where,
 } from "firebase/firestore";
 import {Constant_Var_success, Constant_Var_error, Constant_Var_firebase_collectionName_watchLists, Constant_Var_firebase_fieldName_ownerUid, Constant_Var_firebase_fieldValue_public, Constant_Var_firebase_fieldName_type, Constant_Var_errorMessage_missingParams, Constant_Var_firebase_collectionName_animeList } from "@/utils/constants";
-import { getUserWatchListsInfoCached, setWatchListInfoByIdInfoCached } from "../utils/CacheStorage";
+import { getUserWatchListsInfoCached, setUserWatchListsInfoCached, setWatchListInfoByIdInfoCached } from "../utils/CacheStorage";
 
 export default async function GetOtherUserWatchListsInfo(userId) {
   try {
 
     if(!userId) throw new Error(Constant_Var_errorMessage_missingParams);
 
-    const cachedUserWatchlists = getUserWatchListsInfoCached(userId);
+    const cachedUserWatchlists = getUserWatchListsInfoCached({
+      userId:userId
+    });
 
     if (cachedUserWatchlists != null) 
       return { status: Constant_Var_success, response :cachedUserWatchlists };
@@ -49,9 +51,12 @@ export default async function GetOtherUserWatchListsInfo(userId) {
     // });
       
     const result = userwatchLists.docs.map((doc) => {
-      setWatchListInfoByIdInfoCached(doc.data(), doc.id);
+      setWatchListInfoByIdInfoCached({watchListInfo:doc.data(),watchListId: doc.id});
       return doc.data();
     });
+
+    if (result.length > 0) 
+      setUserWatchListsInfoCached({watchLists:result,userId: userId});
 
     return { status: Constant_Var_success, response: result };
   } catch (error) {

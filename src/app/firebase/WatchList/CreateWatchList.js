@@ -33,7 +33,7 @@ export default async function CreateWatchList(watchListName, type) {
 
     await setDoc(docRef, watchListInfo);
 
-    addUserWatchlistCached(watchListInfo,docRef.id,userData.details.uid);
+    addUserWatchlistCached({watchListInfo:watchListInfo,watchListId:docRef.id,userId:userData.details.uid});
     
     return { status: Constant_Var_success , response:null};
   } catch (error) {
