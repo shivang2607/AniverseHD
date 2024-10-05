@@ -1,6 +1,6 @@
-import { db } from "../utils/firebaseinit";
+import { db } from "../../utils/firebaseinit";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import getUserAuth from "../utils/GetUserAuth";
+import getUserAuth from "../../utils/GetUserAuth";
 import {
   Constant_Var_errorMessage_notAuthenticatedUser,
   Constant_Var_success,
@@ -14,7 +14,7 @@ import {
   getUserWatchListsInfoCached,
   setUserWatchListsInfoCached,
   setWatchListInfoByIdInfoCached,
-} from "../utils/CacheStorage";
+} from "../../utils/CacheStorage";
 
 export default async function GetLoggedUserWatchListsInfo() {
   try {

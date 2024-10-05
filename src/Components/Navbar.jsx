@@ -9,8 +9,8 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import SignInGooglePopUp from '@/app/firebase/SignIn/SignInGooglePopUp';
 import { Constant_Var_success } from '@/utils/constants';
-import UpdateCoverImage from '@/app/firebase/Profile/UpdateCoverImage';
-import UpdateProfileImage from '@/app/firebase/Profile/UpdateProfileImage';
+import AddAnimeToWatchList from '@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList';
+
 
 
 const Navbar = () => {
@@ -37,6 +37,13 @@ const Navbar = () => {
     // const res2= await UpdateProfileImage(false,"/profile_test.jpg");
 
     // console.log(res1);
+  }
+
+  const handleTest=async()=>{
+    const res= await AddAnimeToWatchList({watchListId:"DGQIc1lBnsPpgKqzcgQb",animeAgeRating:"k",animeGenre:[],animeId:"6",animeLength:30,animeName:"lawdasur",animePhoto:"kjkm,",animeScore:6,animeStartYear:2023,animeType:"jjjj"});
+
+    console.log(res.status);
+    console.log(res.response);
   }
 
 
@@ -132,7 +139,7 @@ const Navbar = () => {
                 </button>
                 </div>
             <button className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md " onClick={handleSignIn}>Login</button>
-            {/* <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleTest}>test</button> */}
+            <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleTest}>test</button>
           </div>
           
         </div>

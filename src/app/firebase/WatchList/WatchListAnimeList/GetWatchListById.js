@@ -1,6 +1,6 @@
-import { auth, db } from "../utils/firebaseinit";
+import { auth, db } from "../../utils/firebaseinit";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import getUserAuth from "../utils/GetUserAuth";
+import getUserAuth from "../../utils/GetUserAuth";
 import {
   Constant_Var_errorMessage_notAuthenticatedUser,
   Constant_Var_success,
@@ -11,17 +11,15 @@ import {
   Constant_Var_firebase_collectionName_animeList,
   Constant_Var_errorMessage_privateWatchList,
 } from "@/utils/constants";
-import {
-  getWatchListInfoByIdInfoCached,
-  setWatchListInfoByIdInfoCached,
-} from "../utils/CacheStorage";
+
+import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
 
 //NOT READY YET 
 export default async function GetWatchListById(watchListId,offset,count) {
   try {
     if (!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
 
-    let watchListInfo = await GetWatchListInfoById(watchListId);
+    let watchListInfo = await GetWatchListInfoById({watchListId:watchListId});
 
     if (watchListInfo.status !== Constant_Var_success)
       throw watchListInfo.response;
@@ -62,28 +60,4 @@ export default async function GetWatchListById(watchListId,offset,count) {
   }
 }
 
-export const GetWatchListInfoById = async (watchListId, getFromCache = true) => {
-  try {
-    // Check if user cookies exist
-    const cachedWatchListInfo = getWatchListInfoByIdInfoCached(watchListId);
 
-    if (cachedWatchListInfo != null && getFromCache)
-      return { status: Constant_Var_success, response: cachedWatchListInfo };
-
-    const docRef = doc(
-      db,
-      Constant_Var_firebase_collectionName_watchLists,
-      watchListId
-    );
-    const dataWatchlist = await getDoc(docRef);
-
-    if (dataWatchlist.exists()) {
-      setWatchListInfoByIdInfoCached(dataWatchlist.data(), watchListId);
-      return { status: Constant_Var_success, response: dataWatchlist.data() };
-    } else {
-      throw new Error(`Watchlist with id=${watchListId} does not exists`);
-    }
-  } catch (error) {
-    return { response: error, status: Constant_Var_error };
-  }
-};

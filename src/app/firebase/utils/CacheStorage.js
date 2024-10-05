@@ -8,13 +8,24 @@ import {
 /** Misscelanious  */
 const getSessionStorageParsedItem = (key) => {
   const item = sessionStorage.getItem(key);
-  return item ? JSON.parse(item) : null;
+  try {
+      return item ? JSON.parse(item) : null;
+  } catch (error) {
+      console.error(`Failed to parse item from sessionStorage for key: ${key}`, error);
+      return null; // Or handle this differently
+  }
 };
 
 const findWatchListIndex = ({userWatchLists, watchListId}) => {
-  return userWatchLists.findIndex(watchList => watchList.watchListId === watchListId);
+  return userWatchLists.findIndex(watchList => watchList.id === watchListId);
 };
- 
+
+const updateUserPropertyCached = (property, value) => {
+  let userData = getUserInfoCached();
+  if (!userData) return;
+  userData[property] = value;
+  setUserInfoCached({ userData });
+};
 
 /** User Profile INfo */
 export const getUserInfoCached = () => {
@@ -137,11 +148,17 @@ export const addAnimeToUserWatchListCached = ({watchListId, anime,userId}) => {
  //adding only animeid and timestamp to watchListInfo in user watchLists cache
  if(userWatchLists){
   let ind=findWatchListIndex({userWatchLists:userWatchLists,watchListId:watchListId});
+  
+  if(ind!=-1){
+    const animeExistsInWatchListInfo =userWatchLists[ind] && userWatchLists[ind]?.animeList.some(item => item.animeId === anime.animeId);
 
-  if(ind!=-1) userWatchLists[ind]=watchListInfo;
+    if(!animeExistsInWatchListInfo)
+    userWatchLists[ind].animeList.unshift({animeId: anime.animeId, addedAt: anime.addedAt});
+  }
 
   setUserWatchListsInfoCached({watchLists:userWatchLists,userId:userId});
  }
+ 
  return;
 };
 
@@ -213,3 +230,25 @@ export const deleteUserWatchlistCached = ({watchListId,userId}) => {
   setUserWatchListsInfoCached({watchLists:userWatchLists, userId:userId});
   removeWatchListInfoByIdInfoCached({watchListId:watchListId});
 };
+
+
+export const updatePublicPrivateCached= ({watchListId, type})=>{
+  let watchListInfo= getWatchListInfoByIdInfoCached({watchListId:watchListId});
+  let userWatchLists= getUserWatchListsInfoCached({userId:userId})
+
+  if(watchListInfo){
+    watchListInfo.type=type;
+    setWatchListInfoByIdInfoCached({watchListInfo:watchListInfo,watchListId:watchListId});
+  }
+
+  //adding only animeid and timestamp to watchListInfo in user watchLists cache
+ if(userWatchLists){
+  let ind=findWatchListIndex({userWatchLists:userWatchLists,watchListId:watchListId});
+
+  if(ind!=-1) userWatchLists[ind].type=type;
+
+  setUserWatchListsInfoCached({watchLists:userWatchLists,userId:userId});
+ }
+
+ return;
+}

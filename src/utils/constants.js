@@ -53,3 +53,6 @@ export const starterWatchLists = [
   "Plan To Watch",
   "Completed",
 ];
+
+export  const Constant_Var_starterWatchLists_recent="Recent";
+export  const Constant_Var_starterWatchLists_favourite="Favourite";

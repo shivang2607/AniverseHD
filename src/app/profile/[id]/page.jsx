@@ -11,8 +11,8 @@ import getUserAuth from "@/app/firebase/utils/GetUserAuth";
 import GetOtherUserData from "@/app/firebase/Profile/GetOtherUserData";
 import CreateNewProfile from "@/app/firebase/Profile/CreateNewProfile";
 import { useRouter } from "next/navigation";
-import GetLoggedUserWatchListsInfo from "../../firebase/WatchList/GetLoggedUserWatchListsInfo";
-import GetOtherUserWatchListsInfo from "@/app/firebase/WatchList/GetOtherUserWatchListsInfo";
+import GetLoggedUserWatchListsInfo from "../../firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+import GetOtherUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetOtherUserWatchListsInfo";
 
 const Profile = ({ params }) => {
   const [userInfo, setUserInfo] = useState(null);

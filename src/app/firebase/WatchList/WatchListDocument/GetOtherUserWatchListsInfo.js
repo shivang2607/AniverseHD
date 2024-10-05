@@ -1,4 +1,4 @@
-import { db } from "../utils/firebaseinit";
+import { db } from "../../utils/firebaseinit";
 import {
   collection,
   getDocs,
@@ -6,7 +6,7 @@ import {
   where,
 } from "firebase/firestore";
 import {Constant_Var_success, Constant_Var_error, Constant_Var_firebase_collectionName_watchLists, Constant_Var_firebase_fieldName_ownerUid, Constant_Var_firebase_fieldValue_public, Constant_Var_firebase_fieldName_type, Constant_Var_errorMessage_missingParams, Constant_Var_firebase_collectionName_animeList } from "@/utils/constants";
-import { getUserWatchListsInfoCached, setUserWatchListsInfoCached, setWatchListInfoByIdInfoCached } from "../utils/CacheStorage";
+import { getUserWatchListsInfoCached, setUserWatchListsInfoCached, setWatchListInfoByIdInfoCached } from "../../utils/CacheStorage";
 
 export default async function GetOtherUserWatchListsInfo(userId) {
   try {

@@ -10,6 +10,7 @@ import { Constant_Var_error, Constant_Var_errorMessage_missingParams, Constant_V
 import { addUserWatchlistCached } from "../utils/CacheStorage";
 import WatchListModel from "../DocumentModels/WatchListModel";
 
+
 export default async function CreateWatchList(watchListName, type) {
   try {
     // Check if user cookies exist

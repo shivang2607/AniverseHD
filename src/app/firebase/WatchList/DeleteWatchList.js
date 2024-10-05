@@ -1,6 +1,5 @@
 import { auth, db } from "../utils/firebaseinit";
 import { deleteDoc, doc} from "firebase/firestore";
-import { GetWatchListInfoById } from "./GetWatchListById";
 import getUserAuth from "../utils/GetUserAuth";
 import {
   Constant_Var_errorMessage_notAuthenticatedUser,
@@ -11,6 +10,8 @@ import {
   Constant_Var_errorMessage_missingParams,
 } from "@/utils/constants";
 import { deleteUserWatchlistCached } from "../utils/CacheStorage";
+import GetWatchListInfoById from "./WatchListDocument/GetWatchListInfoById";
+
 
 export default async function DeleteWatchListById(watchListId) {
   try {
@@ -36,7 +37,7 @@ export default async function DeleteWatchListById(watchListId) {
     } else {
       if (watchListInfo.response.ownerUid !== userData.details.uid)
         throw new Error(Constant_Var_errorMessage_notAuthorisedUser);
-      else throw new Error("Special Watchlist:-Recent Cannot be deleted");
+      else throw new Error("Special Starter Watchlist:- Cannot be deleted");
     }
 
   } catch (error) {
