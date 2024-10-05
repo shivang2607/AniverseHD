@@ -5,6 +5,7 @@ import {
   Constant_Var_success,
   Constant_Var_error,
   Constant_Var_firebase_collectionName_watchLists,
+  Constant_Var_errorMessage_missingParams,
 
 } from "@/utils/constants";
 import {
@@ -13,8 +14,28 @@ import {
 } from "../../utils/CacheStorage";
 
 
+/**
+ * Retrieves the information of a watchlist by its ID, optionally from cache.
+ *
+ * @param {Object} params - Parameters for the function.
+ * @param {string} params.watchListId - The ID of the watchlist to retrieve.
+ * @param {boolean} [params.getFromCache=true] - Indicates whether to retrieve the data from cache if available.
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
+ *   - `response` {Object|null}: The watchlist object if successful; otherwise, null.
+ *
+ * @example
+ * const result = await GetWatchListInfoById({ watchListId: 'someWatchListId' });
+ * if (result.status === Constant_Var_success) {
+ *   console.log('Watchlist info:', result.response);
+ * } else {
+ *   console.error('Error:', result.response);
+ * }
+ */
 const GetWatchListInfoById = async ({watchListId, getFromCache = true}) => {
     try {
+
+      if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
       // Check if user cookies exist
       const cachedWatchListInfo = getWatchListInfoByIdInfoCached({watchListId:watchListId});
   

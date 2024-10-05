@@ -8,11 +8,17 @@ import {
 /** Misscelanious  */
 const getSessionStorageParsedItem = (key) => {
   const item = sessionStorage.getItem(key);
+
+  if (!item || item==='undefined') {
+    console.warn(`Item for key: ${key} is not found in sessionStorage.`);
+    return null; // Return null or handle accordingly when the key is missing
+  }
+
   try {
-      return item ? JSON.parse(item) : null;
+    return JSON.parse(item);
   } catch (error) {
-      console.error(`Failed to parse item from sessionStorage for key: ${key}`, error);
-      return null; // Or handle this differently
+    console.error(`Failed to parse item from sessionStorage for key: ${key}`, error);
+    return null; // Return null when JSON parsing fails
   }
 };
 
@@ -29,8 +35,7 @@ const updateUserPropertyCached = (property, value) => {
 
 /** User Profile INfo */
 export const getUserInfoCached = () => {
-  const userData = getSessionStorageParsedItem( Constant_Var_sessionStorage_key_loggedInUser)
-
+  const userData = getSessionStorageParsedItem(Constant_Var_sessionStorage_key_loggedInUser)
   return userData;
 };
 

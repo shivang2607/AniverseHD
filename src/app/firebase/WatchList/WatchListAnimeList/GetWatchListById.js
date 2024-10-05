@@ -15,7 +15,7 @@ import {
 import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
 
 //NOT READY YET 
-export default async function GetWatchListById(watchListId,offset,count) {
+export default async function GetWatchListById({watchListId,offset,count}) {
   try {
     if (!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
 

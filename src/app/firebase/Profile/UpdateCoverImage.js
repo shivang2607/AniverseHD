@@ -11,7 +11,23 @@ import { changeCoverUrlCached, getUserInfoCached } from "../utils/CacheStorage";
 import DeleteImageFromFirebaseStorage from "../utils/DeleteImageFromFirebaseStorage";
 import { db } from "../utils/firebaseinit";
 
-export default async function UpdateCoverImage(blob = false, imageUrl = false) {
+
+/**
+ * Updates the cover image for the authenticated user by uploading a new image to Firebase Storage,
+ * updating the Firestore user document, and deleting the old cover image from storage.
+ *
+ * @param {Object} params - The input parameters.
+ * @param {Blob|boolean} [params.blob=false] - The new cover image file as a Blob. Defaults to false if not provided.
+ * @param {string|boolean} [params.imageUrl=false] - The URL or path of the new cover image. Defaults to false if not provided.
+ *
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success, or `Constant_Var_error` on failure.
+ *   - `response` {string|Error}: The new cover image URL if successful, or an error message if failed.
+ *
+ * No errors are thrown. All errors are caught and returned in the `response` field with `status: Constant_Var_error`.
+ */
+
+export default async function UpdateCoverImage({blob = false, imageUrl = false}) {
   try {
     // Check if user cookies exist
     const userData = await getUserAuth();

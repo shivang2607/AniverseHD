@@ -57,7 +57,10 @@ const EditUserProfileModal = ({
     }
     setProfileError(null);
     setLoading(true);
-    const resp = await UpdateProfileImage(profileImage.file, false);
+    const resp = await UpdateProfileImage({
+      blob: profileImage.file,
+      imageUrl: false,
+    });
 
     if (resp.status === Constant_Var_success) {
       //success Toast
@@ -81,7 +84,10 @@ const EditUserProfileModal = ({
     }
     setCoverError(null);
     setLoading(true);
-    const resp = await UpdateCoverImage(coverImage.file, false);
+    const resp = await UpdateCoverImage({
+      blob: coverImage.file,
+      imageUrl: false,
+    });
 
     if (resp.status === Constant_Var_success) {
       //success Toast
@@ -102,7 +108,7 @@ const EditUserProfileModal = ({
     if (!selectedUserName.trim() || selectedUserName.trim() === "") return;
 
     setLoading(true);
-    const resp = await UpdateName(selectedUserName);
+    const resp = await UpdateName({ userName: selectedUserName });
 
     if (resp.status === Constant_Var_success) {
       //successs

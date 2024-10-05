@@ -27,6 +27,47 @@ import  RemoveAnimeFromWatchList  from "./RemoveAnimeFromWatchList";
 import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
 
 
+/**
+ * Adds an anime to a specified watchlist, handling special starter watchlists such as recent or favourite,
+ * ensuring the anime is not duplicated in multiple watchlists, and managing Firestore updates and cache synchronization.
+ *
+ * @param {Object} params - The input parameters for adding an anime.
+ * @param {string} params.watchListId - The ID of the watchlist to which the anime will be added.
+ * @param {string} params.animeId - The unique ID of the anime to be added.
+ * @param {string} params.animeName - The name of the anime.
+ * @param {string} params.animePhoto - The photo URL or image path of the anime.
+ * @param {string} params.animeGenre - The genre of the anime.
+ * @param {string} params.animeType - The type or category of the anime.
+ * @param {number} params.animeScore - The score of the anime.
+ * @param {string} params.animeAgeRating - The age rating of the anime.
+ * @param {number} params.animeStartYear - The starting year of the anime.
+ * @param {number} params.animeLength - The number of episodes or runtime of the anime.
+ *
+ * @returns {Promise<Object>} - Returns a promise that resolves to an object containing:
+ *   - {string} status - Indicates the success or failure of the operation, will be Constant_Var_success on success or Constant_Var_error on failure.
+ *   - {null|string|Error} response - Will be null on success, or an error message if the operation fails.
+ *
+ * @throws {Error} - Throws an error if the user is not authenticated, not authorized, or if required parameters are missing.
+ *
+ * @example
+ * const result = await AddAnimeToWatchList({
+ *   watchListId: 'exampleWatchListId',
+ *   animeId: 'exampleAnimeId',
+ *   animeName: 'Attack on Titan',
+ *   animePhoto: 'url_to_anime_photo',
+ *   animeGenre: 'Action',
+ *   animeType: 'TV',
+ *   animeScore: 9.2,
+ *   animeAgeRating: 'PG-13',
+ *   animeStartYear: 2013,
+ *   animeLength: 25,
+ * });
+ * if (result.status === Constant_Var_success) {
+ *   console.log('Anime added successfully');
+ * } else {
+ *   console.error('Error:', result.response);
+ * }
+ */
 export default async function AddAnimeToWatchList({
   watchListId,
   animeId,

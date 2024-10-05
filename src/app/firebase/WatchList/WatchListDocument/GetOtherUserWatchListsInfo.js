@@ -8,7 +8,24 @@ import {
 import {Constant_Var_success, Constant_Var_error, Constant_Var_firebase_collectionName_watchLists, Constant_Var_firebase_fieldName_ownerUid, Constant_Var_firebase_fieldValue_public, Constant_Var_firebase_fieldName_type, Constant_Var_errorMessage_missingParams, Constant_Var_firebase_collectionName_animeList } from "@/utils/constants";
 import { getUserWatchListsInfoCached, setUserWatchListsInfoCached, setWatchListInfoByIdInfoCached } from "../../utils/CacheStorage";
 
-export default async function GetOtherUserWatchListsInfo(userId) {
+/**
+ * Retrieves the public watchlists of a specified user.
+ *
+ * @param {Object} params - Parameters for the function.
+ * @param {string} params.userId - The ID of the user whose watchlists are to be retrieved.
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
+ *   - `response` {Array|null}: An array of watchlist objects if successful; otherwise, null.
+ * 
+ * @example
+ * const result = await GetOtherUserWatchListsInfo({ userId: 'someUserId' });
+ * if (result.status === Constant_Var_success) {
+ *   console.log('Other user\'s watchlists:', result.response);
+ * } else {
+ *   console.error('Error:', result.response);
+ * }
+ */
+export default async function GetOtherUserWatchListsInfo({userId}) {
   try {
 
     if(!userId) throw new Error(Constant_Var_errorMessage_missingParams);

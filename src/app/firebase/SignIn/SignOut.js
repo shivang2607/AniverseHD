@@ -7,9 +7,14 @@ import { Constant_Var_error } from "@/utils/constants";
 export default async function SignOut() {
   try {
     await signOut(auth);
-    Cookies.remove("user");
+    ClearSessionandCookies();
     return {status:Constant_Var_success, response:null};
   } catch (error) {
     return { response: error, status: Constant_Var_error };
   }
+}
+
+export function ClearSessionandCookies(){
+    Cookies.remove("user");
+    sessionStorage.clear();
 }

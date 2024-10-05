@@ -16,6 +16,24 @@ import {
   setWatchListInfoByIdInfoCached,
 } from "../../utils/CacheStorage";
 
+/**
+ * Retrieves the watchlists of the currently logged-in user.
+ *
+ * The function handles cache synchronization and updates the user's Firebase Firestore watchlist documents.
+ *
+ *@returns {Promise<Object>} - A promise that resolves to an object containing:
+ *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
+ *   - {Array|null} response - An array of watchlist objects if successful; otherwise, null.
+ * 
+ * 
+ * @example
+ * const result = await GetLoggedUserWatchListsInfo();
+ * if (result.status === Constant_Var_success) {
+ *   console.log('User watchlists:', result.response);
+ * } else {
+ *   console.error('Error:', result.response);
+ * }
+ */
 export default async function GetLoggedUserWatchListsInfo() {
   try {
     // Check if user cookies exist

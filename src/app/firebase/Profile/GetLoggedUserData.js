@@ -12,6 +12,21 @@ import {
   Constant_Var_errorMessage_loggedInUserDoesNostExistsYet,
 } from "@/utils/constants";
 
+/**
+ * Retrieves the profile data of the currently logged-in user from Firestore.
+ *
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
+ *   - `response` {Object|Error}: The user profile data on success, or an error object on failure.
+ *
+ * @example
+ * const result = await GetLoggedUserData();
+ * if (result.status === Constant_Var_success) {
+ *   console.log('User data:', result.response);
+ * } else {
+ *   console.error('Error:', result.response);
+ * }
+ */
 export default async function GetLoggedUserData() {
   try {
     const userData = await getUserAuth();

@@ -7,7 +7,7 @@ import {
 import { IoMdClose } from "react-icons/io";
 import React, { useState } from "react";
 
-const CreateWatchListModal = ({ isOpen, onClose }) => {
+const CreateWatchListModal = ({ isOpen, onClose, reloadUserInfo }) => {
   const [watchlistName, setWatchlistName] = useState("");
   const [watchlistType, setWatchlistType] = useState(
     Constant_Var_firebase_fieldValue_public
@@ -33,10 +33,10 @@ const CreateWatchListModal = ({ isOpen, onClose }) => {
     formData.set("watchlist-type", watchlistType);
 
     // Start loader for creating
-    const resp = await CreateWatchList(
-      formData.get("watchlist-name").trim(),
-      formData.get("watchlist-type")
-    );
+    const resp = await CreateWatchList({
+     watchListName:formData.get("watchlist-name").trim(),
+      type:formData.get("watchlist-type")
+  });
 
     if (resp.status === Constant_Var_success) {
       // Show Toast (Success)
@@ -49,6 +49,7 @@ const CreateWatchListModal = ({ isOpen, onClose }) => {
     setWatchlistName("");
     setWatchlistType(Constant_Var_firebase_fieldValue_public);
     setLoading(false);
+    reloadUserInfo();
     onClose();
   }
 

@@ -13,26 +13,29 @@ import CreateNewProfile from "@/app/firebase/Profile/CreateNewProfile";
 import { useRouter } from "next/navigation";
 import GetLoggedUserWatchListsInfo from "../../firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
 import GetOtherUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetOtherUserWatchListsInfo";
+import useUserStore from "@/Components/utils/userStore";
+
 
 const Profile = ({ params }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [userWatchListsInfo, setUserWatchListsInfo] = useState(null);
   const [isLoggedInUser, setIsLoggedInUser] = useState(false);
   const [isCreatingProfile, setIsCreatingProfile] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(false);
+  // const {setLoggedInUserData} = useUserStore(); 
   const router = useRouter();
 
   async function loadLoggedInUserData() {
     try {
       // Fetching in parallel
       const [respUserInfo, respUserWatchLists] = await Promise.all([
-        GetLoggedUserData(params.id),
-        GetLoggedUserWatchListsInfo(params.id),
+        GetLoggedUserData(),
+        GetLoggedUserWatchListsInfo(),
       ]);
 
        // # Setting User Info #
       if (respUserInfo.status === Constant_Var_success) {
         setUserInfo(respUserInfo.response);
+        // setLoggedInUserData(respUserInfo.response);
       } else if (
         respUserInfo.response.message ===
         Constant_Var_errorMessage_loggedInUserDoesNostExistsYet
@@ -73,8 +76,8 @@ const Profile = ({ params }) => {
   async function loadOtherUser() {
     try {
       const [respUserInfo, respUserWatchLists] = await Promise.all([
-        GetOtherUserData(params.id),
-        GetOtherUserWatchListsInfo(params.id),
+        GetOtherUserData({userId:params.id}),
+        GetOtherUserWatchListsInfo({userId:params.id}),
       ]);
 
       // # Setting User Info #

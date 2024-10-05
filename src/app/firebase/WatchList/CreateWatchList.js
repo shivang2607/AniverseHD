@@ -11,7 +11,25 @@ import { addUserWatchlistCached } from "../utils/CacheStorage";
 import WatchListModel from "../DocumentModels/WatchListModel";
 
 
-export default async function CreateWatchList(watchListName, type) {
+/**
+ * Creates a new watchlist for the authenticated user.
+ *
+ * @param {Object} params - Parameters for creating the watchlist.
+ * @param {string} params.watchListName - The name of the watchlist to be created.
+ * @param {string} params.type - The type of the watchlist (e.g., public or private).
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
+ *   - `response` {null}: Null on success; contains an error message on failure.
+ *
+ * @example
+ * const result = await CreateWatchList({ watchListName: 'My Favorites', type: 'public' });
+ * if (result.status === Constant_Var_success) {
+ *   console.log('Watchlist created successfully!');
+ * } else {
+ *   console.error('Error:', result.response);
+ * }
+ */
+export default async function CreateWatchList({watchListName, type}) {
   try {
     // Check if user cookies exist
     if (!watchListName || !type) {

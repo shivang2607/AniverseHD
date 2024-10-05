@@ -1,20 +1,19 @@
-'use client'
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation'
-import { HiMenu, HiX } from 'react-icons/hi';
-import SearchComponent from './recommendationPanel/SearchComponent';
-import { FaSearch } from 'react-icons/fa';
-import { usePathname } from 'next/navigation';
-import Image from 'next/image';
-import SignInGooglePopUp from '@/app/firebase/SignIn/SignInGooglePopUp';
-import { Constant_Var_success } from '@/utils/constants';
-import AddAnimeToWatchList from '@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList';
-
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { HiMenu, HiX } from "react-icons/hi";
+import SearchComponent from "./recommendationPanel/SearchComponent";
+import { FaSearch } from "react-icons/fa";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
+import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
+import { Constant_Var_success } from "@/utils/constants";
+import SignOut from "@/app/firebase/SignIn/SignOut";
+import  useUserStore  from "./utils/userStore";
 
 
 const Navbar = () => {
-
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -23,33 +22,25 @@ const Navbar = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
+  const { setIsUserLoggedIn,  isUserLoggedIn, loggedInUserData} = useUserStore((state)=>({
+    setIsUserLoggedIn: state.setIsUserLoggedIn,
+    isUserLoggedIn: state.isUserLoggedIn,
+    loggedInUserData: state.loggedInUserData,
+  }));
 
-  const handleSignIn= async()=>{
-   
-    const res=await SignInGooglePopUp();
-    
-    if(res.status===Constant_Var_success){
-       router.push(`/profile/${res.response}`);
-    }else{
+  const handleSignIn = async () => {
+    const res = await SignInGooglePopUp();
 
+    if (res.status === Constant_Var_success) {
+      // setIsUserLoggedIn(true);
+      router.push(`/profile/${res.response}`);
+    } else {
+      //show Toast
     }
-    // const res1= await UpdateCoverImage(false,"/cover_test2.png");
-    // const res2= await UpdateProfileImage(false,"/profile_test.jpg");
-
-    // console.log(res1);
-  }
-
-  const handleTest=async()=>{
-    const res= await AddAnimeToWatchList({watchListId:"DGQIc1lBnsPpgKqzcgQb",animeAgeRating:"k",animeGenre:[],animeId:"6",animeLength:30,animeName:"lawdasur",animePhoto:"kjkm,",animeScore:6,animeStartYear:2023,animeType:"jjjj"});
-
-    console.log(res.status);
-    console.log(res.response);
-  }
-
+  };
 
   const handleScroll = () => {
-
-    if(['/recommendations'].some(path=>path===currentPath))return;
+    if (["/recommendations"].some((path) => path === currentPath)) return;
     const currentScrollY = window.scrollY;
 
     if (currentScrollY > lastScrollY && !isScrollingUp) {
@@ -71,11 +62,11 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     router.prefetch("/profile");
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [lastScrollY, isScrollingUp]);
 
@@ -84,87 +75,134 @@ const Navbar = () => {
     setIsOpen(false);
   }, [currentPath]);
 
+  useEffect(()=>{
+   console.log( isUserLoggedIn, loggedInUserData,"helllll");
+  },[isUserLoggedIn, loggedInUserData,lastScrollY, isScrollingUp]);
+
   return (
     <nav
-    className={`${['/recommendations'].some(path=>path===currentPath)?"static":"fixed"} py-1 border-b-[1px] border-b-primary-100 w-full z-20 transition-transform duration-300 backdrop-blur-sm ${
-      showNavbar ? 'translate-y-0' : '-translate-y-full'
-    } ${isBackgroundVisible?'bg-black/30':'bg-opacity-0'}`}
-  >
+      className={`${
+        ["/recommendations"].some((path) => path === currentPath)
+          ? "static"
+          : "fixed"
+      } py-1 border-b-[1px] border-b-primary-100 w-full z-20 transition-transform duration-300 backdrop-blur-sm ${
+        showNavbar ? "translate-y-0" : "-translate-y-full"
+      } ${isBackgroundVisible ? "bg-black/30" : "bg-opacity-0"}`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex w-full items-center">
             <div className="flex-shrink-0">
               <Link href="/">
-              <div className="logo relative w-52 h-10"> 
-                <Image src="/logo-primary.png" quality={100} priority fill alt="AniverseHD" className="text-xl font-bold "/>
-              </div>
+                <div className="logo relative w-52 h-10">
+                  <Image
+                    src="/logo-primary.png"
+                    quality={100}
+                    priority
+                    fill
+                    alt="AniverseHD"
+                    className="text-xl font-bold "
+                  />
+                </div>
               </Link>
               {/* <h1 className="text-xl font-bold ">AniverseHD</h1> */}
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <Link href="/"  className=" hover:text-white px-3  rounded-md text-md font-light">
+                <Link
+                  href="/"
+                  className=" hover:text-white px-3  rounded-md text-md font-light"
+                >
                   Home
                 </Link>
-                <Link href="/catalog" className=" hover:text-white px-3  rounded-md text-md font-light">
+                <Link
+                  href="/catalog"
+                  className=" hover:text-white px-3  rounded-md text-md font-light"
+                >
                   Catalog
                 </Link>
-                <Link href="/recommendations"  className=" hover:text-white px-3  rounded-md text-md font-light">
+                <Link
+                  href="/recommendations"
+                  className=" hover:text-white px-3  rounded-md text-md font-light"
+                >
                   Recommendations
                 </Link>
-                
               </div>
             </div>
-
           </div>
           <div className="flex items-center flex-row-reverse md:flex-row gap-8">
-          <div className="ml-auto flex md:hidden">
+            <div className="ml-auto flex md:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
               >
                 {isOpen ? (
                   <HiX className="h-6 w-6" />
-                 ) : (
+                ) : (
                   <HiMenu className="h-6 w-6" />
                 )}
               </button>
             </div>
             <div className="searchpanel flex gap-2 items-center">
-          <div className={`w-80 transition-all duration-200 transform ${searchOpen ? 'translate-x-0 opacity-100 visible' : '-translate-x-full opacity-0 invisible'} md:block hidden`}>
-                 <SearchComponent/> 
-                </div>
-                <button onClick={()=>setSearchOpen(!searchOpen)}>
-                <FaSearch className={`${searchOpen?"text-sky-500":"text-[whitesmoke]"} md:block hidden`} size={20}/>
-                </button>
-                </div>
-            <button className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md " onClick={handleSignIn}>Login</button>
-            <button className=" bg-primary-200 w-1/2  md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-6 py-2 rounded-3xl text-sm " onClick={handleTest}>test</button>
+              <div
+                className={`w-80 transition-all duration-200 transform ${
+                  searchOpen
+                    ? "translate-x-0 opacity-100 visible"
+                    : "-translate-x-full opacity-0 invisible"
+                } md:block hidden`}
+              >
+                <SearchComponent />
+              </div>
+              <button onClick={() => setSearchOpen(!searchOpen)}>
+                <FaSearch
+                  className={`${
+                    searchOpen ? "text-sky-500" : "text-[whitesmoke]"
+                  } md:block hidden`}
+                  size={20}
+                />
+              </button>
+            </div>
+            {true? <button
+              className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
+              onClick={handleSignIn}
+            >
+              Login
+            </button>:<Image fill src={loggedInUserData.photoUrl} className="w-40 h-40 rounded-full"/>}
+           
           </div>
-          
         </div>
-        
       </div>
 
-
-
-
       {/* //? MOBILE VIEW IS FROM BELOW */}
-      <div className={`${isOpen ? 'flex' : 'hidden'} md:hidden w-full`}>
+      <div className={`${isOpen ? "flex" : "hidden"} md:hidden w-full`}>
         <div className="px-2 pt-2 pb-3 space-y-1 w-full  sm:px-1">
-          <Link href="/" className=" hover:text-white block px-3  rounded-md text-base font-medium">
+          <Link
+            href="/"
+            className=" hover:text-white block px-3  rounded-md text-base font-medium"
+          >
             Home
           </Link>
-          <Link href="/catalog" className=" hover:text-white block px-3 rounded-md text-base font-medium">
+          <Link
+            href="/catalog"
+            className=" hover:text-white block px-3 rounded-md text-base font-medium"
+          >
             Catalog
           </Link>
-          <Link href="/recommendations" className=" hover:text-white block px-3 rounded-md text-base font-medium">
+          <Link
+            href="/recommendations"
+            className=" hover:text-white block px-3 rounded-md text-base font-medium"
+          >
             Recommendations
           </Link>
           <div className="relative w-[80%] m-2">
-           <SearchComponent/>
+            <SearchComponent />
           </div>
-          <button className="md:w-full block bg-primary-200 !my-3  mx-2 rounded-lg text-gray-800 w-1/6 justify-center hover:bg-primary-100 px-3 py-2  text-sm font-medium" onClick={handleSignIn}>Login</button>
+          <button
+            className="md:w-full block bg-primary-200 !my-3  mx-2 rounded-lg text-gray-800 w-1/6 justify-center hover:bg-primary-100 px-3 py-2  text-sm font-medium"
+            onClick={handleSignIn}
+          >
+            Login
+          </button>
         </div>
       </div>
     </nav>

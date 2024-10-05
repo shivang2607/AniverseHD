@@ -22,9 +22,27 @@ import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage"
 import UserProfileModel from "../DocumentModels/UserProfileModel";
 import WatchListModel from "../DocumentModels/WatchListModel";
 
-// Global variable to track if a profile is being created, avoid race condition
+/**
+ * Global flag to prevent multiple profile creations at the same time.
+ * This avoids race conditions where multiple profiles might be created simultaneously.
+ */
 let isProfileBeingCreated = false;
 
+/**
+ * Creates a new user profile and default watchlists in Firestore. This function also uploads a profile image and cover image to Firebase Storage.
+ *
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
+ *   - `response` {null|Error}: Returns `null` on success, or an error object on failure.
+ *
+ * @example
+ * const result = await CreateNewProfile();
+ * if (result.status === Constant_Var_success) {
+ *   console.log('Profile created successfully');
+ * } else {
+ *   console.error('Error:', result.response);
+ * }
+ */
 export default async function CreateNewProfile() {
   try {
     const userData = await getUserAuth();
@@ -111,7 +129,7 @@ async function createWatchListInBatch(
     watchListName: watchListName,
     type: type,
     isSpecialStarter: isSpecialStarter,
-    id:docRef.id,
+    id: docRef.id,
   });
 
   batch.set(docRef, watchListDocument);

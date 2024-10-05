@@ -13,7 +13,24 @@ import { deleteUserWatchlistCached } from "../utils/CacheStorage";
 import GetWatchListInfoById from "./WatchListDocument/GetWatchListInfoById";
 
 
-export default async function DeleteWatchListById(watchListId) {
+/**
+ * Deletes a watchlist by its ID if the authenticated user is authorized to do so.
+ *
+ * @param {Object} params - Parameters for deleting the watchlist.
+ * @param {string} params.watchListId - The ID of the watchlist to be deleted.
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
+ *   - `response` {null|Object}: Null on successful deletion, or an error object on failure.
+ *
+ * @example
+ * const result = await DeleteWatchListById({ watchListId: '12345' });
+ * if (result.status === Constant_Var_success) {
+ *   console.log('Watchlist deleted successfully!');
+ * } else {
+ *   console.error('Error:', result.response);
+ * }
+ */
+export default async function DeleteWatchListById({watchListId}) {
   try {
     if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
     // Check if user cookies exist

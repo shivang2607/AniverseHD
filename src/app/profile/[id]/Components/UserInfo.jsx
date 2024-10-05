@@ -86,6 +86,7 @@ const UserInfo = ({ userInfo, isLoggedInUser, reloadUserInfo }) => {
       <CreateWatchListModal
         isOpen={isCreateWatchListModalOpen}
         onClose={handleCloseCreateWatchListModal}
+        reloadUserInfo={reloadUserInfo}
       />
       <EditUserProfileModal
         isOpen={iseditUserProfileModalOpen}
