@@ -43,7 +43,7 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  * @param {number} params.animeStartYear - The starting year of the anime.
  * @param {number} params.animeLength - The number of episodes or runtime of the anime.
  *
- * @returns {Promise<Object>} - Returns a promise that resolves to an object containing:
+ * @returns {Promise<{status:string,response:any}>} - Returns a promise that resolves to an object containing:
  *   - {string} status - Indicates the success or failure of the operation, will be Constant_Var_success on success or Constant_Var_error on failure.
  *   - {null|string|Error} response - Will be null on success, or an error message if the operation fails.
  *

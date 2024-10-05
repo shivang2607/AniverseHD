@@ -17,7 +17,7 @@ import WatchListModel from "../DocumentModels/WatchListModel";
  * @param {Object} params - Parameters for creating the watchlist.
  * @param {string} params.watchListName - The name of the watchlist to be created.
  * @param {string} params.type - The type of the watchlist (e.g., public or private).
- * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ * @returns {Promise<{status:string,response:any}>} - A promise that resolves to an object containing:
  *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
  *   - `response` {null}: Null on success; contains an error message on failure.
  *

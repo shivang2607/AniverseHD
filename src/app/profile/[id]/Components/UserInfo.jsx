@@ -46,7 +46,7 @@ const UserInfo = ({ userInfo, isLoggedInUser, reloadUserInfo }) => {
             className="rounded-full lg:h-44 lg:w-44 md:h-44 md:w-44 sm:w-32 sm:h-32 w-28 h-28 border-2 border-white bg-cbg-400 object-cover object-center"
           />
           <div className="flex flex-col sm:ml-5 ml-3">
-            <div className="w-auto sm:text-3xl text-2xl font-extrabold md:px-3 md:py-2 py-1 px-3 rounded-md backdrop-blur-0 ">
+            <div className="w-auto sm:text-3xl text-2xl font-extrabold md:px-3 md:py-2 py-1 px-0 rounded-md backdrop-blur-0 ">
               {userInfo.userName}
             </div>
 

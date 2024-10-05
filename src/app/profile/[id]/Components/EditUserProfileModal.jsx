@@ -74,6 +74,7 @@ const EditUserProfileModal = ({
 
     reloadUserInfo();
     setLoading(false);
+    onClose();
   }
 
   async function handleCoverImageSave(event) {
@@ -100,6 +101,7 @@ const EditUserProfileModal = ({
     }
     reloadUserInfo();
     setLoading(false);
+    onClose();
   }
 
   async function handleUserNameChange(event) {
@@ -114,13 +116,14 @@ const EditUserProfileModal = ({
       //successs
 
       console.log("updated", resp.response);
-      reloadUserInfo();
     } else {
       //some error;
       console.log("error updating Name", resp.response);
     }
 
+    reloadUserInfo();
     setLoading(false);
+    onClose();
   }
 
   return (
@@ -179,7 +182,7 @@ const EditUserProfileModal = ({
                 )}
                 <label
                   htmlFor="profile-image"
-                  className="text-base ml-1 mt-2 cursor-pointer px-3 py-2 rounded-md bg-primary-100"
+                  className="text-base ml-1 mt-4 cursor-pointer px-2.5 py-1 rounded-md bg-primary-100"
                 >
                   Select Profile Image
                 </label>
@@ -237,7 +240,7 @@ const EditUserProfileModal = ({
                 )}
                 <label
                   htmlFor="cover-image"
-                  className="text-base mt-2 ml-1 cursor-pointer px-3 py-2 rounded-md bg-primary-100"
+                  className="text-base mt-2 ml-1 cursor-pointer px-2.5 py-1 rounded-md bg-primary-100"
                 >
                   Select Cover Image
                 </label>

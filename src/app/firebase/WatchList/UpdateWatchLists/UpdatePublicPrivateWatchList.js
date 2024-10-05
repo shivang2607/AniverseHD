@@ -24,7 +24,7 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  * @param {Object} params - Parameters for updating the watchlist.
  * @param {string} params.watchListId - The ID of the watchlist to update.
  * @param {string} params.type - The new privacy type for the watchlist (e.g., public or private).
- * @returns {Promise<Object>} - Returns a promise that resolves to an object containing:
+ * @returns {Promise<{status:string,response:any}>} - Returns a promise that resolves to an object containing:
  *   - {string} status - Indicates the success or failure of the operation.
  *   - {Object|null} response - Contains error details if the operation fails; otherwise, null.
  * @throws {Error} - Throws an error if the user is not authenticated, not authorized, or if required parameters are missing.

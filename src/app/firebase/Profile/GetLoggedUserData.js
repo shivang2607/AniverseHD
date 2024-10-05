@@ -15,7 +15,7 @@ import {
 /**
  * Retrieves the profile data of the currently logged-in user from Firestore.
  *
- * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ * @returns {Promise<{status:string,response:any}>} - A promise that resolves to an object containing:
  *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
  *   - `response` {Object|Error}: The user profile data on success, or an error object on failure.
  *
@@ -45,13 +45,14 @@ export default async function GetLoggedUserData() {
     );
     const data = await getDoc(docRef);
 
-    if (data.exists()) {
-      const userData = data.data();
-      setUserInfoCached({userData:userData});
-      return { status: Constant_Var_success, response: userData };
-    }else{
+    if (!data.exists()) {
       throw new Error(Constant_Var_errorMessage_loggedInUserDoesNostExistsYet);
     }
+    
+    const userInfo = data.data();
+    setUserInfoCached({userData:userInfo});
+    
+    return { status: Constant_Var_success, response: userInfo };
   } catch (error) {
     return { status: Constant_Var_error, response: error };
   }

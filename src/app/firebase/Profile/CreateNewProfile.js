@@ -31,7 +31,7 @@ let isProfileBeingCreated = false;
 /**
  * Creates a new user profile and default watchlists in Firestore. This function also uploads a profile image and cover image to Firebase Storage.
  *
- * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ * @returns {Promise<{status:string,response:any}>} - A promise that resolves to an object containing:
  *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success or `Constant_Var_error` on failure.
  *   - `response` {null|Error}: Returns `null` on success, or an error object on failure.
  *

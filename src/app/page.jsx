@@ -5,20 +5,9 @@ import React, { useEffect } from "react";
 import TopAiringCarousal from "@/components/TopAiringCarousal";
 import RecommendationPanel from "@/components/recommendationPanel/RecommendationPanel";
 import AllTop from "@/components/AllTop";
-import GetLoggedUserData from "./firebase/Profile/GetLoggedUserData";
-import { Constant_Var_errorMessage_loggedInUserDoesNostExistsYet, Constant_Var_success } from "@/utils/constants";
-import SignOut, { ClearSessionandCookies } from "./firebase/SignIn/SignOut";
-import getUserAuth from "./firebase/utils/GetUserAuth";
-import useUserStore from "@/Components/utils/userStore";
 
 
 export default function Page() {
-  const { setIsUserLoggedIn, setLoggedInUserData, isUserLoggedIn, loggedInUserData} = useUserStore((state)=>({
-    setIsUserLoggedIn: state.setIsUserLoggedIn,
-    setLoggedInUserData: state.setLoggedInUserData,
-    isUserLoggedIn:state.isUserLoggedIn,
-    loggedInUserData: state.loggedInUserData,
-  }));
 
   useEffect(() => {
     async function f() {
@@ -42,53 +31,6 @@ export default function Page() {
     }
     // f()
   }, []);
-
-  async function loadLoggedInUserData() {
-    try {
-      // Fetching
-      const respUserInfo = await GetLoggedUserData();
-
-      // # Setting User Info #
-      if (respUserInfo.status === Constant_Var_success) {
-        console.log("hellllo",respUserInfo.response);
-        setIsUserLoggedIn(true);
-        setLoggedInUserData(respUserInfo.response);
-      } else if (
-        respUserInfo.response.message ===
-        Constant_Var_errorMessage_loggedInUserDoesNostExistsYet
-      ) {
-
-        throw respUserInfo.response; //LoggedIn but user Data is not created
-
-      } else {
-        console.log("Error loading user info", respUserInfo.response);
-        throw new Error("Error Loading Profile");
-      }
-      
-    } catch (error) {
-      if(error.message===Constant_Var_errorMessage_loggedInUserDoesNostExistsYet) await SignOut();
-      else{
-         // show toast of error
-
-      }
-    }
-  }
-
-  useEffect(() => {
-    async function loadUserData() {
-      const loggedInUser = await getUserAuth();
-      console.log("loading",loggedInUser);
-      if (loggedInUser) await loadLoggedInUserData();
-      else {
-        ClearSessionandCookies();
-      }
-    }
-    loadUserData();
-  }, []);
-
-  useEffect(()=>{
-    console.log( isUserLoggedIn, loggedInUserData,"hhhhhhhhhhhh");
-   },[ isUserLoggedIn, loggedInUserData])
 
   return (
     <div>

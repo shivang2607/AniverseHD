@@ -14,7 +14,7 @@ import {
  * @param {Object} params - The input parameters.
  * @param {string} params.userId - The ID of the user whose data is to be retrieved.
  *
- * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ * @returns {Promise<{status:string,response:any}>} - A promise that resolves to an object containing:
  *   - `status` {string}: A constant representing the status of the operation (success or error).
  *   - `response` {Object|string}: The user data if successful, or an error message if failed.
  *

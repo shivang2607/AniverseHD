@@ -15,7 +15,7 @@ import { changeUserNameCached } from "../utils/CacheStorage";
  * @param {Object} params - The input parameters.
  * @param {string} params.userName - The new name to be updated for the user.
  *
- * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ * @returns {Promise<{status:string,response:any}>} - A promise that resolves to an object containing:
  *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success, or `Constant_Var_error` on failure.
  *   - `response` {null|Error}: `null` if successful, or an error message if failed.
  *

@@ -2,7 +2,7 @@ import { signOut } from "firebase/auth";
 
 import { auth } from "../utils/firebaseinit";
 import Cookies from "js-cookie";
-import { Constant_Var_error } from "@/utils/constants";
+import { Constant_Var_error, Constant_Var_success } from "@/utils/constants";
 
 export default async function SignOut() {
   try {

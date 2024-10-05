@@ -9,9 +9,8 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import { Constant_Var_success } from "@/utils/constants";
-import SignOut from "@/app/firebase/SignIn/SignOut";
-import  useUserStore  from "./utils/userStore";
-
+import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
+import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 
 const Navbar = () => {
   const router = useRouter();
@@ -22,18 +21,15 @@ const Navbar = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
-  const { setIsUserLoggedIn,  isUserLoggedIn, loggedInUserData} = useUserStore((state)=>({
-    setIsUserLoggedIn: state.setIsUserLoggedIn,
-    isUserLoggedIn: state.isUserLoggedIn,
-    loggedInUserData: state.loggedInUserData,
-  }));
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const [loggedInUserData, setLoggedInUserData] = useState(null);
 
   const handleSignIn = async () => {
     const res = await SignInGooglePopUp();
 
     if (res.status === Constant_Var_success) {
-      // setIsUserLoggedIn(true);
       router.push(`/profile/${res.response}`);
+      loadUserData();
     } else {
       //show Toast
     }
@@ -75,9 +71,20 @@ const Navbar = () => {
     setIsOpen(false);
   }, [currentPath]);
 
-  useEffect(()=>{
-   console.log( isUserLoggedIn, loggedInUserData,"helllll");
-  },[isUserLoggedIn, loggedInUserData,lastScrollY, isScrollingUp]);
+  async function loadUserData() {
+    const result = await GetLoggedUserData();
+    if (result.status === Constant_Var_success) {
+      setLoggedInUserData(result.response);
+      setIsUserLoggedIn(true);
+    } else {
+      setLoggedInUserData(null);
+      setIsUserLoggedIn(false);
+    }
+  }
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
 
   return (
     <nav
@@ -162,13 +169,16 @@ const Navbar = () => {
                 />
               </button>
             </div>
-            {true? <button
-              className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
-              onClick={handleSignIn}
-            >
-              Login
-            </button>:<Image fill src={loggedInUserData.photoUrl} className="w-40 h-40 rounded-full"/>}
-           
+            {!isUserLoggedIn ? (
+              <button
+                className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
+                onClick={handleSignIn}
+              >
+                Login
+              </button>
+            ) : (
+              <DropDownNavbarUserAvatar loggedInUserData={loggedInUserData}/>
+            )}
           </div>
         </div>
       </div>

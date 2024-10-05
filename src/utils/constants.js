@@ -52,6 +52,7 @@ export const starterWatchLists = [
   "On Hold",
   "Plan To Watch",
   "Completed",
+  "Watching",
 ];
 
 export  const Constant_Var_starterWatchLists_recent="Recent";

@@ -21,7 +21,7 @@ import DeleteImageFromFirebaseStorage from "../utils/DeleteImageFromFirebaseStor
  * @param {Blob|boolean} [params.blob=false] - The new profile image file as a Blob. Defaults to false if not provided.
  * @param {string|boolean} [params.imageUrl=false] - The URL or path of the new profile image. Defaults to false if not provided.
  *
- * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ * @returns {Promise<{status:string,response:any}>} - A promise that resolves to an object containing:
  *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success, or `Constant_Var_error` on failure.
  *   - `response` {string|Error}: The new profile image URL if successful, or an error message if failed.
  *
