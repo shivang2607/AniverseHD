@@ -33,6 +33,8 @@ import GetWatchListInfoById from "./WatchListDocument/GetWatchListInfoById";
 export default async function DeleteWatchListById({watchListId}) {
   try {
     if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
+
+    watchListId=toString(watchListId);
     // Check if user cookies exist
     const userData = await getUserAuth();
 

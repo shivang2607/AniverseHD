@@ -95,7 +95,8 @@ export default async function AddAnimeToWatchList({
     ) {
       throw new Error(Constant_Var_errorMessage_missingParams);
     }
-
+    animeId=toString(animeId);
+    watchListId=toString(watchListId);
     const userData = await getUserAuth();
     if (!userData) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);

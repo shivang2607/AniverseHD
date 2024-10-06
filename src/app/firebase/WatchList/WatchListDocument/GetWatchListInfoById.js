@@ -36,6 +36,8 @@ const GetWatchListInfoById = async ({watchListId, getFromCache = true}) => {
     try {
 
       if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
+
+      watchListId=toString(watchListId);
       // Check if user cookies exist
       const cachedWatchListInfo = getWatchListInfoByIdInfoCached({watchListId:watchListId});
   
