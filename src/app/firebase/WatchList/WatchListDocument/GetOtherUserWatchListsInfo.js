@@ -30,6 +30,7 @@ export default async function GetOtherUserWatchListsInfo({userId}) {
 
     if(!userId) throw new Error(Constant_Var_errorMessage_missingParams);
 
+    userId=toString(userId);
     const cachedUserWatchlists = getUserWatchListsInfoCached({
       userId:userId
     });

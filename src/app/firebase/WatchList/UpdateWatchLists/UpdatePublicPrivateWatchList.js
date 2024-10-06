@@ -46,6 +46,8 @@ export default async function UpdatePublicPrivateWatchList({ watchListId, type }
       if (!watchListId || !type) {
         throw new Error("Missing Params in AddtoWatchList Function");
       }
+
+      watchListId=toString(watchListId);
       const userData = await getUserAuth();
       if (!userData) {
         throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);

@@ -24,6 +24,7 @@ export default async function GetOtherUserData({ userId }) {
   try {
     if (!userId) throw new Error(Constant_Var_errorMessage_missingParams);
 
+    userId=toString(userId);
     const docRef = doc(db, Constant_Var_firebase_collectionName_users, userId);
     const data = await getDoc(docRef);
 
