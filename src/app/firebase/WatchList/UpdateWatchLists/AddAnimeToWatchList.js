@@ -81,22 +81,20 @@ export default async function AddAnimeToWatchList({
   animeLength,
 }) {
   try {
-    if (
-      !watchListId ||
-      !animeId ||
-      !animeAgeRating ||
-      !animeGenre ||
-      !animeLength ||
-      !animeName ||
-      !animePhoto ||
-      !animeScore ||
-      !animeStartYear ||
-      !animeType
-    ) {
-      throw new Error(Constant_Var_errorMessage_missingParams);
-    }
-    animeId=toString(animeId);
-    watchListId=toString(watchListId);
+    // Validate the parameters
+    validateParams({
+      watchListId,
+      animeId,
+      animeName,
+      animePhoto,
+      animeGenre,
+      animeType,
+      animeScore,
+      animeAgeRating,
+      animeStartYear,
+      animeLength,
+    });
+
     const userData = await getUserAuth();
     if (!userData) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
@@ -184,6 +182,59 @@ export default async function AddAnimeToWatchList({
   }
 }
 
+function validateParams({
+  watchListId,
+  animeId,
+  animeName,
+  animePhoto,
+  animeGenre,
+  animeType,
+  animeScore,
+  animeAgeRating,
+  animeStartYear,
+  animeLength,
+}) {
+  if (!watchListId || typeof watchListId !== 'string') {
+    throw new Error("Invalid or missing watchListId (should be a string)");
+  }
+
+  if (!animeId || typeof animeId !== 'string') {
+    throw new Error("Invalid or missing animeId (should be a string)");
+  }
+
+  if (!animeName || typeof animeName !== 'string') {
+    throw new Error("Invalid or missing animeName (should be a string)");
+  }
+
+  if (!animePhoto || typeof animePhoto !== 'object') {
+    throw new Error("Invalid or missing animePhoto (should be a object)");
+  }
+
+  if (!animeGenre || !Array.isArray(animeGenre)) {
+    throw new Error("Invalid or missing animeGenre (should be an array)");
+  }
+
+  if (!animeType || typeof animeType !== 'string') {
+    throw new Error("Invalid or missing animeType (should be a string)");
+  }
+
+  if (typeof animeScore !== 'number') {
+    throw new Error("Invalid or missing animeScore (should be a number)");
+  }
+
+  if (!animeAgeRating || typeof animeAgeRating !== 'string') {
+    throw new Error("Invalid or missing animeAgeRating (should be a string)");
+  }
+
+  if (typeof animeStartYear !== 'number') {
+    throw new Error("Invalid or missing animeStartYear (should be a number)");
+  }
+
+  if (typeof animeLength !== 'number') {
+    throw new Error("Invalid or missing animeLength (should be a number)");
+  }
+}
+
 async function addAnime({
   animeObject,
   watchListInfo,
@@ -196,9 +247,9 @@ async function addAnime({
     const docRef = doc(
       db,
       Constant_Var_firebase_collectionName_watchLists,
-      toString(watchListId),
+      watchListId,
       Constant_Var_firebase_collectionName_animeList,
-      toString(animeId)
+      animeId
     );
 
     batch.set(docRef, animeObject);

@@ -34,7 +34,6 @@ export default async function DeleteWatchListById({watchListId}) {
   try {
     if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
 
-    watchListId=toString(watchListId);
     // Check if user cookies exist
     const userData = await getUserAuth();
 
@@ -49,7 +48,7 @@ export default async function DeleteWatchListById({watchListId}) {
       watchListInfo.response.ownerUid === userData.details.uid &&
       watchListInfo.response.isSpecialStarter === false
     ) {
-      let response = await deleteDoc(doc(db, Constant_Var_firebase_collectionName_watchLists, toString(watchListId)));
+      let response = await deleteDoc(doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId));
       deleteUserWatchlistCached({watchListId:watchListId});
       return { status: Constant_Var_success, response: response };
 

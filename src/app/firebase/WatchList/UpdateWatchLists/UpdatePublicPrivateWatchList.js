@@ -47,7 +47,6 @@ export default async function UpdatePublicPrivateWatchList({ watchListId, type }
         throw new Error("Missing Params in AddtoWatchList Function");
       }
 
-      watchListId=toString(watchListId);
       const userData = await getUserAuth();
       if (!userData) {
         throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
@@ -67,7 +66,7 @@ export default async function UpdatePublicPrivateWatchList({ watchListId, type }
         const docRef = doc(
           db,
           Constant_Var_firebase_collectionName_watchLists,
-          toString(watchListId)
+          watchListId
         );
         await updateDoc(docRef, {
           type: type,

@@ -42,11 +42,10 @@ export default async function RemoveAnimeFromWatchList({
   batchFromAddfunc = false,
 }) {
   try {
-    if (!watchListId || !animeId) {
-      throw new Error(Constant_Var_errorMessage_missingParams);
-    }
-    animeId=toString(animeId);
-    watchListId=toString(watchListId);
+    
+    // Validate the parameters
+    validateParams({ watchListId, animeId, batchFromAddfunc });
+  
     const userData = await getUserAuth();
     if (!userData) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
@@ -70,7 +69,7 @@ export default async function RemoveAnimeFromWatchList({
       const docRef = doc(
         db,
         Constant_Var_firebase_collectionName_watchLists,
-        toString(watchListId)
+        watchListId
       );
       batch.update(docRef, {
         animeList: animeListNew,
@@ -80,9 +79,9 @@ export default async function RemoveAnimeFromWatchList({
       const animeDocRef = doc(
         db,
         Constant_Var_firebase_collectionName_watchLists,
-        toString(watchListId),
+        watchListId,
         Constant_Var_firebase_collectionName_animeList,
-        toString(animeId)
+        animeId
       );
 
       batch.delete(animeDocRef);
@@ -103,4 +102,18 @@ export default async function RemoveAnimeFromWatchList({
   } catch (error) {
     return { response: error, status: Constant_Var_error };
   }
+}
+
+function validateParams({ watchListId, animeId, batchFromAddfunc }) {
+  if (!watchListId || typeof watchListId !== 'string') {
+    throw new Error("Invalid or missing watchListId (should be a string)");
+  }
+
+  if (!animeId || typeof animeId !== 'string') {
+    throw new Error("Invalid or missing animeId (should be a string)");
+  }
+
+  // if (batchFromAddfunc !== undefined && typeof batchFromAddfunc !== 'boolean') {
+  //   throw new Error("Invalid batchFromAddfunc (should be a boolean if provided)");
+  // }
 }

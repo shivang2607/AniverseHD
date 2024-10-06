@@ -37,7 +37,6 @@ const GetWatchListInfoById = async ({watchListId, getFromCache = true}) => {
 
       if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
 
-      watchListId=toString(watchListId);
       // Check if user cookies exist
       const cachedWatchListInfo = getWatchListInfoByIdInfoCached({watchListId:watchListId});
   
@@ -47,7 +46,7 @@ const GetWatchListInfoById = async ({watchListId, getFromCache = true}) => {
       const docRef = doc(
         db,
         Constant_Var_firebase_collectionName_watchLists,
-        toString(watchListId)
+        watchListId
       );
       const dataWatchlist = await getDoc(docRef);
   
