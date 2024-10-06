@@ -69,7 +69,7 @@ export default async function RemoveAnimeFromWatchList({
       const docRef = doc(
         db,
         Constant_Var_firebase_collectionName_watchLists,
-        watchListId
+        toString(watchListId)
       );
       batch.update(docRef, {
         animeList: animeListNew,
@@ -79,9 +79,9 @@ export default async function RemoveAnimeFromWatchList({
       const animeDocRef = doc(
         db,
         Constant_Var_firebase_collectionName_watchLists,
-        watchListId,
+        toString(watchListId),
         Constant_Var_firebase_collectionName_animeList,
-        animeId
+        toString(animeId)
       );
 
       batch.delete(animeDocRef);

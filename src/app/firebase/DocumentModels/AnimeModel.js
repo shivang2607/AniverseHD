@@ -6,13 +6,13 @@ import { Timestamp } from "firebase/firestore"; // Import Firestore's Timestamp 
  * @param {Object} params - Object containing the details of the anime
  * @param {string} params.animeId - Unique identifier of the anime
  * @param {string} params.animeName - Name of the anime
- * @param {string} params.animePhoto - URL of the anime's cover photo
- * @param {string} params.animeGenre - Genre of the anime
+ * @param {Object} params.animePhoto - URL of the anime's cover photo
+ * @param {Array} params.animeGenre - Genre of the anime
  * @param {string} params.animeType - Type of the anime (e.g., TV, Movie, OVA, etc.)
  * @param {number} params.animeScore - Rating score of the anime
  * @param {string} params.animeAgeRating - Age rating of the anime (e.g., PG, R, etc.)
  * @param {number} params.animeStartYear - Release year of the anime
- * @param {string} params.animeLength - Length of the anime (e.g., number of episodes or runtime)
+ * @param {number} params.animeLength - Length of the anime (e.g., number of episodes or runtime)
  * @returns {Object} Firestore document object containing the anime data
  * @throws Will throw an error if any required parameter is missing
  */

@@ -45,7 +45,7 @@ const GetWatchListInfoById = async ({watchListId, getFromCache = true}) => {
       const docRef = doc(
         db,
         Constant_Var_firebase_collectionName_watchLists,
-        watchListId
+        toString(watchListId)
       );
       const dataWatchlist = await getDoc(docRef);
   

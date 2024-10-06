@@ -65,7 +65,7 @@ export default async function UpdatePublicPrivateWatchList({ watchListId, type }
         const docRef = doc(
           db,
           Constant_Var_firebase_collectionName_watchLists,
-          watchListId
+          toString(watchListId)
         );
         await updateDoc(docRef, {
           type: type,

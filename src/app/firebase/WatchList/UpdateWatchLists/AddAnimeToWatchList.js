@@ -35,8 +35,8 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  * @param {string} params.watchListId - The ID of the watchlist to which the anime will be added.
  * @param {string} params.animeId - The unique ID of the anime to be added.
  * @param {string} params.animeName - The name of the anime.
- * @param {string} params.animePhoto - The photo URL or image path of the anime.
- * @param {string} params.animeGenre - The genre of the anime.
+ * @param {Object} params.animePhoto - The photo URL or image path of the anime.
+ * @param {Array} params.animeGenre - The genre of the anime.
  * @param {string} params.animeType - The type or category of the anime.
  * @param {number} params.animeScore - The score of the anime.
  * @param {string} params.animeAgeRating - The age rating of the anime.
@@ -55,7 +55,7 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  *   animeId: 'exampleAnimeId',
  *   animeName: 'Attack on Titan',
  *   animePhoto: 'url_to_anime_photo',
- *   animeGenre: 'Action',
+ *   animeGenre: ['Action'],
  *   animeType: 'TV',
  *   animeScore: 9.2,
  *   animeAgeRating: 'PG-13',
@@ -195,9 +195,9 @@ async function addAnime({
     const docRef = doc(
       db,
       Constant_Var_firebase_collectionName_watchLists,
-      watchListId,
+      toString(watchListId),
       Constant_Var_firebase_collectionName_animeList,
-      animeId
+      toString(animeId)
     );
 
     batch.set(docRef, animeObject);

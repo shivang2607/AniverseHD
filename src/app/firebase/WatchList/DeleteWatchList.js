@@ -47,7 +47,7 @@ export default async function DeleteWatchListById({watchListId}) {
       watchListInfo.response.ownerUid === userData.details.uid &&
       watchListInfo.response.isSpecialStarter === false
     ) {
-      let response = await deleteDoc(doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId));
+      let response = await deleteDoc(doc(db, Constant_Var_firebase_collectionName_watchLists, toString(watchListId)));
       deleteUserWatchlistCached({watchListId:watchListId});
       return { status: Constant_Var_success, response: response };
 
