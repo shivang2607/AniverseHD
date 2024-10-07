@@ -5,12 +5,15 @@ import { useEffect } from "react";
 import {
   getSessionWithExpiry,
   setSessionWithExpiry,
-} from "@/Components/utils/storage";
+} from "@/components/utils/storage";
 import { IoMdAdd } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { useSearchParams } from "next/navigation";
-import useStreamStore from "@/Components/utils/streamStore";
+import useStreamStore from "@/components/utils/streamStore";
+import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+import ListDropDown from "@/components/utils/ListDropDown";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -22,6 +25,8 @@ export default function Page({ params }) {
   const dubV = searchParams.get("dub") || false;
 
   const [content, setContent] = useState();
+  const [isWatchListOpen, setIsWatchListOpen] = useState(false);
+  const [watchListData, setWatchListData] = useState();
 
   const {episodesData, setEpisodesData, 
           selectedProvider, setSelectedProvider,
@@ -195,6 +200,17 @@ export default function Page({ params }) {
     } else setEpisodesData(null);
   };
 
+  const handleOnClickWatchList = async () => {
+    const result = await GetLoggedUserWatchListsInfo();
+    console.log(result?.response);
+    if (result.status === "success") {
+      setWatchListData(result?.response);
+      setIsWatchListOpen((prev) => !prev);
+      return;
+    }
+    toast.error(result?.response?.message, { duration: 3000 });
+  };
+
   return (
     <div className="py-16">
       <div className="content py-2 px-4 flex flex-col gap-4">
@@ -205,12 +221,37 @@ export default function Page({ params }) {
         <div className="stream-container self-center w-[95%] flex flex-col gap-12 ">
           <div className="bg-cbg-200 p-4 ">
             <div className="stream bg-black h-[85vh] w-full rounded my-4"></div>
-            <div className="flex mt-4 mx-4 text-sm gap-4">
-              <div className="favorites flex items-center text-lg  justify-center gap-1">
+            <div className="flex mt-4 mx-4 text-sm gap-1">
+              <button className="favorites flex items-center text-lg  justify-center gap-1" onClick={handleOnClickWatchList}>
                 {" "}
                 <PiBookmarkSimpleBold className="font-bold" />
-                <span className="text-sm"> Add to List </span>
-              </div>
+                
+                <div className="flex flex-col">
+                <span className="text-sm flex gap-2 items-center" > Edit Watch List </span>
+                
+                {isWatchListOpen && (
+                      <ListDropDown
+                        anime={content}
+                        isOpen={isWatchListOpen}
+                        watchListData={watchListData}
+                        setIsOpen={setIsWatchListOpen}
+                      />
+                    )}
+                </div>
+
+                <Toaster
+                      toastOptions={{
+                        style: {
+                          borderRadius: "10px",
+                          background: "#b6d7d4",
+                          border: "1px solid ",
+                          color: "#041C32",
+                        },
+                      }}
+                    />
+
+
+              </button>
             </div>
           </div>
 

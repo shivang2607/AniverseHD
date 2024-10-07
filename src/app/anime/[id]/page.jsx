@@ -190,7 +190,7 @@ export default function Anime({ params }) {
                       className="watchnow flex gap-2 items-center bg-gray-200  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
                       onClick={handleOnClickWatchList}
                     >
-                      <IoMdAdd /> Add to List
+                      <IoMdAdd /> Edit Watch List
                     </button>
 
                     {isWatchListOpen && (
