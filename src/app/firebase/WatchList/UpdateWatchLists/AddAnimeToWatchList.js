@@ -35,13 +35,13 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  * @param {string} params.watchListId - The ID of the watchlist to which the anime will be added.
  * @param {string} params.animeId - The unique ID of the anime to be added.
  * @param {string} params.animeName - The name of the anime.
- * @param {Object} params.animePhoto - The photo URL or image path of the anime.
- * @param {Array} params.animeGenre - The genre of the anime.
- * @param {string} params.animeType - The type or category of the anime.
- * @param {number} params.animeScore - The score of the anime.
- * @param {string} params.animeAgeRating - The age rating of the anime.
- * @param {number} params.animeStartYear - The starting year of the anime.
- * @param {number} params.animeLength - The number of episodes or runtime of the anime.
+ * @param {Object|null} params.animePhoto - The photo URL or image path of the anime (can be null).
+ * @param {Array|null} params.animeGenre - The genre of the anime (can be null).
+ * @param {string|null} params.animeType - The type or category of the anime (can be null).
+ * @param {number|null} params.animeScore - The score of the anime (can be null).
+ * @param {string|null} params.animeAgeRating - The age rating of the anime (can be null).
+ * @param {number|null} params.animeStartYear - The starting year of the anime (can be null).
+ * @param {number|null} params.animeLength - The number of episodes or runtime of the anime (can be null).
  *
  * @returns {Promise<{status:string,response:any}>} - Returns a promise that resolves to an object containing:
  *   - {string} status - Indicates the success or failure of the operation, will be Constant_Var_success on success or Constant_Var_error on failure.
@@ -54,7 +54,7 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  *   watchListId: 'exampleWatchListId',
  *   animeId: 'exampleAnimeId',
  *   animeName: 'Attack on Titan',
- *   animePhoto: 'url_to_anime_photo',
+ *   animePhoto: {webp:"rias-gremory.webp",jpg:"akeno-himejima.jpg"},
  *   animeGenre: ['Action'],
  *   animeType: 'TV',
  *   animeScore: 9.2,
@@ -72,13 +72,13 @@ export default async function AddAnimeToWatchList({
   watchListId,
   animeId,
   animeName,
-  animePhoto,
-  animeGenre,
-  animeType,
-  animeScore,
-  animeAgeRating,
-  animeStartYear,
-  animeLength,
+  animePhoto=null,
+  animeGenre=null,
+  animeType=null,
+  animeScore=null,
+  animeAgeRating=null,
+  animeStartYear=null,
+  animeLength=null,
 }) {
   try {
     // Validate the parameters
@@ -206,32 +206,39 @@ function validateParams({
     throw new Error("Invalid or missing animeName (should be a string)");
   }
 
-  if (!animePhoto || typeof animePhoto !== 'object') {
-    throw new Error("Invalid or missing animePhoto (should be a object)");
+  // Anime Photo can be null
+  if (animePhoto !== null && typeof animePhoto !== 'object') {
+    throw new Error("Invalid animePhoto (should be an object or null)");
   }
 
-  if (!animeGenre || !Array.isArray(animeGenre)) {
-    throw new Error("Invalid or missing animeGenre (should be an array)");
+  // Anime Genre can be null
+  if (animeGenre !== null && !Array.isArray(animeGenre)) {
+    throw new Error("Invalid animeGenre (should be an array or null)");
   }
 
-  if (!animeType || typeof animeType !== 'string') {
-    throw new Error("Invalid or missing animeType (should be a string)");
+  // Anime Type can be null
+  if (animeType !== null && typeof animeType !== 'string') {
+    throw new Error("Invalid animeType (should be a string or null)");
   }
 
-  if (typeof animeScore !== 'number') {
-    throw new Error("Invalid or missing animeScore (should be a number)");
+  // Anime Score can be null
+  if (animeScore !== null && typeof animeScore !== 'number') {
+    throw new Error("Invalid animeScore (should be a number or null)");
   }
 
-  if (!animeAgeRating || typeof animeAgeRating !== 'string') {
-    throw new Error("Invalid or missing animeAgeRating (should be a string)");
+  // Anime Age Rating can be null
+  if (animeAgeRating !== null && typeof animeAgeRating !== 'string') {
+    throw new Error("Invalid animeAgeRating (should be a string or null)");
   }
 
-  if (typeof animeStartYear !== 'number') {
-    throw new Error("Invalid or missing animeStartYear (should be a number)");
+  // Anime Start Year can be null
+  if (animeStartYear !== null && typeof animeStartYear !== 'number') {
+    throw new Error("Invalid animeStartYear (should be a number or null)");
   }
 
-  if (typeof animeLength !== 'number') {
-    throw new Error("Invalid or missing animeLength (should be a number)");
+  // Anime Length can be null
+  if (animeLength !== null && typeof animeLength !== 'number') {
+    throw new Error("Invalid animeLength (should be a number or null)");
   }
 }
 
@@ -366,7 +373,6 @@ async function addStarterNonRecentAnime({
     return { response: error, status: Constant_Var_error };
   }
 }
-
 
 async function addToStarterRecentWatchList({
   animeObject,

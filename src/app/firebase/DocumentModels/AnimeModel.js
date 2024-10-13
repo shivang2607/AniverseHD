@@ -17,8 +17,8 @@ import { Timestamp } from "firebase/firestore"; // Import Firestore's Timestamp 
  * @throws Will throw an error if any required parameter is missing
  */
 
-function AnimeModel({ animeId, animeName,animePhoto, animeGenre,animeType,animeScore,animeAgeRating,animeStartYear,animeLength }) {
-  if (!animeId || !animeName || !animePhoto || !animeGenre || !animeType || !animeScore || !animeAgeRating || !animeStartYear || !animeLength ) {
+function AnimeModel({ animeId, animeName,animePhoto=null, animeGenre=null,animeType=null,animeScore=null,animeAgeRating=null,animeStartYear=null,animeLength=null }) {
+  if (!animeId || !animeName) {
     throw new Error(Constant_Var_errorMessage_missingParams);
   }
 

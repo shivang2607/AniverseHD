@@ -23,6 +23,8 @@ import { changeUserNameCached } from "../utils/CacheStorage";
  */
 export default async function UpdateName({ userName }) {
   try {
+
+    validateParams({ userName:userName });
     // Check if user cookies exist
     const userData = await getUserAuth();
     if (!userData) {
@@ -39,5 +41,12 @@ export default async function UpdateName({ userName }) {
     return { status: Constant_Var_success, response: null };
   } catch (error) {
     return { response: error, status: Constant_Var_error };
+  }
+};
+
+
+function validateParams({ userName }) {
+  if (typeof userName !== 'string' || userName.trim() === '') {
+    throw new Error("'userName' must be a non-empty string");
   }
 }

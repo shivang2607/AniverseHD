@@ -5,12 +5,12 @@ import { useEffect } from "react";
 import {
   getSessionWithExpiry,
   setSessionWithExpiry,
-} from "@/Components/utils/storage";
+} from "@/components/utils/storage";
 import { IoMdAdd } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { useSearchParams } from "next/navigation";
-import useStreamStore from "@/Components/utils/streamStore";
+import useStreamStore from "@/components/utils/streamStore";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();

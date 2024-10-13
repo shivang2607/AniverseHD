@@ -6,7 +6,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import getUserAuth from "../utils/GetUserAuth";
-import { Constant_Var_error, Constant_Var_errorMessage_missingParams, Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success, Constant_Var_firebase_collectionName_watchLists } from "@/utils/constants";
+import { Constant_Var_error, Constant_Var_errorMessage_missingParams, Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success, Constant_Var_firebase_collectionName_watchLists, Constant_Var_firebase_fieldValue_public, Constant_Var_firebase_fieldValue_private } from "@/utils/constants";
 import { addUserWatchlistCached } from "../utils/CacheStorage";
 import WatchListModel from "../DocumentModels/WatchListModel";
 
@@ -31,11 +31,10 @@ import WatchListModel from "../DocumentModels/WatchListModel";
  */
 export default async function CreateWatchList({watchListName, type}) {
   try {
-    // Check if user cookies exist
-    if (!watchListName || !type) {
-      throw new Error(Constant_Var_errorMessage_missingParams);
-    }
 
+    validateParams({watchListName:watchListName,type:type})
+
+    // Check if user cookies exist
     const userData = await getUserAuth();
     if (!userData) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
@@ -57,5 +56,20 @@ export default async function CreateWatchList({watchListName, type}) {
     return { status: Constant_Var_success , response:null};
   } catch (error) {
     return { response: error, status: Constant_Var_error };
+  }
+}
+
+function validateParams({ watchListName, type }) {
+  if (!watchListName || typeof watchListName !== 'string') {
+    throw new Error("Invalid or missing watchListName (should be a string)");
+  }
+
+  if (!type || typeof type !== 'string') {
+    throw new Error("Invalid or missing type (should be a string)");
+  }
+
+  const validTypes = [Constant_Var_firebase_fieldValue_public,Constant_Var_firebase_fieldValue_private];
+  if (!validTypes.includes(type)) {
+    throw new Error(`Invalid type. Allowed values are 'public' or 'private', received '${type}'`);
   }
 }

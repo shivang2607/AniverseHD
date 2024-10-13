@@ -32,8 +32,8 @@ import GetWatchListInfoById from "./WatchListDocument/GetWatchListInfoById";
  */
 export default async function DeleteWatchListById({watchListId}) {
   try {
-    if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
-
+    
+    validateParams({ watchListId: watchListId });
     // Check if user cookies exist
     const userData = await getUserAuth();
 
@@ -60,5 +60,11 @@ export default async function DeleteWatchListById({watchListId}) {
 
   } catch (error) {
     return { response: error, status: Constant_Var_error };
+  }
+}
+
+function validateParams({ watchListId }) {
+  if (!watchListId || typeof watchListId !== "string") {
+    throw new Error("Invalid or missing watchListId (should be a string)");
   }
 }

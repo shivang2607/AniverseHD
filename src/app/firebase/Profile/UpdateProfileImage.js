@@ -32,6 +32,8 @@ export default async function UpdateProfileImage({
   imageUrl = false
 }) {
   try {
+    validateParams({ blob:blob, imageUrl:imageUrl });
+    
     // Check if user cookies exist
     const userData = await getUserAuth();
     if (!userData) {
@@ -61,5 +63,19 @@ export default async function UpdateProfileImage({
     return { status: Constant_Var_success, response: resp.response };
   } catch (error) {
     return { response: error, status: Constant_Var_error };
+  }
+}
+
+function validateParams({ blob, imageUrl }) {
+  if (!blob && !imageUrl) {
+    throw new Error("Either 'blob' or 'imageUrl' must be provided");
+  }
+
+  if (blob && !(blob instanceof Blob) && !(blob instanceof File && blob.type.startsWith('image/'))) {
+    throw new Error("'blob' must be a Blob or an image file");
+  }
+
+  if (imageUrl && typeof imageUrl !== 'string') {
+    throw new Error("'imageUrl' must be a string");
   }
 }

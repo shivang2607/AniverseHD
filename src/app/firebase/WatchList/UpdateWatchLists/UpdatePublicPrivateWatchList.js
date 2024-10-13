@@ -11,6 +11,8 @@ import {
   Constant_Var_success,
   Constant_Var_firebase_collectionName_watchLists,
   Constant_Var_starterWatchLists_recent,
+  Constant_Var_firebase_fieldValue_public,
+  Constant_Var_firebase_fieldValue_private,
 } from "@/utils/constants";
 import {
   updatePublicPrivateCached,
@@ -42,11 +44,9 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  */
 export default async function UpdatePublicPrivateWatchList({ watchListId, type }) {
     try {
-      // Check if user cookies exist
-      if (!watchListId || !type) {
-        throw new Error("Missing Params in AddtoWatchList Function");
-      }
 
+      validateParams({watchListId:watchListId,type:type})
+      
       const userData = await getUserAuth();
       if (!userData) {
         throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
@@ -87,3 +87,17 @@ export default async function UpdatePublicPrivateWatchList({ watchListId, type }
     }
   }
   
+  function validateParams({ watchListId, type }) {
+    if (!watchListId || typeof watchListId !== 'string') {
+      throw new Error("Invalid or missing watchListId (should be a string)");
+    }
+  
+    if (!type || typeof type !== 'string') {
+      throw new Error("Invalid or missing type (should be a string)");
+    }
+  
+    const validTypes = [Constant_Var_firebase_fieldValue_public,Constant_Var_firebase_fieldValue_private];
+    if (!validTypes.includes(type)) {
+      throw new Error(`Invalid type. Allowed values are 'public' or 'private', received '${type}'`);
+    }
+  }

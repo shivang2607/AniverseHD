@@ -22,7 +22,7 @@ import {
  */
 export default async function GetOtherUserData({ userId }) {
   try {
-    if (!userId) throw new Error(Constant_Var_errorMessage_missingParams);
+    validateParams({ userId:userId });
 
     const docRef = doc(db, Constant_Var_firebase_collectionName_users, userId);
     const data = await getDoc(docRef);
@@ -35,5 +35,11 @@ export default async function GetOtherUserData({ userId }) {
     throw new Error(Constant_Var_errorMessage_userDoesNotExistWithThisId);
   } catch (error) {
     return { status: Constant_Var_error, response: error };
+  }
+}
+
+function validateParams({ userId }) {
+  if (!userId  || typeof userId  !== 'string') {
+    throw new Error("Invalid or missing userId  (should be a string)");
   }
 }
