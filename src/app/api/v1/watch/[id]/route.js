@@ -74,10 +74,10 @@ export async function GET(req, { params }) {
     await Promise.all(
       Object.keys(animeData?.Sites?.Zoro).map(async (key) => {
         const id = animeData.Sites.Zoro[key].url.split("/").pop();
-        const res = await axios.get(`${aniwatchScrapeUrl}/anime/episodes/${id}`);
-        if (res.data?.totalEpisodes > maxEpisode) {
-          maxEpisode = res.data?.totalEpisodes;
-          zoroEps = res.data;
+        const res = await axios.get(`${aniwatchScrapeUrl}/api/v2/hianime/anime/${id}/episodes`);
+        if (res.data?.data?.totalEpisodes > maxEpisode) {
+          maxEpisode = res.data?.data?.totalEpisodes;
+          zoroEps = res.data?.data;
         }
       })
     );

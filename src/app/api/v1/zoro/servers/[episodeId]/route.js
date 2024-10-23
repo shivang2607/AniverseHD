@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 const options = {
     max: 500,
-    ttl: 1000*60*60*24*7 //7 days
+    ttl: 1000*60* 10 //10 min
 }
 
 const serverCache = new LRUCache(options);
@@ -21,7 +21,7 @@ export async function GET(req, {params}){
 
     try {
         // console.log(`${process.env.ANIWATCH_SCRAPER_URL}/anime/servers?episodeId=${episodeId}?ep=${ep}`)
-        const res = await axios.get(`${process.env.ANIWATCH_SCRAPER_URL}/anime/servers?episodeId=${episodeId}?ep=${ep}`);
+        const res = await axios.get(`${process.env.ANIWATCH_SCRAPER_URL}/api/v2/hianime/episode/servers?animeEpisodeId=${episodeId}?ep=${ep}`);
         serverCache.set(`zoro-server-${episodeId}-${ep}`, res?.data);
         // console.log(res?.data);
         return NextResponse.json(res?.data);

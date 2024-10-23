@@ -179,7 +179,7 @@ export default function Anime({ params }) {
                 {anime ? (
                   <div className="flex mt-4 gap-4 justify-center md:justify-start">
                     <Link
-                      href="#"
+                      href={`/watch/${params?.id}?provider=zoro`}
                       className="watchnow flex gap-2 items-center bg-primary-500  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
                     >
                       <FaPlayCircle />
