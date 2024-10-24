@@ -293,7 +293,7 @@ export default function Page({ params }) {
                       }
                     }
                   }}
-                  onError={e=>toast.error(e.message)}
+                  onError={e=>toast.error(`${e.message}, Try Another Server.`)}
                   // onHlsError={()=>{
                   //   toast.error("Error while loading the file, Try another Provider or try after some time.");
                   //   console.log("Some error occured in playing the file.");
