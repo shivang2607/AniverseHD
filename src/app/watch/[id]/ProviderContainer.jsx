@@ -11,7 +11,7 @@ import Skeleton from "react-loading-skeleton";
 
 
 
-const useDebouncedEffect = (callback, dependencies, delay) => {
+const useDebouncedEffect = (callback, dependencies, delay, setStreamingData) => {
   useEffect(() => {
     const handler = setTimeout(() => {
       callback();
@@ -20,6 +20,7 @@ const useDebouncedEffect = (callback, dependencies, delay) => {
     // Clean up timeout if dependencies change before the delay finishes
     return () => {
       clearTimeout(handler);
+      // setStreamingData(null);
     };
   }, [...dependencies, delay]);
 };
@@ -61,20 +62,21 @@ export default function ProviderContainer({
   streamingData, setStreamingData,
   serverLoading, setServerLoading,
   setStreamLoading,
-  // server,
+  server,
   // setServer,
   } = useStreamStore(state=>({
     ...state,
     episodes : state.episodesData
   }));
 
-  const server = searchParams.get('server');
+  const serverV = searchParams.get('server');
   // const [server, setServer] = useState(searchParams.get('server'));
   // const [serverLoading, setServerLoading] = useState(false);
   const [episodeRangeIndex, setEpisodeRangeIndex] = useState(0); //according to this index range of episodes in the eindow will be shown this will be changed through the dropdown of the select box, and the range is 50 by default and is static for now, you can change this range statically or can make this range dynamic as well.
 
 
   // const memoizedDub = useMemo(() => dub, [dub]);
+  console.log("This is server data",serverData);
 
   useDebouncedEffect(() => {
     if (!zoroEpisodeId && !gogoDubEpisodeId && !gogoSubEpisodeId) return;
@@ -84,7 +86,7 @@ export default function ProviderContainer({
       gogoSubId: gogoSubEpisodeId,
       gogoDubId: gogoDubEpisodeId,
     });
-  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], 50); // 50ms delay
+  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], 50, setStreamingData); // 50ms delay
   
   
   const fetchStreamingData = async(ep)=>{
@@ -92,8 +94,15 @@ export default function ProviderContainer({
     setStreamLoading(true);
     try {
       if(provider==="zoro"){
-
-        const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}?category=${dub?"dub":"sub"}&server=${server}`);
+        console.log(ep?.episodeId)
+        console.log(provider, dub, server);
+        const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
+          params: {
+            category: dub ? "dub" : "sub",
+            server: server || 'hd-1'
+          }
+        });
+        
         setStreamingData(data?.data);
         console.log("zoro ka streaming api vaala data",data?.data);
       }
@@ -103,7 +112,7 @@ export default function ProviderContainer({
         console.log("gogo ki streaming api vaala data", data?.data);
       }
     } catch (error) {
-      console.log(error);
+      console.log("couldn't fetch streaming data, ",error);
     }
     setStreamLoading(false);
   }
@@ -127,7 +136,7 @@ export default function ProviderContainer({
       <div className="provider-server-select self-center flex flex-col gap-8">
         <div className="button self-center flex gap-2 text-gray-200 ">
           <Link
-            href = {updateParams([{key:"provider", val: "zoro"},{ key:"server", val:'vidsrc'}])}
+            href = {updateParams([{key:"provider", val: "zoro"},{ key:"server", val:''}])}
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md ${
               provider === "zoro" ? "bg-primary-100" : ""
@@ -140,7 +149,7 @@ export default function ProviderContainer({
             Provider-Z
           </Link>
           <Link
-            href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:""}])}
+            href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:"hd-1"}])}
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md  ${
               provider === "gogo" ? "bg-primary-100" : ""
@@ -173,6 +182,7 @@ export default function ProviderContainer({
                 }
                 {
                   provider==="zoro" && serverData?.sub?.map(ser=>{
+                    // console.log("ser first", ser);
                     return (
                       <Link 
                       key={ser?.serverName || ser?.name}

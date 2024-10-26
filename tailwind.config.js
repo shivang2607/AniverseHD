@@ -46,6 +46,7 @@ module.exports = {
   },
   plugins: [
     require('tailwind-scrollbar')({ preferredStrategy: 'pseudoelements' }),
+    require('@vidstack/react/tailwind.cjs'),
   ],
 }
 

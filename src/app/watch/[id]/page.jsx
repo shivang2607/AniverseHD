@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useRef, useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
 import {
@@ -9,8 +9,29 @@ import {
 import { IoMdAdd } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import useStreamStore from "@/components/utils/streamStore";
+import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+import ListDropDown from "@/components/utils/ListDropDown";
+import toast, { Toaster } from "react-hot-toast";
+import "@vidstack/react/player/styles/default/theme.css";
+import "@vidstack/react/player/styles/default/layouts/video.css";
+import {
+  AudioGainSlider,
+  Captions,
+  isHLSProvider,
+  MediaPlayer,
+  MediaProvider,
+  Track,
+  useMediaPlayer,
+} from "@vidstack/react";
+import {
+  DefaultAudioLayout,
+  defaultLayoutIcons,
+  DefaultVideoLayout,
+} from "@vidstack/react/player/layouts/default";
+import { ImCross } from "react-icons/im";
+import { ThreeCircles } from "react-loader-spinner";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -22,22 +43,43 @@ export default function Page({ params }) {
   const dubV = searchParams.get("dub") || false;
 
   const [content, setContent] = useState();
+  const [isWatchListOpen, setIsWatchListOpen] = useState(false);
+  const [watchListData, setWatchListData] = useState();
 
-  const {episodesData, setEpisodesData, 
-          selectedProvider, setSelectedProvider,
-          serverData, setServerData,
-          server, setServer,
-          zoroEpisodeId, setZoroEpisodeId,
-          gogoSubEpisodeId, setGogoSubEpisodeId,
-          gogoDubEpisodeId, setGogoDubEpisodeId,
-          dub, setDub,
-          setServerLoading,
+  const {
+    episodesData,
+    setEpisodesData,
+    streamingData,
+    setStreamingData,
+    selectedProvider,
+    setSelectedProvider,
+    serverData,
+    setServerData,
+    server,
+    setServer,
+    zoroEpisodeId,
+    setZoroEpisodeId,
+    gogoSubEpisodeId,
+    setGogoSubEpisodeId,
+    gogoDubEpisodeId,
+    setGogoDubEpisodeId,
+    dub,
+    setDub,
+    setServerLoading,
+    // isAutoSkip, setIsAutoSkip,
   } = useStreamStore();
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const player = useRef(null);
+
+  const [showSkipButton, setShowSkipButton] = useState("");
+  const [isAutoSkip, setIsAutoSkip] = useState(true);
+
   useEffect(() => {
-    
-    if(!provider){
+    if (!provider) {
       window.alert("No provider provided in params");
+      router.back();
       return;
     }
     setServer(serverV);
@@ -47,15 +89,15 @@ export default function Page({ params }) {
     setGogoSubEpisodeId(gogoSubId);
     setDub(dubV);
     // console.log("Hello world!!",provider, episodeId, selectedEpisodeId);
-  
-    return () => {
-      
-    }
-  }, [provider, zoroId, gogoSubId, gogoDubId, serverV, dubV])
-  
+
+    return () => {};
+  }, [provider, zoroId, gogoSubId, gogoDubId, serverV, dubV]);
 
   useEffect(() => {
     if (!params?.id) return;
+
+    setStreamingData(null);
+
     (async () => {
       const cachedData = getSessionWithExpiry(`watch-${params.id}`);
       if (cachedData) {
@@ -66,8 +108,7 @@ export default function Page({ params }) {
           cachedData?.gogoSub
         );
 
-
-        if(!zoroId && !gogoSubId && !gogoDubId){
+        if (!zoroId && !gogoSubId && !gogoDubId) {
           setZoroEpisodeId(cachedData?.zoro?.episodes[0]?.episodeId);
           setGogoSubEpisodeId(cachedData?.gogoSub?.episodes[0]?.id);
           setGogoDubEpisodeId(cachedData?.gogoDub?.episodes[0]?.id);
@@ -78,17 +119,16 @@ export default function Page({ params }) {
       }
       // console.log(params?.id)
       const data = await axios.get(`/api/v1/watch/${params?.id}`);
-      // console.log(`data for /watch/${params?.id}`, data?.data);
+      console.log(`data for /watch/${params?.id}`, data?.data);
       setContent(data?.data);
-      setSessionWithExpiry(`watch-${params.id}`, data?.data, 1000 * 60 * 60); // 1 hour
+      setSessionWithExpiry(`watch-${params.id}`, data?.data, 1000 * 60 * 30); // 30 min
       mergeProviderData(
         data?.data?.zoro,
         data?.data?.gogoDub,
         data?.data?.gogoSub
       );
 
-
-      if(!zoroId && !gogoSubId && !gogoDubId){
+      if (!zoroId && !gogoSubId && !gogoDubId) {
         setZoroEpisodeId(data?.data?.zoro?.episodes[0]?.episodeId);
         setGogoSubEpisodeId(data?.data?.gogoSub?.episodes[0]?.id);
         setGogoDubEpisodeId(data?.data?.gogoDub?.episodes[0]?.id);
@@ -97,78 +137,119 @@ export default function Page({ params }) {
     })();
   }, [params]);
 
+  const updateParams = (paramsList) => {
+    const newParams = new URLSearchParams(searchParams);
+    paramsList.forEach((par) => {
+      newParams.set(par.key, par.val);
+    });
 
+    return pathname + "?" + newParams.toString();
+  };
+
+  const getNextEpisode = () => {
+    const currentIndex = episodesData?.findIndex(
+      (ep) =>
+        ep?.episodeId === zoroEpisodeId ||
+        ep?.gogoDubId === gogoDubEpisodeId ||
+        ep?.gogoSubId === gogoSubEpisodeId
+    );
+
+    if (currentIndex !== -1 && currentIndex < episodesData.length - 1) {
+      const ep = episodesData[currentIndex + 1]; // Return the next episode's ID
+      const url = updateParams([
+        { key: "z-id", val: ep?.episodeId },
+        { key: "g-sub-id", val: ep?.gogoSubId },
+        { key: "g-dub-id", val: ep?.gogoDubId },
+      ]);
+      router.push(url);
+    } else {
+      return null; // No more episodes available
+    }
+  };
 
   useEffect(() => {
     (async () => {
       if (!provider) return;
 
-      if(provider==="zoro" && zoroEpisodeId){
+      if (provider === "zoro" && zoroEpisodeId) {
+        const cachedServerData = getSessionWithExpiry(
+          `serverData-${provider}-${zoroEpisodeId}`
+        );
+        if (cachedServerData) {
+          // console.log("cached servers data : ", cachedServerData);
+          setServerData(cachedServerData);
+          console.log("serverV", serverV);
+          if (!serverV) setServer(cachedServerData?.sub[0].serverName);
+          // return;
+        } else {
+          const serverData = await axios.get(
+            `/api/v1/${provider}/servers/${zoroEpisodeId}`
+          );
 
-      const cachedServerData = getSessionWithExpiry(`serverData-${provider}-${zoroEpisodeId}`);
-      if(cachedServerData){
-        // console.log("cached servers data : ", cachedServerData);
-        setServerData(cachedServerData);
-        console.log("serverV", serverV);
-        if(!serverV)
-        setServer(cachedServerData?.sub[0].serverName);
-      // return;
-      }  
-      else{
-      const serverData = await axios.get(
-        `/api/v1/${provider}/servers/${zoroEpisodeId}`
-      );
-    
-      // console.log("servers data : ", serverData?.data);
-      setServerData(serverData?.data);
-      setServer(serverData?.data?.sub[0].serverName);
-      setSessionWithExpiry(`serverData-${provider}-${zoroEpisodeId}`, serverData?.data, 1000 * 60 * 60 * 24);   //24 hrs
-    }
-    }
+          console.log("servers data : ", serverData?.data?.data);
+          setServerData(serverData?.data?.data);
+          setServer(serverData?.data?.data?.sub[0].serverName);
+          console.log("server", serverData?.data?.data?.sub[0].serverName);
+          setSessionWithExpiry(
+            `serverData-${provider}-${zoroEpisodeId}`,
+            serverData?.data?.data,
+            1000 * 60 * 60 * 24
+          ); //24 hrs
+        }
+      }
 
+      //   else if(provider==="gogo"){
+      //     let dataGogoDub, dataGogoSub;
+      //     if(gogoDubEpisodeId){
+      //       dataGogoDub = await axios.get(
+      //         `/api/v1/${provider}/servers/${gogoDubEpisodeId}`
+      //       );
+      //       // setServerData({dub : dataGogoDub?.data});
 
-  //   else if(provider==="gogo"){
-  //     let dataGogoDub, dataGogoSub;
-  //     if(gogoDubEpisodeId){
-  //       dataGogoDub = await axios.get(
-  //         `/api/v1/${provider}/servers/${gogoDubEpisodeId}`
-  //       );
-  //       // setServerData({dub : dataGogoDub?.data});
+      //     }
 
-  //     }
+      //     if(gogoSubEpisodeId){
+      //       dataGogoSub = await axios.get(
+      //         `/api/v1/${provider}/servers/${gogoSubEpisodeId}`
+      //       );
+      //       // setServerData({sub : dataGogoSub?.data});
 
-  //     if(gogoSubEpisodeId){
-  //       dataGogoSub = await axios.get(
-  //         `/api/v1/${provider}/servers/${gogoSubEpisodeId}`
-  //       );
-  //       // setServerData({sub : dataGogoSub?.data});
+      //     }
+      //     setServerData({
+      //       sub : dataGogoSub?.data,
+      //       dub : dataGogoDub?.data,
+      //   })
 
-  //     }
-  //     setServerData({
-  //       sub : dataGogoSub?.data,
-  //       dub : dataGogoDub?.data,
-  //   })
+      //   if(!serverV){
+      //   if(dataGogoSub?.data?.sub){
+      //     setServer(dataGogoSub?.data?.sub[0]?.name);
+      //   }
+      //   else{
+      //     setServer('Vidstreaming');
+      //   }
+      // }
 
-  //   if(!serverV){
-  //   if(dataGogoSub?.data?.sub){
-  //     setServer(dataGogoSub?.data?.sub[0]?.name);
-  //   } 
-  //   else{
-  //     setServer('Vidstreaming');
-  //   }
-  // }
-      
-  //   }  //!enable it when you need all the servers from gogo that is if you want to use embed urls 
+      //   }  //!enable it when you need all the servers from gogo that is if you want to use embed urls
 
       // setServerLoading(false);
-      
     })();
 
-    return()=>{
+    return () => {
       // setServerData(null);
-      
-    }
+    };
   }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
+
+  // const getVol = ()=>{
+  //   return JSON.parse(localStorage.getItem('player-vol')) || 1;
+  // }
+
+  // const handleVolumeChange = (v)=>{
+  //   localStorage.setItem('player-vol', JSON.stringify(v.volume));
+  // }
+
+  console.log("main page steraming data", streamingData);
+
+  console.log(episodesData);
 
   const mergeProviderData = (zoro, gogoDub, gogoSub) => {
     const gds = gogoDub?.episodes?.length; //gogo dub size
@@ -195,36 +276,245 @@ export default function Page({ params }) {
     } else setEpisodesData(null);
   };
 
+  const handleSkipIntro = () => {
+    if (player) {
+      const skipToTime =
+        showSkipButton === "intro"
+          ? streamingData?.intro?.end
+          : streamingData?.outro?.end;
+
+      if (typeof skipToTime === "number") {
+        console.log("Current time before skip:", player.currentTime); // Should now work correctly
+        player.currentTime = skipToTime; // Skip to the end of the intro or outro
+        console.log("Current time after skip:", player.currentTime);
+      } else {
+        console.error("Invalid time value for skipping.");
+      }
+
+      setShowSkipButton(""); // Hide the button after skipping
+    } else {
+      console.error("Player not found!");
+    }
+  };
+
+  const handleOnClickWatchList = async () => {
+    const result = await GetLoggedUserWatchListsInfo();
+    console.log(result?.response);
+    if (result.status === "success") {
+      setWatchListData(result?.response);
+      setIsWatchListOpen((prev) => !prev);
+      return;
+    }
+    toast.error(result?.response?.message, { duration: 3000 });
+  };
+
   return (
     <div className="py-16">
       <div className="content py-2 px-4 flex flex-col gap-4">
         <h1 className="text-2xl tracking-wide my-3 font-semibold  self-center">
           {" "}
-          {content?.title}
+          Currently Watching : {content?.title_english || content?.title}
         </h1>
         <div className="stream-container self-center w-[95%] flex flex-col gap-12 ">
           <div className="bg-cbg-200 p-4 ">
-            <div className="stream bg-black h-[85vh] w-full rounded my-4"></div>
-            <div className="flex mt-4 mx-4 text-sm gap-4">
-              <div className="favorites flex items-center text-lg  justify-center gap-1">
+            {!streamingData ? (
+              <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
+                <ThreeCircles
+                  visible={true}
+                  height="100"
+                  width="100"
+                  color="#0ea5e9"
+                  // className="text-sky-500"
+                  ariaLabel="three-circles-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              </div>
+            ) : streamingData?.status === 500 ? (
+              <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
+                <ImCross color="red" /> {streamingData?.message}
+              </div>
+            ) : (
+              <div className="stream block bg-black h-[85vh] w-full rounded my-4">
+                <MediaPlayer
+                  load="eager"
+                  autoPlay
+                  ref={player}
+                  // volume={getVol()}
+                  // onVolumeChange={(v, e)=>{
+                  //   handleVolumeChange(v);
+                  // }}
+                  // storage="media-player"
+                  title={streamingData?.malId}
+                  src={streamingData?.sources?.[0]?.url}
+                  className="h-full"
+                  onProviderChange={(prov, eve) => {
+                    if (isHLSProvider(prov) && streamingData?.headers) {
+                      prov.config = {
+                        xhrSetup(xhr) {
+                          xhr.setRequestHeader(
+                            "Referer",
+                            streamingData?.headers?.Referer
+                          );
+                          xhr.setRequestHeader(
+                            "User-Agent",
+                            streamingData?.headers?.["User-Agent"]
+                          );
+                        },
+                      };
+                    }
+                  }}
+                  storage="videoPlayer"
+                  onError={(e) =>
+                    toast.error(`${e.message}, Try Another Server.`)
+                  }
+                  onEnded={() => getNextEpisode()}
+                  onTimeUpdate={(v, event) => {
+                    if (!streamingData?.intro) return;
+                    const player = event.target;
+                    const currentTime = player?.currentTime;
+                    // console.log(currentTime, v);
+                    // Define the intro and outro timestamps
+                    const introStart = streamingData?.intro?.start;
+                    const introEnd = streamingData?.intro?.end;
+                    const outroStart = streamingData?.outro?.start;
+                    const outroEnd = streamingData?.outro?.end;
+
+                    if (!isAutoSkip) {
+                      if (currentTime < introEnd && currentTime > introStart) {
+                        setShowSkipButton("Intro");
+                      } else if (
+                        currentTime > outroStart &&
+                        currentTime < outroEnd
+                      ) {
+                        setShowSkipButton("Outro");
+                      } else setShowSkipButton("");
+
+                      return; //if auto skip intro flag is off then no need to autoskip the intro or outro
+                    }
+
+                    // Skip intro
+                    if (currentTime < introEnd && currentTime > introStart) {
+                      player.currentTime = introEnd;
+                    }
+
+                    // Skip outro
+                    if (currentTime > outroStart && currentTime < outroEnd) {
+                      player.currentTime = outroEnd; // Skip to the end
+                    }
+                  }}
+
+                  // onHlsError={()=>{
+                  //   toast.error("Error while loading the file, Try another Provider or try after some time.");
+                  //   console.log("Some error occured in playing the file.");
+                  // }}
+                >
+                  <MediaProvider>
+                    {streamingData?.tracks
+                      ?.filter((t) => t?.kind === "captions")
+                      ?.map((tr, index) => {
+                        return (
+                          // <Captions key={tr?.file} src={tr?.file}  label={tr?.label} default={tr?.default} className="vds-captions"/>
+                          <Track
+                            key={tr?.file}
+                            src={tr?.file}
+                            kind="subtitles"
+                            label={tr?.label}
+                            // lang="en-US"
+                            default={tr?.default || index === 0}
+                          />
+                        );
+                      })}
+                  </MediaProvider>
+                  <DefaultVideoLayout
+                    thumbnails={
+                      streamingData?.tracks?.filter(
+                        (t) => t.kind === "thumbnails"
+                      )?.[0]?.file
+                    }
+                    slots={{
+                      afterCaptions: showSkipButton && (
+                        <button
+                          className="text-lg w-fit h-fit absolute right-12 bottom-24 px-2 py-1 border-white border-2 rounded-md font-semibold backdrop-blur-lg bg-black/10 flex"
+                          onClick={() => {
+                            console.log(
+                              player?.current?.currentTime,
+                              streamingData?.intro?.end
+                            );
+                            player.current.currentTime =
+                              showSkipButton === "Intro"
+                                ? streamingData?.intro?.end
+                                : streamingData?.outro?.end; // Skip to the end of the intro
+                            setShowSkipButton(""); // Hide the button after skipping
+                          }}
+                        >
+                          Skip {showSkipButton}
+                        </button>
+                      ),
+                    }}
+                    icons={defaultLayoutIcons}
+                  />
+                </MediaPlayer>
+              </div>
+            )}
+            <div className="flex mt-4 mx-4 text-sm gap-1">
+              <button
+                className="favorites flex items-center text-lg  justify-center gap-1"
+                onClick={handleOnClickWatchList}
+              >
                 {" "}
                 <PiBookmarkSimpleBold className="font-bold" />
-                <span className="text-sm"> Add to List </span>
-              </div>
+                <div className="flex flex-col">
+                  <span className="text-sm flex gap-2 items-center">
+                    {" "}
+                    Edit Watch List{" "}
+                  </span>
+
+                  {isWatchListOpen && (
+                    <ListDropDown
+                      anime={content}
+                      isOpen={isWatchListOpen}
+                      watchListData={watchListData}
+                      setIsOpen={setIsWatchListOpen}
+                    />
+                  )}
+                </div>
+                <Toaster
+                  toastOptions={{
+                    style: {
+                      borderRadius: "10px",
+                      background: "#b6d7d4",
+                      border: "1px solid ",
+                      color: "#041C32",
+                    },
+                  }}
+                />
+              </button>
+
+              {provider === "zoro" && (
+                <button
+                  className={`mx-5 ${
+                    isAutoSkip ? "text-sky-400 font-semibold" : ""
+                  } `}
+                  onClick={() => setIsAutoSkip(!isAutoSkip)}
+                >
+                  Auto Skip Intro ({isAutoSkip ? "on" : "off"})
+                </button>
+              )}
             </div>
           </div>
 
           {episodesData && (
             <ProviderContainer
-              // episodes={episodesData}
-              // selectedEpisodeId={selectedEpisodeId}
-              // setSelectedEpisodeId={setSelectedEpisodeId}
-              // provider={selectedProvider}
-              // setProvider = {setSelectedProvider}
-              // // prov = {provider}
-              // dub = {dub}
-              // server = {server}
-              // serverData={serverData}
+            // episodes={episodesData}
+            // selectedEpisodeId={selectedEpisodeId}
+            // setSelectedEpisodeId={setSelectedEpisodeId}
+            // provider={selectedProvider}
+            // setProvider = {setSelectedProvider}
+            // // prov = {provider}
+            // dub = {dub}
+            // server = {server}
+            // serverData={serverData}
             />
           )}
         </div>
