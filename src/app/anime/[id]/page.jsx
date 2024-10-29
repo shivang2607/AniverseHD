@@ -17,6 +17,13 @@ import Skeleton from "react-loading-skeleton";
 import toast, { Toaster } from "react-hot-toast";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
 import ListDropDown from "@/components/utils/ListDropDown";
+import {
+  Constant_Var_errorMessage_loggedInUserDoesNostExistsYet,
+  Constant_Var_errorMessage_notAuthenticatedUser,
+  Constant_Var_errorMessage_userDoesNotExistWithThisId,
+  Constant_Var_success,
+} from "@/utils/constants";
+import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 
 export default function Anime({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -46,11 +53,18 @@ export default function Anime({ params }) {
 
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
-    console.log(result?.response);
-    if (result.status === "success") {
+    
+    if (result.status === Constant_Var_success) {
       setWatchListData(result?.response);
       setIsWatchListOpen((prev) => !prev);
       return;
+    } else if (
+      result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
+    ) {
+      const signInResp = await SignInGooglePopUp((status) => {console.log("login status:",status)});
+
+      if (signInResp.status === Constant_Var_success) return;
+      else toast.error(signInResp?.response?.message, { duration: 3000 });
     }
     toast.error(result?.response?.message, { duration: 3000 });
   };
@@ -185,22 +199,22 @@ export default function Anime({ params }) {
                       <FaPlayCircle />
                       Watch now
                     </Link>
-                  <div className="flex flex-col">
-                    <button
-                      className="watchnow flex gap-2 items-center bg-gray-200  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
-                      onClick={handleOnClickWatchList}
-                    >
-                      <IoMdAdd /> Edit Watch List
-                    </button>
+                    <div className="flex flex-col">
+                      <button
+                        className="watchnow flex gap-2 items-center bg-gray-200  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
+                        onClick={handleOnClickWatchList}
+                      >
+                        <IoMdAdd /> Edit Watch List
+                      </button>
 
-                    {isWatchListOpen && (
-                      <ListDropDown
-                        anime={anime}
-                        isOpen={isWatchListOpen}
-                        watchListData={watchListData}
-                        setIsOpen={setIsWatchListOpen}
-                      />
-                    )}
+                      {isWatchListOpen && (
+                        <ListDropDown
+                          anime={anime}
+                          isOpen={isWatchListOpen}
+                          watchListData={watchListData}
+                          setIsOpen={setIsWatchListOpen}
+                        />
+                      )}
                     </div>
 
                     <Toaster

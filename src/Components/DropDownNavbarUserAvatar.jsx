@@ -15,7 +15,6 @@ const DropDownNavbarUserAvatar = ({ loggedInUserData }) => {
    const resp= await SignOut();
    if(resp.status===Constant_Var_success){
     console.log("signed-Out")
-    window.location.reload();
    }else{
     // show some toast for error
    }

@@ -9,6 +9,7 @@ import {
   Constant_Var_errorMessage_noWatchListExists,
   Constant_Var_firebase_collectionName_animeList,
   Constant_Var_firebase_fieldName_ownerUid,
+  Constant_Var_errorMessage_loggedInUserDoesNostExistsYet,
 } from "@/utils/constants";
 import {
   getUserWatchListsInfoCached,
@@ -93,7 +94,10 @@ export default async function GetLoggedUserWatchListsInfo() {
 
     if (result.length > 0) 
       setUserWatchListsInfoCached({watchLists:result,userId: userData.details.uid});
+    else
+      throw new Error(Constant_Var_errorMessage_loggedInUserDoesNostExistsYet);
 
+    window.location.reload();
     return { status: Constant_Var_success, response: result };
   } catch (error) {
     return { response: error, status: Constant_Var_error };

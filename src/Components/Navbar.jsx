@@ -25,14 +25,11 @@ const Navbar = () => {
   const [loggedInUserData, setLoggedInUserData] = useState(null);
 
   const handleSignIn = async () => {
-    const res = await SignInGooglePopUp();
+    const res = await SignInGooglePopUp((newStatus) => {
+      console.log(newStatus);
+    });
 
-    if (res.status === Constant_Var_success) {
-      router.push(`/profile/${res.response}`);
-      loadUserData();
-    } else {
-      //show Toast
-    }
+    console.log(res.response,"response"); 
   };
 
   const handleScroll = () => {
