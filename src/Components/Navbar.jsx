@@ -11,6 +11,7 @@ import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import { Constant_Var_success } from "@/utils/constants";
 import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
+import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 
 const Navbar = () => {
   const router = useRouter();
@@ -29,9 +30,19 @@ const Navbar = () => {
       console.log(newStatus);
     });
 
-    console.log(res.response,"response"); 
+    console.log(res.response, "response");
   };
 
+  const test = async () => {
+    const res = await AddAnimeToWatchList({
+      watchListId: "byJyzrxJGR6mTvs80T5p",
+      animeId: "1",
+      animeName: "Attack on Titan",
+      url:"hhh"
+    });
+
+    console.log(res.response, "response");
+  };
   const handleScroll = () => {
     if (["/recommendations"].some((path) => path === currentPath)) return;
     const currentScrollY = window.scrollY;
@@ -166,6 +177,13 @@ const Navbar = () => {
                 />
               </button>
             </div>
+
+            <button
+              className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
+              onClick={test}
+            >
+              test
+            </button>
             {!isUserLoggedIn ? (
               <button
                 className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
@@ -174,7 +192,7 @@ const Navbar = () => {
                 Login
               </button>
             ) : (
-              <DropDownNavbarUserAvatar loggedInUserData={loggedInUserData}/>
+              <DropDownNavbarUserAvatar loggedInUserData={loggedInUserData} />
             )}
           </div>
         </div>
