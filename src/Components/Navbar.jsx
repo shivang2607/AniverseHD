@@ -12,8 +12,10 @@ import { Constant_Var_success } from "@/utils/constants";
 import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
+import useUserStore from "./utils/userStore";
 
 const Navbar = () => {
+  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists} = useUserStore();
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -22,27 +24,17 @@ const Navbar = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const [loggedInUserData, setLoggedInUserData] = useState(null);
+  // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  // const [loggedInUserData, setLoggedInUserData] = useState(null);
 
   const handleSignIn = async () => {
-    const res = await SignInGooglePopUp((newStatus) => {
-      console.log(newStatus);
-    });
-
-    console.log(res.response, "response");
+    login();
   };
 
   const test = async () => {
-    const res = await AddAnimeToWatchList({
-      watchListId: "byJyzrxJGR6mTvs80T5p",
-      animeId: "1",
-      animeName: "Attack on Titan",
-      url:"hhh"
-    });
-
-    console.log(res.response, "response");
+  //  setIsUserLoggedIn(true);
   };
+
   const handleScroll = () => {
     if (["/recommendations"].some((path) => path === currentPath)) return;
     const currentScrollY = window.scrollY;
@@ -79,20 +71,12 @@ const Navbar = () => {
     setIsOpen(false);
   }, [currentPath]);
 
-  async function loadUserData() {
-    const result = await GetLoggedUserData();
-    if (result.status === Constant_Var_success) {
-      setLoggedInUserData(result.response);
-      setIsUserLoggedIn(true);
-    } else {
-      setLoggedInUserData(null);
-      setIsUserLoggedIn(false);
-    }
-  }
 
   useEffect(() => {
-    loadUserData();
+    // loadUserData();
+    loadLoggedInUserDataAndWatchLists();
   }, []);
+ 
 
   return (
     <nav
@@ -192,7 +176,7 @@ const Navbar = () => {
                 Login
               </button>
             ) : (
-              <DropDownNavbarUserAvatar loggedInUserData={loggedInUserData} />
+              <DropDownNavbarUserAvatar />
             )}
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import UserInfo from "./Components/UserInfo";
+import LoggedInUserInfo from "./Components/LoggedInUserInfo";
 import GetLoggedUserData from "../../firebase/Profile/GetLoggedUserData";
 import {
   Constant_Var_errorMessage_loggedInUserDoesNostExistsYet,
@@ -13,68 +13,19 @@ import CreateNewProfile from "@/app/firebase/Profile/CreateNewProfile";
 import { useRouter } from "next/navigation";
 import GetLoggedUserWatchListsInfo from "../../firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
 import GetOtherUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetOtherUserWatchListsInfo";
-
+import useUserStore from "@/components/utils/userStore";
 
 const Profile = ({ params }) => {
+  const { isUserLoggedIn, loggedInUserId } = useUserStore();
   const [userInfo, setUserInfo] = useState(null);
   const [userWatchListsInfo, setUserWatchListsInfo] = useState(null);
-  const [isLoggedInUser, setIsLoggedInUser] = useState(false);
-  const [isCreatingProfile, setIsCreatingProfile] = useState(false);
   const router = useRouter();
-
-  async function loadLoggedInUserData() {
-    try {
-      // Fetching in parallel
-      const [respUserInfo, respUserWatchLists] = await Promise.all([
-        GetLoggedUserData(),
-        GetLoggedUserWatchListsInfo(),
-      ]);
-
-       // # Setting User Info #
-      if (respUserInfo.status === Constant_Var_success) {
-        setUserInfo(respUserInfo.response);
-      } else if (
-        respUserInfo.response.message ===
-        Constant_Var_errorMessage_loggedInUserDoesNostExistsYet
-      ) {
-
-        // Create new profile if user doesn't exist
-        setIsCreatingProfile(true);
-        const profileCreationResponse = await CreateNewProfile();
-        setIsCreatingProfile(false);
-
-        if (profileCreationResponse.status === Constant_Var_success) {
-          loadLoggedInUserData(); // Retry loading after profile creation
-          return;
-        } else {
-          console.log("Error creating profile", profileCreationResponse.response);
-          throw new Error("Error Creating Profile");
-        }
-
-      } else {
-        console.log("Error loading user info", respUserInfo.response);
-        throw new Error("Error Loading Profile");
-      }
-
-
-      // # Setting User WatchLists #
-      if (respUserWatchLists.status === Constant_Var_success) {
-        setUserWatchListsInfo(respUserWatchLists.response);
-      } else {
-        console.log("Load watchlists error", respUserWatchLists.response);
-        throw new Error("Error Loading WatchLists");
-      }
-
-    } catch (error) {
-      // show toast of error
-    }
-  }
 
   async function loadOtherUser() {
     try {
       const [respUserInfo, respUserWatchLists] = await Promise.all([
-        GetOtherUserData({userId:params.id}),
-        GetOtherUserWatchListsInfo({userId:params.id}),
+        GetOtherUserData({ userId: params.id }),
+        GetOtherUserWatchListsInfo({ userId: params.id }),
       ]);
 
       // # Setting User Info #
@@ -85,11 +36,10 @@ const Profile = ({ params }) => {
         Constant_Var_errorMessage_userDoesNotExistWithThisId
       )
         router.push("/404");
-       else {
+      else {
         console.log("userInfoerror error", respUserInfo.response);
         throw new Error("Error Loading User Profile");
       }
-
 
       // # Setting User WatchLists #
       if (respUserWatchLists.status === Constant_Var_success)
@@ -98,39 +48,27 @@ const Profile = ({ params }) => {
         console.log("watchlists error", respUserWatchLists.response);
         throw new Error("Error Loading User WatchList");
       }
-
     } catch (error) {
       //show toast
     }
   }
 
   useEffect(() => {
-
     async function loadUserData() {
-      const loggedInUser = await getUserAuth();
-      if (loggedInUser && loggedInUser.details.uid === params.id) {
-        setIsLoggedInUser(true);
-        await loadLoggedInUserData();
-      } else {
-        setIsLoggedInUser(false);
+      if (!isUserLoggedIn || loggedInUserId !== params.id) {
         await loadOtherUser();
       }
     }
-
     loadUserData();
   }, []);
 
   return (
     <div className="w-[100vw] h-[100vh] relative">
-      {userInfo && userWatchListsInfo ? (
-        <UserInfo
-          userInfo={userInfo}
-          reloadUserInfo={loadLoggedInUserData}
-          isLoggedInUser={isLoggedInUser}
-        />
+      {isUserLoggedIn && loggedInUserId == params.id ? (
+        <LoggedInUserInfo />
       ) : (
         <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
-          {isCreatingProfile ? "...Creating Profile" : "...Loading"}
+          {"...Loading"}
 
           {/* hellloooooo */}
         </div>

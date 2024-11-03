@@ -4,8 +4,10 @@ import { FaRegEdit } from "react-icons/fa";
 import Image from "next/image";
 import CreateWatchListModal from "./CreateWatchListModal";
 import EditUserProfileModal from "./EditUserProfileModal";
+import useUserStore from "@/components/utils/userStore";
 
-const UserInfo = ({ userInfo, isLoggedInUser, reloadUserInfo }) => {
+const LoggedInUserInfo = () => {
+  const { loggedInUserData } = useUserStore();
   const [isCreateWatchListModalOpen, setIsCreateWatchListModalOpen] =
     useState(false);
   const [iseditUserProfileModalOpen, setIsEditUserProfileModalOpen] =
@@ -30,7 +32,7 @@ const UserInfo = ({ userInfo, isLoggedInUser, reloadUserInfo }) => {
   return (
     <div
       style={{
-        backgroundImage: `url('${userInfo.coverUrl}')`,
+        backgroundImage: `url('${loggedInUserData.coverUrl}')`,
         backgroundColor: "#1f3146", // Fallback background color
       }}
       className={`w-full md:h-72 h-60 bg-no-repeat bg-cover bg-center `}
@@ -40,17 +42,17 @@ const UserInfo = ({ userInfo, isLoggedInUser, reloadUserInfo }) => {
           <Image
             height={200}
             width={200}
-            src={userInfo.photoUrl}
+            src={loggedInUserData.photoUrl}
             alt={"profile Image"}
             priority
             className="rounded-full lg:h-44 lg:w-44 md:h-44 md:w-44 sm:w-32 sm:h-32 w-28 h-28 border-2 border-white bg-cbg-400 object-cover object-center"
           />
           <div className="flex flex-col sm:ml-5 ml-3">
             <div className="w-auto sm:text-3xl text-2xl font-extrabold md:px-3 md:py-2 py-1 px-0 rounded-md backdrop-blur-0 ">
-              {userInfo.userName}
+              {loggedInUserData.userName}
             </div>
 
-            {isLoggedInUser && (
+            {true && (
               <div className="flex flex-row w-fit sm:mt-2 mt-1 sm:hidden">
                 <button
                   className="bg-primary-100 md:py-2 md:px-3 py-1 px-2 mr-2 rounded-md w-fit h-fit text-primary-600 md:text-lg  sm:text-sm text-xs font-bold"
@@ -66,7 +68,7 @@ const UserInfo = ({ userInfo, isLoggedInUser, reloadUserInfo }) => {
           </div>
         </div>
 
-        {isLoggedInUser && (
+        {true && (
           <div className="sm:flex sm:flex-row mr-4 w-fit mt-24 hidden">
             <button
               className="bg-primary-100 md:py-2 md:px-3 md:mr-2 py-1.5 px-2.5 mr-2.5 rounded-md w-fit h-fit text-primary-600 md:text-md  sm:text-sm font-bold"
@@ -86,16 +88,13 @@ const UserInfo = ({ userInfo, isLoggedInUser, reloadUserInfo }) => {
       <CreateWatchListModal
         isOpen={isCreateWatchListModalOpen}
         onClose={handleCloseCreateWatchListModal}
-        reloadUserInfo={reloadUserInfo}
       />
       <EditUserProfileModal
         isOpen={iseditUserProfileModalOpen}
         onClose={handleCloseEditUserProfileModal}
-        userInfo={userInfo}
-        reloadUserInfo={reloadUserInfo}
       />
     </div>
   );
 };
 
-export default UserInfo;
+export default LoggedInUserInfo;

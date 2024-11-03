@@ -5,23 +5,23 @@ import Image from "next/image";
 import UpdateProfileImage from "@/app/firebase/Profile/UpdateProfileImage";
 import UpdateCoverImage from "@/app/firebase/Profile/UpdateCoverImage";
 import UpdateName from "@/app/firebase/Profile/UpdateName";
+import useUserStore from "@/components/utils/userStore";
 
 const EditUserProfileModal = ({
   isOpen,
   onClose,
-  userInfo,
-  reloadUserInfo,
 }) => {
+  const {loadLoggedInUserData,loggedInUserData} = useUserStore();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const tabs = ["Profile", "Cover", "Name"];
-  const [selectedUserName, setSelectedUserName] = useState(userInfo.userName);
+  const [selectedUserName, setSelectedUserName] = useState(loggedInUserData.userName);
   const [profileImage, setProfileImage] = useState({
     file: null,
-    preview: userInfo.photoUrl,
+    preview: loggedInUserData.photoUrl,
   });
   const [coverImage, setCoverImage] = useState({
     file: null,
-    preview: userInfo.coverUrl,
+    preview: loggedInUserData.coverUrl,
   });
   const [coverError, setCoverError] = useState(null);
   const [profileError, setProfileError] = useState(null);
@@ -72,7 +72,7 @@ const EditUserProfileModal = ({
       console.log(resp.response, "error");
     }
 
-    reloadUserInfo();
+    loadLoggedInUserData();
     setLoading(false);
     onClose();
   }
@@ -99,7 +99,7 @@ const EditUserProfileModal = ({
       setCoverImage({ ...coverImage, file: null });
       console.log(resp.response, "error");
     }
-    reloadUserInfo();
+    loadLoggedInUserData();
     setLoading(false);
     onClose();
   }
@@ -121,7 +121,7 @@ const EditUserProfileModal = ({
       console.log("error updating Name", resp.response);
     }
 
-    reloadUserInfo();
+    loadLoggedInUserData();
     setLoading(false);
     onClose();
   }
