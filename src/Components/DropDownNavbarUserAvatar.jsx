@@ -2,7 +2,7 @@ import SignOut from "@/app/firebase/SignIn/SignOut";
 import { Constant_Var_success } from "@/utils/constants";
 import Link from "next/link";
 import React, { useState } from "react";
-import useUserStore from "./utils/userStore";
+import useUserStore from "./ZustandStores/userStore";
 
 const DropDownNavbarUserAvatar = () => {
   const { logout, loggedInUserData} = useUserStore();
@@ -37,7 +37,7 @@ const DropDownNavbarUserAvatar = () => {
         }`}
       >
         <Link
-          href={`/profile/${loggedInUserData.uid}`}
+          href={`/profile/${loggedInUserData?.uid}`}
           onClick={() => setIsOpen(false)}
           className="block px-4 py-2 text-sm text-cbg-500 hover:bg-cbg-300 hover:text-white transition-colors"
         >

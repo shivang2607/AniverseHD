@@ -5,7 +5,7 @@ import Image from "next/image";
 import UpdateProfileImage from "@/app/firebase/Profile/UpdateProfileImage";
 import UpdateCoverImage from "@/app/firebase/Profile/UpdateCoverImage";
 import UpdateName from "@/app/firebase/Profile/UpdateName";
-import useUserStore from "@/components/utils/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
 
 const EditUserProfileModal = ({
   isOpen,
@@ -323,8 +323,8 @@ const EditUserProfileModal = ({
       </div>
       {loading && (
         //full Screen Loader
-        <div className="fixed inset-0 z-40 bg-white/30 backdrop-blur-sm text-black items-center">
-          ..Loading
+        <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-black text-3xl">
+          ..Updating
         </div>
       )}
     </div>

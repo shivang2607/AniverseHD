@@ -6,7 +6,7 @@ import {
 } from "@/utils/constants";
 import { IoMdClose } from "react-icons/io";
 import React, { useState } from "react";
-import useUserStore from "@/components/utils/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
 
 const CreateWatchListModal = ({ isOpen, onClose }) => {
   const {loadLoggedInUserWatchLists} = useUserStore();
