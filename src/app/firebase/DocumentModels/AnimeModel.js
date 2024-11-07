@@ -37,6 +37,7 @@ function AnimeModel({ animeId, animeName,animePhoto=null, animeGenre=null,animeT
     animeLength: animeLength,
     url:url,
     addedAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
   };
   
   return document; // Return the object that can be sent to Firestore

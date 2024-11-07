@@ -116,6 +116,7 @@ export default async function AddAnimeToWatchList({
       animeLength: animeLength,
       url: url,
     });
+    const currTimestamp = animeObject.addedAt;
 
     if (watchListInfo.response.ownerUid === userData.details.uid) {
       if (
@@ -123,7 +124,10 @@ export default async function AddAnimeToWatchList({
         watchListInfo.response.watchListName !==
           Constant_Var_starterWatchLists_favourite
       ) {
-        if (watchListInfo.response.watchListName === Constant_Var_starterWatchLists_recent) { 
+        if (
+          watchListInfo.response.watchListName ===
+          Constant_Var_starterWatchLists_recent
+        ) {
           // for special recent watch list, it have a fixed size
 
           if (url === null)
@@ -142,6 +146,7 @@ export default async function AddAnimeToWatchList({
               animeId: animeId,
               watchListId: watchListId,
               watchListInfo: watchListInfo.response,
+              currTimestamp: currTimestamp,
             });
 
             if (respUpdate.status !== Constant_Var_success)
@@ -151,6 +156,7 @@ export default async function AddAnimeToWatchList({
               animeId: animeId,
               userId: userData.details.uid,
               watchListId: watchListId,
+              updatedAt: currTimestamp,
             });
           } else {
             //if does not exists in recent, then add to it.
@@ -160,6 +166,7 @@ export default async function AddAnimeToWatchList({
               userId: userData.details.uid,
               watchListId: watchListId,
               watchListInfo: watchListInfo.response,
+              currTimestamp: currTimestamp,
             });
 
             if (addRecentResp.status === Constant_Var_error)
@@ -173,6 +180,7 @@ export default async function AddAnimeToWatchList({
             userId: userData.details.uid,
             watchListId: watchListId,
             watchListInfo: watchListInfo.response,
+            currTimestamp: currTimestamp,
           });
 
           if (addAnimeResp.status === Constant_Var_error)
@@ -185,6 +193,7 @@ export default async function AddAnimeToWatchList({
           watchListInfo: watchListInfo.response,
           watchListId: watchListId,
           animeId: animeId,
+          currTimestamp: currTimestamp,
         });
 
         if (addAnimeResp.status === Constant_Var_error)
@@ -198,6 +207,7 @@ export default async function AddAnimeToWatchList({
       anime: animeObject,
       userId: userData.details.uid,
       watchListId: watchListId,
+      updatedAt: currTimestamp,
     });
     return { status: Constant_Var_success, response: null };
   } catch (error) {
@@ -210,6 +220,7 @@ async function addAnime({
   watchListInfo,
   watchListId,
   animeId,
+  currTimestamp,
   withBatch = false,
 }) {
   try {
@@ -239,6 +250,7 @@ async function addAnime({
           animeId: animeId,
           addedAt: animeObject.addedAt,
         }),
+        updatedAt: currTimestamp,
       });
     } else {
       throw new Error("Anime already Exists in WatchList");
@@ -259,10 +271,12 @@ async function addStarterNonRecentAnime({
   animeId,
   watchListInfo,
   watchListId,
-  userId,
+  currTimestamp,
+  userId
 }) {
   try {
     const userWatchLists = (await GetLoggedUserWatchListsInfo()) || [];
+
 
     if (userWatchLists.status === Constant_Var_error)
       throw userWatchLists.response;
@@ -297,6 +311,7 @@ async function addStarterNonRecentAnime({
           watchListId: item,
           animeId: animeId,
           batchFromAddfunc: batch,
+          currTimestamp: currTimestamp,
         })
       );
     }
@@ -309,6 +324,7 @@ async function addStarterNonRecentAnime({
         watchListId: watchListId,
         watchListInfo: watchListInfo,
         withBatch: batch,
+        currTimestamp: currTimestamp,
       })
     );
 
@@ -327,6 +343,7 @@ async function addStarterNonRecentAnime({
         animeId: animeId,
         userId: userId,
         watchListId: item,
+        updatedAt:currTimestamp,
       });
     });
 
@@ -341,7 +358,8 @@ async function addToStarterRecentWatchList({
   animeId,
   watchListInfo,
   watchListId,
-  userId,
+  currTimestamp,
+  userId
 }) {
   try {
     if (!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
@@ -366,6 +384,7 @@ async function addToStarterRecentWatchList({
           watchListId: watchListId,
           animeId: earliestAnimeObj.animeId,
           batchFromAddfunc: batch,
+          currTimestamp: currTimestamp,
         }),
         addAnime({
           animeObject: animeObject,
@@ -373,6 +392,7 @@ async function addToStarterRecentWatchList({
           watchListId: watchListId,
           watchListInfo: watchListInfo,
           withBatch: batch,
+          currTimestamp: currTimestamp,
         }),
       ];
 
@@ -389,6 +409,7 @@ async function addToStarterRecentWatchList({
         animeId: earliestAnimeObj.animeId,
         userId: userId,
         watchListId: watchListId,
+        updatedAt:currTimestamp
       });
     } else {
       const respAdd = await addAnime({
@@ -397,6 +418,7 @@ async function addToStarterRecentWatchList({
         watchListId: watchListId,
         watchListInfo: watchListInfo,
         withBatch: batch,
+        currTimestamp: currTimestamp,
       });
 
       if (respAdd.status !== Constant_Var_success) throw respAdd.response;
@@ -416,6 +438,7 @@ async function updateAnimeInWatchList({
   watchListInfo,
   animeId,
   withBatch = false,
+  currTimestamp,
 }) {
   try {
     const batch = writeBatch(db);
@@ -427,10 +450,13 @@ async function updateAnimeInWatchList({
       animeId
     );
 
-    // Filter out fields that are null or undefined
-    const filteredAnimeObject = Object.fromEntries(
-      Object.entries(animeObject).filter(([_, value]) => value != null)
+    // Filter out fields that are null or undefined and exclude 'addedAt'
+    let filteredAnimeObject = Object.fromEntries(
+      Object.entries(animeObject).filter(
+        ([key, value]) => value != null && key !== "addedAt"
+      )
     );
+    filteredAnimeObject.updatedAt = currTimestamp;
 
     // Update only the fields that are not null
     batch.update(docRef, filteredAnimeObject);
@@ -445,7 +471,7 @@ async function updateAnimeInWatchList({
 
     batch.update(
       doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId),
-      { animeList: updatedAnimeList }
+      { animeList: updatedAnimeList, updatedAt: currTimestamp }
     );
 
     if (withBatch) return { status: Constant_Var_success, response: null };

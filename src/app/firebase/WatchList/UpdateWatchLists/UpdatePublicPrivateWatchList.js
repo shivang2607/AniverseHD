@@ -2,6 +2,7 @@
 import { auth, db } from "../../utils/firebaseinit";
 import {
   doc,
+  Timestamp,
   updateDoc,
 } from "firebase/firestore";
 import getUserAuth from "../../utils/GetUserAuth";
@@ -51,6 +52,7 @@ export default async function UpdatePublicPrivateWatchList({ watchListId, type }
       if (!userData) {
         throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
       }
+      const currTimestamp=Timestamp.now();
   
       const watchListInfo = await GetWatchListInfoById({
         watchListId: watchListId,
@@ -70,9 +72,10 @@ export default async function UpdatePublicPrivateWatchList({ watchListId, type }
         );
         await updateDoc(docRef, {
           type: type,
+          updatedAt:currTimestamp
         });
   
-        updatePublicPrivateCached({ watchListId: watchListId, type: type });
+        updatePublicPrivateCached({ watchListId: watchListId, type: type,updatedAt:currTimestamp });
   
         return { status: Constant_Var_success, response: null };
       } else {

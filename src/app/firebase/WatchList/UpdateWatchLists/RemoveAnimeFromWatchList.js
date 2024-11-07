@@ -1,5 +1,5 @@
 import { auth, db } from "../../utils/firebaseinit";
-import { doc, writeBatch } from "firebase/firestore";
+import { doc, Timestamp, writeBatch } from "firebase/firestore";
 import getUserAuth from "../../utils/GetUserAuth";
 import {
   Constant_Var_error,
@@ -20,6 +20,7 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  * @param {string} params.watchListId - The ID of the watchlist from which to remove the anime.
  * @param {string} params.animeId - The ID of the anime to remove.
  * @param {boolean} [params.batchFromAddfunc=false] - Optional (IMP- Not to be used from frontend !!!). Indicates if the batch is coming from a parent function.
+ * @param {Timestamp} [params.currTimestamp=null] - Optional (IMP- Not to be used from frontend !!!). Indicates if the timestamp is coming from a parent function.
  * @returns {Promise<{status:string,response:any}>} - Returns a promise that resolves to an object containing:
  *   - {string} status - Indicates the success or failure of the operation.
  *   - {Object|null} response - Contains error details if the operation fails; otherwise, null.
@@ -40,6 +41,7 @@ export default async function RemoveAnimeFromWatchList({
   watchListId,
   animeId,
   batchFromAddfunc = false,
+  currTimestamp=null
 }) {
   try {
     
@@ -50,6 +52,8 @@ export default async function RemoveAnimeFromWatchList({
     if (!userData) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
+
+    if(currTimestamp==null) currTimestamp=Timestamp.now();
 
     const watchListInfo = await GetWatchListInfoById({
       watchListId: watchListId,
@@ -73,6 +77,7 @@ export default async function RemoveAnimeFromWatchList({
       );
       batch.update(docRef, {
         animeList: animeListNew,
+        updatedAt:currTimestamp,
       });
 
       // Deleting from Subcollection
@@ -91,9 +96,15 @@ export default async function RemoveAnimeFromWatchList({
         return { status: Constant_Var_success, response: null };
       }
 
+      removeAnimeFromUserWatchListCached({
+        animeId: animeId,
+        userId: userData.details.uid,
+        watchListId: watchListId,
+        updatedAt: currTimestamp,
+      });
+
       await batch.commit();
 
-      removeAnimeFromUserWatchListCached({ watchListId, animeId });
 
       return { status: Constant_Var_success, response: null };
     } else {

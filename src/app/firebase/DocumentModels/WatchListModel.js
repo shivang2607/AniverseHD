@@ -23,6 +23,7 @@ function WatchListModel({ ownerUid, watchListName, type, isSpecialStarter, id })
     isSpecialStarter: isSpecialStarter, // Defaults to false if not provided
     id: id,
     createdAt: Timestamp.now(), // Firestore timestamp
+    updatedAt: Timestamp.now(),
     // count: 0, // Initial count of items in the watchlist
     animeList:[]
   };
