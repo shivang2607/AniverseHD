@@ -36,11 +36,17 @@ export async function syncQdrant(id, resPayload) {
     };
 
     // https://cors-anywhere.herokuapp.com/ (old proxy)
+    //https://api.allorigins.win/raw?url= (another proxy)
     // cors.sh , (other proxy , only needed in development phase)
-    // console.log(resPayload.Sites);
+    console.log("Sites", resPayload.Sites);
+
+    // *corsProxy url isint working plus you need to do error handling here, also iski vajah se jaha /anime/id vaali api call ho rahi h vaha undefined return ho raha h which should not happen at all to isko bhi address krna h, yhi cheez addAnime function m bhi anjaam deni h, I can just create a proxy server of my own and deploy it to the netlify or onrender, its just a basic page after all.
+    
+
     if (!(resPayload.Sites)) {
         // console.log("HI")
-        const corsProxyUrl = process.env.ENV === 'DEV' ? 'https://api.allorigins.win/raw?url=' : '';
+        
+        const corsProxyUrl = process.env.ENV === 'DEV' ? 'https://cors-anywhere.herokuapp.com/' : '';
         const headers = {
             'Origin': '*'
         };
@@ -50,7 +56,7 @@ export async function syncQdrant(id, resPayload) {
             "Sites": malSyncData?.data?.Sites
         };
         // console.log(updatePayload.Sites);
-        // console.log(malSyncData);
+        console.log("malsync data",malSyncData);
     }
 
     if (!(resPayload?.relations)) {

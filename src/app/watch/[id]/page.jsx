@@ -109,9 +109,9 @@ export default function Page({ params }) {
         );
 
         if (!zoroId && !gogoSubId && !gogoDubId) {
-          setZoroEpisodeId(cachedData?.zoro?.episodes[0]?.episodeId);
-          setGogoSubEpisodeId(cachedData?.gogoSub?.episodes[0]?.id);
-          setGogoDubEpisodeId(cachedData?.gogoDub?.episodes[0]?.id);
+          setZoroEpisodeId(cachedData?.zoro?.episodes?.[0]?.episodeId);
+          setGogoSubEpisodeId(cachedData?.gogoSub?.episodes?.[0]?.id);
+          setGogoDubEpisodeId(cachedData?.gogoDub?.episodes?.[0]?.id);
         }
         // console.log(cachedData);
 
@@ -129,9 +129,9 @@ export default function Page({ params }) {
       );
 
       if (!zoroId && !gogoSubId && !gogoDubId) {
-        setZoroEpisodeId(data?.data?.zoro?.episodes[0]?.episodeId);
-        setGogoSubEpisodeId(data?.data?.gogoSub?.episodes[0]?.id);
-        setGogoDubEpisodeId(data?.data?.gogoDub?.episodes[0]?.id);
+        setZoroEpisodeId(data?.data?.zoro?.episodes?.[0]?.episodeId);
+        setGogoSubEpisodeId(data?.data?.gogoSub?.episodes?.[0]?.id);
+        setGogoDubEpisodeId(data?.data?.gogoDub?.episodes?.[0]?.id);
       }
       // console.log(data?.data);
     })();

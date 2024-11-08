@@ -36,6 +36,9 @@ export async function addQdrantAnime(id) {
     });
 
     // Use proxy if in dev mode else make call directly to the malSync api, check if the response contains gogo, or zoro mappings, if Yes then Add it to the payload.
+
+    // *corsProxy url isint working plus you need to do error handling here, also iski vajah se jaha /anime/id vaali api call ho rahi h vaha undefined retuen ho raha h which should not happen at all to isko bhi address krna h
+    
     const corsProxyUrl = process.env.ENV === 'DEV' ? 'https://api.allorigins.win/raw?url=' : '';
     const headers = { 'Origin': '*' };
     const malSyncData = await limiter.schedule(() => axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, { headers }));

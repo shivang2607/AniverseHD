@@ -15,10 +15,10 @@ export default function Page() {
       const res = await axios.get("/api/v1/watch/1");
       console.log("response for watch anime api : ", res.data);
       const streamingData = await axios.get(
-        `/api/v1/gogo/stream/${res.data.gogoSub.episodes[0].id}`
+        `/api/v1/gogo/stream/${res.data.gogoSub.episodes?.[0].id}`
       );
       const streamingZoro = await axios.get(
-        `api/v1/zoro/stream/${res.data.zoro.episodes[0].episodeId}`,
+        `api/v1/zoro/stream/${res.data.zoro.episodes?.[0].episodeId}`,
         {
           params: {
             // server:"vidstreaming",  //both parameters are optional parameters : vidstreaming is working, streamtape is working as well, other servers cant be guranteed to work
