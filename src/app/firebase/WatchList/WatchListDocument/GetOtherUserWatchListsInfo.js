@@ -28,8 +28,8 @@ import { getUserWatchListsInfoCached, setUserWatchListsInfoCached, setWatchListI
 export default async function GetOtherUserWatchListsInfo({userId}) {
   try {
 
-    if(!userId) throw new Error(Constant_Var_errorMessage_missingParams);
-
+    validateParams({ userId:userId });
+    
     const cachedUserWatchlists = getUserWatchListsInfoCached({
       userId:userId
     });
@@ -78,5 +78,11 @@ export default async function GetOtherUserWatchListsInfo({userId}) {
     return { status: Constant_Var_success, response: result };
   } catch (error) {
     return { response: error, status: Constant_Var_error };
+  }
+}
+
+function validateParams({ userId }) {
+  if (!userId  || typeof userId  !== 'string') {
+    throw new Error("Invalid or missing userId  (should be a string)");
   }
 }

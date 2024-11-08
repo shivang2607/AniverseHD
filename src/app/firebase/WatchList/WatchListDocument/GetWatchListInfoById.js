@@ -1,4 +1,3 @@
-
 import { auth, db } from "../../utils/firebaseinit";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import {
@@ -6,13 +5,11 @@ import {
   Constant_Var_error,
   Constant_Var_firebase_collectionName_watchLists,
   Constant_Var_errorMessage_missingParams,
-
 } from "@/utils/constants";
 import {
   getWatchListInfoByIdInfoCached,
   setWatchListInfoByIdInfoCached,
 } from "../../utils/CacheStorage";
-
 
 /**
  * Retrieves the information of a watchlist by its ID, optionally from cache.
@@ -32,33 +29,44 @@ import {
  *   console.error('Error:', result.response);
  * }
  */
-const GetWatchListInfoById = async ({watchListId, getFromCache = true}) => {
-    try {
+export default async function GetWatchListInfoById({ watchListId, getFromCache = true }){
+  try {
+    validateParams({ watchListId: watchListId, getFromCache: getFromCache });
 
-      if(!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
+    const cachedWatchListInfo = getWatchListInfoByIdInfoCached({
+      watchListId: watchListId,
+    });
 
-      // Check if user cookies exist
-      const cachedWatchListInfo = getWatchListInfoByIdInfoCached({watchListId:watchListId});
-  
-      if (cachedWatchListInfo != null && getFromCache)
-        return { status: Constant_Var_success, response: cachedWatchListInfo };
-  
-      const docRef = doc(
-        db,
-        Constant_Var_firebase_collectionName_watchLists,
-        watchListId
-      );
-      const dataWatchlist = await getDoc(docRef);
-  
-      if (dataWatchlist.exists()) {
-        setWatchListInfoByIdInfoCached({watchListInfo:dataWatchlist.data(), watchListId:watchListId});
-        return { status: Constant_Var_success, response: dataWatchlist.data() };
-      } else {
-        throw new Error(`Watchlist with id=${watchListId} does not exists`);
-      }
-    } catch (error) {
-      return { response: error, status: Constant_Var_error };
+    if (cachedWatchListInfo != null && getFromCache)
+      return { status: Constant_Var_success, response: cachedWatchListInfo };
+
+    const docRef = doc(
+      db,
+      Constant_Var_firebase_collectionName_watchLists,
+      watchListId
+    );
+    const dataWatchlist = await getDoc(docRef);
+
+    if (dataWatchlist.exists()) {
+      setWatchListInfoByIdInfoCached({
+        watchListInfo: dataWatchlist.data(),
+        watchListId: watchListId,
+      });
+      return { status: Constant_Var_success, response: dataWatchlist.data() };
+    } else {
+      throw new Error(`Watchlist with id=${watchListId} does not exists`);
     }
-  };
-  
-  export default  GetWatchListInfoById;
+  } catch (error) {
+    return { response: error, status: Constant_Var_error };
+  }
+};
+
+function validateParams({ watchListId, getFromCache }) {
+  if (!watchListId || typeof watchListId !== "string") {
+    throw new Error("Invalid or missing watchListId (should be a string)");
+  }
+  if (typeof getFromCache !== "boolean") {
+    throw new Error("Invalid getFromCache (should be a boolean)");
+  }
+}
+

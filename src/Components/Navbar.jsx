@@ -11,8 +11,11 @@ import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import { Constant_Var_success } from "@/utils/constants";
 import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
+import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
+import useUserStore from "./ZustandStores/userStore";
 
 const Navbar = () => {
+  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists} = useUserStore();
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -21,18 +24,15 @@ const Navbar = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const [loggedInUserData, setLoggedInUserData] = useState(null);
+  // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  // const [loggedInUserData, setLoggedInUserData] = useState(null);
 
   const handleSignIn = async () => {
-    const res = await SignInGooglePopUp();
+    login();
+  };
 
-    if (res.status === Constant_Var_success) {
-      router.push(`/profile/${res.response}`);
-      loadUserData();
-    } else {
-      //show Toast
-    }
+  const test = async () => {
+  //  setIsUserLoggedIn(true);
   };
 
   const handleScroll = () => {
@@ -71,20 +71,12 @@ const Navbar = () => {
     setIsOpen(false);
   }, [currentPath]);
 
-  async function loadUserData() {
-    const result = await GetLoggedUserData();
-    if (result.status === Constant_Var_success) {
-      setLoggedInUserData(result.response);
-      setIsUserLoggedIn(true);
-    } else {
-      setLoggedInUserData(null);
-      setIsUserLoggedIn(false);
-    }
-  }
 
   useEffect(() => {
-    loadUserData();
+    // loadUserData();
+    loadLoggedInUserDataAndWatchLists();
   }, []);
+ 
 
   return (
     <nav
@@ -169,6 +161,13 @@ const Navbar = () => {
                 />
               </button>
             </div>
+
+            <button
+              className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
+              onClick={test}
+            >
+              test
+            </button>
             {!isUserLoggedIn ? (
               <button
                 className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
@@ -177,7 +176,7 @@ const Navbar = () => {
                 Login
               </button>
             ) : (
-              <DropDownNavbarUserAvatar loggedInUserData={loggedInUserData}/>
+              <DropDownNavbarUserAvatar />
             )}
           </div>
         </div>

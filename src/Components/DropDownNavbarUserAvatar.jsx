@@ -2,8 +2,10 @@ import SignOut from "@/app/firebase/SignIn/SignOut";
 import { Constant_Var_success } from "@/utils/constants";
 import Link from "next/link";
 import React, { useState } from "react";
+import useUserStore from "./ZustandStores/userStore";
 
-const DropDownNavbarUserAvatar = ({ loggedInUserData }) => {
+const DropDownNavbarUserAvatar = () => {
+  const { logout, loggedInUserData} = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDropdownToggle = () => {
@@ -12,13 +14,7 @@ const DropDownNavbarUserAvatar = ({ loggedInUserData }) => {
 
   const handleLogOut= async ()=>{
    setIsOpen(false);
-   const resp= await SignOut();
-   if(resp.status===Constant_Var_success){
-    console.log("signed-Out")
-    window.location.reload();
-   }else{
-    // show some toast for error
-   }
+   logout();
   }
 
   return (
@@ -41,7 +37,7 @@ const DropDownNavbarUserAvatar = ({ loggedInUserData }) => {
         }`}
       >
         <Link
-          href={`/profile/${loggedInUserData.uid}`}
+          href={`/profile/${loggedInUserData?.uid}`}
           onClick={() => setIsOpen(false)}
           className="block px-4 py-2 text-sm text-cbg-500 hover:bg-cbg-300 hover:text-white transition-colors"
         >

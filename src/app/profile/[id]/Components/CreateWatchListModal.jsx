@@ -6,8 +6,10 @@ import {
 } from "@/utils/constants";
 import { IoMdClose } from "react-icons/io";
 import React, { useState } from "react";
+import useUserStore from "@/components/ZustandStores/userStore";
 
-const CreateWatchListModal = ({ isOpen, onClose, reloadUserInfo }) => {
+const CreateWatchListModal = ({ isOpen, onClose }) => {
+  const {loadLoggedInUserWatchLists} = useUserStore();
   const [watchlistName, setWatchlistName] = useState("");
   const [watchlistType, setWatchlistType] = useState(
     Constant_Var_firebase_fieldValue_public
@@ -49,7 +51,7 @@ const CreateWatchListModal = ({ isOpen, onClose, reloadUserInfo }) => {
     setWatchlistName("");
     setWatchlistType(Constant_Var_firebase_fieldValue_public);
     setLoading(false);
-    reloadUserInfo();
+    loadLoggedInUserWatchLists();
     onClose();
   }
 

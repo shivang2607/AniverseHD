@@ -56,4 +56,4 @@ export default async function GetLoggedUserData() {
   } catch (error) {
     return { status: Constant_Var_error, response: error };
   }
-}
+};
