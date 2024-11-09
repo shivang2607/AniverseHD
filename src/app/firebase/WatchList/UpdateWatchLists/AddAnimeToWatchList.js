@@ -238,6 +238,8 @@ async function addAnime({
     const animeObject2 = watchListInfo.animeList.find(
       (obj) => obj.animeId === animeId
     );
+    const newAnimeList=watchListInfo.animeList;
+    newAnimeList.push({animeId:animeId,addedAt:animeObject.addedAt});
 
     if (animeObject2 == undefined) {
       const docRef = doc(
@@ -246,10 +248,7 @@ async function addAnime({
         watchListId
       );
       batch.update(docRef, {
-        animeList: arrayUnion({
-          animeId: animeId,
-          addedAt: animeObject.addedAt,
-        }),
+        animeList:newAnimeList,
         updatedAt: currTimestamp,
       });
     } else {
@@ -471,7 +470,7 @@ async function updateAnimeInWatchList({
 
     batch.update(
       doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId),
-      { animeList: updatedAnimeList, updatedAt: currTimestamp }
+      { animeList: updatedAnimeList, addedAtAt: currTimestamp }
     );
 
     if (withBatch) return { status: Constant_Var_success, response: null };

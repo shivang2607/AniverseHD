@@ -136,6 +136,12 @@ export const setWatchListAnimeListByIdCached = ({
   );
 };
 
+export const removeWatchlistAnimeListCached=({watchListId})=>{
+  sessionStorage.removeItem(
+    `${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`
+  );
+}
+
 export const addAnimeToUserWatchListCached = ({
   watchListId,
   anime,
@@ -226,7 +232,7 @@ export const addAnimeToWatchListByIdCachedInBatch = ({
   } else {
     watchListAnimeList = animeList;
   }
-
+  watchListAnimeList.sort((a, b) => a.age - b.age);
   setWatchListAnimeListByIdCached({
     watchlistAnimeList: watchListAnimeList,
     watchListId: watchListId,
@@ -289,6 +295,7 @@ export const removeAnimeFromUserWatchListCached = ({
 
   return;
 };
+
 
 /**user watchlist alteration   issue, not adding in session storage when new watchlist is created*/
 export const addUserWatchlistCached = ({

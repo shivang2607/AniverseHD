@@ -13,6 +13,7 @@ import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import useUserStore from "./ZustandStores/userStore";
+import GetWatchListById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListById";
 
 const Navbar = () => {
   const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists} = useUserStore();
@@ -33,6 +34,8 @@ const Navbar = () => {
 
   const test = async () => {
   //  setIsUserLoggedIn(true);
+    const res=await GetWatchListById({watchListId:"IPEFfE9vqwpDs0A2Bcrs",offset:10,pageSize:2});
+    console.log(res.response,res.status);
   };
 
   const handleScroll = () => {
