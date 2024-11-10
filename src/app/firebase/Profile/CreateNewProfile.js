@@ -17,6 +17,8 @@ import {
   Constant_Var_firebase_fieldValue_private,
   Constant_Array_firebase_profileImageArr,
   starterWatchLists,
+  Constant_Var_firebase_fieldValue_public,
+  Constant_Var_starterWatchLists_recent,
 } from "@/utils/constants";
 import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage";
 import UserProfileModel from "../DocumentModels/UserProfileModel";
@@ -93,13 +95,23 @@ export default async function CreateNewProfile() {
 
     const watchLists = starterWatchLists;
     watchLists.forEach((listName) => {
-      createWatchListInBatch(
-        batch,
-        listName,
-        Constant_Var_firebase_fieldValue_private,
-        userData,
-        true
-      );
+      if(listName!==Constant_Var_starterWatchLists_recent){
+        createWatchListInBatch(
+          batch,
+          listName,
+          Constant_Var_firebase_fieldValue_private,
+          userData,
+          true
+        );
+      }else{
+        createWatchListInBatch(
+          batch,
+          listName,
+          Constant_Var_firebase_fieldValue_public,
+          userData,
+          true
+        );
+      }
     });
 
     await batch.commit();

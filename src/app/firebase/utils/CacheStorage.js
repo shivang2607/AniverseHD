@@ -165,9 +165,9 @@ export const addAnimeToUserWatchListCached = ({
   // Adding whole anime data to WatchListAnimeListBYId cache if it does not exist
   if (!animeExistsInWatchList) {
     if (watchListAnimeList) {
-      watchListAnimeList.unshift(anime);
+      watchListAnimeList.push(anime);
     } else {
-      watchListAnimeList = [anime]; // If it doesn't exist, initialize the array
+      watchListAnimeList = [anime]; // If animeList doesn't exist, initialize the array
     }
     setWatchListAnimeListByIdCached({
       watchlistAnimeList: watchListAnimeList,
@@ -182,7 +182,7 @@ export const addAnimeToUserWatchListCached = ({
 
   // Adding only animeId and timestamp to watchListInfo By Id cache
   if (!animeExistsInWatchListInfo) {
-    watchListInfo.animeList.unshift({
+    watchListInfo.animeList.push({
       animeId: anime.animeId,
       addedAt: anime.addedAt,
     });

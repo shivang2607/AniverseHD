@@ -23,7 +23,7 @@ export default function ListDropDown({
       animeStartYear: Math.floor(
         anime?.aired?.prop?.from?.year || anime?.start_year || anime?.year
       ) || "NA",
-      animeLength: 1110 || anime?.episodes || anime?.episode || null,
+      animeLength: anime?.episodes || anime?.episode || null,
     });
 
     if (result?.status === "success") {
