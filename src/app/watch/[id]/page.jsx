@@ -120,15 +120,37 @@ export default function Page({ params }) {
         return;
       }
       // console.log(params?.id)
-      const data = await axios.get(`/api/v1/watch/${params?.id}`);
-      console.log(`data for /watch/${params?.id}`, data?.data);
-      setContent(data?.data);
-      setSessionWithExpiry(`watch-${params.id}`, data?.data, 1000 * 60 * 30); // 30 min
-      mergeProviderData(
-        data?.data?.zoro,
-        data?.data?.gogoDub,
-        data?.data?.gogoSub
-      );
+      try {
+        const response = await axios.get(`/api/v1/watch/${params?.id}`);
+        const data = response?.data;
+    
+        // Check if the data object has an 'error' key
+        if (data?.error) {
+            console.error(`Error in response data: ${data.error}`);
+            // Optionally, you could set some error state here or throw an error to handle it elsewhere
+            return;
+        }
+    
+        console.log(`data for /watch/${params?.id}`, data);
+        setContent(data);
+        console.log("This is content data", response, data);
+    
+        // Set session with 30-minute expiry
+        setSessionWithExpiry(`watch-${params.id}`, data, 1000 * 60 * 30);
+    
+        // Merge provider data only if keys are available in data
+        mergeProviderData(
+            data?.zoro,
+            data?.gogoDub,
+            data?.gogoSub
+        );
+    } catch (error) {
+        // Log the error and handle it gracefully
+        console.error(`Failed to fetch data for /watch/${params?.id}:`, error.message);
+        return;
+        // Optionally, update state to reflect error or notify the user
+    }
+    
 
       if (!zoroId && !gogoSubId && !gogoDubId) {
         setZoroEpisodeId(data?.data?.zoro?.episodes?.[0]?.episodeId);

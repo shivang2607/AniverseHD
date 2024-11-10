@@ -105,7 +105,7 @@ const ResponsiveCarousal = () => {
                   
 
                   <div className="reroute flex md:gap-6 gap-3 items-center mt-5">
-                    <Link href="#" className="rounded-lg p-2 text-nowrap  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
+                    <Link href={`/watch/${params?.id}?provider=zoro`} className="rounded-lg p-2 text-nowrap  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
                     <Link href={`/anime/${anime?.mal_id}`} className="rounded-lg  p-2 md:text-base text-sm  md:gap-2 items-center flex text-primary-600 bg-cbg-300 tracking-wide">Details <FaChevronRight/></Link>
                   </div>
                 

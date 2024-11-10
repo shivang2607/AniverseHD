@@ -53,7 +53,7 @@ export default function Anime({ params }) {
 
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
-    
+
     if (result.status === Constant_Var_success) {
       setWatchListData(result?.response);
       setIsWatchListOpen((prev) => !prev);
@@ -61,7 +61,9 @@ export default function Anime({ params }) {
     } else if (
       result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
     ) {
-      const signInResp = await SignInGooglePopUp((status) => {console.log("login status:",status)});
+      const signInResp = await SignInGooglePopUp((status) => {
+        console.log("login status:", status);
+      });
 
       if (signInResp.status === Constant_Var_success) return;
       else toast.error(signInResp?.response?.message, { duration: 3000 });
@@ -192,13 +194,15 @@ export default function Anime({ params }) {
 
                 {anime ? (
                   <div className="flex mt-4 gap-4 justify-center md:justify-start">
-                    <Link
-                      href={`/watch/${params?.id}?provider=zoro`}
-                      className="watchnow flex gap-2 items-center bg-primary-500  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
-                    >
-                      <FaPlayCircle />
-                      Watch now
-                    </Link>
+                    {anime?.Sites && (
+                      <Link
+                        href={`/watch/${params?.id}?provider=zoro`}
+                        className="watchnow flex gap-2 items-center bg-primary-500  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
+                      >
+                        <FaPlayCircle />
+                        Watch now
+                      </Link>
+                    )}
                     <div className="flex flex-col">
                       <button
                         className="watchnow flex gap-2 items-center bg-gray-200  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"

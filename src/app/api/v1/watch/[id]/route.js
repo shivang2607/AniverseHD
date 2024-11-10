@@ -130,7 +130,7 @@ export async function GET(req, { params }) {
     // Caching logic handling
     if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to)) {
       console.log("current anime is finished more than 6 months ago");
-      await redisClient.set(`watch-${id}`, JSON.stringify(finalResponse), "EX", 60 * 60 * 24 * 7); // Cache for 7 days
+      id && await redisClient.set(`watch-${id}`, JSON.stringify(finalResponse), "EX", 60 * 60 * 24 * 7); // Cache for 7 days
     }
     watchCache.set(`watch-${id}`, finalResponse);
     return NextResponse.json(finalResponse);
