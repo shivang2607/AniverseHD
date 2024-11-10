@@ -39,26 +39,40 @@ export async function addQdrantAnime(id) {
 
     // *corsProxy url isint working plus you need to do error handling here, also iski vajah se jaha /anime/id vaali api call ho rahi h vaha undefined retuen ho raha h which should not happen at all to isko bhi address krna h
     
-    const corsProxyUrl = process.env.ENV === 'DEV' ? 'https://api.allorigins.win/raw?url=' : '';
+    const corsProxyUrl = process.env.ENV === 'DEV' ? process.env.CUSTOM_PROXY_URL : '';
     const headers = { 'Origin': '*' };
-    const malSyncData = await limiter.schedule(() => axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, { headers }));
-
     let payload = jikanResp;
-    payload = {
-        ...payload,
-        "genres": jikanResp.genres.map(genre => genre.name),
-        "themes": jikanResp.themes.map(theme => theme.name),
-        "demographics": jikanResp.demographics?.map(demo => demo.name),
-
+    
+    // Attempt to fetch malSyncData, catch any error, and provide a fallback
+    let malSyncData = null;
+    try {
+        malSyncData = await limiter.schedule(() => axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, { headers }));
+    } catch (error) {
+        console.error('Failed to fetch malSyncData:', error.message);
     }
-
+    
+    // Process jikanResp and handle cases where genres, themes, or demographics might be missing
+    try {
+        payload = {
+            ...payload,
+            "genres": jikanResp.genres?.map(genre => genre.name) || [],
+            "themes": jikanResp.themes?.map(theme => theme.name) || [],
+            "demographics": jikanResp.demographics?.map(demo => demo.name) || []
+        };
+    } catch (error) {
+        console.error('Error processing jikanResp data:', error.message);
+    }
+    
+    // Conditionally add Sites if present in malSyncData
     if (malSyncData?.data?.Sites?.Gogoanime || malSyncData?.data?.Sites?.Zoro) {
         payload = {
             ...payload,
-            "Sites": malSyncData?.data?.Sites
+            "Sites": malSyncData.data.Sites
         };
+    } else {
+        console.warn('Gogoanime or Zoro data not found in malSyncData.');
     }
-
+    
     // Add the anime to the Qdrant database with its payload and embeddings.
     const uploadPoint = await axios.put(
         `${process.env.QDRANT_URL}/collections/Anime/points`,

@@ -32,6 +32,8 @@ import {
 } from "@vidstack/react/player/layouts/default";
 import { ImCross } from "react-icons/im";
 import { ThreeCircles } from "react-loader-spinner";
+import { Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success } from "@/utils/constants";
+import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -299,11 +301,18 @@ export default function Page({ params }) {
 
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
-    console.log(result?.response);
-    if (result.status === "success") {
+    
+    if (result.status === Constant_Var_success) {
       setWatchListData(result?.response);
       setIsWatchListOpen((prev) => !prev);
       return;
+    } else if (
+      result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
+    ) {
+      const signInResp = await SignInGooglePopUp((status) => {console.log("login status:",status)});
+
+      if (signInResp.status === Constant_Var_success) return;
+      else toast.error(signInResp?.response?.message, { duration: 3000 });
     }
     toast.error(result?.response?.message, { duration: 3000 });
   };
@@ -421,7 +430,7 @@ export default function Page({ params }) {
                             kind="subtitles"
                             label={tr?.label}
                             // lang="en-US"
-                            default={tr?.default || index === 0}
+                            default={tr?.default}
                           />
                         );
                       })}

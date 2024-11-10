@@ -43,21 +43,36 @@ export async function syncQdrant(id, resPayload) {
     // *corsProxy url isint working plus you need to do error handling here, also iski vajah se jaha /anime/id vaali api call ho rahi h vaha undefined return ho raha h which should not happen at all to isko bhi address krna h, yhi cheez addAnime function m bhi anjaam deni h, I can just create a proxy server of my own and deploy it to the netlify or onrender, its just a basic page after all.
     
 
-    if (!(resPayload.Sites)) {
-        // console.log("HI")
-        
-        const corsProxyUrl = process.env.ENV === 'DEV' ? 'https://cors-anywhere.herokuapp.com/' : '';
-        const headers = {
-            'Origin': '*'
-        };
-        const malSyncData = await limiter.schedule(() => axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, { headers }));
-        updatePayload = {
-            ...updatePayload,
-            "Sites": malSyncData?.data?.Sites
-        };
-        // console.log(updatePayload.Sites);
-        console.log("malsync data",malSyncData);
+    if (!resPayload.Sites) {
+        const corsProxyUrl = process.env.ENV === 'DEV' ? process.env.CUSTOM_PROXY_URL : '';
+        const headers = { 'Origin': '*' };
+    
+        try {
+            // Attempt to fetch the data through the proxy
+            const malSyncData = await limiter.schedule(() =>
+                axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, { headers })
+            );
+    
+            // Check if malSyncData exists and contains the expected data
+            if (malSyncData?.data?.Sites) {
+                updatePayload = {
+                    ...updatePayload,
+                    "Sites": malSyncData.data.Sites
+                };
+            } else {
+                console.error('No Sites data found in the response.');
+                // Optional: Set a default value for Sites if required
+                // updatePayload.Sites = {}; // or [] based on your requirements
+            }
+    
+            console.log("malsync data", malSyncData);
+        } catch (error) {
+            // Log the error and set error response
+            console.error('Failed to fetch data from the site:', error.message);
+            // updatePayload.Sites = {}; // Optional: Provide fallback/default data
+        }
     }
+    
 
     if (!(resPayload?.relations)) {
         updatePayload = {
