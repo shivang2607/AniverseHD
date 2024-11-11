@@ -26,7 +26,7 @@ export default async function getAnime(id) {
     const cachedResult = await redisClient.get(`qdrant-anime-${id}`);
     if (cachedResult) { // data found in redis cache
       const parsedCacheResult = JSON.parse(cachedResult);
-      console.log('cache hit : response sent from REDIS cached result');
+      console.log('cache hit : response sent from REDIS cached result for anime id ', id);
       animeCache.set(`qdrant-anime-${id}`, parsedCacheResult);
       return parsedCacheResult;
     }
