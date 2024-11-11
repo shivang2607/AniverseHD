@@ -34,6 +34,7 @@ import { ImCross } from "react-icons/im";
 import { ThreeCircles } from "react-loader-spinner";
 import { Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
+import Image from "next/image";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -47,6 +48,7 @@ export default function Page({ params }) {
   const [content, setContent] = useState();
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
+  const [animeNotAvailable, setAnimeNotAvailable] = useState(false);
 
   const {
     episodesData,
@@ -127,6 +129,7 @@ export default function Page({ params }) {
         // Check if the data object has an 'error' key
         if (data?.error) {
             console.error(`Error in response data: ${data.error}`);
+            setAnimeNotAvailable(true);
             // Optionally, you could set some error state here or throw an error to handle it elsewhere
             return;
         }
@@ -143,20 +146,23 @@ export default function Page({ params }) {
             data?.zoro,
             data?.gogoDub,
             data?.gogoSub
-        );
+          );
+          if (!zoroId && !gogoSubId && !gogoDubId) {
+            setZoroEpisodeId(data?.zoro?.episodes?.[0]?.episodeId);
+            setGogoSubEpisodeId(data?.gogoSub?.episodes?.[0]?.id);
+            setGogoDubEpisodeId(data?.gogoDub?.episodes?.[0]?.id);
+          }
+          console.log("zoro, gogo episode ids are set !")
+          setAnimeNotAvailable(false);
     } catch (error) {
         // Log the error and handle it gracefully
         console.error(`Failed to fetch data for /watch/${params?.id}:`, error.message);
+        setAnimeNotAvailable(true);
         return;
         // Optionally, update state to reflect error or notify the user
     }
     
 
-      if (!zoroId && !gogoSubId && !gogoDubId) {
-        setZoroEpisodeId(data?.data?.zoro?.episodes?.[0]?.episodeId);
-        setGogoSubEpisodeId(data?.data?.gogoSub?.episodes?.[0]?.id);
-        setGogoDubEpisodeId(data?.data?.gogoDub?.episodes?.[0]?.id);
-      }
       // console.log(data?.data);
     })();
   }, [params]);
@@ -196,6 +202,7 @@ export default function Page({ params }) {
       if (!provider) return;
 
       if (provider === "zoro" && zoroEpisodeId) {
+        console.log("provider is zoro and zoro episode id is present")
         const cachedServerData = getSessionWithExpiry(
           `serverData-${provider}-${zoroEpisodeId}`
         );
@@ -216,7 +223,7 @@ export default function Page({ params }) {
           console.log("server", serverData?.data?.data?.sub[0].serverName);
           setSessionWithExpiry(
             `serverData-${provider}-${zoroEpisodeId}`,
-            serverData?.data?.data,
+            serverData?.data?.data, 
             1000 * 60 * 60 * 24
           ); //24 hrs
         }
@@ -342,13 +349,24 @@ export default function Page({ params }) {
   return (
     <div className="py-16">
       <div className="content py-2 px-4 flex flex-col gap-4">
-        <h1 className="text-2xl tracking-wide my-3 font-semibold  self-center">
+        {!animeNotAvailable && <h1 className="text-2xl tracking-wide my-3 font-semibold  self-center">
           {" "}
           Currently Watching : {content?.title_english || content?.title}
-        </h1>
+        </h1>}
         <div className="stream-container self-center w-[95%] flex flex-col gap-12 ">
           <div className="bg-cbg-200 p-4 ">
-            {!streamingData ? (
+            {
+            animeNotAvailable ? 
+            
+            <div className=" mx-auto flex flex-col gap-4 h-72 w-72 justify-center items-center">
+            <div className='relative overflow-hidden rounded h-full w-full flex flex-col gap-4 mx-auto object-cover object-center'>
+            <Image src="/anime-not-available.webp" unoptimized alt='Anime not Available for Streaming...' fill className=''/>
+            
+        </div>
+            <div className="text-lg text-center mx-aut z-20">Sorry! Not Available on this Provider !!</div>
+        </div>
+            :
+            !streamingData ? (
               <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
                 <ThreeCircles
                   visible={true}
