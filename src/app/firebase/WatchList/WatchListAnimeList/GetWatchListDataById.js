@@ -6,6 +6,7 @@ import {
   endBefore,
   getDoc,
   getDocs,
+  getFirestore,
   orderBy,
   query,
   startAfter,
@@ -32,14 +33,63 @@ import {
 } from "../../utils/CacheStorage";
 import _ from "lodash";
 
-//NOT READY YET
-export default async function GetWatchListById({
+/**
+ * Retrieves a specific watchlist by its ID, with options for pagination or fetching the full list.
+ * The function checks if the watchlist is public or owned by the current user before returning data.
+ * If the watchlist is updated, it clears outdated cached data.
+ *
+ * @async
+ * @function
+ * @param {Object} params - The parameters for fetching the watchlist.
+ * @param {string} params.watchListId - The ID of the watchlist to retrieve.
+ * @param {number|null} [params.offset=null] - The offset for paginated retrieval. 
+ *                                             Required if `getAll` is false.
+ * @param {number|null} [params.pageSize=null] - The number of items to retrieve per page.
+ *                                               Required if `getAll` is false.
+ * @param {boolean} [params.getAll=false] - Whether to fetch the entire list of items.
+ *                                          Overrides offset and pageSize if true.
+ *
+ * @returns {Promise<Object>} - An object with a `status` key, which is 
+ *                              `Constant_Var_success` on success and 
+ *                              `Constant_Var_error` on error, and a `response` 
+ *                              key with the retrieved watchlist data or an error message.
+ *
+ * @throws Will throw an error if required parameters are missing.
+ *
+ * @example
+ * // Fetching with pagination (getAll: false)
+ * const result = await GetWatchListById({
+ *   watchListId: 'abc123',
+ *   offset: 0,
+ *   pageSize: 10,
+ *   getAll: false
+ * });
+ * if (result.status === Constant_Var_success) {
+ *   console.log("Paginated Watchlist Data:", result.response);
+ * } else {
+ *   console.error("Error fetching paginated watchlist:", result.response);
+ * }
+ *
+ * @example
+ * // Fetching the complete watchlist (getAll: true)
+ * const result = await GetWatchListById({
+ *   watchListId: 'abc123',
+ *   getAll: true
+ * });
+ * if (result.status === Constant_Var_success) {
+ *   console.log("Complete Watchlist Data:", result.response);
+ * } else {
+ *   console.error("Error fetching complete watchlist:", result.response);
+ * }
+ */
+export default async function GetWatchListDataById({
   watchListId,
-  offset,
-  pageSize,
+  offset=null,
+  pageSize=null,
+  getAll=false
 }) {
   try {
-    if (!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
+    if (!(watchListId && ((offset && pageSize) || getAll))) throw new Error(Constant_Var_errorMessage_missingParams);
 
     let watchlistInfoCache = await GetWatchListInfoById({
       watchListId: watchListId,
@@ -69,11 +119,15 @@ export default async function GetWatchListById({
       watchListInfo.response.type === Constant_Var_firebase_fieldValue_public ||
       (await getUserAuth())?.details.uid === watchListInfo.response.ownerUid
     ) {
+      if(getAll){
+        response= await GetFromFirestore({watchListId:watchListId, getAll:true});
+      }else{
       response = await Helper({
         watchListInfo: watchListInfo.response,
         offset: offset,
         pageSize: pageSize,
       });
+    }
     } else {
       throw new Error(Constant_Var_errorMessage_privateWatchList);
     }
@@ -96,7 +150,7 @@ async function Helper({ watchListInfo, offset, pageSize }) {
     watchListId: id,
   });
 
-  // console.log(startAnime,endAnime,"hh");
+  console.log(startAnime,endAnime,"hh");
   let startIndex = Search({
     arrayofObjects: animeListCache,
     attribute: "addedAt",
@@ -187,10 +241,23 @@ async function GetFromFirestore({
   endTimestamp,
   startInclude = true,
   endInclude=true,
+  getAll=false
 }) {
   let queryResult;
 
-  if (startInclude  && endInclude) {
+  if(getAll){
+    queryResult = await getDocs(
+      query(
+        collection(
+          db,
+          Constant_Var_firebase_collectionName_watchLists,
+          watchListId,
+          Constant_Var_firebase_collectionName_animeList
+        ),
+        orderBy("updatedAt"),
+      )
+    );
+  }else if (startInclude  && endInclude) {
     queryResult = await getDocs(
       query(
         collection(
@@ -248,25 +315,6 @@ async function GetFromFirestore({
       )
     );
   }
-  // console.log(queryResult.docs, startTimestamp,
-  //   endTimestamp, "result firestore");
   // Map through the docs and return an array of document data
   return queryResult.docs.map((doc) => doc.data());
 }
-
-// const collectionRef = collection(
-//   db,
-//   Constant_Var_firebase_collectionName_watchLists,
-//   watchListId,
-//   Constant_Var_firebase_collectionName_animeList
-// );
-// // query(collectionRef, orderBy("createdAt"), startAt(offset));
-// const animeList = await getDocs(collectionRef);
-// let animeListArr = [];
-
-// animeList.forEach((anime) => {
-//   animeListArr.push(anime.data());
-// });
-
-// let result = { ...watchListInfo.response, animeList: animeListArr };
-// return { status: Constant_Var_success, response: result };

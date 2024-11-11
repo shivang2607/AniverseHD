@@ -13,7 +13,7 @@ import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import useUserStore from "./ZustandStores/userStore";
-import GetWatchListById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListById";
+import GetWatchListById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
 
 const Navbar = () => {
   const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists} = useUserStore();

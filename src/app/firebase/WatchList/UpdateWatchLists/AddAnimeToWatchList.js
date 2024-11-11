@@ -1,5 +1,5 @@
 import { auth, db } from "../../utils/firebaseinit";
-import { arrayUnion, doc, writeBatch } from "firebase/firestore";
+import { arrayUnion, doc, Timestamp, writeBatch } from "firebase/firestore";
 import getUserAuth from "../../utils/GetUserAuth";
 import {
   Constant_Var_RecentWatchlistSize,
@@ -37,6 +37,8 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  * @param {string|null} params.animeAgeRating - The age rating of the anime (can be null).
  * @param {number|null} params.animeStartYear - The starting year of the anime (can be null).
  * @param {number|null} params.animeLength - The number of episodes or runtime of the anime (can be null).
+ * @param {string|null} params.url - Url of episode for recent watchlist 
+ * @param {object|null} params.episodeTimestamp - Timestamp of episode for recent watchlist
  *
  * @returns {Promise<{status:string,response:any}>} - Returns a promise that resolves to an object containing:
  *   - {string} status - Indicates the success or failure of the operation, will be Constant_Var_success on success or Constant_Var_error on failure.
@@ -75,6 +77,7 @@ export default async function AddAnimeToWatchList({
   animeStartYear = null,
   animeLength = null,
   url = null,
+  episodeTimestamp=null,
 }) {
   try {
     // Validate the parameters
@@ -90,6 +93,7 @@ export default async function AddAnimeToWatchList({
       animeStartYear,
       animeLength,
       url,
+      episodeTimestamp,
     });
 
     const userData = await getUserAuth();
@@ -115,6 +119,7 @@ export default async function AddAnimeToWatchList({
       animeStartYear: animeStartYear,
       animeLength: animeLength,
       url: url,
+      episodeTimestamp:episodeTimestamp
     });
     const currTimestamp = animeObject.addedAt;
 
@@ -130,9 +135,9 @@ export default async function AddAnimeToWatchList({
         ) {
           // for special recent watch list, it have a fixed size
 
-          if (url === null)
+          if (url === null ||episodeTimestamp==null)
             throw new Error(
-              "Url cannot be null when watchlist is starter recent"
+              "Url and episodeTimestamp cannot be null when watchlist is starter recent"
             );
 
           const doesExists = watchListInfo.response.animeList?.find(
