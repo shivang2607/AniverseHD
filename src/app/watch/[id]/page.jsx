@@ -217,7 +217,7 @@ export default function Page({ params }) {
           // console.log("cached servers data : ", cachedServerData);
           setServerData(cachedServerData);
           console.log("serverV", serverV);
-          if (!serverV) setServer(cachedServerData?.sub[0].serverName);
+          if (!serverV) setServer(cachedServerData?.sub[0]?.serverName);
           // return;
         } else {
           const serverData = await axios.get(
@@ -226,8 +226,8 @@ export default function Page({ params }) {
 
           console.log("servers data : ", serverData?.data?.data);
           setServerData(serverData?.data?.data);
-          setServer(serverData?.data?.data?.sub[0].serverName);
-          console.log("server", serverData?.data?.data?.sub[0].serverName);
+          setServer(serverData?.data?.data?.sub[0]?.serverName);
+          console.log("server", serverData?.data?.data?.sub[0]?.serverName);
           setSessionWithExpiry(
             `serverData-${provider}-${zoroEpisodeId}`,
             serverData?.data?.data,
