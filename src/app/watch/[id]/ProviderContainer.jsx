@@ -5,6 +5,9 @@ import { usePathname, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { useEffect } from "react";
 import Skeleton from "react-loading-skeleton";
+import { FaClosedCaptioning } from "react-icons/fa6";
+import { FaMicrophoneAlt } from "react-icons/fa";
+import Image from "next/image";
 
 
 
@@ -34,6 +37,7 @@ const useDebouncedEffect = (callback, dependencies, delay, setStreamingData) => 
 
 
 export default function ProviderContainer({
+  content
   // episodes,
   // serverData,
   // // prov = "gogo",
@@ -132,7 +136,8 @@ export default function ProviderContainer({
   // console.log("this is server:", server);
 
   return (
-    <div className="w-full rounded-lg bg-cbg-200 flex flex-col py-8 gap-2">
+    <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">
+      <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10"/>
       <div className="provider-server-select self-center flex flex-col gap-8">
         <div className="button self-center flex gap-2 text-gray-200 ">
           <Link
@@ -140,7 +145,7 @@ export default function ProviderContainer({
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md ${
               provider === "zoro" ? "bg-primary-100" : ""
-            }  `}
+            }  `} 
             onClick={() => {
               setSelectedProvider("zoro");
               // setServerLoading(true);
@@ -165,14 +170,14 @@ export default function ProviderContainer({
 
         <div className="availableServers self-center flex flex-col">
         {(serverData?.sub || provider==="gogo") &&<div className="sub flex font-semibold text-sm items-center p-2 gap-4">
-               <h2>SUB:</h2>
+               <h2 className="flex gap-2 items-center"><FaClosedCaptioning className="text-lg text-primary-300"/> SUB:</h2>
               <div className="flex gap-3">
                 {provider==="gogo" && 
                 <Link
                 href={updateParams([{key: "dub", val:''}, {key:"server", val: "default-sub"}])} 
                 scroll={false} 
                 aria-disabled = {serverLoading}
-                className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub ? "bg-sky-300 text-gray-900":""}`}
+                className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub ? "bg-primary-100 text-gray-100":""}`}
                 // onClick={()=>fetchStreamingData({
                 //   episodeId : zoroEpisodeId,
                 //   gogoSubId: gogoSubEpisodeId,
@@ -188,7 +193,7 @@ export default function ProviderContainer({
                       key={ser?.serverName || ser?.name}
                       href={updateParams([{key: "dub", val:''}, {key:"server", val: ser?.serverName || ser?.name}])} 
                       scroll={false} 
-                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub && (server===ser?.serverName || server===ser?.name) ? "bg-sky-300 text-gray-900":""}`}
+                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
                       //   episodeId : zoroEpisodeId,
                       //   gogoSubId: gogoSubEpisodeId,
@@ -203,14 +208,14 @@ export default function ProviderContainer({
         }
 
             {(serverData?.dub || provider==="gogo") && <div className="sub flex font-semibold text-sm items-center p-2 gap-4">
-              <h2>DUB:</h2>
+              <h2 className="flex gap-2 items-center"><FaMicrophoneAlt className="text-lg text-primary-300"/> DUB:</h2>
               <div className="flex gap-3">
 
               {provider==="gogo" && 
                 <Link
                 href={updateParams([{key: "dub", val:'1'}, {key:"server", val: "default-dub"}])} 
                 scroll={false} 
-                className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub  ? "bg-sky-300 text-gray-900":""}`}
+                className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub  ? "bg-primary-100 text-gray-100":""}`}
                 // onClick={()=>fetchStreamingData({
                 //   episodeId : zoroEpisodeId,
                 //   gogoSubId: gogoSubEpisodeId,
@@ -226,7 +231,7 @@ export default function ProviderContainer({
                       <Link key={ser?.serverName || ser?.name} 
                       scroll={false} 
                       href={updateParams([{key: "dub", val:'1'}, {key:"server", val: ser?.serverName || ser?.name}])} 
-                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub && (server===ser?.serverName || server===ser?.name) ? "bg-sky-300 text-gray-900":""}`}
+                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
                       //   episodeId : zoroEpisodeId,
                       //   gogoSubId: gogoSubEpisodeId,

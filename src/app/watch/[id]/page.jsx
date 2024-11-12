@@ -32,9 +32,13 @@ import {
 } from "@vidstack/react/player/layouts/default";
 import { ImCross } from "react-icons/im";
 import { ThreeCircles } from "react-loader-spinner";
-import { Constant_Var_errorMessage_notAuthenticatedUser, Constant_Var_success } from "@/utils/constants";
+import {
+  Constant_Var_errorMessage_notAuthenticatedUser,
+  Constant_Var_success,
+} from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import Image from "next/image";
+
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -78,7 +82,12 @@ export default function Page({ params }) {
   const player = useRef(null);
 
   const [showSkipButton, setShowSkipButton] = useState("");
-  const [isAutoSkip, setIsAutoSkip] = useState(true);
+  const [mediaPlayerState, setMediaPlayerState] = useState({
+    isAutoSkip: false,
+    isAutoPlay: true,
+    isAutoNext: true,
+  });
+  // const [isAutoSkip, setIsAutoSkip] = useState(true);
 
   useEffect(() => {
     if (!provider) {
@@ -125,43 +134,41 @@ export default function Page({ params }) {
       try {
         const response = await axios.get(`/api/v1/watch/${params?.id}`);
         const data = response?.data;
-    
+
         // Check if the data object has an 'error' key
         if (data?.error) {
-            console.error(`Error in response data: ${data.error}`);
-            setAnimeNotAvailable(true);
-            // Optionally, you could set some error state here or throw an error to handle it elsewhere
-            return;
+          console.error(`Error in response data: ${data.error}`);
+          setAnimeNotAvailable(true);
+          // Optionally, you could set some error state here or throw an error to handle it elsewhere
+          return;
         }
-    
+
         console.log(`data for /watch/${params?.id}`, data);
         setContent(data);
         console.log("This is content data", response, data);
-    
+
         // Set session with 30-minute expiry
         setSessionWithExpiry(`watch-${params.id}`, data, 1000 * 60 * 30);
-    
+
         // Merge provider data only if keys are available in data
-        mergeProviderData(
-            data?.zoro,
-            data?.gogoDub,
-            data?.gogoSub
-          );
-          if (!zoroId && !gogoSubId && !gogoDubId) {
-            setZoroEpisodeId(data?.zoro?.episodes?.[0]?.episodeId);
-            setGogoSubEpisodeId(data?.gogoSub?.episodes?.[0]?.id);
-            setGogoDubEpisodeId(data?.gogoDub?.episodes?.[0]?.id);
-          }
-          console.log("zoro, gogo episode ids are set !")
-          setAnimeNotAvailable(false);
-    } catch (error) {
+        mergeProviderData(data?.zoro, data?.gogoDub, data?.gogoSub);
+        if (!zoroId && !gogoSubId && !gogoDubId) {
+          setZoroEpisodeId(data?.zoro?.episodes?.[0]?.episodeId);
+          setGogoSubEpisodeId(data?.gogoSub?.episodes?.[0]?.id);
+          setGogoDubEpisodeId(data?.gogoDub?.episodes?.[0]?.id);
+        }
+        console.log("zoro, gogo episode ids are set !");
+        setAnimeNotAvailable(false);
+      } catch (error) {
         // Log the error and handle it gracefully
-        console.error(`Failed to fetch data for /watch/${params?.id}:`, error.message);
+        console.error(
+          `Failed to fetch data for /watch/${params?.id}:`,
+          error.message
+        );
         setAnimeNotAvailable(true);
         return;
         // Optionally, update state to reflect error or notify the user
-    }
-    
+      }
 
       // console.log(data?.data);
     })();
@@ -202,7 +209,7 @@ export default function Page({ params }) {
       if (!provider) return;
 
       if (provider === "zoro" && zoroEpisodeId) {
-        console.log("provider is zoro and zoro episode id is present")
+        console.log("provider is zoro and zoro episode id is present");
         const cachedServerData = getSessionWithExpiry(
           `serverData-${provider}-${zoroEpisodeId}`
         );
@@ -223,7 +230,7 @@ export default function Page({ params }) {
           console.log("server", serverData?.data?.data?.sub[0].serverName);
           setSessionWithExpiry(
             `serverData-${provider}-${zoroEpisodeId}`,
-            serverData?.data?.data, 
+            serverData?.data?.data,
             1000 * 60 * 60 * 24
           ); //24 hrs
         }
@@ -330,7 +337,7 @@ export default function Page({ params }) {
 
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
-    
+
     if (result.status === Constant_Var_success) {
       setWatchListData(result?.response);
       setIsWatchListOpen((prev) => !prev);
@@ -338,7 +345,9 @@ export default function Page({ params }) {
     } else if (
       result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
     ) {
-      const signInResp = await SignInGooglePopUp((status) => {console.log("login status:",status)});
+      const signInResp = await SignInGooglePopUp((status) => {
+        console.log("login status:", status);
+      });
 
       if (signInResp.status === Constant_Var_success) return;
       else toast.error(signInResp?.response?.message, { duration: 3000 });
@@ -349,24 +358,30 @@ export default function Page({ params }) {
   return (
     <div className="py-16">
       <div className="content py-2 px-4 flex flex-col gap-4">
-        {!animeNotAvailable && <h1 className="text-2xl tracking-wide my-3 font-semibold  self-center">
-          {" "}
-          Currently Watching : {content?.title_english || content?.title}
-        </h1>}
+        {!animeNotAvailable && (
+          <h1 className="text-2xl tracking-wide my-3 font-semibold  self-center">
+            {" "}
+            Currently Watching : {content?.title_english || content?.title}
+          </h1>
+        )}
         <div className="stream-container self-center w-[95%] flex flex-col gap-12 ">
           <div className="bg-cbg-200 p-4 ">
-            {
-            animeNotAvailable ? 
-            
-            <div className=" mx-auto flex flex-col gap-4 h-72 w-72 justify-center items-center">
-            <div className='relative overflow-hidden rounded h-full w-full flex flex-col gap-4 mx-auto object-cover object-center'>
-            <Image src="/anime-not-available.webp" unoptimized alt='Anime not Available for Streaming...' fill className=''/>
-            
-        </div>
-            <div className="text-lg text-center mx-aut z-20">Sorry! Not Available on this Provider !!</div>
-        </div>
-            :
-            !streamingData ? (
+            {animeNotAvailable ? (
+              <div className=" mx-auto flex flex-col gap-4 h-72 w-72 justify-center items-center">
+                <div className="relative overflow-hidden rounded h-full w-full flex flex-col gap-4 mx-auto object-cover object-center">
+                  <Image
+                    src="/anime-not-available.webp"
+                    unoptimized
+                    alt="Anime not Available for Streaming..."
+                    fill
+                    className=""
+                  />
+                </div>
+                <div className="text-lg text-center mx-aut z-20">
+                  Sorry! Not Available on this Provider !!
+                </div>
+              </div>
+            ) : !streamingData ? (
               <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
                 <ThreeCircles
                   visible={true}
@@ -387,7 +402,7 @@ export default function Page({ params }) {
               <div className="stream block bg-black h-[85vh] w-full rounded my-4">
                 <MediaPlayer
                   load="eager"
-                  autoPlay
+                  autoPlay = {mediaPlayerState?.isAutoPlay ? true : false}
                   ref={player}
                   // volume={getVol()}
                   // onVolumeChange={(v, e)=>{
@@ -417,7 +432,7 @@ export default function Page({ params }) {
                   onError={(e) =>
                     toast.error(`${e.message}, Try Another Server.`)
                   }
-                  onEnded={() => getNextEpisode()}
+                  onEnded={() => mediaPlayerState?.isAutoNext && getNextEpisode()} //only fetch next episode if the auto next state is set to true.
                   onTimeUpdate={(v, event) => {
                     if (!streamingData?.intro) return;
                     const player = event.target;
@@ -429,7 +444,7 @@ export default function Page({ params }) {
                     const outroStart = streamingData?.outro?.start;
                     const outroEnd = streamingData?.outro?.end;
 
-                    if (!isAutoSkip) {
+                    if (!mediaPlayerState?.isAutoSkip) {
                       if (currentTime < introEnd && currentTime > introStart) {
                         setShowSkipButton("Intro");
                       } else if (
@@ -508,7 +523,7 @@ export default function Page({ params }) {
             )}
             <div className="flex mt-4 mx-4 text-sm gap-1">
               <button
-                className="favorites flex items-center text-lg  justify-center gap-1"
+                className="favorites flex items-center text-lg  mr-5 justify-center gap-1"
                 onClick={handleOnClickWatchList}
               >
                 {" "}
@@ -542,19 +557,53 @@ export default function Page({ params }) {
 
               {provider === "zoro" && (
                 <button
-                  className={`mx-5 ${
-                    isAutoSkip ? "text-sky-400 font-semibold" : ""
+                  className={`mx-1 ${
+                    mediaPlayerState?.isAutoSkip
+                      ? "text-sky-400 font-semibold"
+                      : "font-[300]"
                   } `}
-                  onClick={() => setIsAutoSkip(!isAutoSkip)}
+                  onClick={() =>
+                    setMediaPlayerState((prev) => ({
+                      ...prev,
+                      isAutoSkip: !(prev?.isAutoSkip),
+                    }))
+                  }
                 >
-                  Auto Skip Intro ({isAutoSkip ? "on" : "off"})
+                  Auto Skip Intro ({mediaPlayerState?.isAutoSkip ? "on" : "off"}
+                  )
                 </button>
               )}
+
+              <button
+                className={`mx-1 ${
+                  mediaPlayerState?.isAutoNext ? "text-sky-400 font-semibold" : "font-[300]"
+                } `}
+                onClick={() => setMediaPlayerState((prev) => ({
+                  ...prev,
+                  isAutoNext: !(prev?.isAutoNext),
+                }))}
+              >
+                Auto Next ({mediaPlayerState?.isAutoNext ? "on" : "off"})
+              </button>
+
+
+              <button
+                className={`mx-1 ${
+                  mediaPlayerState?.isAutoPlay ? "text-sky-400 font-semibold" : "font-[300]"
+                } `}
+                onClick={() => setMediaPlayerState((prev) => ({
+                  ...prev,
+                  isAutoPlay: !(prev?.isAutoPlay),
+                }))}
+              >
+                Auto Play ({mediaPlayerState?.isAutoPlay ? "on" : "off"})
+              </button>
             </div>
           </div>
 
           {episodesData && (
             <ProviderContainer
+              content = {content}
             // episodes={episodesData}
             // selectedEpisodeId={selectedEpisodeId}
             // setSelectedEpisodeId={setSelectedEpisodeId}
