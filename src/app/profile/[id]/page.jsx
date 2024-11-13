@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import UserInfo from "./Components/UserInfo";
-import WatchLists from "./Components/WatchLists";
+import UserWatchLists from "./Components/UserWatchLists";
 
 const Profile = ({ params }) => {
   // const [userInfo, setUserInfo] = useState(null);
@@ -55,7 +55,7 @@ const Profile = ({ params }) => {
   return (
     <div className="w-[100vw] h-[100vh] relative">
       <UserInfo id={params.id} />
-      <WatchLists id={params.id}/>
+      <UserWatchLists id={params.id}/>
     </div>
   );
 };

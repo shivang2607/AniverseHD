@@ -8,9 +8,10 @@ import {
 import { useRouter } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
-import WatchListComponent from "./WatchListComponent";
+import WatchListsTabs from "./WatchListsTabs";
+import WatchListPagination from "./WatchListPagination";
 
-const WatchLists = ({ id }) => {
+const UserWatchLists = ({ id }) => {
   const { isUserLoggedIn, loggedInUserId, loggedInUserWatchListsInfo } =
     useUserStore();
   const [userWatchLists, setUserWatchLists] = useState(null);
@@ -62,32 +63,20 @@ const WatchLists = ({ id }) => {
     loadUserData();
   }, [loggedInUserWatchListsInfo]);
 
-  useEffect(() => {
-    if (userWatchLists && userWatchLists.length > 0){
-      userWatchLists.forEach((ele)=>{
-        if(ele.watchListName === "Watching" &&
-          ele.isSpecialStarter){
-            setSelectedWatchList(ele);
-          }
-      })
-    }
-  }, [userWatchLists]);
-
   return (
     <>
       {userWatchLists ? (
         <div>
-        <div className="flex flex-row mt-5 ml-5">
-          {userWatchLists.map((ele, ind) => {
-            return (
-              !(
-                ele.watchListName === Constant_Var_starterWatchLists_recent &&
-                ele.isSpecialStarter
-              ) && <div key={ind} className="mx-5">{ele.watchListName}</div>
-            );
-          })}
-        </div>
-        {selectedWatchList && (<WatchListComponent selectedWatchList={selectedWatchList}/>)}
+          <div className="flex flex-row mt-5 ml-5">
+            <WatchListsTabs
+              WatchLists={userWatchLists}
+              setSelectedWatchList={setSelectedWatchList}
+              selectedWatchList={selectedWatchList}
+            />
+          </div>
+          {selectedWatchList && (
+            <WatchListPagination selectedWatchList={selectedWatchList} />
+          )}
         </div>
       ) : (
         <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
@@ -98,4 +87,4 @@ const WatchLists = ({ id }) => {
   );
 };
 
-export default WatchLists;
+export default UserWatchLists;

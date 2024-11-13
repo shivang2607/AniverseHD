@@ -3,12 +3,12 @@ import WatchListCard from '@/components/watchListCard';
 import { Constant_Var_success } from '@/utils/constants';
 import React, { useEffect, useState } from 'react'
 
-const WatchListComponent = ({selectedWatchList}) => {
+const WatchListPagination = ({selectedWatchList}) => {
     const [list,setList]=useState();
 
     useEffect(()=>{
         async function loadUserData() {
-           const resp= await GetWatchListDataById({watchListId:selectedWatchList.id,getAll:true});
+           const resp= await GetWatchListDataById({watchListId:selectedWatchList.id,offset:0, pageSize:10});
            if(resp.status===Constant_Var_success){
             setList(resp.response);
             console.log(resp.response,"hello");
@@ -31,4 +31,4 @@ const WatchListComponent = ({selectedWatchList}) => {
   )
 }
 
-export default WatchListComponent
+export default WatchListPagination;
