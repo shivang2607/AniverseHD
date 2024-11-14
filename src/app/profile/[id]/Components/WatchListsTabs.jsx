@@ -1,7 +1,3 @@
-import {
-  Constant_Var_starterWatchLists_recent,
-  starterWatchLists,
-} from "@/utils/constants";
 import React, { useEffect, useState } from "react";
 
 const WatchListsTabs = ({

@@ -132,7 +132,7 @@ const UserInfo = ({ id }) => {
                   className="bg-primary-100 md:pt-1.5 md:pr-1.5 md:pl-2.5 md:pb-2.5 sm:pt-1 sm:pr-1 sm:pl-2 sm:pb-2 md:text-xl sm:text-lg rounded-md cursor-pointer text-primary-600 h-fit font-bold"
                   onClick={handleOpenEditUserProfileModal}
                 >
-                  <FaRegEdit />
+                  Edit Profile <FaRegEdit />
                 </div>
               </div>
             )}

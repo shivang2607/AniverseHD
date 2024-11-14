@@ -6,8 +6,9 @@ import React, { useEffect, useState } from "react";
 
 const WatchListPagination = ({ selectedWatchList }) => {
   const [list, setList] = useState(null);
-  const [pageSize, setPageSize] = useState(12);
+  const pageSize = 12;
   const [offset, setOffset] = useState(0);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function loadUserData() {
@@ -22,11 +23,12 @@ const WatchListPagination = ({ selectedWatchList }) => {
         setList(resp.response);
         console.log(resp.response, "hello");
       } else {
+        setError(true);
         console.error(resp.response);
       }
     }
     loadUserData();
-  }, [selectedWatchList, offset, pageSize]);
+  }, [selectedWatchList, offset]);
 
   return (
     <div className="flex flex-col justify-center mx-20 my-10">
@@ -40,8 +42,10 @@ const WatchListPagination = ({ selectedWatchList }) => {
         ) : (
           <div className="h-full w-full">No Data</div>
         )
-      ) : (
+      ) : !error ? (
         <div className="h-full w-full">Loading</div>
+      ) : (
+        <div className="h-full w-full">Error Loading Data</div>
       )}
 
       {selectedWatchList && selectedWatchList.animeList.length > 0 && (
