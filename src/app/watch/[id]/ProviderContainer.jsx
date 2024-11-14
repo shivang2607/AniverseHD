@@ -149,14 +149,14 @@ export default function ProviderContainer({
   return (
     <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">
       <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10"/>
-      <div className="w-5/6 mx-auto justify-between flex mb-8 flex-row">
-        <div className="metadata flex gap-6">
-          <div className="img relative h-60 w-40">
+      <div className="w-[90%] mx-auto justify-between flex mb-8 flex-row">
+        <div className="metadata flex gap-6 items-center mx-2">
+          <div className="img relative h-60 w-40 flex my-auto">
           <Image src={content?.images?.webp?.large_image_url} fill className=" h-full flex-shrink-0 w-full rounded"/>
           </div>
 
           <div className="contentContainer text-sm flex flex-col gap-3 my-auto">
-            <h2 className="title text-2xl tracking-wide font-semibold">{content?.title_english || content?.title}</h2>
+            <h2 className="title text-2xl tracking-wide max-w-96 flex-wrap font-semibold">{content?.title_english || content?.title}</h2>
 
             <div className="additional-data justify-center md:justify-start flex gap-2 md:text-sm ">
                   {content && (
