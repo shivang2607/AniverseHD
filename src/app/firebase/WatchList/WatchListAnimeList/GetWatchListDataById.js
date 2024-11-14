@@ -91,7 +91,7 @@ export default async function GetWatchListDataById({
   try {
     if (!(watchListId && ((offset!=null && pageSize!=null) || getAll))) throw new Error(Constant_Var_errorMessage_missingParams);
 
-    console.log(offset,pageSize,"start");
+    // console.log(offset,pageSize,"start");
     let watchlistInfoCache = await GetWatchListInfoById({
       watchListId: watchListId,
       getFromCache: true,
@@ -108,7 +108,7 @@ export default async function GetWatchListDataById({
       throw watchlistInfoCache.response;
 
     if (
-      watchlistInfoCache.response.updatedAt < watchListInfo.response.updatedAt
+      compareTimestamp( watchlistInfoCache.response.updatedAt,watchListInfo.response.updatedAt)
     ) {
       // Clear watchlistAnimelist cache
       removeWatchlistAnimeListCached({ watchListId: watchListId });
@@ -155,7 +155,7 @@ async function Helper({ watchListInfo, offset, pageSize }) {
     watchListId: id,
   });
 
-  console.log(startAnime,endAnime,"hh");
+  // console.log(startAnime,endAnime,"hh");
   let startIndex = Search({
     arrayofObjects: animeListCache,
     attribute: "addedAt",
@@ -168,7 +168,7 @@ async function Helper({ watchListInfo, offset, pageSize }) {
     key: endAnime.addedAt,
   });
 
-  console.log(startIndex, endIndex);
+  // console.log(startIndex, endIndex);
 
   if (startIndex !== -1 && endIndex !== -1) {
     return animeListCache.slice(startIndex, endIndex+1);
@@ -322,4 +322,11 @@ async function GetFromFirestore({
   }
   // Map through the docs and return an array of document data
   return queryResult.docs.map((doc) => doc.data());
+}
+
+function compareTimestamp(timestamp1, timestamp2) {
+  const time1 = timestamp1.seconds * 1000 + timestamp1.nanoseconds / 1e6;
+  const time2 = timestamp2.seconds * 1000 + timestamp2.nanoseconds / 1e6;
+
+  return time1 < time2;
 }

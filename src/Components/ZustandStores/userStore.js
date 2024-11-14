@@ -2,8 +2,9 @@ import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import SignOut from "@/app/firebase/SignIn/SignOut";
 import getUserAuth from "@/app/firebase/utils/GetUserAuth";
+import GetWatchListDataById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
-import { Constant_Var_success } from "@/utils/constants";
+import { Constant_Var_starterWatchLists_recent, Constant_Var_success } from "@/utils/constants";
 import { create } from "zustand";
 
 const useUserStore = create((set, get) => ({
@@ -12,6 +13,8 @@ const useUserStore = create((set, get) => ({
   loggedInUserData: null,
   loggedInUserWatchListsInfo: null,
   loadingData: false,
+  RecentWatchListId:null,
+  RecentWatchListData:null,
   setIsUserLoggedIn: (status) => set({ isUserLoggedIn: status }),
   setLoggedInUserData: (data) => set({ loggedInUserData: data }),
 
@@ -26,13 +29,22 @@ const useUserStore = create((set, get) => ({
       respUserInfo.status === Constant_Var_success &&
       respUserWatchLists.status === Constant_Var_success
     ) {
-      set({
-        loggedInUserData: respUserInfo.response,
-        loggedInUserId: respUserInfo.response.uid,
-        loggedInUserWatchListsInfo: respUserWatchLists.response,
-        isUserLoggedIn: true,
-        loadingData: false,
-      });
+      for(let i=0; i<respUserWatchLists.response.length;++i){
+        let ele=respUserWatchLists.response[i];
+
+        if(ele.isSpecialStarter && ele.watchListName===Constant_Var_starterWatchLists_recent){
+          set({
+            loggedInUserData: respUserInfo.response,
+            loggedInUserId: respUserInfo.response.uid,
+            loggedInUserWatchListsInfo: respUserWatchLists.response,
+            isUserLoggedIn: true,
+            loadingData: false,
+            RecentWatchListId:ele.id,
+          });
+          break;
+        }
+      }
+     
     } else {
       set({
         loggedInUserData: null,
@@ -40,6 +52,7 @@ const useUserStore = create((set, get) => ({
         isUserLoggedIn: false,
         loggedInUserWatchListsInfo: null,
         loadingData: false,
+        RecentWatchListId:null
       });
     }
   },
@@ -83,6 +96,25 @@ const useUserStore = create((set, get) => ({
         loggedInUserWatchListsInfo: null,
         loadingData: false,
       });
+    }
+  },
+
+ 
+  loadLoggedInUserRecentWatchList: async () => {
+  
+    let {RecentWatchListId}=get();
+
+    if (RecentWatchListId) {
+      const resp = await GetWatchListDataById({
+        watchListId: RecentWatchListId,
+        getAll:true,
+      });
+
+      if (resp.status === Constant_Var_success) {
+        set({ RecentWatchListData: resp.response });
+      }else{
+        set({RecentWatchListData: null });
+      }
     }
   },
 

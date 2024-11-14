@@ -24,7 +24,7 @@ const UserWatchLists = ({ id }) => {
       const respUserWatchLists = await GetOtherUserWatchListsInfo({
         userId: id,
       });
-      console.log(respUserWatchLists, "hello");
+      // console.log(respUserWatchLists, "hello");
       // # Setting User Info #
       if (respUserWatchLists.status === Constant_Var_success){
         let starter=[],custom=[];
@@ -79,7 +79,7 @@ const UserWatchLists = ({ id }) => {
               starter.push(obj);
             }
         }
-        console.log(starter,custom);
+        // console.log(starter,custom);
         setUserCustomWatchLists(custom);
         setUserStarterWatchLists(starter);
         setSelectedWatchList(starter[0]);

@@ -14,9 +14,10 @@ import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import useUserStore from "./ZustandStores/userStore";
 import GetWatchListById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
+import UpdatePlayOptions from "@/app/firebase/Profile/UpdatePlayOptions";
 
 const Navbar = () => {
-  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists} = useUserStore();
+  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists,RecentWatchListId, loadLoggedInUserRecentWatchList} = useUserStore();
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -34,8 +35,9 @@ const Navbar = () => {
 
   const test = async () => {
   //  setIsUserLoggedIn(true);
-    const res=await GetWatchListById({watchListId:"IPEFfE9vqwpDs0A2Bcrs",offset:10,pageSize:2});
-    console.log(res.response,res.status);
+      
+    // const res=await AddAnimeToWatchList({watchListId:"UnoQ0EQgGMi6jzvwRFqo",animeName:"jjj",animeId:"890",url:"jhj",episodeTimestamp:{}});
+    // console.log(res.response,res.status);
   };
 
   const handleScroll = () => {
@@ -79,7 +81,12 @@ const Navbar = () => {
     // loadUserData();
     loadLoggedInUserDataAndWatchLists();
   }, []);
+
  
+  useEffect(()=>{
+    if(RecentWatchListId)
+    loadLoggedInUserRecentWatchList();
+  },[RecentWatchListId])
 
   return (
     <nav
