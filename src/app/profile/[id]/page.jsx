@@ -53,7 +53,7 @@ const Profile = ({ params }) => {
   // }, []);
 
   return (
-    <div className="w-[100vw] h-[100vh] relative">
+    <div className="w-full min-h-[100vh]">
       <UserInfo id={params.id} />
       <UserWatchLists id={params.id}/>
     </div>

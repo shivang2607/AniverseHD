@@ -99,7 +99,7 @@ export default async function CreateNewProfile() {
         createWatchListInBatch(
           batch,
           listName,
-          Constant_Var_firebase_fieldValue_private,
+          Constant_Var_firebase_fieldValue_public,
           userData,
           true
         );
@@ -107,7 +107,7 @@ export default async function CreateNewProfile() {
         createWatchListInBatch(
           batch,
           listName,
-          Constant_Var_firebase_fieldValue_public,
+          Constant_Var_firebase_fieldValue_private,
           userData,
           true
         );

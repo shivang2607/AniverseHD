@@ -89,8 +89,9 @@ export default async function GetWatchListDataById({
   getAll=false
 }) {
   try {
-    if (!(watchListId && ((offset && pageSize) || getAll))) throw new Error(Constant_Var_errorMessage_missingParams);
+    if (!(watchListId && ((offset!=null && pageSize!=null) || getAll))) throw new Error(Constant_Var_errorMessage_missingParams);
 
+    console.log(offset,pageSize,"start");
     let watchlistInfoCache = await GetWatchListInfoById({
       watchListId: watchListId,
       getFromCache: true,
@@ -121,6 +122,10 @@ export default async function GetWatchListDataById({
     ) {
       if(getAll){
         response= await GetFromFirestore({watchListId:watchListId, getAll:true});
+        addAnimeToWatchListByIdCachedInBatch({
+          watchListId: watchListId,
+          animeList: response,
+        });
       }else{
       response = await Helper({
         watchListInfo: watchListInfo.response,

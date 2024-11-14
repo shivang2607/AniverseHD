@@ -207,7 +207,7 @@ export const addAnimeToUserWatchListCached = ({
         );
 
       if (!animeExistsInWatchListInfo)
-        userWatchLists[ind].animeList.unshift({
+        userWatchLists[ind].animeList.push({
           animeId: anime.animeId,
           addedAt: anime.addedAt,
         });
