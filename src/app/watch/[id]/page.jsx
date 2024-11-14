@@ -54,6 +54,8 @@ export default function Page({ params }) {
   const [watchListData, setWatchListData] = useState();
   const [animeNotAvailable, setAnimeNotAvailable] = useState(false);
 
+  
+
   const {
     episodesData,
     setEpisodesData,
@@ -197,6 +199,7 @@ export default function Page({ params }) {
         { key: "z-id", val: ep?.episodeId },
         { key: "g-sub-id", val: ep?.gogoSubId },
         { key: "g-dub-id", val: ep?.gogoDubId },
+        { key: "n", val: currentIndex + 1},
       ]);
       router.push(url);
     } else {
@@ -615,6 +618,10 @@ export default function Page({ params }) {
             // serverData={serverData}
             />
           )}
+
+          <div className="note text-sm flex items-center px-4 text-gray-400">
+            *Note: Episode boxes with <div className="rounded w-5 h-3 bg-sky-400 mx-2"></div> color are filler episodes!
+          </div>
         </div>
       </div>
     </div>

@@ -14,8 +14,8 @@ export default function ListDropDown({
   watchListData,
 }) {
   const handleOnClickList = async (id, listName, isAnimeInList) => {
-
-    if(isAnimeInList && listName === "Favourite"){
+    if(isAnimeInList){
+      console.log(listName);
       const result = await RemoveAnimeFromWatchList({
            watchListId: id,
            animeId: `${anime?.mal_id}`,
@@ -28,9 +28,10 @@ export default function ListDropDown({
           });
           setIsOpen(false);
         } else {
-          toast.error(result?.response?.message, { duration: 3000 , id: "2"});
+          toast.error(result?.response?.message || "Some Error Occured while Updating the List!", { duration: 3000 , id: "2"});
         }
     }
+    else{
     const result = await AddAnimeToWatchList({
       watchListId: id,
       animeId: `${anime?.mal_id}`,
@@ -57,6 +58,7 @@ export default function ListDropDown({
       toast.error(result?.response?.message, { duration: 3000, id: "2 " });
     }
     console.log(result?.response);
+  }
   };
 
   const removeFromAll = async () => {
@@ -64,7 +66,7 @@ export default function ListDropDown({
       // Filter the lists to exclude "Recent" and "Favourite"
       const listsToRemoveFrom = watchListData?.filter(
         (lst) =>
-          lst?.watchListName !== "Recent" && lst?.watchListName !== "Favourite"
+          lst?.watchListName !== "Recent"
       );
 
       console.log(anime);
@@ -72,7 +74,7 @@ export default function ListDropDown({
       const removalPromises = listsToRemoveFrom.map((list) => {
         return RemoveAnimeFromWatchList({
           watchListId: list?.id,
-          animeId: toString(anime?.mal_id),
+          animeId: `${anime?.mal_id}`,
         });
       });
 
