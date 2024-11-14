@@ -8,6 +8,11 @@ import Skeleton from "react-loading-skeleton";
 import { FaClosedCaptioning } from "react-icons/fa6";
 import { FaMicrophoneAlt } from "react-icons/fa";
 import Image from "next/image";
+import { IoStar } from "react-icons/io5";
+import { MdOutlineSportsScore } from "react-icons/md";
+import { PiVideoFill } from "react-icons/pi";
+import { IoMdTimer } from "react-icons/io";
+import { RxDotFilled } from "react-icons/rx";
 
 
 
@@ -51,7 +56,9 @@ export default function ProviderContainer({
 
   const searchParams = useSearchParams();
   const provider = searchParams.get("provider") || "zoro";
+  const n = searchParams.get("n") || 0;
   const pathname = usePathname();
+  const episodesPerWindow = 50;
 
 
   const {
@@ -76,8 +83,12 @@ export default function ProviderContainer({
   const serverV = searchParams.get('server');
   // const [server, setServer] = useState(searchParams.get('server'));
   // const [serverLoading, setServerLoading] = useState(false);
-  const [episodeRangeIndex, setEpisodeRangeIndex] = useState(0); //according to this index range of episodes in the eindow will be shown this will be changed through the dropdown of the select box, and the range is 50 by default and is static for now, you can change this range statically or can make this range dynamic as well.
+  const [episodeRangeIndex, setEpisodeRangeIndex] = useState(0); //according to this index range of episodes in the window will be shown , this will be changed through the dropdown of the select box, and the range is episodesPerWindow by default and is static for now, you can change this range statically or can make this range dynamic as well.
 
+
+  useEffect(()=>{
+    setEpisodeRangeIndex(n/episodesPerWindow);
+  }, [n]);
 
   // const memoizedDub = useMemo(() => dub, [dub]);
   console.log("This is server data",serverData);
@@ -90,7 +101,7 @@ export default function ProviderContainer({
       gogoSubId: gogoSubEpisodeId,
       gogoDubId: gogoDubEpisodeId,
     });
-  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], 50, setStreamingData); // 50ms delay
+  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], episodesPerWindow, setStreamingData); // 50ms delay
   
   
   const fetchStreamingData = async(ep)=>{
@@ -133,11 +144,56 @@ export default function ProviderContainer({
     return pathname + '?' + newParams.toString();
   }
   
-  // console.log("this is server:", server);
+  console.log("this is content  :", content);
 
   return (
     <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">
       <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10"/>
+      <div className="w-5/6 mx-auto justify-between flex mb-8 flex-row">
+        <div className="metadata flex gap-6">
+          <div className="img relative h-60 w-40">
+          <Image src={content?.images?.webp?.large_image_url} fill className=" h-full flex-shrink-0 w-full rounded"/>
+          </div>
+
+          <div className="contentContainer text-sm flex flex-col gap-3 my-auto">
+            <h2 className="title text-2xl tracking-wide font-semibold">{content?.title_english || content?.title}</h2>
+
+            <div className="additional-data justify-center md:justify-start flex gap-2 md:text-sm ">
+                  {content && (
+                    <>
+                      {content?.score && (
+                        <div className="score rounded flex items-center bg-sky-400 p- px-1 text-cbg-200 font-semibold">
+                          <MdOutlineSportsScore className="text-xl" />{" "}
+                          {content?.score?.toFixed(2)}
+                        </div>
+                      )}
+                      <div className="episodes flex gap-1 bg-primary-300 text-cbg-200 font-semibold rounded px-1 items-center">
+                        <PiVideoFill /> {content?.episodes || "?"}
+                      </div>
+                      <div className="flex gap-1 items-center bg-cbg-400 rounded px-1">
+                        <IoMdTimer />{" "}
+                        {content?.duration || content?.episode_duration || "?"}
+                      </div>
+                      <div className="type flex  items-center">
+                        <RxDotFilled /> {content?.type?.toUpperCase() || "?"}
+                      </div>
+                    </>
+                  )}
+                </div>
+            
+            <div className="genre-themes text-gray-400 ">
+              {content?.genres?.join(", ")} <br />
+              {content?.themes?.join(", ")} <br />
+            </div>
+
+            <div className="synopsis w-96 text-justify h-24 overflow-y-scroll scrollbar-track-transparent  md:scrollbar-thin pr-3 text-xs flex-wrap">
+              {content?.synopsis  || ""}
+            </div>
+          </div>
+        </div>
+
+
+
       <div className="provider-server-select self-center flex flex-col gap-8">
         <div className="button self-center flex gap-2 text-gray-200 ">
           <Link
@@ -247,6 +303,7 @@ export default function ProviderContainer({
                 }
         </div>
       </div>
+      </div>
 
       <div className="w-52">
         <select
@@ -254,11 +311,11 @@ export default function ProviderContainer({
           value={episodeRangeIndex}
           onChange={(e) => setEpisodeRangeIndex(parseInt(e.target.value))}
         >
-          {[...Array(Math.ceil(episodes?.length / 50))].map((e, i) => {
+          {[...Array(Math.ceil(episodes?.length / episodesPerWindow))].map((e, i) => {
             // console.log(i);
             return (
               <option key={i} value={i} className="p-2 m-2">
-                Eps {50 * i + 1} - {Math.min(episodes?.length, 50 * (i + 1))}
+                Eps {episodesPerWindow * i + 1} - {Math.min(episodes?.length, episodesPerWindow * (i + 1))}
               </option>
             );
           })}
@@ -268,8 +325,8 @@ export default function ProviderContainer({
       <div className="episode-list grid grid-cols-4 gap-2 m-3 max-h-screen overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
         {episodes
           ?.slice(
-            50 * episodeRangeIndex,
-            Math.min(episodes?.length, 50 * (episodeRangeIndex + 1))
+            episodesPerWindow * episodeRangeIndex,
+            Math.min(episodes?.length, episodesPerWindow * (episodeRangeIndex + 1))
           )
           ?.map((ep,i) => {
             return (
@@ -286,7 +343,7 @@ export default function ProviderContainer({
                   zoroEpisodeId === ep?.episodeId ||
                   gogoSubEpisodeId === ep?.gogoSubId ||
                   gogoDubEpisodeId === ep?.gogoDubId
-                    ? "text-primary-100 font-semibold bg-black/50"
+                    ? ep?.isFiller ? "text-sky-400 bg-black/60" : "text-primary-100 font-semibold bg-black/60" 
                     : "font-[350] bg-black/30"
                 }
                     ${ep?.isFiller ? "bg-sky-400" : ""} `}

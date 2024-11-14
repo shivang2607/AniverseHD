@@ -44,6 +44,7 @@ export async function GET(req, { params }) {
       themes,
       type,
       score,
+      episodes,
       aired,
       airing,
       synopsis,
@@ -116,6 +117,7 @@ export async function GET(req, { params }) {
       themes,
       type,
       score,
+      episodes,
       aired,
       airing,
       synopsis,
@@ -125,7 +127,7 @@ export async function GET(req, { params }) {
       main_picture,
       rating,
       start_year,
-    };
+    }; 
 
     // Caching logic handling
     if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to)) {
