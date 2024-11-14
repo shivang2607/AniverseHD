@@ -13,7 +13,24 @@ export default function ListDropDown({
   setIsOpen,
   watchListData,
 }) {
-  const handleOnClickList = async (id) => {
+  const handleOnClickList = async (id, listName, isAnimeInList) => {
+
+    if(isAnimeInList && listName === "Favourite"){
+      const result = await RemoveAnimeFromWatchList({
+           watchListId: id,
+           animeId: `${anime?.mal_id}`,
+         });
+         console.log(result);
+         if (result?.status === Constant_Var_success) {
+          toast.success("Watchlist Updated Successfully!!", {
+            id: "1",
+            duration: 3000,
+          });
+          setIsOpen(false);
+        } else {
+          toast.error(result?.response?.message, { duration: 3000 , id: "2"});
+        }
+    }
     const result = await AddAnimeToWatchList({
       watchListId: id,
       animeId: `${anime?.mal_id}`,
@@ -30,14 +47,14 @@ export default function ListDropDown({
       animeLength: anime?.episodes || anime?.episode || null,
     });
 
-    if (result?.status === "success") {
+    if (result?.status === Constant_Var_success) {
       toast.success("Watchlist Updated Successfully!!", {
         id: "1",
         duration: 3000,
       });
       setIsOpen(false);
     } else {
-      toast.error(result?.response?.message, { duration: 3000 });
+      toast.error(result?.response?.message, { duration: 3000, id: "2 " });
     }
     console.log(result?.response);
   };
@@ -46,9 +63,10 @@ export default function ListDropDown({
     try {
       // Filter the lists to exclude "Recent" and "Favourite"
       const listsToRemoveFrom = watchListData?.filter(
-        (lst) => lst?.watchListName !== "Recent" && lst?.watchListName !== "Favourite"
+        (lst) =>
+          lst?.watchListName !== "Recent" && lst?.watchListName !== "Favourite"
       );
-  
+
       console.log(anime);
       // Create an array of promises for removing the anime from each watchlist
       const removalPromises = listsToRemoveFrom.map((list) => {
@@ -57,43 +75,55 @@ export default function ListDropDown({
           animeId: toString(anime?.mal_id),
         });
       });
-  
+
       // Execute all promises concurrently
       const results = await Promise.all(removalPromises);
-  
+
       console.log(results);
       // Check if all removals were successful
       const allSuccessful = results.every((result) => {
-        result.status === Constant_Var_success;
-    }); 
-  
+        return result.status === Constant_Var_success;
+      });
+
       if (allSuccessful) {
-        toast.success("Anime successfully removed from all watchlists.", {
+        toast.success("Anime successfully removed from watchlists.", {
           id: "2",
           duration: 3000,
         });
-        console.log("Anime successfully removed from all watchlists.");
+        console.log("Anime successfully removed from watchlists.");
         setIsOpen(false);
       } else {
-        //! also show the reason for error, and on clicking favorite it should toggle the list.
-        toast.error("Some removals failed.", {
-          id: "2",
-          duration: 3000,
-        });
+        //! also show the reason for error,
+        const failedRemovals = results.filter(
+          (result) => result.status !== Constant_Var_success
+        );
+
+        // Extract error messages from the failed results
+        const errorMessages = failedRemovals.map(
+          (result) => result.error || "Unknown error"
+        );
+
+        // Show a toast with all error messages
+        toast.error(
+          `Some removals failed. Reasons: ${errorMessages.join(", ")}`,
+          {
+            id: "2",
+            duration: 3000, 
+          }
+        );
       }
     } catch (error) {
       console.log(error);
       toast.error("Watchlist could not be updated!", { duration: 3000 });
     }
   };
-  
 
   console.log(watchListData);
 
   return (
     <>
       {isOpen && (
-        <div className="absolute z-30 h-60 w-40 overflow-y-scroll md:scrollbar-thin bg-cbg-300 text-sm flex flex-col  rounded-lg py-2  mt-10  ">
+        <div className="absolute z-30 h-60 w-40 overflow-y-scroll md:scrollbar-thin md:scrollbar-track-transparent  bg-cbg-300 text-sm flex flex-col  rounded-lg py-2  mt-10  ">
           {watchListData
             ?.filter((lst) => lst?.watchListName !== "Recent")
             ?.map((list) => {
@@ -103,12 +133,15 @@ export default function ListDropDown({
               return (
                 <div
                   key={list?.id}
-                  className={`p-2 ${isAnimeInList ? "bg-primary-400/70 w-full text-sky-00" : "hover:bg-cbg-400"
-                    }  my-1 items-center px-2  cursor-pointer  flex justify-between gap-2 `}
+                  className={`p-2 ${
+                    isAnimeInList
+                      ? "bg-primary-400/70 w-full text-sky-00"
+                      : "hover:bg-cbg-400"
+                  }  my-1 items-center px-2  cursor-pointer  flex justify-between gap-2 `}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleOnClickList(list?.id);
+                    handleOnClickList(list?.id, list?.watchListName, isAnimeInList);
                   }}
                 >
                   <div>{list?.watchListName}</div>{" "}
