@@ -76,14 +76,11 @@ export const changePhotoUrlCached = ({ photoUrl }) => {
   setUserInfoCached(userData);
 };
 
-export const changeUserPlayOptionsCached = ({ autoPlay, autoNext, autoSkipIntro }) => {
+export const changeUserPlayOptionsCached = ({playerOptions}) => {
   let userData = getUserInfoCached();
   if (!userData) return;
 
-  // Update only the parameters that are provided (not undefined)
-  if (autoPlay !== undefined) userData.autoPlay = autoPlay;
-  if (autoNext !== undefined) userData.autoNext = autoNext;
-  if (autoSkipIntro !== undefined) userData.autoSkipIntro = autoSkipIntro;
+   userData.playerOptions=playerOptions;
 
   setUserInfoCached({ userData });
 };

@@ -14,7 +14,8 @@ import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import useUserStore from "./ZustandStores/userStore";
 import GetWatchListById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
-import UpdatePlayOptions from "@/app/firebase/Profile/UpdatePlayOptions";
+import UpdatePlayOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
+import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 
 const Navbar = () => {
   const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists,RecentWatchListId, loadLoggedInUserRecentWatchList} = useUserStore();
@@ -36,8 +37,12 @@ const Navbar = () => {
   const test = async () => {
   //  setIsUserLoggedIn(true);
       
-    // const res=await AddAnimeToWatchList({watchListId:"UnoQ0EQgGMi6jzvwRFqo",animeName:"jjj",animeId:"890",url:"jhj",episodeTimestamp:{}});
-    // console.log(res.response,res.status);
+    const res=await UpdatePlayerOptions({ 
+      autoPlay:false,
+      autoSkipIntro:false,
+      autoNext:true,
+    });
+    console.log(res.response,res.status);
   };
 
   const handleScroll = () => {

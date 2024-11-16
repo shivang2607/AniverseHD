@@ -1,3 +1,4 @@
+import useUserStore from "@/components/ZustandStores/userStore";
 import React, { useEffect, useState } from "react";
 
 const WatchListsTabs = ({
@@ -6,6 +7,8 @@ const WatchListsTabs = ({
   setSelectedWatchList,
   selectedWatchList,
 }) => {
+  const { isUserLoggedIn, loggedInUserId} =
+  useUserStore();
   return (
     <div className="flex flex-row w-full">
       <div className="watchlist-tabs flex flex-row w-[60%] overflow-x-auto no-scrollbar space-x-3 py-2">
@@ -36,6 +39,10 @@ const WatchListsTabs = ({
             {ele.watchListName}
           </div>
         ))}
+      </div>
+
+      <div>
+        
       </div>
     </div>
   );

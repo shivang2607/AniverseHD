@@ -30,28 +30,24 @@ import { changeUserNameCached, changeUserPlayOptionsCached } from "../utils/Cach
  * 
  * @throws {Error} If the user is not authenticated.
  */
-export default async function UpdatePlayOptions({ autoPlay=null,autoSkipIntro=null,autoNext=null }) {
+export default async function UpdatePlayerOptions(playerOptions) {
   try {
-
-    validateParams({ autoNext:autoNext,autoPlay:autoPlay,autoSkipIntro:autoSkipIntro });
+    validateParams(playerOptions);
     // Check if user cookies exist
     const userData = await getUserAuth();
     if (!userData) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
-    const updateData = {};
-    if (autoPlay !== null) updateData.autoPlay = autoPlay;
-    if (autoSkipIntro !== null) updateData.autoSkipIntro = autoSkipIntro;
-    if (autoNext !== null) updateData.autoNext = autoNext;
-
-    if (Object.keys(updateData).length > 0) {
-        await updateDoc(
+    
+    await updateDoc(
           doc(db, Constant_Var_firebase_collectionName_users, userData.details.uid),
-          updateData
-        );
-      }
+          {
+            playerOptions:playerOptions
+          }
+    );
+      
 
-    changeUserPlayOptionsCached(updateData);
+    changeUserPlayOptionsCached({playerOptions:playerOptions});
     
     return { status: Constant_Var_success, response: null };
   } catch (error) {
