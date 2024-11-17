@@ -47,7 +47,7 @@ export default function Page({ params }) {
   const gogoDubId = searchParams.get("g-dub-id") || null;
   const provider = searchParams.get("provider") || "zoro";
   const serverV = searchParams.get("server");
-  const dubV = searchParams.get("dub") || false;
+  const dubV = searchParams.get("dub") || "";
 
   const [content, setContent] = useState();
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
@@ -207,6 +207,26 @@ export default function Page({ params }) {
     }
   };
 
+ const updateDubVal = (serData)=>{
+    const subLength = serData?.sub?.length;
+    const dubLength = serData?.dub?.length;
+
+    if(dub==""){
+      if(subLength)return "";
+      return "-1";
+    }
+    else if(dub=="1"){
+      if(dubLength)return "1";
+      if(subLength)return "";
+      return "-1";
+    }
+    else if(dub=="-1"){
+      if(subLength)return "";
+      return "-1";
+    }
+    return "";
+  }
+
   useEffect(() => {
     (async () => {
       if (!provider) return;
@@ -218,19 +238,35 @@ export default function Page({ params }) {
         );
         if (cachedServerData) {
           // console.log("cached servers data : ", cachedServerData);
+          // if sub is not available then cahnge the default server and dub flag to the raw
+          const subLength = cachedServerData?.sub?.length;
+          console.log("subLength is ", subLength, "condition is ", (subLength && dub != "1"));
+          router.replace(updateParams([
+            {key: "dub", val: updateDubVal(cachedServerData)}
+          ]))
+          
+          
           setServerData(cachedServerData);
           console.log("serverV", serverV);
-          if (!serverV) setServer(cachedServerData?.sub[0]?.serverName);
+          if (!serverV) setServer(cachedServerData?.sub?.[0]?.serverName || cachedServerData?.raw?.[0]?.serverName);
           // return;
         } else {
           const serverData = await axios.get(
             `/api/v1/${provider}/servers/${zoroEpisodeId}`
           );
 
+          // if sub is not available then cahnge the default server and dub flag to the raw
+          const subLength = serverData?.data?.data?.sub?.length;
+          console.log("subLength is ", subLength, "condition is ", (subLength && dub === "1"));
+          router.replace(updateParams([
+            {key: "dub", val:  updateDubVal(serverData?.data?.data)}
+          ]))
+
+
           console.log("servers data : ", serverData?.data?.data);
           setServerData(serverData?.data?.data);
-          setServer(serverData?.data?.data?.sub[0]?.serverName);
-          console.log("server", serverData?.data?.data?.sub[0]?.serverName);
+          setServer(serverData?.data?.data?.sub?.[0]?.serverName || serverData?.data?.data?.raw?.[0]?.serverName);
+          console.log("server", serverData?.data?.data?.sub?.[0]?.serverName);
           setSessionWithExpiry(
             `serverData-${provider}-${zoroEpisodeId}`,
             serverData?.data?.data,
