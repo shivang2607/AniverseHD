@@ -38,7 +38,9 @@ import {
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import Image from "next/image";
-
+import useUserStore from "@/components/ZustandStores/userStore";
+import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
+import handleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -53,8 +55,6 @@ export default function Page({ params }) {
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
   const [animeNotAvailable, setAnimeNotAvailable] = useState(false);
-
-  
 
   const {
     episodesData,
@@ -79,9 +79,12 @@ export default function Page({ params }) {
     // isAutoSkip, setIsAutoSkip,
   } = useStreamStore();
 
+  const { loggedInUserData, isUserLoggedIn } = useUserStore();
+
   const router = useRouter();
   const pathname = usePathname();
   const player = useRef(null);
+  const debounceMediaPlayerUpdate = handleUpdateMediaPlayerOptions();
 
   const [showSkipButton, setShowSkipButton] = useState("");
   const [mediaPlayerState, setMediaPlayerState] = useState({
@@ -90,6 +93,35 @@ export default function Page({ params }) {
     isAutoNext: true,
   });
   // const [isAutoSkip, setIsAutoSkip] = useState(true);
+
+  useEffect(()=>{
+
+    const cachedPlayerOptions = JSON.parse(localStorage.getItem("player_options"));
+    if(cachedPlayerOptions){
+      setMediaPlayerState(cachedPlayerOptions);
+    }
+
+    return (()=>{
+
+    })
+  }, []);
+
+  useEffect(() => {
+    console.log("this is logged in user data", loggedInUserData);
+    const mediaPlayerOptions = loggedInUserData?.playerOptions;
+
+    if (mediaPlayerOptions) {
+      setMediaPlayerState({
+        isAutoNext: mediaPlayerOptions?.autoNext,
+        isAutoPlay: mediaPlayerOptions?.autoPlay,
+        isAutoSkip: mediaPlayerOptions?.autoSkipIntro,
+      });
+      return;
+    }
+    
+    
+
+  }, [loggedInUserData]);
 
   useEffect(() => {
     if (!provider) {
@@ -199,7 +231,7 @@ export default function Page({ params }) {
         { key: "z-id", val: ep?.episodeId },
         { key: "g-sub-id", val: ep?.gogoSubId },
         { key: "g-dub-id", val: ep?.gogoDubId },
-        { key: "n", val: currentIndex + 1},
+        { key: "n", val: currentIndex + 1 },
       ]);
       router.push(url);
     } else {
@@ -207,25 +239,23 @@ export default function Page({ params }) {
     }
   };
 
- const updateDubVal = (serData)=>{
+  const updateDubVal = (serData) => {
     const subLength = serData?.sub?.length;
     const dubLength = serData?.dub?.length;
 
-    if(dub==""){
-      if(subLength)return "";
+    if (dub == "") {
+      if (subLength) return "";
       return "-1";
-    }
-    else if(dub=="1"){
-      if(dubLength)return "1";
-      if(subLength)return "";
+    } else if (dub == "1") {
+      if (dubLength) return "1";
+      if (subLength) return "";
       return "-1";
-    }
-    else if(dub=="-1"){
-      if(subLength)return "";
+    } else if (dub == "-1") {
+      if (subLength) return "";
       return "-1";
     }
     return "";
-  }
+  };
 
   useEffect(() => {
     (async () => {
@@ -240,15 +270,23 @@ export default function Page({ params }) {
           // console.log("cached servers data : ", cachedServerData);
           // if sub is not available then cahnge the default server and dub flag to the raw
           const subLength = cachedServerData?.sub?.length;
-          console.log("subLength is ", subLength, "condition is ", (subLength && dub != "1"));
-          router.replace(updateParams([
-            {key: "dub", val: updateDubVal(cachedServerData)}
-          ]))
-          
-          
+          console.log(
+            "subLength is ",
+            subLength,
+            "condition is ",
+            subLength && dub != "1"
+          );
+          router.replace(
+            updateParams([{ key: "dub", val: updateDubVal(cachedServerData) }])
+          );
+
           setServerData(cachedServerData);
           console.log("serverV", serverV);
-          if (!serverV) setServer(cachedServerData?.sub?.[0]?.serverName || cachedServerData?.raw?.[0]?.serverName);
+          if (!serverV)
+            setServer(
+              cachedServerData?.sub?.[0]?.serverName ||
+                cachedServerData?.raw?.[0]?.serverName
+            );
           // return;
         } else {
           const serverData = await axios.get(
@@ -257,15 +295,24 @@ export default function Page({ params }) {
 
           // if sub is not available then cahnge the default server and dub flag to the raw
           const subLength = serverData?.data?.data?.sub?.length;
-          console.log("subLength is ", subLength, "condition is ", (subLength && dub === "1"));
-          router.replace(updateParams([
-            {key: "dub", val:  updateDubVal(serverData?.data?.data)}
-          ]))
-
+          console.log(
+            "subLength is ",
+            subLength,
+            "condition is ",
+            subLength && dub === "1"
+          );
+          router.replace(
+            updateParams([
+              { key: "dub", val: updateDubVal(serverData?.data?.data) },
+            ])
+          );
 
           console.log("servers data : ", serverData?.data?.data);
           setServerData(serverData?.data?.data);
-          setServer(serverData?.data?.data?.sub?.[0]?.serverName || serverData?.data?.data?.raw?.[0]?.serverName);
+          setServer(
+            serverData?.data?.data?.sub?.[0]?.serverName ||
+              serverData?.data?.data?.raw?.[0]?.serverName
+          );
           console.log("server", serverData?.data?.data?.sub?.[0]?.serverName);
           setSessionWithExpiry(
             `serverData-${provider}-${zoroEpisodeId}`,
@@ -316,17 +363,18 @@ export default function Page({ params }) {
     };
   }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
 
-  // const getVol = ()=>{
-  //   return JSON.parse(localStorage.getItem('player-vol')) || 1;
-  // }
+   const updatePlayerOptions = (newOpt)=>{
+    localStorage.setItem("player_options", JSON.stringify(newOpt));
+    if(isUserLoggedIn) 
+      debounceMediaPlayerUpdate(newOpt);
+    else{
+      toast.success("Changes saved!");
+    }
+    setMediaPlayerState(newOpt);
 
-  // const handleVolumeChange = (v)=>{
-  //   localStorage.setItem('player-vol', JSON.stringify(v.volume));
-  // }
+   }
 
-  console.log("main page steraming data", streamingData);
-
-  console.log(episodesData);
+  // console.log(episodesData);
 
   const mergeProviderData = (zoro, gogoDub, gogoSub) => {
     const gds = gogoDub?.episodes?.length; //gogo dub size
@@ -441,7 +489,7 @@ export default function Page({ params }) {
               <div className="stream block bg-black h-[85vh] w-full rounded my-4">
                 <MediaPlayer
                   load="eager"
-                  autoPlay = {mediaPlayerState?.isAutoPlay ? true : false}
+                  autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
                   ref={player}
                   // volume={getVol()}
                   // onVolumeChange={(v, e)=>{
@@ -471,7 +519,9 @@ export default function Page({ params }) {
                   onError={(e) =>
                     toast.error(`${e.message}, Try Another Server.`)
                   }
-                  onEnded={() => mediaPlayerState?.isAutoNext && getNextEpisode()} //only fetch next episode if the auto next state is set to true.
+                  onEnded={() =>
+                    mediaPlayerState?.isAutoNext && getNextEpisode()
+                  } //only fetch next episode if the auto next state is set to true.
                   onTimeUpdate={(v, event) => {
                     if (!streamingData?.intro) return;
                     const player = event.target;
@@ -602,10 +652,10 @@ export default function Page({ params }) {
                       : "font-[300]"
                   } `}
                   onClick={() =>
-                    setMediaPlayerState((prev) => ({
-                      ...prev,
-                      isAutoSkip: !(prev?.isAutoSkip),
-                    }))
+                    updatePlayerOptions({
+                      ...mediaPlayerState,
+                      isAutoSkip: !(mediaPlayerState?.isAutoSkip),
+                    })
                   }
                 >
                   Auto Skip Intro ({mediaPlayerState?.isAutoSkip ? "on" : "off"}
@@ -615,48 +665,44 @@ export default function Page({ params }) {
 
               <button
                 className={`mx-1 ${
-                  mediaPlayerState?.isAutoNext ? "text-sky-400 font-semibold" : "font-[300]"
+                  mediaPlayerState?.isAutoNext
+                    ? "text-sky-400 font-semibold"
+                    : "font-[300]"
                 } `}
-                onClick={() => setMediaPlayerState((prev) => ({
-                  ...prev,
-                  isAutoNext: !(prev?.isAutoNext),
-                }))}
+                onClick={() =>
+                  updatePlayerOptions({
+                    ...mediaPlayerState,
+                    isAutoNext: !(mediaPlayerState?.isAutoNext),
+                  })
+                }
               >
                 Auto Next ({mediaPlayerState?.isAutoNext ? "on" : "off"})
               </button>
 
-
               <button
                 className={`mx-1 ${
-                  mediaPlayerState?.isAutoPlay ? "text-sky-400 font-semibold" : "font-[300]"
+                  mediaPlayerState?.isAutoPlay
+                    ? "text-sky-400 font-semibold"
+                    : "font-[300]"
                 } `}
-                onClick={() => setMediaPlayerState((prev) => ({
-                  ...prev,
-                  isAutoPlay: !(prev?.isAutoPlay),
-                }))}
+                onClick={() =>
+                  updatePlayerOptions({
+                    ...mediaPlayerState,
+                    isAutoPlay: !(mediaPlayerState?.isAutoPlay),
+                  })
+                }
               >
                 Auto Play ({mediaPlayerState?.isAutoPlay ? "on" : "off"})
               </button>
             </div>
           </div>
 
-          {episodesData && (
-            <ProviderContainer
-              content = {content}
-            // episodes={episodesData}
-            // selectedEpisodeId={selectedEpisodeId}
-            // setSelectedEpisodeId={setSelectedEpisodeId}
-            // provider={selectedProvider}
-            // setProvider = {setSelectedProvider}
-            // // prov = {provider}
-            // dub = {dub}
-            // server = {server}
-            // serverData={serverData}
-            />
-          )}
+          {episodesData && <ProviderContainer content={content} />}
 
           <div className="note text-sm flex items-center px-4 text-gray-400">
-            *Note: Episode boxes with <div className="rounded w-5 h-3 bg-sky-400 mx-2"></div> color are filler episodes!
+            *Note: Episode boxes with{" "}
+            <div className="rounded w-5 h-3 bg-sky-400 mx-2"></div> color are
+            filler episodes!
           </div>
         </div>
       </div>
