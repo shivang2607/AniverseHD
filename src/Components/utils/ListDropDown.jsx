@@ -14,6 +14,7 @@ export default function ListDropDown({
   watchListData,
 }) {
   const handleOnClickList = async (id, listName, isAnimeInList) => {
+    // console.log("list has been clicked",listName, isAnimeInList, anime);
     if(isAnimeInList){
       console.log(listName);
       const result = await RemoveAnimeFromWatchList({
@@ -32,6 +33,7 @@ export default function ListDropDown({
         }
     }
     else{
+      // console.log("these are images",anime?.images);
     const result = await AddAnimeToWatchList({
       watchListId: id,
       animeId: `${anime?.mal_id}`,

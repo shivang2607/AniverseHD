@@ -24,7 +24,7 @@ export default function MainCard({ anime }) {
     }
     toast.error(result?.response?.message, { duration: 3000 });
   };
-  // console.log(anime);
+  // console.log("this is an anime ",anime);
   return (
     <div className="image-container  my-1 w-full  h-fit pb-3 rounded-md  flex flex-col  hover:shadow-m overflow-hidden">
       <Link
