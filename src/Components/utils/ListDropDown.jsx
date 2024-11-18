@@ -38,7 +38,7 @@ export default function ListDropDown({
       watchListId: id,
       animeId: `${anime?.mal_id}`,
       animeName: anime?.title_english || anime?.title,
-      animePhoto: anime?.images || {},
+      animePhoto: anime?.main_picture || anime?.images || {},
       animeGenre: anime?.genres || [],
       animeType: anime?.type || "NA",
       animeScore: anime?.score || "NA",
