@@ -89,7 +89,7 @@ export default function ListDropDown({
 
       if (allSuccessful) {
         toast.success("Anime successfully removed from watchlists.", {
-          id: "2",
+          id: "1",
           duration: 3000,
         });
         console.log("Anime successfully removed from watchlists.");

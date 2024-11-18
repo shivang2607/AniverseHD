@@ -41,6 +41,7 @@ import Image from "next/image";
 import useUserStore from "@/components/ZustandStores/userStore";
 import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import handleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
+import Suggested from "@/app/anime/[id]/Suggested";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -55,6 +56,7 @@ export default function Page({ params }) {
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
   const [animeNotAvailable, setAnimeNotAvailable] = useState(false);
+
 
   const {
     episodesData,
@@ -76,6 +78,7 @@ export default function Page({ params }) {
     dub,
     setDub,
     setServerLoading,
+    recentTimestamp, setRecentTimestamp
     // isAutoSkip, setIsAutoSkip,
   } = useStreamStore();
 
@@ -102,7 +105,8 @@ export default function Page({ params }) {
     }
 
     return (()=>{
-
+      console.log("recent timestamp", recentTimestamp);
+      localStorage.setItem('recent-timestamp', `${recentTimestamp}`);
     })
   }, []);
 
@@ -154,21 +158,21 @@ export default function Page({ params }) {
           cachedData?.gogoDub,
           cachedData?.gogoSub
         );
-
+        
         if (!zoroId && !gogoSubId && !gogoDubId) {
           setZoroEpisodeId(cachedData?.zoro?.episodes?.[0]?.episodeId);
           setGogoSubEpisodeId(cachedData?.gogoSub?.episodes?.[0]?.id);
           setGogoDubEpisodeId(cachedData?.gogoDub?.episodes?.[0]?.id);
         }
         // console.log(cachedData);
-
+        
         return;
       }
       // console.log(params?.id)
       try {
         const response = await axios.get(`/api/v1/watch/${params?.id}`);
         const data = response?.data;
-
+        
         // Check if the data object has an 'error' key
         if (data?.error) {
           console.error(`Error in response data: ${data.error}`);
@@ -176,14 +180,14 @@ export default function Page({ params }) {
           // Optionally, you could set some error state here or throw an error to handle it elsewhere
           return;
         }
-
+        
         console.log(`data for /watch/${params?.id}`, data);
         setContent(data);
         console.log("This is content data", response, data);
-
+        
         // Set session with 30-minute expiry
         setSessionWithExpiry(`watch-${params.id}`, data, 1000 * 60 * 30);
-
+        
         // Merge provider data only if keys are available in data
         mergeProviderData(data?.zoro, data?.gogoDub, data?.gogoSub);
         if (!zoroId && !gogoSubId && !gogoDubId) {
@@ -203,60 +207,11 @@ export default function Page({ params }) {
         return;
         // Optionally, update state to reflect error or notify the user
       }
-
+      
       // console.log(data?.data);
     })();
   }, [params]);
-
-  const updateParams = (paramsList) => {
-    const newParams = new URLSearchParams(searchParams);
-    paramsList.forEach((par) => {
-      newParams.set(par.key, par.val);
-    });
-
-    return pathname + "?" + newParams.toString();
-  };
-
-  const getNextEpisode = () => {
-    const currentIndex = episodesData?.findIndex(
-      (ep) =>
-        ep?.episodeId === zoroEpisodeId ||
-        ep?.gogoDubId === gogoDubEpisodeId ||
-        ep?.gogoSubId === gogoSubEpisodeId
-    );
-
-    if (currentIndex !== -1 && currentIndex < episodesData.length - 1) {
-      const ep = episodesData[currentIndex + 1]; // Return the next episode's ID
-      const url = updateParams([
-        { key: "z-id", val: ep?.episodeId },
-        { key: "g-sub-id", val: ep?.gogoSubId },
-        { key: "g-dub-id", val: ep?.gogoDubId },
-        { key: "n", val: currentIndex + 1 },
-      ]);
-      router.push(url);
-    } else {
-      return null; // No more episodes available
-    }
-  };
-
-  const updateDubVal = (serData) => {
-    const subLength = serData?.sub?.length;
-    const dubLength = serData?.dub?.length;
-
-    if (dub == "") {
-      if (subLength) return "";
-      return "-1";
-    } else if (dub == "1") {
-      if (dubLength) return "1";
-      if (subLength) return "";
-      return "-1";
-    } else if (dub == "-1") {
-      if (subLength) return "";
-      return "-1";
-    }
-    return "";
-  };
-
+  
   useEffect(() => {
     (async () => {
       if (!provider) return;
@@ -363,19 +318,53 @@ export default function Page({ params }) {
     };
   }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
 
-   const updatePlayerOptions = (newOpt)=>{
+
+  const updateParams = (paramsList) => {
+    const newParams = new URLSearchParams(searchParams);
+    paramsList.forEach((par) => {
+      newParams.set(par.key, par.val);
+    });
+
+    return pathname + "?" + newParams.toString();
+  };
+
+  const getNextEpisode = () => {
+    const currentIndex = episodesData?.findIndex(
+      (ep) =>
+        ep?.episodeId === zoroEpisodeId ||
+        ep?.gogoDubId === gogoDubEpisodeId ||
+        ep?.gogoSubId === gogoSubEpisodeId
+    );
+
+    if (currentIndex !== -1 && currentIndex < episodesData.length - 1) {
+      const ep = episodesData[currentIndex + 1]; // Return the next episode's ID
+      const url = updateParams([
+        { key: "z-id", val: ep?.episodeId },
+        { key: "g-sub-id", val: ep?.gogoSubId },
+        { key: "g-dub-id", val: ep?.gogoDubId },
+        { key: "n", val: currentIndex + 1 },
+      ]);
+      router.push(url);
+    } else {
+      return null; // No more episodes available
+    }
+  };
+
+  
+  
+  const updatePlayerOptions = (newOpt)=>{
     localStorage.setItem("player_options", JSON.stringify(newOpt));
+    setMediaPlayerState(newOpt);
     if(isUserLoggedIn) 
       debounceMediaPlayerUpdate(newOpt);
     else{
       toast.success("Changes saved!");
     }
-    setMediaPlayerState(newOpt);
-
-   }
-
+    
+  }
+  
   // console.log(episodesData);
-
+  
   const mergeProviderData = (zoro, gogoDub, gogoSub) => {
     const gds = gogoDub?.episodes?.length; //gogo dub size
     const gss = gogoSub?.episodes?.length; //gogo sub size
@@ -400,14 +389,14 @@ export default function Page({ params }) {
       // console.log("this is merged data with zoro", newMergedData);
     } else setEpisodesData(null);
   };
-
+  
   const handleSkipIntro = () => {
     if (player) {
       const skipToTime =
-        showSkipButton === "intro"
-          ? streamingData?.intro?.end
-          : streamingData?.outro?.end;
-
+      showSkipButton === "intro"
+      ? streamingData?.intro?.end
+      : streamingData?.outro?.end;
+      
       if (typeof skipToTime === "number") {
         console.log("Current time before skip:", player.currentTime); // Should now work correctly
         player.currentTime = skipToTime; // Skip to the end of the intro or outro
@@ -415,16 +404,16 @@ export default function Page({ params }) {
       } else {
         console.error("Invalid time value for skipping.");
       }
-
+      
       setShowSkipButton(""); // Hide the button after skipping
     } else {
       console.error("Player not found!");
     }
   };
-
+  
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
-
+    
     if (result.status === Constant_Var_success) {
       setWatchListData(result?.response);
       setIsWatchListOpen((prev) => !prev);
@@ -435,13 +424,32 @@ export default function Page({ params }) {
       const signInResp = await SignInGooglePopUp((status) => {
         console.log("login status:", status);
       });
-
+      
       if (signInResp.status === Constant_Var_success) return;
       else toast.error(signInResp?.response?.message, { duration: 3000 });
     }
     toast.error(result?.response?.message, { duration: 3000 });
   };
 
+
+  const updateDubVal = (serData) => {
+    const subLength = serData?.sub?.length;
+    const dubLength = serData?.dub?.length;
+
+    if (dub == "") {
+      if (subLength) return "";
+      return "-1";
+    } else if (dub == "1") {
+      if (dubLength) return "1";
+      if (subLength) return "";
+      return "-1";
+    } else if (dub == "-1") {
+      if (subLength) return "";
+      return "-1";
+    }
+    return "";
+  };
+  
   return (
     <div className="py-16">
       <div className="content py-2 px-4 flex flex-col gap-4">
@@ -526,12 +534,20 @@ export default function Page({ params }) {
                     if (!streamingData?.intro) return;
                     const player = event.target;
                     const currentTime = player?.currentTime;
+                    
+                    const t = currentTime;
+                    if((Math.floor(t) % 5 == 0) && (Math.floor(t) > recentTimestamp)){    //save timestamp after every 5 seconds
+                      console.log(recentTimestamp);
+                      setRecentTimestamp(currentTime);
+                    }
+
                     // console.log(currentTime, v);
                     // Define the intro and outro timestamps
                     const introStart = streamingData?.intro?.start;
                     const introEnd = streamingData?.intro?.end;
                     const outroStart = streamingData?.outro?.start;
                     const outroEnd = streamingData?.outro?.end;
+
 
                     if (!mediaPlayerState?.isAutoSkip) {
                       if (currentTime < introEnd && currentTime > introStart) {
@@ -632,16 +648,17 @@ export default function Page({ params }) {
                     />
                   )}
                 </div>
-                <Toaster
+                {/* <Toaster
                   toastOptions={{
                     style: {
                       borderRadius: "10px",
                       background: "#b6d7d4",
                       border: "1px solid ",
                       color: "#041C32",
+              
                     },
                   }}
-                />
+                /> */}
               </button>
 
               {provider === "zoro" && (
@@ -697,14 +714,16 @@ export default function Page({ params }) {
             </div>
           </div>
 
-          {episodesData && <ProviderContainer content={content} />}
+          {episodesData && <ProviderContainer content={content} id={params?.id}/>}
 
           <div className="note text-sm flex items-center px-4 text-gray-400">
             *Note: Episode boxes with{" "}
             <div className="rounded w-5 h-3 bg-sky-400 mx-2"></div> color are
             filler episodes!
           </div>
+
         </div>
+          {params?.id && <Suggested id={params?.id}/>}
       </div>
     </div>
   );

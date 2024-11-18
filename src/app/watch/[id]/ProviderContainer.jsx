@@ -43,7 +43,7 @@ const useDebouncedEffect = (callback, dependencies, delay, setStreamingData) => 
 
 
 export default function ProviderContainer({
-  content
+  content, id
   // episodes,
   // serverData,
   // // prov = "gogo",
@@ -64,6 +64,7 @@ export default function ProviderContainer({
 
   const {
     episodes,
+    setEpisodesData,
   serverData,
   // prov = "gogo",
   setSelectedProvider,
@@ -89,12 +90,21 @@ export default function ProviderContainer({
 
 
   useEffect(()=>{
+    return () => {
+      console.log("useEffect cleanup triggered");
+      setEpisodesData([]);
+      setStreamingData([]);
+    };
+  }, []);
+
+
+  useEffect(()=>{
     // console.log(Math.floor(n/episodesPerWindow));
     setEpisodeRangeIndex(Math.floor(n/episodesPerWindow));
   }, [n]);
 
   // const memoizedDub = useMemo(() => dub, [dub]);
-  console.log("This is server data",serverData);
+  // console.log("This is server data",serverData);
 
   useDebouncedEffect(() => {
     if (!zoroEpisodeId && !gogoDubEpisodeId && !gogoSubEpisodeId) return;
@@ -152,16 +162,20 @@ export default function ProviderContainer({
     return pathname + '?' + newParams.toString();
   }
   
-  console.log("this is content  :", content);
+  // console.log("this is content  :", content);
 
   return (
     <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">
        <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10" />
       <div className="w-[90%] mx-auto justify-between flex mb-8 flex-row">
         <div className="metadata flex gap-6 items-center mx-2">
+          <div className="flex flex-col gap-2 justify-center">
           <div className="img relative h-60 w-40 flex my-auto">
           {content?.images &&<Image src={content?.images?.webp?.large_image_url} fill className=" h-full flex-shrink-0 w-full rounded" alt={content?.title_english || content?.title}/>}
           </div>
+          { id &&  <Link href={`/anime/${id}`} className="px-1 w-fit text-sm  bg-gray-200 text-gray-800 rounded-full">View Details</Link>}
+          </div>
+          
 
           <div className="contentContainer text-sm flex flex-col gap-3 my-auto">
             <h2 className="title text-2xl tracking-wide max-w-96 flex-wrap font-semibold">{content?.title_english || content?.title}</h2>
