@@ -62,7 +62,11 @@ export default function Page({ params }) {
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
   const [animeNotAvailable, setAnimeNotAvailable] = useState(false);
-
+  
+  const router = useRouter();
+  const pathname = usePathname();
+  const player = useRef(null);
+  const debounceMediaPlayerUpdate = handleUpdateMediaPlayerOptions();
 
   const {
     episodesData,
@@ -89,10 +93,6 @@ export default function Page({ params }) {
 
   const { loggedInUserData, isUserLoggedIn, RecentWatchListId, loadLoggedInUserRecentWatchList } = useUserStore();
 
-  const router = useRouter();
-  const pathname = usePathname();
-  const player = useRef(null);
-  const debounceMediaPlayerUpdate = handleUpdateMediaPlayerOptions();
 
   const [showSkipButton, setShowSkipButton] = useState("");
   const [mediaPlayerState, setMediaPlayerState] = useState({
@@ -106,56 +106,56 @@ export default function Page({ params }) {
   const contentRef = useRef(content);
   // const [isAutoSkip, setIsAutoSkip] = useState(true);
 
-  
-  useEffect(()=>{
-    
+
+  useEffect(() => {
+
     const cachedPlayerOptions = JSON.parse(localStorage.getItem("player_options"));
-    if(cachedPlayerOptions){
+    if (cachedPlayerOptions) {
       setMediaPlayerState(cachedPlayerOptions);
     }
-    
-    
-    
-    return (()=>{
 
-      const f = async ()=>{
-        
+
+
+    return (() => {
+
+      const f = async () => {
+
         const content = contentRef.current;
         const result = await AddAnimeToWatchList({
-        watchListId: RecentWatchListId,
-        url: currentAbsoluteURL.current,
-        episodeTimestamp: recentTimestampRef.current,
-        animeId: `${params?.id}`,
-        animeName: content?.title_english || content?.title,
-        animePhoto: content?.main_picture || content?.images || {},
-        animeGenre: content?.genres || [],
-        animeType: content?.type || "NA",
-        animeScore: content?.score || "NA",
-        animeAgeRating: content?.rating || "NA",
-        animeStartYear:
-          Math.floor(
-            content?.aired?.prop?.from?.year || content?.start_year || content?.year
-          ) || "NA",
-        animeLength: content?.episodes || content?.episode || null,
-      });
-      // if (result?.status === Constant_Var_success) {
-      //   toast.success("Watchlist Updated Successfully!!", {
-      //     id: "1",
-      //     duration: 3000,
-      //   });
-      //   setIsOpen(false);
-      // } else {
-      //   toast.error(result?.response?.message, { duration: 3000, id: "2 " });
-      // }
+          watchListId: RecentWatchListId,
+          url: currentAbsoluteURL.current,
+          episodeTimestamp: recentTimestampRef.current,
+          animeId: `${params?.id}`,
+          animeName: content?.title_english || content?.title,
+          animePhoto: content?.main_picture || content?.images || {},
+          animeGenre: content?.genres || [],
+          animeType: content?.type || "NA",
+          animeScore: content?.score || "NA",
+          animeAgeRating: content?.rating || "NA",
+          animeStartYear:
+            Math.floor(
+              content?.aired?.prop?.from?.year || content?.start_year || content?.year
+            ) || "NA",
+          animeLength: content?.episodes || content?.episode || null,
+        });
+        // if (result?.status === Constant_Var_success) {
+        //   toast.success("Watchlist Updated Successfully!!", {
+        //     id: "1",
+        //     duration: 3000,
+        //   });
+        //   setIsOpen(false);
+        // } else {
+        //   toast.error(result?.response?.message, { duration: 3000, id: "2 " });
+        // }
 
 
-      loadLoggedInUserRecentWatchList();
-    }
-    if(isUserLoggedIn) f();
+        loadLoggedInUserRecentWatchList();
+      }
+      if (isUserLoggedIn) f();
     })
-  
+
   }, []);
-  
+
   useEffect(() => {
     recentTimestampRef.current = recentTimestamp;
   }, [recentTimestamp]);
@@ -164,7 +164,7 @@ export default function Page({ params }) {
     currentAbsoluteURL.current = (getAbsoluteURLPath(pathname, searchParams));
   }, [searchParams, pathname]);
 
-  useEffect(()=>{
+  useEffect(() => {
     contentRef.current = content;
   }, [content]);
 
@@ -180,8 +180,8 @@ export default function Page({ params }) {
       });
       return;
     }
-    
-    
+
+
 
   }, [loggedInUserData]);
 
@@ -196,13 +196,13 @@ export default function Page({ params }) {
     setGogoDubEpisodeId(gogoDubId);
     setSelectedProvider(provider);
     setGogoSubEpisodeId(gogoSubId);
-    setDub(dubV); 
+    setDub(dubV);
     setRecentTimestamp(0);
-    
-    
+
+
     // console.log("Hello world!!",provider, episodeId, selectedEpisodeId);
 
-    return () => {};
+    return () => { };
   }, [provider, zoroId, gogoSubId, gogoDubId, serverV, dubV]);
 
   useEffect(() => {
@@ -220,21 +220,21 @@ export default function Page({ params }) {
           cachedData?.gogoDub,
           cachedData?.gogoSub
         );
-        
+
         if (!zoroId && !gogoSubId && !gogoDubId) {
           setZoroEpisodeId(cachedData?.zoro?.episodes?.[0]?.episodeId);
           setGogoSubEpisodeId(cachedData?.gogoSub?.episodes?.[0]?.id);
           setGogoDubEpisodeId(cachedData?.gogoDub?.episodes?.[0]?.id);
         }
         // console.log(cachedData);
-        
+
         return;
       }
       // console.log(params?.id)
       try {
         const response = await axios.get(`/api/v1/watch/${params?.id}`);
         const data = response?.data;
-        
+
         // Check if the data object has an 'error' key
         if (data?.error) {
           console.error(`Error in response data: ${data.error}`);
@@ -242,14 +242,14 @@ export default function Page({ params }) {
           // Optionally, you could set some error state here or throw an error to handle it elsewhere
           return;
         }
-        
+
         console.log(`data for /watch/${params?.id}`, data);
         setContent(data);
         // console.log("This is content data", response, data);
-        
+
         // Set session with 30-minute expiry
         setSessionWithExpiry(`watch-${params.id}`, data, 1000 * 60 * 30);
-        
+
         // Merge provider data only if keys are available in data
         mergeProviderData(data?.zoro, data?.gogoDub, data?.gogoSub);
         if (!zoroId && !gogoSubId && !gogoDubId) {
@@ -268,11 +268,11 @@ export default function Page({ params }) {
         return;
         // Optionally, update state to reflect error or notify the user
       }
-      
+
       // console.log(data?.data);
     })();
   }, [params]);
-  
+
   useEffect(() => {
     (async () => {
       if (!provider) return;
@@ -299,7 +299,7 @@ export default function Page({ params }) {
           if (!serverV)
             setServer(
               cachedServerData?.sub?.[0]?.serverName ||
-                cachedServerData?.raw?.[0]?.serverName
+              cachedServerData?.raw?.[0]?.serverName
             );
           // return;
         } else {
@@ -309,7 +309,7 @@ export default function Page({ params }) {
 
           // if sub is not available then cahnge the default server and dub flag to the raw
           const subLength = serverData?.data?.data?.sub?.length;
-         
+
           router.replace(
             updateParams([
               { key: "dub", val: updateDubVal(serverData?.data?.data) },
@@ -319,7 +319,7 @@ export default function Page({ params }) {
           setServerData(serverData?.data?.data);
           setServer(
             serverData?.data?.data?.sub?.[0]?.serverName ||
-              serverData?.data?.data?.raw?.[0]?.serverName
+            serverData?.data?.data?.raw?.[0]?.serverName
           );
           console.log("server", serverData?.data?.data?.sub?.[0]?.serverName);
           setSessionWithExpiry(
@@ -372,9 +372,9 @@ export default function Page({ params }) {
   }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
 
 
-  const updateParams = (paramsList, resetT=true) => {
+  const updateParams = (paramsList, resetT = true) => {
     const newParams = new URLSearchParams(searchParams);
-    if(resetT) newParams.delete("t");
+    if (resetT) newParams.delete("t");
     paramsList.forEach((par) => {
       newParams.set(par.key, par.val);
     });
@@ -404,21 +404,21 @@ export default function Page({ params }) {
     }
   };
 
-  
-  
-  const updatePlayerOptions = (newOpt)=>{
+
+
+  const updatePlayerOptions = (newOpt) => {
     localStorage.setItem("player_options", JSON.stringify(newOpt));
     setMediaPlayerState(newOpt);
-    if(isUserLoggedIn) 
+    if (isUserLoggedIn)
       debounceMediaPlayerUpdate(newOpt);
-    else{
+    else {
       toast.success("Changes saved!");
     }
-    
+
   }
-  
+
   // console.log(episodesData);
-  
+
   const mergeProviderData = (zoro, gogoDub, gogoSub) => {
     const gds = gogoDub?.episodes?.length; //gogo dub size
     const gss = gogoSub?.episodes?.length; //gogo sub size
@@ -443,14 +443,14 @@ export default function Page({ params }) {
       // console.log("this is merged data with zoro", newMergedData);
     } else setEpisodesData(null);
   };
-  
+
   const handleSkipIntro = () => {
     if (player) {
       const skipToTime =
-      showSkipButton === "intro"
-      ? streamingData?.intro?.end
-      : streamingData?.outro?.end;
-      
+        showSkipButton === "intro"
+          ? streamingData?.intro?.end
+          : streamingData?.outro?.end;
+
       if (typeof skipToTime === "number") {
         console.log("Current time before skip:", player.currentTime); // Should now work correctly
         player.currentTime = skipToTime; // Skip to the end of the intro or outro
@@ -458,16 +458,16 @@ export default function Page({ params }) {
       } else {
         console.error("Invalid time value for skipping.");
       }
-      
+
       setShowSkipButton(""); // Hide the button after skipping
     } else {
       console.error("Player not found!");
     }
   };
-  
+
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
-    
+
     if (result.status === Constant_Var_success) {
       setWatchListData(result?.response);
       setIsWatchListOpen((prev) => !prev);
@@ -478,7 +478,7 @@ export default function Page({ params }) {
       const signInResp = await SignInGooglePopUp((status) => {
         console.log("login status:", status);
       });
-      
+
       if (signInResp.status === Constant_Var_success) return;
       else toast.error(signInResp?.response?.message, { duration: 3000 });
     }
@@ -503,7 +503,7 @@ export default function Page({ params }) {
     }
     return "";
   };
-  
+
   return (
     <div className="py-16">
       <div className="content py-2 px-4 flex flex-col gap-4">
@@ -589,9 +589,9 @@ export default function Page({ params }) {
                     if (!streamingData?.intro) return;
                     const player = event.target;
                     const currentTime = player?.currentTime;
-                    
+
                     const t = currentTime;
-                    if((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))){    //save timestamp after every 5 seconds
+                    if ((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))) {    //save timestamp after every 5 seconds
                       console.log(recentTimestamp);
                       setRecentTimestamp(currentTime);
                     }
@@ -628,10 +628,10 @@ export default function Page({ params }) {
                     }
                   }}
 
-                  // onHlsError={()=>{
-                  //   toast.error("Error while loading the file, Try another Provider or try after some time.");
-                  //   console.log("Some error occured in playing the file.");
-                  // }}
+                // onHlsError={()=>{
+                //   toast.error("Error while loading the file, Try another Provider or try after some time.");
+                //   console.log("Some error occured in playing the file.");
+                // }}
                 >
                   <MediaProvider>
                     {streamingData?.tracks
@@ -718,11 +718,10 @@ export default function Page({ params }) {
 
               {provider === "zoro" && (
                 <button
-                  className={`mx-1 ${
-                    mediaPlayerState?.isAutoSkip
+                  className={`mx-1 ${mediaPlayerState?.isAutoSkip
                       ? "text-sky-400 font-semibold"
                       : "font-[300]"
-                  } `}
+                    } `}
                   onClick={() =>
                     updatePlayerOptions({
                       ...mediaPlayerState,
@@ -736,11 +735,10 @@ export default function Page({ params }) {
               )}
 
               <button
-                className={`mx-1 ${
-                  mediaPlayerState?.isAutoNext
+                className={`mx-1 ${mediaPlayerState?.isAutoNext
                     ? "text-sky-400 font-semibold"
                     : "font-[300]"
-                } `}
+                  } `}
                 onClick={() =>
                   updatePlayerOptions({
                     ...mediaPlayerState,
@@ -752,11 +750,10 @@ export default function Page({ params }) {
               </button>
 
               <button
-                className={`mx-1 ${
-                  mediaPlayerState?.isAutoPlay
+                className={`mx-1 ${mediaPlayerState?.isAutoPlay
                     ? "text-sky-400 font-semibold"
                     : "font-[300]"
-                } `}
+                  } `}
                 onClick={() =>
                   updatePlayerOptions({
                     ...mediaPlayerState,
@@ -769,7 +766,7 @@ export default function Page({ params }) {
             </div>
           </div>
 
-          {episodesData && <ProviderContainer content={content} id={params?.id}/>}
+          {episodesData && <ProviderContainer content={content} id={params?.id} />}
 
           <div className="note text-sm flex items-center px-4 text-gray-400">
             *Note: Episode boxes with{" "}
@@ -778,7 +775,7 @@ export default function Page({ params }) {
           </div>
 
         </div>
-          {params?.id && <Suggested id={params?.id}/>}
+        {params?.id && <Suggested id={params?.id} />}
       </div>
     </div>
   );
