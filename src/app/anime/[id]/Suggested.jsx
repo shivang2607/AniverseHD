@@ -18,7 +18,6 @@ export default function Suggested({ id }) {
       setSuggestions(data);
     })();
   }, []);
-  console.log(suggestions);
   return (
     <div className="flex flex-col md:px-8 px-4 gap-4 my-16">
       <h1 className="text-primary-400 font-semibold tracking-wide text-2xl">
@@ -27,7 +26,6 @@ export default function Suggested({ id }) {
       <div className="grid md:grid-cols-5 grid-cols-2 gap-4">
         {!loading ? (
           suggestions?.map((anime) => {
-            console.log("anime of suggestions", anime);
             return (
               <MainCard
                 anime={{ ...anime.payload, mal_id: anime.id }}

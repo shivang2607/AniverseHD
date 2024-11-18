@@ -155,6 +155,7 @@ export default function ProviderContainer({
 
   const updateParams = (paramsList)=>{
     const newParams = new URLSearchParams(searchParams); 
+    newParams.delete("t");
     paramsList.forEach(par => {
       newParams.set(par.key, par.val);
     });

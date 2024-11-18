@@ -6,6 +6,7 @@ import { TiTick } from "react-icons/ti";
 import { RxCross1 } from "react-icons/rx";
 import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
 import { Constant_Var_success } from "@/utils/constants";
+import useUserStore from "../ZustandStores/userStore";
 
 export default function ListDropDown({
   anime,
@@ -13,6 +14,9 @@ export default function ListDropDown({
   setIsOpen,
   watchListData,
 }) {
+
+  const {loadLoggedInUserWatchLists} = useUserStore();
+
   const handleOnClickList = async (id, listName, isAnimeInList) => {
     // console.log("list has been clicked",listName, isAnimeInList, anime);
     if(isAnimeInList){
@@ -61,6 +65,9 @@ export default function ListDropDown({
     }
     console.log(result?.response);
   }
+
+  loadLoggedInUserWatchLists(); //this will sync the zustand store with the latest data 
+  
   };
 
   const removeFromAll = async () => {

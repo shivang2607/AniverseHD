@@ -14,7 +14,6 @@ const streamStore = (set, get)=>({
     streamingData : null,
     serverLoading : false,
     streamLoading : false,
-    recentTimestamp : 0,
 
     setSelectedProvider : (prov)=> set({selectedProvider : prov}),
 
@@ -40,7 +39,6 @@ const streamStore = (set, get)=>({
 
     setStreamLoading : (streamLoading) => set({streamLoading}),
 
-    setRecentTimestamp : (recentTimestamp) => set({recentTimestamp}),
 
 
 
