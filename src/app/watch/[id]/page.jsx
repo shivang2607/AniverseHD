@@ -62,7 +62,7 @@ export default function Page({ params }) {
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
   const [animeNotAvailable, setAnimeNotAvailable] = useState(false);
-  
+
   const router = useRouter();
   const pathname = usePathname();
   const player = useRef(null);
@@ -719,8 +719,8 @@ export default function Page({ params }) {
               {provider === "zoro" && (
                 <button
                   className={`mx-1 ${mediaPlayerState?.isAutoSkip
-                      ? "text-sky-400 font-semibold"
-                      : "font-[300]"
+                    ? "text-sky-400 font-semibold"
+                    : "font-[300]"
                     } `}
                   onClick={() =>
                     updatePlayerOptions({
@@ -736,8 +736,8 @@ export default function Page({ params }) {
 
               <button
                 className={`mx-1 ${mediaPlayerState?.isAutoNext
-                    ? "text-sky-400 font-semibold"
-                    : "font-[300]"
+                  ? "text-sky-400 font-semibold"
+                  : "font-[300]"
                   } `}
                 onClick={() =>
                   updatePlayerOptions({
@@ -751,8 +751,8 @@ export default function Page({ params }) {
 
               <button
                 className={`mx-1 ${mediaPlayerState?.isAutoPlay
-                    ? "text-sky-400 font-semibold"
-                    : "font-[300]"
+                  ? "text-sky-400 font-semibold"
+                  : "font-[300]"
                   } `}
                 onClick={() =>
                   updatePlayerOptions({
