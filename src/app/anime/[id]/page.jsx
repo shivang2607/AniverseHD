@@ -24,6 +24,7 @@ import {
   Constant_Var_success,
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
+import { useRouter } from "next/navigation";
 
 export default function Anime({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -34,15 +35,31 @@ export default function Anime({ params }) {
     anime: state.getAnimeById(params.id),
   }));
 
+  const router = useRouter();
+
+
+
   useEffect(() => {
-    console.log("response anime data", anime);
-    if (!params.id || anime) return;
-    params?.id && fetchAnime(params.id);
-
-    // setRelations(filteredRelations);
-
-    // console.log("relations h bhaai", filteredRelations);
-  }, [params.id, fetchAnime, anime]);
+    const fetchData = async () => {
+      console.log("response anime data", anime);
+      
+      if (!params?.id || anime) return;
+      
+      const res = await fetchAnime(params.id);
+      
+      // Check if the response status is 404, then redirect to /not-found
+      if (res?.status === 404) {
+        router.replace("/not-found");
+      }
+    };
+  
+    fetchData();
+  
+    return () => {
+    };
+  
+  }, [params?.id, anime]);  
+  
 
   const filteredRelations = anime?.relations
     ?.map((item) => ({
@@ -228,6 +245,7 @@ export default function Anime({ params }) {
                           background: "#b6d7d4",
                           border: "1px solid ",
                           color: "#041C32",
+              
                         },
                       }}
                     />
