@@ -12,7 +12,7 @@ import WatchListsTabs from "./WatchListsTabs";
 import WatchListPagination from "./WatchListPagination";
 
 const UserWatchLists = ({ id }) => {
-  const { isUserLoggedIn, loggedInUserId, loggedInUserWatchListsInfo } =
+  const { isUserLoggedIn, loggedInUserId, loggedInUserWatchListsInfo} =
     useUserStore();
   const [userStarterWatchLists, setUserStarterWatchLists] = useState(null);
   const [userCustomWatchLists, setUserCustomWatchLists] = useState(null);
@@ -26,21 +26,25 @@ const UserWatchLists = ({ id }) => {
       });
       // console.log(respUserWatchLists, "hello");
       // # Setting User Info #
-      if (respUserWatchLists.status === Constant_Var_success){
-        let starter=[],custom=[];
-        for(let i=0; i<respUserWatchLists.response.length;++i){
-            let obj= respUserWatchLists.response[i];
-            if(!obj.isSpecialStarter){
-              custom.push(obj);
-            }else if(obj.isSpecialStarter && obj.watchListName!=Constant_Var_starterWatchLists_recent){
-              starter.push(obj);
-            }
+      if (respUserWatchLists.status === Constant_Var_success) {
+        let starter = [],
+          custom = [];
+        for (let i = 0; i < respUserWatchLists.response.length; ++i) {
+          let obj = respUserWatchLists.response[i];
+          if (!obj.isSpecialStarter) {
+            custom.push(obj);
+          } else if (
+            obj.isSpecialStarter &&
+            obj.watchListName != Constant_Var_starterWatchLists_recent
+          ) {
+            starter.push(obj);
+          }
         }
         setUserCustomWatchLists(custom);
         setUserStarterWatchLists(starter);
         if(starter.length>0)
         setSelectedWatchList(starter[0]);
-        else setSelectedWatchList(custom[0]);
+        else if(custom.length>0) setSelectedWatchList(custom[0]);
       }
       else if (
         respUserWatchLists.response.message ===
@@ -59,7 +63,7 @@ const UserWatchLists = ({ id }) => {
   useEffect(() => {
     //loading other user data
     async function loadUserData() {
-      if (!isUserLoggedIn || loggedInUserId !== id) {
+      if (isUserLoggedIn!==null && (isUserLoggedIn===false || loggedInUserId !== id)) {
         await loadOtherUser();
       }
     }
@@ -70,26 +74,48 @@ const UserWatchLists = ({ id }) => {
     // loading loggedInuser Data
     async function loadUserData() {
       if (isUserLoggedIn && loggedInUserId === id) {
-        let starter=[],custom=[];
-        for(let i=0; i<loggedInUserWatchListsInfo.length;++i){
-            let obj= loggedInUserWatchListsInfo[i];
-            if(!obj.isSpecialStarter){
-              custom.push(obj);
-            }else if(obj.isSpecialStarter && obj.watchListName!=Constant_Var_starterWatchLists_recent){
-              starter.push(obj);
-            }
+        let starter = [],
+          custom = [];
+        for (let i = 0; i < loggedInUserWatchListsInfo.length; ++i) {
+          let obj = loggedInUserWatchListsInfo[i];
+          if (!obj.isSpecialStarter) {
+            custom.push(obj);
+          } else if (
+            obj.isSpecialStarter &&
+            obj.watchListName != Constant_Var_starterWatchLists_recent
+          ) {
+            starter.push(obj);
+          }
         }
-        // console.log(starter,custom);
+        
+        /* for keeping selectedWatchList same between rerenders due to anime removal, in case of delete watchlist the selectedWatchList is set with a new watchList */
+        // console.log("he",selectedWatchList,custom,starter,userCustomWatchLists,userStarterWatchLists);
+        if (
+          selectedWatchList === null ||
+          (custom.length + starter.length) !==
+            (userCustomWatchLists.length + userStarterWatchLists.length)
+        ) {
+          setSelectedWatchList(starter[0]);
+        } else {
+          let sel = starter.filter((ele) => {
+            return ele.id === selectedWatchList.id;
+          });
+          if(sel.length==0)
+            sel = custom.filter((ele) => {
+              return ele.id === selectedWatchList.id;
+            });
+          // console.log(sel,"hello",selectedWatchList,starter,custom);
+          if (sel.length > 0) setSelectedWatchList(sel[0]);
+          else setSelectedWatchList(starter[0]);
+        }
+
         setUserCustomWatchLists(custom);
         setUserStarterWatchLists(starter);
-        setSelectedWatchList(starter[0]);
-        // console.log(loggedInUserWatchListsInfo, "hello");
+
       }
     }
-
     loadUserData();
   }, [loggedInUserWatchListsInfo]);
-
 
   return (
     <>
@@ -101,11 +127,11 @@ const UserWatchLists = ({ id }) => {
               CustomWatchLists={userCustomWatchLists}
               setSelectedWatchList={setSelectedWatchList}
               selectedWatchList={selectedWatchList}
+              paramsUserId={id}
             />
           </div>
-          
+
           <WatchListPagination selectedWatchList={selectedWatchList} />
-     
         </div>
       ) : (
         <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">

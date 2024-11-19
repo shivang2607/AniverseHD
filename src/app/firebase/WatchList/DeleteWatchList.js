@@ -41,7 +41,7 @@ export default async function DeleteWatchListById({watchListId}) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
     
-    const watchListInfo = await GetWatchListInfoById(watchListId,false);
+    const watchListInfo = await GetWatchListInfoById({watchListId:watchListId,getFromCache:false});
     if (watchListInfo.status !== Constant_Var_success) throw watchListInfo.response;
 
     if (
@@ -49,7 +49,7 @@ export default async function DeleteWatchListById({watchListId}) {
       watchListInfo.response.isSpecialStarter === false
     ) {
       let response = await deleteDoc(doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId));
-      deleteUserWatchlistCached({watchListId:watchListId});
+      deleteUserWatchlistCached({watchListId:watchListId,userId:userData.details.uid});
       return { status: Constant_Var_success, response: response };
 
     } else {

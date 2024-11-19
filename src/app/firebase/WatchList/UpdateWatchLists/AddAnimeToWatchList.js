@@ -80,6 +80,18 @@ export default async function AddAnimeToWatchList({
   episodeTimestamp=null,
 }) {
   try {
+    console.log(watchListId,
+      animeId,
+      animeName,
+      animePhoto ,
+      animeGenre ,
+      animeType ,
+      animeScore ,
+      animeAgeRating ,
+      animeStartYear ,
+      animeLength ,
+      url ,
+      episodeTimestamp,)
     // Validate the parameters
     validateParams({
       watchListId,

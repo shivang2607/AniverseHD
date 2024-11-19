@@ -320,6 +320,7 @@ async function GetFromFirestore({
       )
     );
   }
+  // console.log(queryResult.docs.map((doc) => doc.data()),"firestore");
   // Map through the docs and return an array of document data
   return queryResult.docs.map((doc) => doc.data());
 }

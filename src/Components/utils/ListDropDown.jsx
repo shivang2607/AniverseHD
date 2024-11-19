@@ -32,6 +32,7 @@ export default function ListDropDown({
         }
     }
     else{
+      console.log("anime",anime);
     const result = await AddAnimeToWatchList({
       watchListId: id,
       animeId: `${anime?.mal_id}`,

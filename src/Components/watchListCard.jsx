@@ -8,27 +8,22 @@ import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ListDropDown from "./utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+import { MdDeleteOutline } from "react-icons/md";
+import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
+import { Constant_Var_success } from "@/utils/constants";
+import useUserStore from "./ZustandStores/userStore";
 
-export default function WatchListCard({ anime }) {
-  const [isWatchListOpen, setIsWatchListOpen] = useState(false);
-  const [watchListData, setWatchListData] = useState();
+export default function WatchListCard({ anime, watchListId }) {
+  const {removeAnimeFromWatchList}=useUserStore();
 
-
-  // const handleOnClickWatchList = async () => {
-  //   const result = await GetLoggedUserWatchListsInfo();
-  //   console.log(result?.response);
-  //   if (result.status === "success") {
-  //     setWatchListData(result?.response);
-  //     setIsWatchListOpen((prev) => !prev);
-  //     return;
-  //   }
-  //   toast.error(result?.response?.message, { duration: 3000 });
-  // };
-  // console.log(anime);
+  const handleRemoveAnime= async (id,watchListId)=>{
+     await removeAnimeFromWatchList({watchListId:watchListId,animeId:id});
+  }
+  
   return (
     <div className="image-container  my-1 w-full  h-fit pb-3 rounded-md  flex flex-col  hover:shadow-m overflow-hidden">
       <Link
-        href={`/anime/${anime?.animeId}`}
+        href={anime.url? `${anime?.url}`:`/watch/${anime?.animeId}?provider=zoro`}
         className=" flex relative flex-col gap-2 h-56  rounded-md overflow-hidden duration-300 transition-all w-full   "
       >
         <div className="image relative rounded-md overflow-hidden  h-full w-full ">
@@ -46,29 +41,21 @@ export default function WatchListCard({ anime }) {
           <div className="content flex flex-col  w-full h-full z-10">
             <div className="flex">
               <div className="flex flex-col">
-                {/* <button
-                  className="flex mr-auto m-2 px-1 rounded-sm  text-fuchsia-400 z-20 text-2xl font-bold"
+                <button
+                  className="flex mr-auto m-2 px-1 rounded-sm z-20 text-red-500 text-2xl font-bold"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleOnClickWatchList();
-                    
+                    handleRemoveAnime(anime.animeId,watchListId);
                   }}
                 >
-                  <PiBookmarkSimpleBold />
+                  <MdDeleteOutline/>
                 </button>
-                {isWatchListOpen && (
-                  <ListDropDown
-                    anime={anime}
-                    isOpen={isWatchListOpen}
-                    watchListData={watchListData}
-                    setIsOpen={setIsWatchListOpen}
-                  />
-                )} */}
+        
               </div>
              
               <div className="flex ml-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">
-                {anime?.animeAgeRatings?.split(" ")[0].toUpperCase() || "NA"}
+                {anime?.animeAgeRating?.split(" ")[0].toUpperCase() || "NA"}
               </div>
             </div>
             <div className="absolute  play hover:opacity-100 opacity-0 flex h-full w-full items-center justify-center ">

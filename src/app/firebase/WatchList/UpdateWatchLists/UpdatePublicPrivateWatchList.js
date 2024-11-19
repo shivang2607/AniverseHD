@@ -75,7 +75,7 @@ export default async function UpdatePublicPrivateWatchList({ watchListId, type }
           updatedAt:currTimestamp
         });
   
-        updatePublicPrivateCached({ watchListId: watchListId, type: type,updatedAt:currTimestamp });
+        updatePublicPrivateCached({ watchListId: watchListId, type: type,updatedAt:currTimestamp,userId:userData.details.uid });
   
         return { status: Constant_Var_success, response: null };
       } else {
