@@ -106,6 +106,7 @@ export default function WatchListCard({ anime, watchListId }) {
                     background: "#b6d7d4",
                     border: "1px solid ",
                     color: "#041C32",
+              
                   },
                 }}
               />

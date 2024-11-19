@@ -24,25 +24,52 @@ import {
   Constant_Var_success,
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
+import { useRouter } from "next/navigation";
+import useUserStore from "@/components/ZustandStores/userStore";
 
 export default function Anime({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
+  const [recentData, setRecentData] = useState();
   const { anime, fetchAnime } = useAnimeStore((state) => ({
     fetchAnime: state.fetchAnime,
     anime: state.getAnimeById(params.id),
   }));
 
+  const router = useRouter();
+
+  const { RecentWatchListData } = useUserStore();
+
   useEffect(() => {
-    console.log("response anime data", anime);
-    if (!params.id || anime) return;
-    params?.id && fetchAnime(params.id);
+    const fetchData = async () => {
+      console.log("response anime data", anime);
 
-    // setRelations(filteredRelations);
+      if (!params?.id || anime) return;
 
-    // console.log("relations h bhaai", filteredRelations);
-  }, [params.id, fetchAnime, anime]);
+      const res = await fetchAnime(params.id);
+
+      // Check if the response status is 404, then redirect to /not-found
+      if (res?.status === 404) {
+        router.replace("/not-found");
+      }
+    };
+
+    fetchData();
+
+    return () => {};
+  }, [params?.id, anime]);
+
+  useEffect(() => {
+    const filteredData = RecentWatchListData?.filter(
+      (obj) => obj?.animeId === `${params?.id}`
+    );
+    if(filteredData?.length > 0){
+      setRecentData(filteredData[0]);
+      console.log(filteredData[0]);
+    }
+    
+  }, [RecentWatchListData]);
 
   const filteredRelations = anime?.relations
     ?.map((item) => ({
@@ -196,11 +223,15 @@ export default function Anime({ params }) {
                   <div className="flex mt-4 gap-4 justify-center md:justify-start">
                     {anime?.Sites && (
                       <Link
-                        href={`/watch/${params?.id}?provider=zoro`}
+                        href={
+                          recentData
+                            ? `${recentData?.url}&t=${recentData?.episodeTimestamp}`
+                            : `/watch/${params?.id}?provider=zoro`
+                        }
                         className="watchnow flex gap-2 items-center bg-primary-500  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
                       >
                         <FaPlayCircle />
-                        Watch now
+                        Watch Now
                       </Link>
                     )}
                     <div className="flex flex-col">

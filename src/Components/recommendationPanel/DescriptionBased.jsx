@@ -133,6 +133,7 @@ export default function DescriptionBased() {
               background: "#b6d7d4",
               border: "1px solid ",
               color: "#041C32",
+              
             },
           }}
         />

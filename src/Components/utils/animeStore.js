@@ -13,9 +13,13 @@ const useAnimeStore = create((set, get) => ({
     }
 
     const response = await axios.get(`/api/v1/anime/${id}`);
+    console.log("This is the response from the anime details API", response);
+    if(!(response?.data) || Object.keys(response?.data).length === 0){
+      return {status: 404, message: "Anime not found with the given Id"};
+    }
     const animeData = response.data;
     set((state) => ({ anime: { ...state.anime, [id]: animeData } }));
-    setWithExpiry(`anime_${id}`, animeData, 60 * 60 * 1000); // 60 minutes TTL
+    setWithExpiry(`anime_${id}`, animeData, 2 * 60 * 60 * 1000); // 2hrs TTL
     return animeData;
   },
 

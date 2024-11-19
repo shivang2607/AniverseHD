@@ -13,6 +13,7 @@ import { MdOutlineSportsScore } from "react-icons/md";
 import { PiVideoFill } from "react-icons/pi";
 import { IoMdTimer } from "react-icons/io";
 import { RxDotFilled } from "react-icons/rx";
+import toast from "react-hot-toast";
 
 
 
@@ -42,7 +43,7 @@ const useDebouncedEffect = (callback, dependencies, delay, setStreamingData) => 
 
 
 export default function ProviderContainer({
-  content
+  content, id
   // episodes,
   // serverData,
   // // prov = "gogo",
@@ -63,13 +64,14 @@ export default function ProviderContainer({
 
   const {
     episodes,
+    setEpisodesData,
   serverData,
   // prov = "gogo",
   setSelectedProvider,
   zoroEpisodeId, setZoroEpisodeId,
   gogoSubEpisodeId, setGogoSubEpisodeId,
   gogoDubEpisodeId, setGogoDubEpisodeId,
-  dub,
+  // dub,
   streamingData, setStreamingData,
   serverLoading, setServerLoading,
   setStreamLoading,
@@ -81,17 +83,28 @@ export default function ProviderContainer({
   }));
 
   const serverV = searchParams.get('server');
+  const dub = searchParams.get('dub');
   // const [server, setServer] = useState(searchParams.get('server'));
   // const [serverLoading, setServerLoading] = useState(false);
   const [episodeRangeIndex, setEpisodeRangeIndex] = useState(0); //according to this index range of episodes in the window will be shown , this will be changed through the dropdown of the select box, and the range is episodesPerWindow by default and is static for now, you can change this range statically or can make this range dynamic as well.
 
 
   useEffect(()=>{
-    setEpisodeRangeIndex(n/episodesPerWindow);
+    return () => {
+      console.log("useEffect cleanup triggered");
+      setEpisodesData([]);
+      setStreamingData([]);
+    };
+  }, []);
+
+
+  useEffect(()=>{
+    // console.log(Math.floor(n/episodesPerWindow));
+    setEpisodeRangeIndex(Math.floor(n/episodesPerWindow));
   }, [n]);
 
   // const memoizedDub = useMemo(() => dub, [dub]);
-  console.log("This is server data",serverData);
+  // console.log("This is server data",serverData);
 
   useDebouncedEffect(() => {
     if (!zoroEpisodeId && !gogoDubEpisodeId && !gogoSubEpisodeId) return;
@@ -113,11 +126,16 @@ export default function ProviderContainer({
         console.log(provider, dub, server);
         const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
           params: {
-            category: dub ? "dub" : "sub",
+            category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
             server: server || 'hd-1'
           }
         });
         
+        if(data?.data?.status){
+          console.log(data?.data)
+          console.log("Bad Gateway, try reloading the page!");
+          return;
+        }
         setStreamingData(data?.data);
         console.log("zoro ka streaming api vaala data",data?.data);
       }
@@ -137,6 +155,7 @@ export default function ProviderContainer({
 
   const updateParams = (paramsList)=>{
     const newParams = new URLSearchParams(searchParams); 
+    newParams.delete("t");
     paramsList.forEach(par => {
       newParams.set(par.key, par.val);
     });
@@ -144,16 +163,20 @@ export default function ProviderContainer({
     return pathname + '?' + newParams.toString();
   }
   
-  console.log("this is content  :", content);
+  // console.log("this is content  :", content);
 
   return (
     <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">
-      <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10"/>
+       <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10" />
       <div className="w-[90%] mx-auto justify-between flex mb-8 flex-row">
         <div className="metadata flex gap-6 items-center mx-2">
+          <div className="flex flex-col gap-2 justify-center">
           <div className="img relative h-60 w-40 flex my-auto">
-          <Image src={content?.images?.webp?.large_image_url} fill className=" h-full flex-shrink-0 w-full rounded"/>
+          {content?.images &&<Image src={content?.images?.webp?.large_image_url} fill className=" h-full flex-shrink-0 w-full rounded" alt={content?.title_english || content?.title}/>}
           </div>
+          { id &&  <Link href={`/anime/${id}`} className="px-1 w-fit text-sm  bg-gray-200 text-gray-800 rounded-full">View Details</Link>}
+          </div>
+          
 
           <div className="contentContainer text-sm flex flex-col gap-3 my-auto">
             <h2 className="title text-2xl tracking-wide max-w-96 flex-wrap font-semibold">{content?.title_english || content?.title}</h2>
@@ -226,7 +249,7 @@ export default function ProviderContainer({
 
         <div className="availableServers self-center flex flex-col">
         {(serverData?.sub || provider==="gogo") &&<div className="sub flex font-semibold text-sm items-center p-2 gap-4">
-               <h2 className="flex gap-2 items-center"><FaClosedCaptioning className="text-lg text-primary-300"/> SUB:</h2>
+               <h2 className="flex gap-2 items-center"><FaClosedCaptioning className="text-lg text-primary-300"/> {(serverData?.sub?.length > 0) ? "SUB:" : "RAW:"}</h2>
               <div className="flex gap-3">
                 {provider==="gogo" && 
                 <Link
@@ -242,7 +265,7 @@ export default function ProviderContainer({
                 >Default</Link>
                 }
                 {
-                  provider==="zoro" && serverData?.sub?.map(ser=>{
+                  provider==="zoro" && (serverData?.sub?.length > 0) ? serverData?.sub?.map(ser=>{
                     // console.log("ser first", ser);
                     return (
                       <Link 
@@ -257,7 +280,25 @@ export default function ProviderContainer({
                       // })}
                       >{ser?.serverName || ser?.name}</Link>
                     )
+                  }) :
+
+                  serverData?.raw && serverData?.raw?.map(ser=>{
+                    // console.log("ser first", ser);
+                    return (
+                      <Link 
+                      key={ser?.serverName || ser?.name}
+                      href={updateParams([{key: "dub", val:'-1'}, {key:"server", val: ser?.serverName || ser?.name}])} 
+                      scroll={false} 
+                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub==="-1" && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
+                      // onClick={()=>fetchStreamingData({
+                      //   episodeId : zoroEpisodeId,
+                      //   gogoSubId: gogoSubEpisodeId,
+                      //   gogoDubId: gogoDubEpisodeId
+                      // })}
+                      >{ser?.serverName || ser?.name}</Link>
+                    )
                   })
+                  
                 }
               </div>
             </div>
@@ -325,7 +366,7 @@ export default function ProviderContainer({
       <div className="episode-list grid grid-cols-4 gap-2 m-3 max-h-screen overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
         {episodes
           ?.slice(
-            episodesPerWindow * episodeRangeIndex,
+            (episodesPerWindow * episodeRangeIndex),
             Math.min(episodes?.length, episodesPerWindow * (episodeRangeIndex + 1))
           )
           ?.map((ep,i) => {
@@ -343,10 +384,10 @@ export default function ProviderContainer({
                   zoroEpisodeId === ep?.episodeId ||
                   gogoSubEpisodeId === ep?.gogoSubId ||
                   gogoDubEpisodeId === ep?.gogoDubId
-                    ? ep?.isFiller ? "text-sky-400 bg-black/60" : "text-primary-100 font-semibold bg-black/60" 
+                    ? ep?.isFiller ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
                     : "font-[350] bg-black/30"
                 }
-                    ${ep?.isFiller ? "bg-sky-400" : ""} `}
+                    ${ep?.isFiller ? "bg-sky-400/30 " : ""} `}
                 onClick={() =>{
                   // fetchStreamingData(ep);
                 }
