@@ -6,6 +6,7 @@ import { TiTick } from "react-icons/ti";
 import { RxCross1 } from "react-icons/rx";
 import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
 import { Constant_Var_success } from "@/utils/constants";
+import useUserStore from "../ZustandStores/userStore";
 
 export default function ListDropDown({
   anime,
@@ -13,7 +14,11 @@ export default function ListDropDown({
   setIsOpen,
   watchListData,
 }) {
+
+  const {loadLoggedInUserWatchLists} = useUserStore();
+
   const handleOnClickList = async (id, listName, isAnimeInList) => {
+    // console.log("list has been clicked",listName, isAnimeInList, anime);
     if(isAnimeInList){
       console.log(listName);
       const result = await RemoveAnimeFromWatchList({
@@ -32,12 +37,12 @@ export default function ListDropDown({
         }
     }
     else{
-      console.log("anime",anime);
+      // console.log("these are images",anime?.images);
     const result = await AddAnimeToWatchList({
       watchListId: id,
       animeId: `${anime?.mal_id}`,
       animeName: anime?.title_english || anime?.title,
-      animePhoto: anime?.images || {},
+      animePhoto: anime?.main_picture || anime?.images || {},
       animeGenre: anime?.genres || [],
       animeType: anime?.type || "NA",
       animeScore: anime?.score || "NA",
@@ -60,6 +65,9 @@ export default function ListDropDown({
     }
     console.log(result?.response);
   }
+
+  loadLoggedInUserWatchLists(); //this will sync the zustand store with the latest data 
+  
   };
 
   const removeFromAll = async () => {
@@ -90,7 +98,7 @@ export default function ListDropDown({
 
       if (allSuccessful) {
         toast.success("Anime successfully removed from watchlists.", {
-          id: "2",
+          id: "1",
           duration: 3000,
         });
         console.log("Anime successfully removed from watchlists.");
