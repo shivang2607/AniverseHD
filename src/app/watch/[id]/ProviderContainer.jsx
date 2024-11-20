@@ -14,6 +14,7 @@ import { PiVideoFill } from "react-icons/pi";
 import { IoMdTimer } from "react-icons/io";
 import { RxDotFilled } from "react-icons/rx";
 import toast from "react-hot-toast";
+import ShareModal from "@/components/utils/ShareModal";
 
 
 
@@ -153,9 +154,9 @@ export default function ProviderContainer({
 
   
 
-  const updateParams = (paramsList)=>{
+  const updateParams = (paramsList, resetT=true)=>{
     const newParams = new URLSearchParams(searchParams); 
-    newParams.delete("t");
+    if(resetT) newParams.delete("t");
     paramsList.forEach(par => {
       newParams.set(par.key, par.val);
     });
@@ -174,7 +175,11 @@ export default function ProviderContainer({
           <div className="img relative h-60 w-40 flex my-auto">
           {content?.images &&<Image src={content?.images?.webp?.large_image_url} fill className=" h-full flex-shrink-0 w-full rounded" alt={content?.title_english || content?.title}/>}
           </div>
+          <div className="flex justify-between w-full">
           { id &&  <Link href={`/anime/${id}`} className="px-1 w-fit text-sm  bg-gray-200 text-gray-800 rounded-full">View Details</Link>}
+
+          <ShareModal url={`/anime/${id}`}/>
+          </div>
           </div>
           
 
@@ -227,6 +232,7 @@ export default function ProviderContainer({
             }  `} 
             onClick={() => {
               setSelectedProvider("zoro");
+              
               // setServerLoading(true);
             }}
           >
