@@ -32,7 +32,7 @@ const ShareModal = ({ url, buttonText = "", modalTitle = "Share this Anime", tit
   }
 
   return (
-    <div className='flex items-center'>
+    <div className='flex items-center max-w-screen-lg'>
       {/* Dynamic button */}
       <div className="button flex mx-2 cursor-pointer items-center my-auto gap-[0.15rem] " onClick={()=> setIsOpen(true)}>
         <FaShareSquare className='text-primary-300'/> 
