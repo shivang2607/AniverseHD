@@ -592,7 +592,7 @@ export default function Page({ params }) {
 
                     const t = currentTime;
                     if ((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))) {    //save timestamp after every 5 seconds
-                      console.log(recentTimestamp);
+                      // console.log(recentTimestamp);
                       setRecentTimestamp(currentTime);
                     }
 
