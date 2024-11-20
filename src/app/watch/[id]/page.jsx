@@ -611,7 +611,7 @@ export default function Page({ params }) {
                         maxFragLookUpTolerance: 0.5,
                         fragLoadingTimeOut: 30000,
                         fragLoadingMaxRetry: 5,
-                        maxMaxBufferLength: 400,
+                        maxMaxBufferLength: 600,
                         maxBufferLength: 20,
 
                       }
