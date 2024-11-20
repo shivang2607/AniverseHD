@@ -556,28 +556,13 @@ export default function Page({ params }) {
                   keyTarget='player'
                   storage="media-player"
                   title={streamingData?.malId}
-                  src={`${streamingData?.sources?.[0]?.url}`} //https://m3u8-proxy-cors-ochre-gamma.vercel.app/cors?url=
+                  src={process.env.NEXT_PUBLIC_GOOD_PROXY + encodeURIComponent(streamingData?.sources?.[0]?.url)} //https://m3u8-proxy-cors-ochre-gamma.vercel.app/cors?url=
                   className="h-full"
                   playsInline
                   crossOrigin
                   streamType="on-demand"
                   // crossOrigin="anonymous"
-                  onProviderChange={(prov, eve) => {
-                    if (isHLSProvider(prov) && streamingData?.headers) {
-                      prov.config = {
-                        xhrSetup(xhr) {
-                          xhr.setRequestHeader(
-                            "Referer",
-                            streamingData?.headers?.Referer
-                          );
-                          xhr.setRequestHeader(
-                            "User-Agent",
-                            streamingData?.headers?.["User-Agent"]
-                          );
-                        },
-                      };
-                    }
-                  }}
+                  
                   currentTime={startTime}
                   onError={(e) =>
                     toast.error(`${e.message}, Try Another Server.`)
