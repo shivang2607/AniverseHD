@@ -561,7 +561,13 @@ export default function Page({ params }) {
                   playsInline
                   crossOrigin
                   streamType="on-demand"
-                  // crossOrigin="anonymous"
+                  hlsConfig={{
+                    loader: {
+                      timeout: 30000, // 30 seconds timeout
+                      maxRetry: 5,    // Retry 5 times
+                      retryDelay: 500 // 500ms delay between retries
+                    },
+                  }}
                   onProviderChange={(prov, eve) => {
                     if (isHLSProvider(prov) && streamingData?.headers) {
                       prov.config = {
