@@ -553,35 +553,21 @@ export default function Page({ params }) {
                   load="eager"
                   autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
                   ref={player}
-                  // volume={getVol()}
-                  // onVolumeChange={(v, e)=>{
-                  //   handleVolumeChange(v);
-                  // }}
-                  // storage="media-player"
+                  keyTarget='player'
+                  storage="media-player"
                   title={streamingData?.malId}
-                  src={streamingData?.sources?.[0]?.url}
+                  src={process.env.NEXT_PUBLIC_GOOD_PROXY + encodeURIComponent(streamingData?.sources?.[0]?.url)} //https://m3u8-proxy-cors-ochre-gamma.vercel.app/cors?url=
                   className="h-full"
-                  onProviderChange={(prov, eve) => {
-                    if (isHLSProvider(prov) && streamingData?.headers) {
-                      prov.config = {
-                        xhrSetup(xhr) {
-                          xhr.setRequestHeader(
-                            "Referer",
-                            streamingData?.headers?.Referer
-                          );
-                          xhr.setRequestHeader(
-                            "User-Agent",
-                            streamingData?.headers?.["User-Agent"]
-                          );
-                        },
-                      };
-                    }
-                  }}
-                  storage="videoPlayer"
+                  playsInline
+                  crossOrigin
+                  streamType="on-demand"
+                  // crossOrigin="anonymous"
+                  
                   currentTime={startTime}
                   onError={(e) =>
                     toast.error(`${e.message}, Try Another Server.`)
                   }
+                  
                   onEnded={() =>
                     mediaPlayerState?.isAutoNext && getNextEpisode()
                   } //only fetch next episode if the auto next state is set to true.
@@ -592,7 +578,7 @@ export default function Page({ params }) {
 
                     const t = currentTime;
                     if ((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))) {    //save timestamp after every 5 seconds
-                      console.log(recentTimestamp);
+                      // console.log(recentTimestamp);
                       setRecentTimestamp(t);
                     }
 
