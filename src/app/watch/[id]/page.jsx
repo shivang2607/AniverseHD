@@ -555,12 +555,26 @@ export default function Page({ params }) {
                   ref={player}
                   keyTarget='player'
                   storage="media-player"
+                  buffer
                   title={streamingData?.malId}
                   src={process.env.NEXT_PUBLIC_GOOD_PROXY + encodeURIComponent(streamingData?.sources?.[0]?.url)} //https://m3u8-proxy-cors-ochre-gamma.vercel.app/cors?url=
                   className="h-full"
                   playsInline
                   crossOrigin
                   streamType="on-demand"
+                  onProviderChange={(provider, event)=>{
+                    if(isHLSProvider(provider)){
+                      provider.config = {
+                        nudgeMaxRetry: 5,
+                        maxFragLookUpTolerance: 0.5,
+                        fragLoadingTimeOut: 30000,
+                        fragLoadingMaxRetry: 5,
+                        maxMaxBufferLength: 400,
+                        maxBufferLength: 20,
+
+                      }
+                    }
+                  }}
                   // crossOrigin="anonymous"
                   
                   currentTime={startTime}
