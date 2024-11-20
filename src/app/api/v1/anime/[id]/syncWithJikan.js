@@ -54,7 +54,7 @@ export async function syncQdrant(id, resPayload) {
             );
     
             // Check if malSyncData exists and contains the expected data
-            if (malSyncData?.data?.Sites) {
+            if (malSyncData?.data?.Sites?.Gogoanime || malSyncData?.data?.Sites?.Zoro ) {
                 updatePayload = {
                     ...updatePayload,
                     "Sites": malSyncData.data.Sites
