@@ -62,7 +62,7 @@ export default function Page({ params }) {
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
   const [animeNotAvailable, setAnimeNotAvailable] = useState(false);
-  
+
   const router = useRouter();
   const pathname = usePathname();
   const player = useRef(null);
@@ -553,14 +553,15 @@ export default function Page({ params }) {
                   load="eager"
                   autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
                   ref={player}
-                  // volume={getVol()}
-                  // onVolumeChange={(v, e)=>{
-                  //   handleVolumeChange(v);
-                  // }}
-                  // storage="media-player"
+                  keyTarget='player'
+                  storage="media-player"
                   title={streamingData?.malId}
-                  src={streamingData?.sources?.[0]?.url}
+                  src={`${streamingData?.sources?.[0]?.url}`} //https://m3u8-proxy-cors-ochre-gamma.vercel.app/cors?url=
                   className="h-full"
+                  playsInline
+                  crossOrigin
+                  streamType="on-demand"
+                  // crossOrigin="anonymous"
                   onProviderChange={(prov, eve) => {
                     if (isHLSProvider(prov) && streamingData?.headers) {
                       prov.config = {
@@ -577,11 +578,11 @@ export default function Page({ params }) {
                       };
                     }
                   }}
-                  storage="videoPlayer"
                   currentTime={startTime}
                   onError={(e) =>
                     toast.error(`${e.message}, Try Another Server.`)
                   }
+                  
                   onEnded={() =>
                     mediaPlayerState?.isAutoNext && getNextEpisode()
                   } //only fetch next episode if the auto next state is set to true.
@@ -593,7 +594,7 @@ export default function Page({ params }) {
                     const t = currentTime;
                     if ((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))) {    //save timestamp after every 5 seconds
                       // console.log(recentTimestamp);
-                      setRecentTimestamp(currentTime);
+                      setRecentTimestamp(t);
                     }
 
                     // console.log(currentTime, v);
@@ -719,8 +720,8 @@ export default function Page({ params }) {
               {provider === "zoro" && (
                 <button
                   className={`mx-1 ${mediaPlayerState?.isAutoSkip
-                      ? "text-sky-400 font-semibold"
-                      : "font-[300]"
+                    ? "text-sky-400 font-semibold"
+                    : "font-[300]"
                     } `}
                   onClick={() =>
                     updatePlayerOptions({
@@ -736,8 +737,8 @@ export default function Page({ params }) {
 
               <button
                 className={`mx-1 ${mediaPlayerState?.isAutoNext
-                    ? "text-sky-400 font-semibold"
-                    : "font-[300]"
+                  ? "text-sky-400 font-semibold"
+                  : "font-[300]"
                   } `}
                 onClick={() =>
                   updatePlayerOptions({
@@ -751,8 +752,8 @@ export default function Page({ params }) {
 
               <button
                 className={`mx-1 ${mediaPlayerState?.isAutoPlay
-                    ? "text-sky-400 font-semibold"
-                    : "font-[300]"
+                  ? "text-sky-400 font-semibold"
+                  : "font-[300]"
                   } `}
                 onClick={() =>
                   updatePlayerOptions({
