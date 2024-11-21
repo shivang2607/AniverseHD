@@ -40,10 +40,10 @@ export async function syncQdrant(id, resPayload) {
     // cors.sh , (other proxy , only needed in development phase)
     console.log("Sites", resPayload.Sites);
 
-    // *corsProxy url isint working plus you need to do error handling here, also iski vajah se jaha /anime/id vaali api call ho rahi h vaha undefined return ho raha h which should not happen at all to isko bhi address krna h, yhi cheez addAnime function m bhi anjaam deni h, I can just create a proxy server of my own and deploy it to the netlify or onrender, its just a basic page after all.
     
-
-    if (!resPayload.Sites) {
+    
+    //checks if Sites is undefined, null or falsy or {} i.e. empty object
+    if (!resPayload.Sites || (Object.keys(resPayload.Sites).length === 0 && resPayload.Sites.constructor === Object)) {
         const corsProxyUrl = process.env.ENV === 'DEV' ? process.env.CUSTOM_PROXY_URL : '';
         const headers = { 'Origin': '*' };
     
@@ -54,7 +54,7 @@ export async function syncQdrant(id, resPayload) {
             );
     
             // Check if malSyncData exists and contains the expected data
-            if (malSyncData?.data?.Sites) {
+            if (malSyncData?.data?.Sites?.Gogoanime || malSyncData?.data?.Sites?.Zoro ) {
                 updatePayload = {
                     ...updatePayload,
                     "Sites": malSyncData.data.Sites

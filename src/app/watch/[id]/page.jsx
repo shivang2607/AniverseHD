@@ -44,6 +44,7 @@ import handleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import { getAbsoluteURLPath } from "./utilFunctions";
+import ShareModal from "@/Components/utils/ShareModal";
 
 export default function Page({ params }) {
 
@@ -485,6 +486,48 @@ export default function Page({ params }) {
     toast.error(result?.response?.message, { duration: 3000 });
   };
 
+  const handleTimeUpdate = (v, event)=>{
+    if (!streamingData?.intro) return;
+    const player = event.target;
+    const currentTime = player?.currentTime;
+
+    const t = currentTime;
+    if ((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))) {    //save timestamp after every 5 seconds
+      // console.log(recentTimestamp);
+      setRecentTimestamp(t);
+    }
+
+    // console.log(currentTime, v);
+    // Define the intro and outro timestamps
+    const introStart = streamingData?.intro?.start;
+    const introEnd = streamingData?.intro?.end;
+    const outroStart = streamingData?.outro?.start;
+    const outroEnd = streamingData?.outro?.end;
+
+
+    if (!mediaPlayerState?.isAutoSkip) {
+      if (currentTime < introEnd && currentTime > introStart) {
+        setShowSkipButton("Intro");
+      } else if (
+        currentTime > outroStart &&
+        currentTime < outroEnd
+      ) {
+        setShowSkipButton("Outro");
+      } else setShowSkipButton("");
+
+      return; //if auto skip intro flag is off then no need to autoskip the intro or outro
+    }
+
+    // Skip intro
+    if (currentTime < introEnd && currentTime > introStart) {
+      player.currentTime = introEnd;
+    }
+
+    // Skip outro
+    if (currentTime > outroStart && currentTime < outroEnd) {
+      player.currentTime = outroEnd; // Skip to the end
+    }
+  }
 
   const updateDubVal = (serData) => {
     const subLength = serData?.sub?.length;
@@ -555,12 +598,26 @@ export default function Page({ params }) {
                   ref={player}
                   keyTarget='player'
                   storage="media-player"
+                  buffer
                   title={streamingData?.malId}
-                  src={process.env.NEXT_PUBLIC_GOOD_PROXY + encodeURIComponent(streamingData?.sources?.[0]?.url)} //https://m3u8-proxy-cors-ochre-gamma.vercel.app/cors?url=
+                  src={process.env.NEXT_PUBLIC_GOOD_PROXY + encodeURIComponent(streamingData?.sources?.[0]?.url)} 
                   className="h-full"
                   playsInline
                   crossOrigin
                   streamType="on-demand"
+                  onProviderChange={(provider, event)=>{
+                    if(isHLSProvider(provider)){
+                      provider.config = {
+                        nudgeMaxRetry: 5,
+                        maxFragLookUpTolerance: 0.5,
+                        fragLoadingTimeOut: 30000,
+                        fragLoadingMaxRetry: 5,
+                        maxMaxBufferLength: 600,
+                        maxBufferLength: 20,
+
+                      }
+                    }
+                  }}
                   // crossOrigin="anonymous"
                   
                   currentTime={startTime}
@@ -572,46 +629,7 @@ export default function Page({ params }) {
                     mediaPlayerState?.isAutoNext && getNextEpisode()
                   } //only fetch next episode if the auto next state is set to true.
                   onTimeUpdate={(v, event) => {
-                    if (!streamingData?.intro) return;
-                    const player = event.target;
-                    const currentTime = player?.currentTime;
-
-                    const t = currentTime;
-                    if ((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))) {    //save timestamp after every 5 seconds
-                      // console.log(recentTimestamp);
-                      setRecentTimestamp(t);
-                    }
-
-                    // console.log(currentTime, v);
-                    // Define the intro and outro timestamps
-                    const introStart = streamingData?.intro?.start;
-                    const introEnd = streamingData?.intro?.end;
-                    const outroStart = streamingData?.outro?.start;
-                    const outroEnd = streamingData?.outro?.end;
-
-
-                    if (!mediaPlayerState?.isAutoSkip) {
-                      if (currentTime < introEnd && currentTime > introStart) {
-                        setShowSkipButton("Intro");
-                      } else if (
-                        currentTime > outroStart &&
-                        currentTime < outroEnd
-                      ) {
-                        setShowSkipButton("Outro");
-                      } else setShowSkipButton("");
-
-                      return; //if auto skip intro flag is off then no need to autoskip the intro or outro
-                    }
-
-                    // Skip intro
-                    if (currentTime < introEnd && currentTime > introStart) {
-                      player.currentTime = introEnd;
-                    }
-
-                    // Skip outro
-                    if (currentTime > outroStart && currentTime < outroEnd) {
-                      player.currentTime = outroEnd; // Skip to the end
-                    }
+                   handleTimeUpdate(v, event);
                   }}
 
                 // onHlsError={()=>{
@@ -749,6 +767,10 @@ export default function Page({ params }) {
               >
                 Auto Play ({mediaPlayerState?.isAutoPlay ? "on" : "off"})
               </button>
+
+              <div className="ml-auto">
+                <ShareModal buttonText="Share this episode" title={`Checkout this Amazing Episode from ${content?.title_english || content?.title}`}/>
+              </div>
             </div>
           </div>
 
