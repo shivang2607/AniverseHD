@@ -44,7 +44,8 @@ import handleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import { getAbsoluteURLPath } from "./utilFunctions";
-import ShareModal from "@/Components/utils/ShareModal";
+import { TbPlayerTrackNextFilled } from "react-icons/tb";
+import ShareModal from "@/components/utils/ShareModal";
 
 export default function Page({ params }) {
 
@@ -101,6 +102,7 @@ export default function Page({ params }) {
     isAutoPlay: true,
     isAutoNext: true,
   });
+  const [isNextEpisodeAvailable, setIsNextEpisodeAvailable] = useState(true);
   const [recentTimestamp, setRecentTimestamp] = useState(0);
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
@@ -308,8 +310,6 @@ export default function Page({ params }) {
             `/api/v1/${provider}/servers/${zoroEpisodeId}`
           );
 
-          // if sub is not available then cahnge the default server and dub flag to the raw
-          const subLength = serverData?.data?.data?.sub?.length;
 
           router.replace(
             updateParams([
@@ -391,6 +391,8 @@ export default function Page({ params }) {
         ep?.gogoSubId === gogoSubEpisodeId
     );
 
+
+
     if (currentIndex !== -1 && currentIndex < episodesData.length - 1) {
       const ep = episodesData[currentIndex + 1]; // Return the next episode's ID
       const url = updateParams([
@@ -401,6 +403,7 @@ export default function Page({ params }) {
       ]);
       router.push(url);
     } else {
+      setIsNextEpisodeAvailable(false);
       return null; // No more episodes available
     }
   };
@@ -486,14 +489,14 @@ export default function Page({ params }) {
     toast.error(result?.response?.message, { duration: 3000 });
   };
 
-  const handleTimeUpdate = (v, event)=>{
+  const handleTimeUpdate = (v, event) => {
     if (!streamingData?.intro) return;
     const player = event.target;
     const currentTime = player?.currentTime;
 
     const t = currentTime;
     if ((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))) {    //save timestamp after every 5 seconds
-      // console.log(recentTimestamp);
+      console.log(recentTimestamp);
       setRecentTimestamp(t);
     }
 
@@ -600,13 +603,13 @@ export default function Page({ params }) {
                   storage="media-player"
                   buffer
                   title={streamingData?.malId}
-                  src={process.env.NEXT_PUBLIC_GOOD_PROXY + encodeURIComponent(streamingData?.sources?.[0]?.url)} 
+                  src={process.env.NEXT_PUBLIC_GOOD_PROXY + encodeURIComponent(streamingData?.sources?.[0]?.url)}
                   className="h-full"
                   playsInline
                   crossOrigin
                   streamType="on-demand"
-                  onProviderChange={(provider, event)=>{
-                    if(isHLSProvider(provider)){
+                  onProviderChange={(provider, event) => {
+                    if (isHLSProvider(provider)) {
                       provider.config = {
                         nudgeMaxRetry: 5,
                         maxFragLookUpTolerance: 0.5,
@@ -619,17 +622,17 @@ export default function Page({ params }) {
                     }
                   }}
                   // crossOrigin="anonymous"
-                  
+
                   currentTime={startTime}
                   onError={(e) =>
                     toast.error(`${e.message}, Try Another Server.`)
                   }
-                  
+
                   onEnded={() =>
                     mediaPlayerState?.isAutoNext && getNextEpisode()
                   } //only fetch next episode if the auto next state is set to true.
                   onTimeUpdate={(v, event) => {
-                   handleTimeUpdate(v, event);
+                    handleTimeUpdate(v, event);
                   }}
 
                 // onHlsError={()=>{
@@ -768,9 +771,16 @@ export default function Page({ params }) {
                 Auto Play ({mediaPlayerState?.isAutoPlay ? "on" : "off"})
               </button>
 
-              <div className="ml-auto">
-                <ShareModal buttonText="Share this episode" title={`Checkout this Amazing Episode from ${content?.title_english || content?.title}`}/>
+              <div className="ml-auto flex gap-2 items-center">
+                {/* {episodesData?.length > 1 && isNextEpisodeAvailable && <button className="nextEpisode flex gap-1 items-center" onClick={getNextEpisode}>
+                  <TbPlayerTrackNextFilled /> Next Episode
+                </button>} */}
+
+                //* I have not yet checked if sending state instead of useRef will work or not
+                { <ShareModal t= {recentTimestamp}  buttonText="Share this Scene" title={`Checkout this Amazing Scene from ${content?.title_english || content?.title}`} />}
+                <ShareModal buttonText="Share this episode" title={`Checkout this Amazing Episode from ${content?.title_english || content?.title}`} />
               </div>
+
             </div>
           </div>
 
