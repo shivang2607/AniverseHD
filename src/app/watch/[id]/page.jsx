@@ -44,6 +44,7 @@ import handleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import { getAbsoluteURLPath } from "./utilFunctions";
+import ShareModal from "@/Components/utils/ShareModal";
 
 export default function Page({ params }) {
 
@@ -766,6 +767,10 @@ export default function Page({ params }) {
               >
                 Auto Play ({mediaPlayerState?.isAutoPlay ? "on" : "off"})
               </button>
+
+              <div className="ml-auto">
+                <ShareModal buttonText="Share this episode" title={`Checkout this Amazing Episode from ${content?.title_english || content?.title}`}/>
+              </div>
             </div>
           </div>
 
