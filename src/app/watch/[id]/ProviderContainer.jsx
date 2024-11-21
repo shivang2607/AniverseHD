@@ -178,7 +178,7 @@ export default function ProviderContainer({
           <div className="flex justify-between w-full">
           { id &&  <Link href={`/anime/${id}`} className="px-1 w-fit text-sm  bg-gray-200 text-gray-800 rounded-full">View Details</Link>}
 
-          <ShareModal url={`/anime/${id}`}/>
+          <ShareModal url={window.location.origin + `/anime/${id}`}/>
           </div>
           </div>
           

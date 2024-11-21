@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -18,16 +18,37 @@ import {
 import {  FaShareSquare } from "react-icons/fa";
 import { IoCopy } from 'react-icons/io5';
 import toast, { Toaster } from 'react-hot-toast';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { getAbsoluteURLPath } from '@/app/watch/[id]/utilFunctions';
 
-const ShareModal = ({ url, buttonText = "", modalTitle = "Share this Anime", title="Checkout this Amazing Anime" }) => {
+const ShareModal = ({ 
+                      url, 
+                      buttonText = "", 
+                      modalTitle = "Share this Anime", 
+                      title="Checkout this Amazing Anime" 
+                    }) => {
 
     const iconSize = 40;
-  const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
-  const closeModal = () => setIsOpen(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [fullURL, setFullURL] = useState(url);
+    
+
+    const closeModal = () => setIsOpen(false);
+
+    useEffect(()=>{
+      if(!url){
+        setFullURL(window.location.origin + getAbsoluteURLPath(pathname, searchParams));
+        console.log(fullURL);
+      }
+    }, [pathname, searchParams]);
+
+
 
   const handleOnCopy = ()=>{
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(fullURL);
     toast.success("Link Copied to Clipboard");
   }
 
@@ -42,7 +63,7 @@ const ShareModal = ({ url, buttonText = "", modalTitle = "Share this Anime", tit
 
 
       {/* Modal */}
-      {isOpen && (
+      {isOpen && fullURL && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 rounded-md flex items-center justify-center z-50"
           onClick={closeModal} // Close modal on clicking the overlay
@@ -56,7 +77,7 @@ const ShareModal = ({ url, buttonText = "", modalTitle = "Share this Anime", tit
             <h2 className="text-xl font-semibold mb-4 text-center">{modalTitle}</h2>
 
             <div className="copyText flex mx-auto self-center justify-between w-1/2 items-center gap-4">
-            <input type="text" name="" id="" value={url} disabled={true} className='rounded-md my-3 w-full /4 px-2 py-1' />
+            <input type="text" name="" id="" value={fullURL} disabled={true} className='rounded-md my-3 w-full /4 px-2 py-1' />
             <IoCopy className='text-2xl text-primary-300 cursor-pointer hover:scale-110 ease-in duration-100' onClick={handleOnCopy}/>
            
 
@@ -65,39 +86,39 @@ const ShareModal = ({ url, buttonText = "", modalTitle = "Share this Anime", tit
               {/* Facebook */}
               
               {/* Email */}
-              <EmailShareButton url={url} subject={title} body="Check this out!">
+              <EmailShareButton url={fullURL} subject={title} body="Check this out!">
                 <EmailIcon size={iconSize} round />
               </EmailShareButton>
 
               {/* WhatsApp */}
-              <WhatsappShareButton url={url} title={title}>
+              <WhatsappShareButton url={fullURL} title={title}>
                 <WhatsappIcon size={iconSize} round />
               </WhatsappShareButton>
 
               {/* Telegram */}
-              <TelegramShareButton url={url} title={title}>
+              <TelegramShareButton url={fullURL} title={title}>
                 <TelegramIcon size={iconSize} round />
               </TelegramShareButton>
               
               {/* LinkedIn */}
-              <LinkedinShareButton url={url} title={title}>
+              <LinkedinShareButton url={fullURL} title={title}>
                 <LinkedinIcon size={iconSize} round />
               </LinkedinShareButton>
 
 
               {/* Reddit */}
-              <RedditShareButton url={url} title={title}>
+              <RedditShareButton url={fullURL} title={title}>
                 <RedditIcon size={iconSize} round />
               </RedditShareButton>
 
 
               
-              <FacebookShareButton url={url} quote={title}>
+              <FacebookShareButton url={fullURL} quote={title}>
                 <FacebookIcon size={iconSize} round />
               </FacebookShareButton>
               
               {/* Twitter */}
-              <TwitterShareButton url={url} title={title}>
+              <TwitterShareButton url={fullURL} title={title}>
                 <TwitterIcon size={iconSize} round />
               </TwitterShareButton>
             </div>
