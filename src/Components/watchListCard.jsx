@@ -31,7 +31,7 @@ export default function WatchListCard({ anime, watchListId }) {
             fill
             src={
               anime?.animePhoto?.webp?.large_image_url ||
-              anime?.animePhoto?.webp?.large_image_url
+              anime?.animePhoto?.webp?.large_image_url || anime?.animePhoto || ""
             }
             alt={anime?.animeName || "Anime title"}
             className="object-cover "

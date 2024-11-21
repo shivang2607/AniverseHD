@@ -526,18 +526,18 @@ function validateParams({
   }
 
   // Anime Photo can be null
-  if (animePhoto !== null && typeof animePhoto !== "object") {
-    throw new Error("Invalid animePhoto (should be an object or null)");
+  if (animePhoto !== null && typeof animePhoto !== "object" && typeof animePhoto !== "string") {
+    throw new Error("Invalid animePhoto (should be an object or string)");
   }
 
   // Anime Genre can be null
   if (animeGenre !== null && !Array.isArray(animeGenre)) {
-    throw new Error("Invalid animeGenre (should be an array or null)");
+    throw new Error("Invalid animeGenre (should be an array )");
   }
 
   // Anime Type can be null
   if (animeType !== null && typeof animeType !== "string") {
-    throw new Error("Invalid animeType (should be a string or null)");
+    throw new Error("Invalid animeType (should be a string)");
   }
 
   // Anime Score can be null
