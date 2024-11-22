@@ -40,7 +40,7 @@ import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import Image from "next/image";
 import useUserStore from "@/components/ZustandStores/userStore";
 import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
-import handleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
+import HandleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import { getAbsoluteURLPath } from "./utilFunctions";
@@ -67,7 +67,7 @@ export default function Page({ params }) {
   const router = useRouter();
   const pathname = usePathname();
   const player = useRef(null);
-  const debounceMediaPlayerUpdate = handleUpdateMediaPlayerOptions();
+  const debounceMediaPlayerUpdate = HandleUpdateMediaPlayerOptions();
 
   const {
     episodesData,

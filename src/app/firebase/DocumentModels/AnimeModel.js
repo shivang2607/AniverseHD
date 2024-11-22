@@ -15,11 +15,12 @@ import { Timestamp } from "firebase/firestore"; // Import Firestore's Timestamp 
  * @param {number} params.animeLength - Length of the anime (e.g., number of episodes or runtime)
  * @param {string} params.url - Url of episode for recent watchlist 
  * @param {object} params.episodeTimestamp - Timestamp of episode for recent watchlist 
+ * @param {object} params.duration - edisode duration
  * @returns {Object} Firestore document object containing the anime data
  * @throws Will throw an error if any required parameter is missing
  */
 
-function AnimeModel({ animeId, animeName,animePhoto=null, animeGenre=null,animeType=null,animeScore=null,animeAgeRating=null,animeStartYear=null,animeLength=null, url=null, episodeTimestamp=null }) {
+function AnimeModel({ animeId, animeName,animePhoto=null, animeGenre=null,animeType=null,animeScore=null,animeAgeRating=null,animeStartYear=null,animeLength=null, url=null, episodeTimestamp=null,duration=null }) {
   if (!animeId || !animeName) {
     throw new Error(Constant_Var_errorMessage_missingParams);
   }
@@ -37,6 +38,7 @@ function AnimeModel({ animeId, animeName,animePhoto=null, animeGenre=null,animeT
     animeStartYear: animeStartYear,
     animeLength: animeLength,
     url:url,
+    duration:animeEpDuration,
     episodeTimestamp:episodeTimestamp,
     addedAt: Timestamp.now(),
     updatedAt: Timestamp.now(),

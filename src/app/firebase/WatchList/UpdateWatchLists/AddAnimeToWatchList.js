@@ -78,6 +78,7 @@ export default async function AddAnimeToWatchList({
   animeLength = null,
   url = null,
   episodeTimestamp=null,
+  duration=null
 }) {
   try {
     console.log(watchListId,
@@ -131,7 +132,8 @@ export default async function AddAnimeToWatchList({
       animeStartYear: animeStartYear,
       animeLength: animeLength,
       url: url,
-      episodeTimestamp:episodeTimestamp
+      episodeTimestamp:episodeTimestamp,
+      duration:duration,
     });
     const currTimestamp = animeObject.addedAt;
 
@@ -147,7 +149,7 @@ export default async function AddAnimeToWatchList({
         ) {
           // for special recent watch list, it have a fixed size
 
-          if (url === null ||episodeTimestamp==null)
+          if (url === null ||episodeTimestamp==null || duration==null)
             throw new Error(
               "Url and episodeTimestamp cannot be null when watchlist is starter recent"
             );
@@ -551,7 +553,7 @@ function validateParams({
   }
 
   // Anime Start Year can be null
-  if (animeStartYear !== null && typeof animeStartYear !== "number") {
+  if (animeStartYear !== null && typeof animeStartYear !== "number" && typeof animeStartYear !== "string") {
     throw new Error("Invalid animeStartYear (should be a number or null)");
   }
 

@@ -2,7 +2,7 @@ import UpdatePlayerOptions from '@/app/firebase/Profile/UpdatePlayerOptions';
 import { useRef } from 'react';
 import toast from 'react-hot-toast';
 
-const handleUpdateMediaPlayerOptions = () => {
+const HandleUpdateMediaPlayerOptions = () => {
   const debounceRef = useRef(null);
 
   return async (opt) => {
@@ -38,4 +38,4 @@ const handleUpdateMediaPlayerOptions = () => {
   };
 };
 
-export default handleUpdateMediaPlayerOptions;
+export default HandleUpdateMediaPlayerOptions;
