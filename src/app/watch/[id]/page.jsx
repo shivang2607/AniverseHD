@@ -46,6 +46,7 @@ import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAn
 import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/Components/utils/ShareModal";
+import Metadata from "./Metadata";
 
 export default function Page({ params }) {
 
@@ -527,15 +528,15 @@ export default function Page({ params }) {
 
   return (
     <div className="py-16">
-      <div className="content py-2 px-4 flex flex-col gap-4">
+      <div className="content py-2 md:px-4 flex flex-col gap-4">
         {!animeNotAvailable && (
-          <h1 className="text-2xl tracking-wide my-3 font-semibold  self-center">
+          <h1 className="text-2xl mx-2 md:mx-0 tracking-wide my-3 font-semibold  self-center">
             {" "}
             Currently Watching : {content?.title_english || content?.title}
           </h1>
         )}
-        <div className="stream-container self-center w-[95%] flex flex-col gap-12 ">
-          <div className="bg-cbg-200 p-4 ">
+        <div className="stream-container self-center md:w-[95%] w-full flex flex-col gap-12 ">
+          <div className="bg-cbg-200 md:p-4 ">
             {animeNotAvailable ? (
               <div className=" mx-auto flex flex-col gap-4 h-72 w-72 justify-center items-center">
                 <div className="relative overflow-hidden rounded h-full w-full flex flex-col gap-4 mx-auto object-cover object-center">
@@ -569,7 +570,7 @@ export default function Page({ params }) {
                 <ImCross color="red" /> {streamingData?.message}
               </div>
             ) : (
-              <div className="stream block bg-black h-[85vh] w-full rounded my-4">
+              <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
                 <MediaPlayer
                   load="eager"
                   autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
@@ -642,7 +643,7 @@ export default function Page({ params }) {
                     slots={{
                       afterCaptions: showSkipButton && (
                         <button
-                          className="text-lg w-fit h-fit absolute right-12 bottom-24 px-2 py-1 border-white border-2 rounded-md font-semibold backdrop-blur-lg bg-black/10 flex"
+                          className="md:text-lg w-fit h-fit absolute right-4 bottom-8 md:right-12 md:bottom-24 px-2 py-1 border-white border-2 rounded-md font-semibold backdrop-blur-lg bg-black/10 flex"
                           onClick={() => {
                             console.log(
                               player?.current?.currentTime,
@@ -664,15 +665,15 @@ export default function Page({ params }) {
                 </MediaPlayer>
               </div>
             )}
-            <div className="flex mt-4 mx-4 text-sm gap-1">
+            <div className="flex mt-4 mx-1 md:mx-4 md:text-sm my-2  text-[10px] md:gap-1 gap-[0.20rem]">
               <button
-                className="favorites flex items-center text-lg  mr-5 justify-center gap-1"
+                className="favorites flex items-center text-lg  md:mr-5 justify-center gap-1"
                 onClick={handleOnClickWatchList}
               >
                 {" "}
-                <PiBookmarkSimpleBold className="font-bold" />
+                <PiBookmarkSimpleBold className="font-bold text-2xl md:text-base" />
                 <div className="flex flex-col">
-                  <span className="text-sm flex gap-2 items-center">
+                  <span className="text-sm hidden md:flex gap-2 items-center">
                     {" "}
                     Edit Watch List{" "}
                   </span>
@@ -701,7 +702,7 @@ export default function Page({ params }) {
 
               {provider === "zoro" && (
                 <button
-                  className={`mx-1 ${mediaPlayerState?.isAutoSkip
+                  className={`md:mx-1 ${mediaPlayerState?.isAutoSkip
                     ? "text-sky-400 font-semibold"
                     : "font-[300]"
                     } `}
@@ -718,7 +719,7 @@ export default function Page({ params }) {
               )}
 
               <button
-                className={`mx-1 ${mediaPlayerState?.isAutoNext
+                className={`md:mx-1 ${mediaPlayerState?.isAutoNext
                   ? "text-sky-400 font-semibold"
                   : "font-[300]"
                   } `}
@@ -733,7 +734,7 @@ export default function Page({ params }) {
               </button>
 
               <button
-                className={`mx-1 ${mediaPlayerState?.isAutoPlay
+                className={`md:mx-1 ${mediaPlayerState?.isAutoPlay
                   ? "text-sky-400 font-semibold"
                   : "font-[300]"
                   } `}
@@ -747,7 +748,7 @@ export default function Page({ params }) {
                 Auto Play ({mediaPlayerState?.isAutoPlay ? "on" : "off"})
               </button>
 
-              <div className="ml-auto flex gap-2 items-center">
+              <div className="md:ml-auto flex gap-2 items-center">
                 {/* {episodesData?.length > 1 && isNextEpisodeAvailable && <button className="nextEpisode flex gap-1 items-center" onClick={getNextEpisode}>
                   <TbPlayerTrackNextFilled /> Next Episode
                 </button>} */}
@@ -761,15 +762,19 @@ export default function Page({ params }) {
 
           {episodesData && <ProviderContainer content={content} id={params?.id} />}
 
-          <div className="note text-sm flex items-center px-4 text-gray-400">
+          <div className="note text-sm flex text-nowrp items-center  self-center text-gray-400">
             *Note: Episode boxes with{" "}
             <div className="rounded w-5 h-3 bg-sky-400 mx-2"></div> color are
             filler episodes!
           </div>
 
         </div>
-        {params?.id && <Suggested id={params?.id} />}
+
+        <div className="md:hidden block my-12"><Metadata content={content} id={params?.id}/></div>
+
+
       </div>
+        {params?.id && <Suggested id={params?.id} />}
     </div>
   );
 }

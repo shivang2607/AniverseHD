@@ -60,7 +60,7 @@ const ShareModal = ({
     <div className='flex items-center max-w-screen-lg'>
       {/* Dynamic button */}
       <div className="button flex mx-2 cursor-pointer items-center my-auto gap-[0.15rem] " onClick={()=> setIsOpen(true)}>
-        <FaShareSquare className='text-primary-300'/> 
+        <FaShareSquare className='text-primary-300 md:text-base text-2xl'/> 
         {buttonText}
 
       </div>
@@ -72,16 +72,16 @@ const ShareModal = ({
           className="fixed inset-0 bg-black bg-opacity-50 rounded-md flex items-center justify-center z-50"
           onClick={closeModal} // Close modal on clicking the overlay
         >
-            <div className="img bg-recommendation-box-banne bg-center bg-cover  rounded-lg overflow-hidden flex flex-col gap-2  w-1/2 h-80 items-center shadow-lg">
+            <div className="img  bg-recommendation-box-banne bg-center bg-cover  rounded-lg overflow-hidden flex flex-col gap-2  md:w-1/2 w-5/6 md:h-80 h-96 items-center shadow-lg">
           <div
-            className="bg-cbg-100/100 backdrop-blur-sm w-full h-full"
+            className="bg-cbg-100/100 backdrop-blur-sm my-auto flex flex-col w-full h-full"
             onClick={(e) => e.stopPropagation()} // Prevent closing on clicking inside the modal
           >
             <div className='w-full flex flex-col my-auto p-3'>
             <h2 className="text-xl font-semibold mb-4 text-center">{modalTitle}</h2>
 
-            <div className="copyText flex mx-auto self-center justify-between w-1/2 items-center gap-4">
-            <label type="text" name="" id="" value={fullURL} disabled={true} className=' text-ellipsis rounded-md whitespace-nowrap bg-gray-500 overflow-hidden my-3 w-full /4 px-2 py-1' >{fullURL}</label>
+            <div className="copyText flex mx-auto self-center justify-between md:w-1/2 w-full items-center gap-4">
+            <label type="text" name="" id="" value={fullURL} disabled={true} className=' text-ellipsis rounded-md whitespace-nowrap bg-gray-500 text-sm overflow-hidden my-3 w-full /4 px-2 py-1' >{fullURL}</label>
             <IoCopy className='text-2xl text-primary-300 cursor-pointer hover:scale-110 ease-in duration-100' onClick={handleOnCopy}/>
            
 
