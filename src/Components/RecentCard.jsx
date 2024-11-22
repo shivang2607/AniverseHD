@@ -11,7 +11,9 @@ import { Constant_Var_success } from '@/utils/constants'
 
 export default function RecentCard({anime}) {
 
-    const {RecentWatchListId, } = useUserStore();
+    const {RecentWatchListId, loadLoggedInUserRecentWatchList} = useUserStore();
+
+    
 
     const handleOnRemove = async(e)=>{
         e.preventDefault();
@@ -21,7 +23,7 @@ export default function RecentCard({anime}) {
             animeId: anime?.animeId,
           });
         loadLoggedInUserRecentWatchList();
-
+        
         if (result.status !== Constant_Var_success){
             toast.error("Can't Remove Anime from Recent Watch list")
         }
@@ -32,7 +34,7 @@ export default function RecentCard({anime}) {
         // Calculate hours, minutes, and seconds
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
+        const secs = Math.round(seconds % 60);
       
         // Format hours, minutes, and seconds to be 2 digits
         const formattedHours = hours > 0 ? `${hours}:` : ''; // Show hours if greater than 0
@@ -88,12 +90,12 @@ export default function RecentCard({anime}) {
         
 
         <div className='progress flex flex-col gap-2 w-full my-4'>
-            <div className="timeWatched flex ml-auto  text-xs">
-                {formatTime(anime?.episodeTimestamp)}
-                {anime?.duration && `/${formatTime(anime?.duration)}`}
+            <div className="timeWatched flex ml-auto font-semibold text-xs">
+                <div className='text-primary-100'>{formatTime(anime?.episodeTimestamp)}</div> &nbsp;
+                {anime?.duration && `/ ${formatTime(anime?.duration)}`}
             </div>
         <div className=" w-full h-1 rounded-full bg-cbg-300">
-            <div className="h-full bg-primary-100" style={{width: `${(anime?.episodeTimestamp/anime?.duration) || 1}%`}}></div>
+            <div className="h-full bg-primary-100" style={{width: `${(100 * anime?.episodeTimestamp/anime?.duration) || 1}%`}}></div>
         </div>
         </div>
 

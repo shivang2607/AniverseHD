@@ -107,6 +107,7 @@ export default function Page({ params }) {
   const [duration, setDuration] = useState();
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
+  const durationRef = useRef(duration);
   const contentRef = useRef(content);
   // const [isAutoSkip, setIsAutoSkip] = useState(true);
 
@@ -129,7 +130,7 @@ export default function Page({ params }) {
           watchListId: RecentWatchListId,
           url: currentAbsoluteURL.current,
           episodeTimestamp: recentTimestampRef.current,
-          duration,
+          duration: durationRef.current,
           animeId: `${params?.id}`,
           animeName: content?.title_english || content?.title,
           animePhoto: content?.main_picture || content?.images || {},
@@ -143,6 +144,7 @@ export default function Page({ params }) {
             ) || "NA",
           animeLength: content?.episodes || content?.episode || null,
         });
+        console.log(result);
         // if (result?.status === Constant_Var_success) {
         //   toast.success("Watchlist Updated Successfully!!", {
         //     id: "1",
@@ -172,6 +174,11 @@ export default function Page({ params }) {
   useEffect(() => {
     contentRef.current = content;
   }, [content]);
+
+  useEffect(() => {
+    durationRef.current = duration;
+  }, [duration]);
+
 
 
   useEffect(() => {

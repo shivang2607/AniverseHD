@@ -92,7 +92,8 @@ export default async function AddAnimeToWatchList({
       animeStartYear ,
       animeLength ,
       url ,
-      episodeTimestamp,)
+      episodeTimestamp,
+      duration)
     // Validate the parameters
     validateParams({
       watchListId,
