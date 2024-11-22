@@ -1,21 +1,24 @@
-"use client"
-import MainCard from "@/components/mainCard";
-import Pagination from "@/components/Pagination";
+"use client";
+import React, { useEffect } from "react";
+import ShowCards from "./components/ShowCards";
+import Filters from "./components/Filters";
 import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
-import React from "react";
 
 const Page = () => {
-    const {setQuery,search,searchResults}=useAnimeSearchFilterStore();
+  const { resetFilters } = useAnimeSearchFilterStore();
 
-  return <div className="pt-96">
-    <input onChange={(e)=>setQuery(e.target.value)}/>
-    <button onClick={search}>Search</button>
-    <div className="px-10 grid md:grid-cols-5 grid-cols-2 gap-4">
-    {searchResults && searchResults.map((ele,ind)=>(
-        <MainCard anime={ele} key={ind}/>
-    ))}
+  useEffect(() => {
+    return () => {
+      resetFilters();
+    };
+  }, []);
+
+  return (
+    <div className="pt-96 px-10 flex flex-row">
+      <Filters />
+      <ShowCards />
     </div>
-  </div>;
+  );
 };
 
 export default Page;

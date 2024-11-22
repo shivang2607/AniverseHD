@@ -2,7 +2,7 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 
 const useAnimeSearchFilterStore= create((set, get) => ({
- searchResults:[],
+ searchResults:null,
  page:1,
  limit:25,
  q:null,
@@ -68,27 +68,29 @@ const useAnimeSearchFilterStore= create((set, get) => ({
     // Build query parameters
     const params = new URLSearchParams();
 
-    if (q) params.append('q', q);
-    if (type) params.append('type', type);
-    if (score) params.append('score', score);
-    if (min_score) params.append('min_score', min_score);
-    if (max_score) params.append('max_score', max_score);
-    if (status) params.append('status', status);
-    if (rating) params.append('rating', rating);
-    if (sfw) params.append('sfw', sfw);
-    if (genres) params.append('genres', genres);
-    if (genres_exclude) params.append('genres_exclude', genres_exclude);
-    if (order_by) params.append('order_by', order_by);
-    if (sort) params.append('sort', sort);
-    if (letter) params.append('letter', letter);
-    if (producers) params.append('producers', producers);
-    if (start_date) params.append('start_date', start_date);
-    if (end_date) params.append('end_date', end_date);
+    if (q!==null) params.append('q', q);
+    if (type!==null) params.append('type', type);
+    if (score!==null) params.append('score', score);
+    if (min_score!==null) params.append('min_score', min_score);
+    if (max_score!==null) params.append('max_score', max_score);
+    if (status!==null) params.append('status', status);
+    if (rating!==null) params.append('rating', rating);
+    if (sfw!==null) params.append('sfw', sfw);
+    if (genres!==null) params.append('genres', genres);
+    if (genres_exclude!==null) params.append('genres_exclude', genres_exclude);
+    if (order_by!==null) params.append('order_by', order_by);
+    if (sort!==null) params.append('sort', sort);
+    if (letter!==null) params.append('letter', letter);
+    if (producers!==null) params.append('producers', producers);
+    if (start_date!==null) params.append('start_date', start_date);
+    if (end_date!==null) params.append('end_date', end_date);
 
     params.append('page', page);
     params.append('limit', limit);
 
     try {
+    
+      set({ searchResults: null });
       // Make the API call
       const response = await fetch(`https://api.jikan.moe/v4/anime?${params.toString()}`);
       if (!response.ok) {
@@ -98,9 +100,9 @@ const useAnimeSearchFilterStore= create((set, get) => ({
       // Parse the response
       const data = await response.json();
 
-      console.log(data,data?.data,"success");
+      // console.log(data,data?.data,"success");
       // Update the store with the search results
-      set({ searchResults: data.data });
+      set({ searchResults: data });
     } catch (error) {
         toast.error(error.message, {
             id: "1",
@@ -108,6 +110,30 @@ const useAnimeSearchFilterStore= create((set, get) => ({
           });
       console.error('Error fetching anime search results:', error);
     }
+  },
+
+  resetFilters: async()=>{
+    set({
+      searchResults:null,
+      page:1,
+      limit:25,
+      q:null,
+      type:null,
+      score:null,
+      min_score:null,
+      max_score:null,
+      status:null,
+      rating:null,
+      sfw:null,
+      genres:null,
+      genres_exclude:null,
+      order_by:null,
+      sort:null,
+      letter:null,
+      producers:null,
+      start_date:null,
+      end_date:null,
+    })
   }
 }));
 
