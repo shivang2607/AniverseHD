@@ -11,7 +11,7 @@ const EditUserProfileModal = ({
   isOpen,
   onClose,
 }) => {
-  const {loadLoggedInUserData,loggedInUserData} = useUserStore();
+  const {loadLoggedInUserData,loggedInUserData,updateUserName} = useUserStore();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const tabs = ["Profile", "Cover", "Name"];
   const [selectedUserName, setSelectedUserName] = useState(loggedInUserData.userName);
@@ -108,20 +108,8 @@ const EditUserProfileModal = ({
     event.preventDefault();
 
     if (!selectedUserName.trim() || selectedUserName.trim() === "") return;
-
     setLoading(true);
-    const resp = await UpdateName({ userName: selectedUserName });
-
-    if (resp.status === Constant_Var_success) {
-      //successs
-
-      console.log("updated", resp.response);
-    } else {
-      //some error;
-      console.log("error updating Name", resp.response);
-    }
-
-    loadLoggedInUserData();
+    const resp = await updateUserName({ userName: selectedUserName });
     setLoading(false);
     onClose();
   }

@@ -1,4 +1,11 @@
+import DeleteWatchListById from "@/app/firebase/WatchList/DeleteWatchList";
+import UpdatePublicPrivateWatchList from "@/app/firebase/WatchList/UpdateWatchLists/UpdatePublicPrivateWatchList";
 import useUserStore from "@/Components/ZustandStores/userStore";
+import {
+  Constant_Var_firebase_fieldValue_private,
+  Constant_Var_firebase_fieldValue_public,
+  Constant_Var_success,
+} from "@/utils/constants";
 import React, { useEffect, useState } from "react";
 
 const WatchListsTabs = ({
@@ -6,11 +13,45 @@ const WatchListsTabs = ({
   CustomWatchLists,
   setSelectedWatchList,
   selectedWatchList,
+  paramsUserId,
 }) => {
-  const { isUserLoggedIn, loggedInUserId} =
-  useUserStore();
+  const { isUserLoggedIn, loggedInUserId, loadLoggedInUserWatchLists } =
+    useUserStore();
+  const [publicOrPrivate, setPublicOrPrivate] = useState(
+    selectedWatchList.type
+  );
+
+  async function DeleteCurrentWatchList() {
+    const resp = await DeleteWatchListById({
+      watchListId: selectedWatchList.id,
+    });
+
+    if (resp.status === Constant_Var_success) {
+      console.log(resp.status);
+      loadLoggedInUserWatchLists();
+    } else {
+      console.error("error", resp.response);
+    }
+  }
+
+  async function UpdatePublicPrivate(e) {
+    const type = e.target.value;
+    setPublicOrPrivate(type);
+    const resp = await UpdatePublicPrivateWatchList({
+      watchListId: selectedWatchList.id,
+      type: type,
+    });
+
+    if (resp.status === Constant_Var_success) {
+      console.log(resp.status);
+      loadLoggedInUserWatchLists();
+    } else {
+      console.error("error", resp.response);
+    }
+  }
+
   return (
-    <div className="flex flex-row w-full">
+    <div className="flex flex-row w-full justify-between">
       <div className="watchlist-tabs flex flex-row w-[60%] overflow-x-auto no-scrollbar space-x-3 py-2">
         {StarterWatchLists.map((ele, ind) => (
           <div
@@ -41,9 +82,26 @@ const WatchListsTabs = ({
         ))}
       </div>
 
-      <div>
-        
-      </div>
+      {isUserLoggedIn && loggedInUserId === paramsUserId && (
+        <div>
+          {!selectedWatchList.isSpecialStarter && (
+            <button
+              className="px-4 py-2 bg-red-600 text-white rounded-md font-semibold hover:bg-red-700 transition-all"
+              onClick={DeleteCurrentWatchList}
+            >
+              Delete Watchlist
+            </button>
+          )}
+          <select defaultValue={publicOrPrivate} onChange={UpdatePublicPrivate}>
+            <option value={Constant_Var_firebase_fieldValue_private}>
+              {Constant_Var_firebase_fieldValue_private}
+            </option>
+            <option value={Constant_Var_firebase_fieldValue_public}>
+              {Constant_Var_firebase_fieldValue_public}
+            </option>
+          </select>
+        </div>
+      )}
     </div>
   );
 };

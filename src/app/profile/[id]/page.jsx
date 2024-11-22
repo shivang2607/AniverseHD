@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import UserInfo from "./Components/UserInfo";
 import UserWatchLists from "./Components/UserWatchLists";
+import { Toaster } from "react-hot-toast";
 
 const Profile = ({ params }) => {
   // const [userInfo, setUserInfo] = useState(null);
@@ -55,7 +56,17 @@ const Profile = ({ params }) => {
   return (
     <div className="w-full min-h-[100vh]">
       <UserInfo id={params.id} />
-      <UserWatchLists id={params.id}/>
+      <UserWatchLists id={params.id} />
+      <Toaster
+        toastOptions={{
+          style: {
+            borderRadius: "10px",
+            background: "#b6d7d4",
+            border: "1px solid ",
+            color: "#041C32",
+          },
+        }}
+      />
     </div>
   );
 };

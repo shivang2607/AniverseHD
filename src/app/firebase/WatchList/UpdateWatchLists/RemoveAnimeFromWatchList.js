@@ -105,6 +105,7 @@ export default async function RemoveAnimeFromWatchList({
         return { status: Constant_Var_success, response: null };
       }
 
+      await batch.commit();
       removeAnimeFromUserWatchListCached({
         animeId: animeId,
         userId: userData.details.uid,
@@ -112,7 +113,7 @@ export default async function RemoveAnimeFromWatchList({
         updatedAt: currTimestamp,
       });
 
-      await batch.commit();
+     
 
 
       return { status: Constant_Var_success, response: null };

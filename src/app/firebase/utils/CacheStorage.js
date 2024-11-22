@@ -29,6 +29,7 @@ const findWatchListIndex = ({ userWatchLists, watchListId }) => {
   return userWatchLists.findIndex((watchList) => watchList.id === watchListId);
 };
 
+
 const updateUserPropertyCached = (property, value) => {
   let userData = getUserInfoCached();
   if (!userData) return;
@@ -240,7 +241,14 @@ export const addAnimeToWatchListByIdCachedInBatch = ({
   } else {
     watchListAnimeList = animeList;
   }
-  watchListAnimeList.sort((a, b) => a.age - b.age);
+  watchListAnimeList.sort((a, b) => {
+    if (a.updatedAt.seconds !== b.updatedAt.seconds) {
+      return a.updatedAt.seconds - b.updatedAt.seconds; 
+    }
+    return a.updatedAt.nanoseconds - b.updatedAt.nanoseconds;
+  }
+  
+  );
   setWatchListAnimeListByIdCached({
     watchlistAnimeList: watchListAnimeList,
     watchListId: watchListId,
@@ -332,7 +340,7 @@ export const deleteUserWatchlistCached = ({ watchListId, userId }) => {
   removeWatchListInfoByIdInfoCached({ watchListId: watchListId });
 };
 
-export const updatePublicPrivateCached = ({ watchListId, type, updatedAt }) => {
+export const updatePublicPrivateCached = ({ watchListId, type, updatedAt,userId }) => {
   let watchListInfo = getWatchListInfoByIdInfoCached({
     watchListId: watchListId,
   });

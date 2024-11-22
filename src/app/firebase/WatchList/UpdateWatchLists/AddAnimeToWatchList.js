@@ -78,8 +78,21 @@ export default async function AddAnimeToWatchList({
   animeLength = null,
   url = null,
   episodeTimestamp=null,
+  duration=null
 }) {
   try {
+    console.log(watchListId,
+      animeId,
+      animeName,
+      animePhoto ,
+      animeGenre ,
+      animeType ,
+      animeScore ,
+      animeAgeRating ,
+      animeStartYear ,
+      animeLength ,
+      url ,
+      episodeTimestamp,)
     // Validate the parameters
     validateParams({
       watchListId,
@@ -119,7 +132,8 @@ export default async function AddAnimeToWatchList({
       animeStartYear: animeStartYear,
       animeLength: animeLength,
       url: url,
-      episodeTimestamp:episodeTimestamp
+      episodeTimestamp:episodeTimestamp,
+      duration:duration,
     });
     const currTimestamp = animeObject.addedAt;
 
@@ -135,7 +149,7 @@ export default async function AddAnimeToWatchList({
         ) {
           // for special recent watch list, it have a fixed size
 
-          if (url === null ||episodeTimestamp==null)
+          if (url === null ||episodeTimestamp==null || duration==null)
             throw new Error(
               "Url and episodeTimestamp cannot be null when watchlist is starter recent"
             );
@@ -514,18 +528,18 @@ function validateParams({
   }
 
   // Anime Photo can be null
-  if (animePhoto !== null && typeof animePhoto !== "object") {
-    throw new Error("Invalid animePhoto (should be an object or null)");
+  if (animePhoto !== null && typeof animePhoto !== "object" && typeof animePhoto !== "string") {
+    throw new Error("Invalid animePhoto (should be an object or string)");
   }
 
   // Anime Genre can be null
   if (animeGenre !== null && !Array.isArray(animeGenre)) {
-    throw new Error("Invalid animeGenre (should be an array or null)");
+    throw new Error("Invalid animeGenre (should be an array )");
   }
 
   // Anime Type can be null
   if (animeType !== null && typeof animeType !== "string") {
-    throw new Error("Invalid animeType (should be a string or null)");
+    throw new Error("Invalid animeType (should be a string)");
   }
 
   // Anime Score can be null
@@ -539,7 +553,7 @@ function validateParams({
   }
 
   // Anime Start Year can be null
-  if (animeStartYear !== null && typeof animeStartYear !== "number") {
+  if (animeStartYear !== null && typeof animeStartYear !== "number" && typeof animeStartYear !== "string") {
     throw new Error("Invalid animeStartYear (should be a number or null)");
   }
 
