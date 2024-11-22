@@ -1,5 +1,5 @@
 "use client"
-import MainCard from '@/components/mainCard';
+import MainCard from '@/Components/mainCard';
 import axios from 'axios';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';

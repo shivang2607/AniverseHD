@@ -1,4 +1,4 @@
-import useStreamStore from "@/components/utils/streamStore";
+import useStreamStore from "@/Components/utils/streamStore";
 import axios from "axios";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -14,7 +14,7 @@ import { PiVideoFill } from "react-icons/pi";
 import { IoMdTimer } from "react-icons/io";
 import { RxDotFilled } from "react-icons/rx";
 import toast from "react-hot-toast";
-import ShareModal from "@/components/utils/ShareModal";
+import ShareModal from "@/Components/utils/ShareModal";
 
 
 
@@ -170,7 +170,7 @@ export default function ProviderContainer({
 
   return (
     <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">
-       <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10" />
+       <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10" alt={content?.title_english}/>
       <div className="w-[90%] mx-auto justify-between flex mb-8 flex-row">
         <div className="metadata flex gap-6 items-center mx-2">
           <div className="flex flex-col gap-2 justify-center">

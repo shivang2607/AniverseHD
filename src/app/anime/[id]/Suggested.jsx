@@ -1,5 +1,5 @@
-import MainCard from "@/components/mainCard";
-import useAnimeStore from "@/components/utils/animeStore";
+import MainCard from "@/Components/mainCard";
+import useAnimeStore from "@/Components/utils/animeStore";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { Oval } from "react-loader-spinner";

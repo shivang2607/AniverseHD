@@ -38,7 +38,7 @@ function AnimeModel({ animeId, animeName,animePhoto=null, animeGenre=null,animeT
     animeStartYear: animeStartYear,
     animeLength: animeLength,
     url:url,
-    duration:animeEpDuration,
+    duration: duration,
     episodeTimestamp:episodeTimestamp,
     addedAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
