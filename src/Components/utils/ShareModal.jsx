@@ -26,7 +26,8 @@ const ShareModal = ({
                       url, 
                       buttonText = "", 
                       modalTitle = "Share this Anime", 
-                      title="Checkout this Amazing Anime" 
+                      title="Checkout this Amazing Anime",
+                      t
                     }) => {
 
     const iconSize = 40;
@@ -40,11 +41,13 @@ const ShareModal = ({
     const closeModal = () => setIsOpen(false);
 
     useEffect(()=>{
+        console.log("This is timestamp recieved by shareModal", t);
       if(!url){
-        setFullURL(window.location.origin + getAbsoluteURLPath(pathname, searchParams));
-        console.log(fullURL);
+        const path = window.location.origin + getAbsoluteURLPath(pathname, searchParams);
+        setFullURL(t ? path + `&t=${t}` : path);
+        // console.log(fullURL);
       }
-    }, [pathname, searchParams]);
+    }, [[url, pathname, searchParams, t]]);
 
 
 
@@ -78,7 +81,7 @@ const ShareModal = ({
             <h2 className="text-xl font-semibold mb-4 text-center">{modalTitle}</h2>
 
             <div className="copyText flex mx-auto self-center justify-between w-1/2 items-center gap-4">
-            <input type="text" name="" id="" value={fullURL} disabled={true} className='rounded-md my-3 w-full /4 px-2 py-1' />
+            <label type="text" name="" id="" value={fullURL} disabled={true} className=' text-ellipsis rounded-md whitespace-nowrap bg-gray-500 overflow-hidden my-3 w-full /4 px-2 py-1' >{fullURL}</label>
             <IoCopy className='text-2xl text-primary-300 cursor-pointer hover:scale-110 ease-in duration-100' onClick={handleOnCopy}/>
            
 

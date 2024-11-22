@@ -87,10 +87,12 @@ export default function ProviderContainer({
   const dub = searchParams.get('dub');
   // const [server, setServer] = useState(searchParams.get('server'));
   // const [serverLoading, setServerLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const [episodeRangeIndex, setEpisodeRangeIndex] = useState(0); //according to this index range of episodes in the window will be shown , this will be changed through the dropdown of the select box, and the range is episodesPerWindow by default and is static for now, you can change this range statically or can make this range dynamic as well.
 
 
   useEffect(()=>{
+    setIsClient(true);
     return () => {
       console.log("useEffect cleanup triggered");
       setEpisodesData([]);
@@ -178,7 +180,11 @@ export default function ProviderContainer({
           <div className="flex justify-between w-full">
           { id &&  <Link href={`/anime/${id}`} className="px-1 w-fit text-sm  bg-gray-200 text-gray-800 rounded-full">View Details</Link>}
 
-          <ShareModal url={window.location.origin + `/anime/${id}`} modalTitle="Share this Episode"/>
+          {isClient &&
+          
+          <ShareModal url={window?.location?.origin + `/anime/${id}`} modalTitle="Share this Episode"/>
+          
+          }
           </div>
           </div>
           
