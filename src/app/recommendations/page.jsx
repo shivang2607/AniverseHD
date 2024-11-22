@@ -1,8 +1,8 @@
 "use client";
-import MainCard from "@/components/mainCard";
-import RecommendationSearchComponent from "@/components/recommendationPanel/SearchComponentRecommendation";
-import SharinganLoader from "@/components/sharinganLoader";
-import useRecommendationStore from "@/components/utils/store";
+import MainCard from "@/Components/mainCard";
+import RecommendationSearchComponent from "@/Components/recommendationPanel/SearchComponentRecommendation";
+import SharinganLoader from "@/Components/sharinganLoader";
+import useRecommendationStore from "@/Components/utils/store";
 import Image from "next/image";
 import React from "react";
 import toast, { Toaster } from "react-hot-toast";

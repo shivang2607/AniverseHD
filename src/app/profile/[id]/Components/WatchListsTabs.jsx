@@ -1,4 +1,4 @@
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/Components/ZustandStores/userStore";
 import React, { useEffect, useState } from "react";
 
 const WatchListsTabs = ({

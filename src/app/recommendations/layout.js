@@ -1,4 +1,4 @@
-import FilterPanel from "@/components/utils/FilterPanel";
+import FilterPanel from "@/Components/utils/FilterPanel";
 
 export default function RecommendationLayout({
     children, // will be a page or nested layout

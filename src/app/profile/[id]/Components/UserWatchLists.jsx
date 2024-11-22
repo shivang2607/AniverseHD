@@ -1,5 +1,5 @@
 import GetOtherUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetOtherUserWatchListsInfo";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/Components/ZustandStores/userStore";
 import {
   Constant_Var_errorMessage_userDoesNotExistWithThisId,
   Constant_Var_starterWatchLists_recent,

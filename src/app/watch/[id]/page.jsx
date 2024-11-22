@@ -5,14 +5,14 @@ import { useEffect } from "react";
 import {
   getSessionWithExpiry,
   setSessionWithExpiry,
-} from "@/components/utils/storage";
+} from "@/Components/utils/storage";
 import { IoMdAdd } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import useStreamStore from "@/components/utils/streamStore";
+import useStreamStore from "@/Components/utils/streamStore";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
-import ListDropDown from "@/components/utils/ListDropDown";
+import ListDropDown from "@/Components/utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
 import "@vidstack/react/player/styles/default/theme.css";
 import "@vidstack/react/player/styles/default/layouts/video.css";
@@ -38,14 +38,14 @@ import {
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import Image from "next/image";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/Components/ZustandStores/userStore";
 import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import handleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
-import ShareModal from "@/components/utils/ShareModal";
+import ShareModal from "@/Components/utils/ShareModal";
 
 export default function Page({ params }) {
 
@@ -104,6 +104,7 @@ export default function Page({ params }) {
   });
   const [isNextEpisodeAvailable, setIsNextEpisodeAvailable] = useState(true);
   const [recentTimestamp, setRecentTimestamp] = useState(0);
+  const [duration, setDuration] = useState();
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
   const contentRef = useRef(content);
@@ -128,6 +129,7 @@ export default function Page({ params }) {
           watchListId: RecentWatchListId,
           url: currentAbsoluteURL.current,
           episodeTimestamp: recentTimestampRef.current,
+          duration,
           animeId: `${params?.id}`,
           animeName: content?.title_english || content?.title,
           animePhoto: content?.main_picture || content?.images || {},
@@ -331,40 +333,6 @@ export default function Page({ params }) {
         }
       }
 
-      //   else if(provider==="gogo"){
-      //     let dataGogoDub, dataGogoSub;
-      //     if(gogoDubEpisodeId){
-      //       dataGogoDub = await axios.get(
-      //         `/api/v1/${provider}/servers/${gogoDubEpisodeId}`
-      //       );
-      //       // setServerData({dub : dataGogoDub?.data});
-
-      //     }
-
-      //     if(gogoSubEpisodeId){
-      //       dataGogoSub = await axios.get(
-      //         `/api/v1/${provider}/servers/${gogoSubEpisodeId}`
-      //       );
-      //       // setServerData({sub : dataGogoSub?.data});
-
-      //     }
-      //     setServerData({
-      //       sub : dataGogoSub?.data,
-      //       dub : dataGogoDub?.data,
-      //   })
-
-      //   if(!serverV){
-      //   if(dataGogoSub?.data?.sub){
-      //     setServer(dataGogoSub?.data?.sub[0]?.name);
-      //   }
-      //   else{
-      //     setServer('Vidstreaming');
-      //   }
-      // }
-
-      //   }  //!enable it when you need all the servers from gogo that is if you want to use embed urls
-
-      // setServerLoading(false);
     })();
 
     return () => {
@@ -608,6 +576,7 @@ export default function Page({ params }) {
                   playsInline
                   crossOrigin
                   streamType="on-demand"
+                  onLoadedMetadata={(e)=> {console.log("duration of this episode is ",e.target.duration); setDuration(e.target.duration)}}
                   onProviderChange={(provider, event) => {
                     if (isHLSProvider(provider)) {
                       provider.config = {
@@ -776,7 +745,7 @@ export default function Page({ params }) {
                   <TbPlayerTrackNextFilled /> Next Episode
                 </button>} */}
 
-                {recentTimestamp && <ShareModal t= {recentTimestamp}  buttonText="Share this Scene" title={`Checkout this Amazing Scene from ${content?.title_english || content?.title}`} />}
+                {recentTimestamp > 0 && <ShareModal t= {recentTimestamp}  buttonText="Share this Scene" title={`Checkout this Amazing Scene from ${content?.title_english || content?.title}`} />}
                 <ShareModal buttonText="Share this episode" title={`Checkout this Amazing Episode from ${content?.title_english || content?.title}`} />
               </div>
 
