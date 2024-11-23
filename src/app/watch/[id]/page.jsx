@@ -145,7 +145,7 @@ export default function Page({ params }) {
             ) || "NA",
           animeLength: content?.episodes || content?.episode || null,
         });
-        console.log(result);
+        console.log("RESULT OF ADDING ANIME IN RECENT WATCHLIST ", result);
         // if (result?.status === Constant_Var_success) {
         //   toast.success("Watchlist Updated Successfully!!", {
         //     id: "1",
