@@ -1,4 +1,4 @@
-import useStreamStore from "@/Components/utils/streamStore";
+import useStreamStore from "@/components/utils/streamStore";
 import axios from "axios";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -14,7 +14,7 @@ import { PiVideoFill } from "react-icons/pi";
 import { IoMdTimer } from "react-icons/io";
 import { RxDotFilled } from "react-icons/rx";
 import toast from "react-hot-toast";
-import ShareModal from "@/Components/utils/ShareModal";
+import ShareModal from "@/components/utils/ShareModal";
 
 
 

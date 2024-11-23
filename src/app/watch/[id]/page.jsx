@@ -5,14 +5,14 @@ import { useEffect } from "react";
 import {
   getSessionWithExpiry,
   setSessionWithExpiry,
-} from "@/Components/utils/storage";
+} from "@/components/utils/storage";
 import { IoMdAdd } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import useStreamStore from "@/Components/utils/streamStore";
+import useStreamStore from "@/components/utils/streamStore";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
-import ListDropDown from "@/Components/utils/ListDropDown";
+import ListDropDown from "@/components/utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
 import "@vidstack/react/player/styles/default/theme.css";
 import "@vidstack/react/player/styles/default/layouts/video.css";
@@ -38,14 +38,14 @@ import {
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import Image from "next/image";
-import useUserStore from "@/Components/ZustandStores/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
 import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import HandleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
-import ShareModal from "@/Components/utils/ShareModal";
+import ShareModal from "@/components/utils/ShareModal";
 
 export default function Page({ params }) {
 

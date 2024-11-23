@@ -1,5 +1,5 @@
 import GetWatchListDataById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
-import Pagination from "@/Components/Pagination";
+import Pagination from "@/components/Pagination";
 import WatchListCard from "@/components/watchListCard";
 import { Constant_Var_success } from "@/utils/constants";
 import React, { useEffect, useRef, useState } from "react";
