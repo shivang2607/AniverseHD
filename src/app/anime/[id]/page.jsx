@@ -25,7 +25,7 @@ import {
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import { useRouter } from "next/navigation";
-import useUserStore from "@/Components/ZustandStores/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
 
 export default function Anime({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);

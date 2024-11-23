@@ -5,7 +5,7 @@ import Image from "next/image";
 import UpdateProfileImage from "@/app/firebase/Profile/UpdateProfileImage";
 import UpdateCoverImage from "@/app/firebase/Profile/UpdateCoverImage";
 import UpdateName from "@/app/firebase/Profile/UpdateName";
-import useUserStore from "@/Components/ZustandStores/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
 
 const EditUserProfileModal = ({
   isOpen,

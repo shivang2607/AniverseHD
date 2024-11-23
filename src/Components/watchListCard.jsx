@@ -4,14 +4,10 @@ import React, { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 import { MdMovie } from "react-icons/md";
 import { IoMdTimer } from "react-icons/io";
-import { PiBookmarkSimpleBold } from "react-icons/pi";
-import ListDropDown from "./utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
-import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
 import { MdDeleteOutline } from "react-icons/md";
-import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
-import { Constant_Var_success } from "@/utils/constants";
-import useUserStore from "./ZustandStores/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
+
 
 export default function WatchListCard({ anime, watchListId }) {
   const {removeAnimeFromWatchList}=useUserStore();
