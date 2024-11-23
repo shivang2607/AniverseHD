@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import UserInfo from "./Components/UserInfo";
-import UserWatchLists from "./Components/UserWatchLists";
+import UserInfo from "./components/UserInfo";
+import UserWatchLists from "./components/UserWatchLists";
 import { Toaster } from "react-hot-toast";
 
 const Profile = ({ params }) => {

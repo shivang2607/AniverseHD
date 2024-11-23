@@ -131,7 +131,7 @@ const UserWatchLists = ({ id }) => {
             />
           </div>
 
-          <WatchListPagination selectedWatchList={selectedWatchList} />
+          <WatchListPagination selectedWatchList={selectedWatchList} key={selectedWatchList.id} />
         </div>
       ) : (
         <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">

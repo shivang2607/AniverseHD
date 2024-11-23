@@ -38,7 +38,7 @@ import {
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import Image from "next/image";
-import useUserStore from "@/Components/ZustandStores/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
 import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import HandleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
@@ -46,7 +46,6 @@ import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAn
 import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
-import Metadata from "./Metadata";
 
 export default function Page({ params }) {
 

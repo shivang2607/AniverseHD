@@ -9,6 +9,7 @@ const WatchListPagination = ({ selectedWatchList }) => {
   const pageSize = 12;
   const [offset, setOffset] = useState(0);
   const [error, setError] = useState(false);
+  const [currentPage,setCurrentPage]=useState(1);
   let prevWatchListId = useRef(null);
 
   useEffect(() => {
@@ -46,14 +47,18 @@ const WatchListPagination = ({ selectedWatchList }) => {
     loadWatchListData();
   }, [offset, selectedWatchList]);
 
+  useEffect(()=>{
+   setOffset((currentPage-1)*pageSize);
+  },[currentPage])
+
   const reloadWatchListData = async () => {};
 
   return (
-    <div className="flex flex-col justify-center mx-20 my-10">
+    <div className="flex flex-col justify-center md:mx-20 sm:mx-10 mx-5 my-10">
       {list ? (
         list.length > 0 ? (
           <div
-            className={`grid md:grid-cols-6 grid-cols-2 gap-4 transition-all duration-500`}
+            className={`grid lg:grid-cols-6 sm:grid-cols-4 grid-cols-2 gap-4 transition-all duration-500`}
           >
             {list.map((ele, ind) => (
               <WatchListCard
@@ -75,8 +80,8 @@ const WatchListPagination = ({ selectedWatchList }) => {
       {selectedWatchList && selectedWatchList.animeList.length > 0 && (
         <Pagination
           totalPages={Math.ceil(selectedWatchList.animeList.length / pageSize)}
-          pageSize={pageSize}
-          setOffset={(val) => setOffset(val)}
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
           key={selectedWatchList.id}
         />
       )}

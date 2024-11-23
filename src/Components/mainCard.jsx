@@ -9,7 +9,7 @@ import ListDropDown from "./utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
 
-export default function MainCard({ anime }) {
+export default function MainCard({ anime , imageHeight=72}) {
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
 
@@ -29,7 +29,7 @@ export default function MainCard({ anime }) {
     <div className="image-container  my-1 w-full  h-fit pb-3 rounded-md  flex flex-col  hover:shadow-m overflow-hidden">
       <Link
         href={`/anime/${anime?.mal_id}`}
-        className=" flex relative flex-col gap-2 h-72  rounded-md overflow-hidden duration-300 transition-all w-full   "
+        className={ `flex relative flex-col gap-2 h-${imageHeight}  rounded-md overflow-hidden duration-300 transition-all w-full   `}
       >
         <div className="image relative rounded-md overflow-hidden  h-full w-full ">
           <Image

@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
 
-const Pagination = ({ totalPages, pageSize, setOffset }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-
+const Pagination = ({ totalPages,currentPage,setCurrentPage }) => {
+  
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    setOffset((page - 1) * pageSize);
   };
 
   const handlePrev = () => {
     if (currentPage > 1) {
-      setOffset((currentPage - 2) * pageSize);
       setCurrentPage(currentPage - 1);
     }
   };
 
   const handleNext = () => {
     if (currentPage < totalPages) {
-      setOffset(currentPage * pageSize);
-      setCurrentPage((prev) => prev + 1);
+      setCurrentPage(currentPage+1);
     }
   };
 

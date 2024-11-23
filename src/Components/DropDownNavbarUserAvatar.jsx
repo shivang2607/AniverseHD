@@ -1,8 +1,7 @@
-import SignOut from "@/app/firebase/SignIn/SignOut";
-import { Constant_Var_success } from "@/utils/constants";
 import Link from "next/link";
 import React, { useState } from "react";
-import useUserStore from "./ZustandStores/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
+
 
 const DropDownNavbarUserAvatar = () => {
   const { logout, loggedInUserData} = useUserStore();
@@ -30,7 +29,7 @@ const DropDownNavbarUserAvatar = () => {
         </div>
       </button>
       <div
-        className={`absolute right-0 mt-1 w-48 bg-cbg-200 rounded-md shadow-lg py-1 z-10 border border-cbg-300 transform transition-all duration-300 ease-in-out ${
+        className={`absolute right-0 mt-1 w-48 bg-cbg-200 rounded-md shadow-lg py-1 z-50 border border-cbg-300 transform transition-all duration-300 ease-in-out ${
           isOpen
             ? "opacity-100 translate-y-0 scale-100"
             : "opacity-0 translate-y-4 scale-95 pointer-events-none"
