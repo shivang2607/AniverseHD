@@ -20,10 +20,10 @@ export default function Page() {
   return (
     <div>
       <ResponsiveCarousal />
+      <RecentWatching/>
       <TopAiringCarousal />
       <RecommendationPanel />
       <AllTop />
-      <RecentWatching/>
     </div>
   );
 }
