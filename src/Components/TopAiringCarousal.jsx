@@ -26,7 +26,7 @@ export default function TopAiringCarousal() {
   }, []);
 
   return (
-    <div className="my-6 p-4  flex flex-col gap-4">
+    <div className="my-1 p-4  flex flex-col gap-4">
       <h1 className="text-primary-500 font-semibold text-2xl tracking-wide">
         Top Airing
       </h1>

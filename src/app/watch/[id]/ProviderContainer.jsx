@@ -1,4 +1,4 @@
-import useStreamStore from "@/Components/utils/streamStore";
+import useStreamStore from "@/components/utils/streamStore";
 import axios from "axios";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -14,7 +14,7 @@ import { PiVideoFill } from "react-icons/pi";
 import { IoMdTimer } from "react-icons/io";
 import { RxDotFilled } from "react-icons/rx";
 import toast from "react-hot-toast";
-import ShareModal from "@/Components/utils/ShareModal";
+import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
 
 
@@ -323,7 +323,7 @@ export default function ProviderContainer({
         </select>
       </div>
 
-      <div className="episode-list grid md:grid-cols-4 grid-cols-2 gap-2 m-3 max-h-screen overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
+      <div className="episode-list grid md:grid-cols-4 grid-cols-2 gap-2 m-3 md:max-h-screen h-[40vh] overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
         {episodes
           ?.slice(
             (episodesPerWindow * episodeRangeIndex),

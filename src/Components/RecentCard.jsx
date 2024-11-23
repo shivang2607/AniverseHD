@@ -9,7 +9,7 @@ import { MdMovie } from 'react-icons/md'
 import useUserStore from './ZustandStores/userStore'
 import { Constant_Var_success } from '@/utils/constants'
 
-export default function RecentCard({anime}) {
+export default function RecentCard({anime, grid=false}) {
 
     const {RecentWatchListId, loadLoggedInUserRecentWatchList} = useUserStore();
 
@@ -45,7 +45,7 @@ export default function RecentCard({anime}) {
       };
 
   return (
-    <div className="image-container  my-1 w-full  h-fit pb-3 rounded-md  flex flex-col  hover:shadow-m overflow-hidden">
+    <div className={`image-container  my-1 ${grid ? "w-full  h-96" : "md:w-1/6 w-[35%] h-80"} flex-shrink-0 md:h-fit  pb-1 rounded-md  flex flex-col  hover:shadow-m overflow-hidden`}>
       <Link
         href={`${anime?.url}&t=${anime?.episodeTimestamp}`}
         className=" flex relative flex-col gap-2 h-72  rounded-md overflow-hidden duration-300 transition-all w-full   "

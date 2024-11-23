@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import useAnimeStore from "@/Components/utils/animeStore";
+import useAnimeStore from "@/components/utils/animeStore";
 import Image from "next/image";
 import { FaPlay, FaPlayCircle } from "react-icons/fa";
 import { MdPlayDisabled } from "react-icons/md";
@@ -16,7 +16,7 @@ import Suggested from "./Suggested";
 import Skeleton from "react-loading-skeleton";
 import toast, { Toaster } from "react-hot-toast";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
-import ListDropDown from "@/Components/utils/ListDropDown";
+import ListDropDown from "@/components/utils/ListDropDown";
 import {
   Constant_Var_errorMessage_loggedInUserDoesNostExistsYet,
   Constant_Var_errorMessage_notAuthenticatedUser,
@@ -25,7 +25,7 @@ import {
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import { useRouter } from "next/navigation";
-import useUserStore from "@/Components/ZustandStores/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
 
 export default function Anime({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);

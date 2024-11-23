@@ -4,7 +4,7 @@ import { FaRegEdit } from "react-icons/fa";
 import Image from "next/image";
 import CreateWatchListModal from "./CreateWatchListModal";
 import EditUserProfileModal from "./EditUserProfileModal";
-import useUserStore from "@/Components/ZustandStores/userStore";
+import useUserStore from "@/components/ZustandStores/userStore";
 import GetOtherUserData from "@/app/firebase/Profile/GetOtherUserData";
 import {
   Constant_Var_errorMessage_userDoesNotExistWithThisId,
