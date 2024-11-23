@@ -14,7 +14,7 @@ const Page = () => {
   }, []);
 
   return (
-    <div className="pt-96 px-10 flex flex-row">
+    <div className="pt-20 px-10 flex flex-row">
       <Filters />
       <ShowCards />
     </div>

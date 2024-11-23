@@ -43,6 +43,20 @@ const useAnimeSearchFilterStore= create((set, get) => ({
  setStartDate: (start_date) => set({ start_date }),
  setEndDate: (end_date) => set({ end_date }),
 
+ toggleGenre: (genreId)=>{
+  const {genres}=get();
+  if(genres==null){
+    set({genres:[genreId]});
+    return;
+  }
+
+  if(genres.some(e=>e==genreId)){
+    set({genres:genres.filter(e=>e!==genreId)});
+  }else{
+    set({genres:genres.concat([genreId])});
+  }
+ },
+
  search: async () => {
     const {
       page,
@@ -73,15 +87,15 @@ const useAnimeSearchFilterStore= create((set, get) => ({
     if (score!==null) params.append('score', score);
     if (min_score!==null) params.append('min_score', min_score);
     if (max_score!==null) params.append('max_score', max_score);
-    if (status!==null) params.append('status', status);
+    if (status!==null ) params.append('status', status);
     if (rating!==null) params.append('rating', rating);
     if (sfw!==null) params.append('sfw', sfw);
-    if (genres!==null) params.append('genres', genres);
-    if (genres_exclude!==null) params.append('genres_exclude', genres_exclude);
+    if (genres!==null && genres.length>0) params.append('genres', genres);
+    if (genres_exclude!==null && genres_exclude.length>0) params.append('genres_exclude', genres_exclude);
     if (order_by!==null) params.append('order_by', order_by);
     if (sort!==null) params.append('sort', sort);
     if (letter!==null) params.append('letter', letter);
-    if (producers!==null) params.append('producers', producers);
+    if (producers!==null && producers.length>0) params.append('producers', producers);
     if (start_date!==null) params.append('start_date', start_date);
     if (end_date!==null) params.append('end_date', end_date);
 

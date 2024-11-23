@@ -42,16 +42,16 @@ import _ from "lodash";
  * @function
  * @param {Object} params - The parameters for fetching the watchlist.
  * @param {string} params.watchListId - The ID of the watchlist to retrieve.
- * @param {number|null} [params.offset=null] - The offset for paginated retrieval. 
+ * @param {number|null} [params.offset=null] - The offset for paginated retrieval.
  *                                             Required if `getAll` is false.
  * @param {number|null} [params.pageSize=null] - The number of items to retrieve per page.
  *                                               Required if `getAll` is false.
  * @param {boolean} [params.getAll=false] - Whether to fetch the entire list of items.
  *                                          Overrides offset and pageSize if true.
  *
- * @returns {Promise<Object>} - An object with a `status` key, which is 
- *                              `Constant_Var_success` on success and 
- *                              `Constant_Var_error` on error, and a `response` 
+ * @returns {Promise<Object>} - An object with a `status` key, which is
+ *                              `Constant_Var_success` on success and
+ *                              `Constant_Var_error` on error, and a `response`
  *                              key with the retrieved watchlist data or an error message.
  *
  * @throws Will throw an error if required parameters are missing.
@@ -84,12 +84,13 @@ import _ from "lodash";
  */
 export default async function GetWatchListDataById({
   watchListId,
-  offset=null,
-  pageSize=null,
-  getAll=false
+  offset = null,
+  pageSize = null,
+  getAll = false,
 }) {
   try {
-    if (!(watchListId && ((offset!=null && pageSize!=null) || getAll))) throw new Error(Constant_Var_errorMessage_missingParams);
+    if (!(watchListId && ((offset != null && pageSize != null) || getAll)))
+      throw new Error(Constant_Var_errorMessage_missingParams);
 
     // console.log(offset,pageSize,"start");
     let watchlistInfoCache = await GetWatchListInfoById({
@@ -108,7 +109,10 @@ export default async function GetWatchListDataById({
       throw watchlistInfoCache.response;
 
     if (
-      compareTimestamp( watchlistInfoCache.response.updatedAt,watchListInfo.response.updatedAt)
+      compareTimestamp(
+        watchlistInfoCache.response.updatedAt,
+        watchListInfo.response.updatedAt
+      )
     ) {
       // Clear watchlistAnimelist cache
       removeWatchlistAnimeListCached({ watchListId: watchListId });
@@ -120,19 +124,13 @@ export default async function GetWatchListDataById({
       watchListInfo.response.type === Constant_Var_firebase_fieldValue_public ||
       (await getUserAuth())?.details.uid === watchListInfo.response.ownerUid
     ) {
-      if(getAll){
-        response= await GetFromFirestore({watchListId:watchListId, getAll:true});
-        addAnimeToWatchListByIdCachedInBatch({
-          watchListId: watchListId,
-          animeList: response,
+
+        response = await Helper({
+          watchListInfo: watchListInfo.response,
+          offset: offset,
+          pageSize: pageSize,
+          getAll: getAll
         });
-      }else{
-      response = await Helper({
-        watchListInfo: watchListInfo.response,
-        offset: offset,
-        pageSize: pageSize,
-      });
-    }
     } else {
       throw new Error(Constant_Var_errorMessage_privateWatchList);
     }
@@ -143,19 +141,28 @@ export default async function GetWatchListDataById({
   }
 }
 
-async function Helper({ watchListInfo, offset, pageSize }) {
+async function Helper({ watchListInfo, offset, pageSize, getAll=false }) {
   const { animeList, id } = watchListInfo;
-  if (offset >= animeList.length) return [];
+ 
+  let startAnime = null,
+    endAnime = null;
+  if (getAll) {
+    if(animeList.length==0) return [];
 
-  let startAnime = animeList[offset];
-  let endAnime =
-    animeList[Math.min(animeList.length - 1, offset + pageSize - 1)];
+    startAnime=animeList[0];
+    endAnime=animeList[animeList.length-1];
+  } else {
+    if (offset >= animeList.length) return [];
+
+    startAnime = animeList[offset];
+    endAnime = animeList[Math.min(animeList.length - 1, offset + pageSize - 1)];
+  }
 
   let animeListCache = getWatchListAnimeListByIdCached({
     watchListId: id,
   });
 
-  console.log(startAnime,endAnime,"hh");
+  // console.log(startAnime, endAnime, "hh");
   let startIndex = Search({
     arrayofObjects: animeListCache,
     attribute: "addedAt",
@@ -168,17 +175,17 @@ async function Helper({ watchListInfo, offset, pageSize }) {
     key: endAnime.addedAt,
   });
 
-  console.log(startIndex, endIndex);
+  // console.log(startIndex, endIndex);
 
   if (startIndex !== -1 && endIndex !== -1) {
-    return animeListCache.slice(startIndex, endIndex+1);
+    return animeListCache.slice(startIndex, endIndex + 1);
   } else if (startIndex !== -1 && endIndex === -1) {
     let arr = animeListCache.slice(startIndex, animeListCache.length);
     let arr2 = await GetFromFirestore({
       watchListId: id,
       startTimestamp: animeListCache[animeListCache.length - 1].updatedAt,
       endTimestamp: endAnime.addedAt,
-      startInclude:false,
+      startInclude: false,
     });
     addAnimeToWatchListByIdCachedInBatch({
       watchListId: id,
@@ -186,15 +193,15 @@ async function Helper({ watchListInfo, offset, pageSize }) {
     });
     return arr.concat(arr2);
   } else if (endIndex !== -1 && startIndex === -1) {
-    let arr = animeListCache.slice(0, endIndex+1);
+    let arr = animeListCache.slice(0, endIndex + 1);
     let arr2 = await GetFromFirestore({
       watchListId: id,
       startTimestamp: startAnime.addedAt,
       endTimestamp: animeListCache[0].updatedAt,
-      endInclude:false,
+      endInclude: false,
     });
     addAnimeToWatchListByIdCachedInBatch({
-      watchListId:id,
+      watchListId: id,
       animeList: arr2,
     });
     return arr.concat(arr2);
@@ -245,12 +252,12 @@ async function GetFromFirestore({
   startTimestamp,
   endTimestamp,
   startInclude = true,
-  endInclude=true,
-  getAll=false
+  endInclude = true,
+  getAll = false,
 }) {
   let queryResult;
 
-  if(getAll){
+  if (getAll) {
     queryResult = await getDocs(
       query(
         collection(
@@ -259,10 +266,10 @@ async function GetFromFirestore({
           watchListId,
           Constant_Var_firebase_collectionName_animeList
         ),
-        orderBy("updatedAt"),
+        orderBy("updatedAt")
       )
     );
-  }else if (startInclude  && endInclude) {
+  } else if (startInclude && endInclude) {
     queryResult = await getDocs(
       query(
         collection(
@@ -272,12 +279,13 @@ async function GetFromFirestore({
           Constant_Var_firebase_collectionName_animeList
         ),
         orderBy("updatedAt"),
-        startAt(new Timestamp( startTimestamp.seconds,startTimestamp.nanoseconds)),
-        endAt(new Timestamp( endTimestamp.seconds,endTimestamp.nanoseconds))
+        startAt(
+          new Timestamp(startTimestamp.seconds, startTimestamp.nanoseconds)
+        ),
+        endAt(new Timestamp(endTimestamp.seconds, endTimestamp.nanoseconds))
       )
     );
-   
-  } else if(startInclude){
+  } else if (startInclude) {
     queryResult = await getDocs(
       query(
         collection(
@@ -287,11 +295,13 @@ async function GetFromFirestore({
           Constant_Var_firebase_collectionName_animeList
         ),
         orderBy("updatedAt"),
-        startAt(new Timestamp( startTimestamp.seconds,startTimestamp.nanoseconds)),
-        endBefore(new Timestamp( endTimestamp.seconds,endTimestamp.nanoseconds))
+        startAt(
+          new Timestamp(startTimestamp.seconds, startTimestamp.nanoseconds)
+        ),
+        endBefore(new Timestamp(endTimestamp.seconds, endTimestamp.nanoseconds))
       )
     );
-  }else if(endInclude){
+  } else if (endInclude) {
     queryResult = await getDocs(
       query(
         collection(
@@ -301,11 +311,13 @@ async function GetFromFirestore({
           Constant_Var_firebase_collectionName_animeList
         ),
         orderBy("updatedAt"),
-        startAfter(new Timestamp( startTimestamp.seconds,startTimestamp.nanoseconds)),
-        endAt(new Timestamp( endTimestamp.seconds,endTimestamp.nanoseconds))
+        startAfter(
+          new Timestamp(startTimestamp.seconds, startTimestamp.nanoseconds)
+        ),
+        endAt(new Timestamp(endTimestamp.seconds, endTimestamp.nanoseconds))
       )
     );
-  }else{
+  } else {
     queryResult = await getDocs(
       query(
         collection(
@@ -315,12 +327,17 @@ async function GetFromFirestore({
           Constant_Var_firebase_collectionName_animeList
         ),
         orderBy("updatedAt"),
-        startAfter(new Timestamp( startTimestamp.seconds,startTimestamp.nanoseconds)),
-        endBefore(new Timestamp( endTimestamp.seconds,endTimestamp.nanoseconds))
+        startAfter(
+          new Timestamp(startTimestamp.seconds, startTimestamp.nanoseconds)
+        ),
+        endBefore(new Timestamp(endTimestamp.seconds, endTimestamp.nanoseconds))
       )
     );
   }
-  console.log(queryResult.docs.map((doc) => doc.data()),"firestore");
+  // console.log(
+  //   queryResult.docs.map((doc) => doc.data()),
+  //   "firestore"
+  // );
   // Map through the docs and return an array of document data
   return queryResult.docs.map((doc) => doc.data());
 }
