@@ -46,6 +46,7 @@ import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAn
 import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
+import Metadata from "./Metadata";
 
 export default function Page({ params }) {
 
@@ -122,7 +123,7 @@ export default function Page({ params }) {
 
 
     return (() => {
-
+      console.log("cleanup of watch triggered, user logged in is ", isUserLoggedIn);
       const f = async () => {
 
         const content = contentRef.current;

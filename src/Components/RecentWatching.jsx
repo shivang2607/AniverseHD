@@ -24,7 +24,7 @@ export default function RecentWatching() {
       </div>
       {/* grid grid-cols-2 md:grid-cols-5 */}
       <div className="results  flex overflow-x-auto gap-4 my-2 md:scrollbar-hidden ">
-        {RecentWatchListData?.slice()?.reverse().slice(0, defaultLength).map(anime=>{
+        {RecentWatchListData?.slice()?.reverse()?.slice(0, defaultLength)?.map(anime=>{
           return <RecentCard anime={anime} key={anime.animeId}/>
         })} 
       </div>
