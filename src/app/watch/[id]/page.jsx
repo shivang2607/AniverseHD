@@ -47,10 +47,7 @@ import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
-<<<<<<< HEAD
-=======
 import { FaStepBackward, FaStepForward } from "react-icons/fa";
->>>>>>> 000c304d73503363c186d26c017eee5ef436bfa7
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
