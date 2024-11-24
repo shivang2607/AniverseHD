@@ -98,6 +98,7 @@ export default function Page({ params }) {
     isUserLoggedIn,
     RecentWatchListId,
     loadLoggedInUserRecentWatchList,
+    loadLoggedInUserWatchLists
   } = useUserStore();
 
   const [showSkipButton, setShowSkipButton] = useState("");
@@ -163,6 +164,7 @@ export default function Page({ params }) {
         // }
 
         loadLoggedInUserRecentWatchList();
+        loadLoggedInUserWatchLists();
       };
       if (isUserLoggedIn) f();
     };

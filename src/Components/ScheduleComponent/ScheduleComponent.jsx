@@ -84,7 +84,6 @@ export default function ScheduleComponent() {
 
         <div className='grid md:grid-cols-7 grid-cols-3 gap-4'>
             {scheduledData?.data?.map(anime => {
-                console.log(uniqueId())
                 return (
                     <ScheduleCard anime={anime} key={uniqueId(`${anime?.mal_id}`)}/>
                 )

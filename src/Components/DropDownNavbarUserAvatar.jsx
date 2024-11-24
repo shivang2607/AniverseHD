@@ -4,7 +4,7 @@ import useUserStore from "@/components/ZustandStores/userStore";
 
 
 const DropDownNavbarUserAvatar = () => {
-  const { logout, loggedInUserData} = useUserStore();
+  const { logout, loggedInUserData, hideWatchlistBar, toggleHideWatchlistBar} = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDropdownToggle = () => {
@@ -49,6 +49,12 @@ const DropDownNavbarUserAvatar = () => {
         >
           Feedback
         </Link>
+        <button className="flex w-full px-4 py-2 text-sm text-cbg-500 hover:bg-cbg-300 hover:text-white transition-colors" onClick={()=>{
+          toggleHideWatchlistBar();
+          setIsOpen(false);
+          }}>
+          {hideWatchlistBar ? "Show" : "Hide"} Watchlist Bar
+        </button>
         <button
           onClick={() => {handleLogOut()}}
           className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-cbg-300 transition-colors"

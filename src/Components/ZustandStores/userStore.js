@@ -25,6 +25,10 @@ const useUserStore = create((set, get) => ({
   loadingData: false,
   RecentWatchListId: null,
   RecentWatchListData: null,
+  hideWatchlistBar : false, 
+  selectedId : null,
+  listData : [],
+  
 
   setIsUserLoggedIn: (status) => set({ isUserLoggedIn: status }),
   setLoggedInUserData: (data) => set({ loggedInUserData: data }),
@@ -265,6 +269,12 @@ const useUserStore = create((set, get) => ({
       // show error toast
     }
   },
+
+  toggleHideWatchlistBar : () => set({hideWatchlistBar: !(get().hideWatchlistBar)}),
+
+  setSelectedId : (selectedId) => set({selectedId}),
+
+  setListData : (listData) => set({listData}),
 }));
 
 export default useUserStore;

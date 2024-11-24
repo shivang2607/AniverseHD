@@ -16,9 +16,10 @@ import useUserStore from "./ZustandStores/userStore";
 import GetWatchListById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
 import UpdatePlayOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
+import WatchlistBar from "./WatchlistBar";
 
 const Navbar = () => {
-  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists,RecentWatchListId, loadLoggedInUserRecentWatchList} = useUserStore();
+  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists,RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar} = useUserStore();
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -94,11 +95,12 @@ const Navbar = () => {
   },[RecentWatchListId])
 
   return (
+    <>
     <nav
       className={`${
         ["/recommendations"].some((path) => path === currentPath)
           ? "static"
-          : "fixed"
+          : "fixed top-0"
       } py-1 border-b-[1px] border-b-primary-100 w-full z-20 transition-transform duration-300 backdrop-blur-sm ${
         showNavbar ? "translate-y-0" : "-translate-y-full"
       } ${isBackgroundVisible ? "bg-black/30" : "bg-opacity-0"}`}
@@ -229,7 +231,10 @@ const Navbar = () => {
           </button>
         </div>
       </div>
+    {isUserLoggedIn && !hideWatchlistBar && <WatchlistBar  />}
     </nav>
+
+    </>
   );
 };
 
