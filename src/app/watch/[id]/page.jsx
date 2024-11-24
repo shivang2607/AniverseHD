@@ -47,10 +47,9 @@ import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
+import { FaStepBackward, FaStepForward } from "react-icons/fa";
 
 export default function Page({ params }) {
-
-
   const searchParams = useSearchParams();
   const zoroId = searchParams.get("z-id") || null;
   const gogoSubId = searchParams.get("g-sub-id") || null;
@@ -94,8 +93,12 @@ export default function Page({ params }) {
     // isAutoSkip, setIsAutoSkip,
   } = useStreamStore();
 
-  const { loggedInUserData, isUserLoggedIn, RecentWatchListId, loadLoggedInUserRecentWatchList } = useUserStore();
-
+  const {
+    loggedInUserData,
+    isUserLoggedIn,
+    RecentWatchListId,
+    loadLoggedInUserRecentWatchList,
+  } = useUserStore();
 
   const [showSkipButton, setShowSkipButton] = useState("");
   const [mediaPlayerState, setMediaPlayerState] = useState({
@@ -104,6 +107,7 @@ export default function Page({ params }) {
     isAutoNext: true,
   });
   const [isNextEpisodeAvailable, setIsNextEpisodeAvailable] = useState(true);
+  const [isPrevEpisodeAvailable, setIsPrevEpisodeAvailable] = useState(false);
   const [recentTimestamp, setRecentTimestamp] = useState(0);
   const [duration, setDuration] = useState();
   const currentAbsoluteURL = useRef("");
@@ -112,20 +116,20 @@ export default function Page({ params }) {
   const contentRef = useRef(content);
   // const [isAutoSkip, setIsAutoSkip] = useState(true);
 
-
   useEffect(() => {
-
-    const cachedPlayerOptions = JSON.parse(localStorage.getItem("player_options"));
+    const cachedPlayerOptions = JSON.parse(
+      localStorage.getItem("player_options")
+    );
     if (cachedPlayerOptions) {
       setMediaPlayerState(cachedPlayerOptions);
     }
 
-
-
-    return (() => {
-      console.log("cleanup of watch triggered, user logged in is ", isUserLoggedIn);
+    return () => {
+      console.log(
+        "cleanup of watch triggered, user logged in is ",
+        isUserLoggedIn
+      );
       const f = async () => {
-
         const content = contentRef.current;
         const result = await AddAnimeToWatchList({
           watchListId: RecentWatchListId,
@@ -141,7 +145,9 @@ export default function Page({ params }) {
           animeAgeRating: content?.rating || "NA",
           animeStartYear:
             Math.floor(
-              content?.aired?.prop?.from?.year || content?.start_year || content?.year
+              content?.aired?.prop?.from?.year ||
+                content?.start_year ||
+                content?.year
             ) || "NA",
           animeLength: content?.episodes || content?.episode || null,
         });
@@ -156,12 +162,10 @@ export default function Page({ params }) {
         //   toast.error(result?.response?.message, { duration: 3000, id: "2 " });
         // }
 
-
         loadLoggedInUserRecentWatchList();
-      }
+      };
       if (isUserLoggedIn) f();
-    })
-
+    };
   }, []);
 
   useEffect(() => {
@@ -169,7 +173,7 @@ export default function Page({ params }) {
   }, [recentTimestamp]);
 
   useEffect(() => {
-    currentAbsoluteURL.current = (getAbsoluteURLPath(pathname, searchParams));
+    currentAbsoluteURL.current = getAbsoluteURLPath(pathname, searchParams);
   }, [searchParams, pathname]);
 
   useEffect(() => {
@@ -179,8 +183,6 @@ export default function Page({ params }) {
   useEffect(() => {
     durationRef.current = duration;
   }, [duration]);
-
-
 
   useEffect(() => {
     const mediaPlayerOptions = loggedInUserData?.playerOptions;
@@ -193,9 +195,6 @@ export default function Page({ params }) {
       });
       return;
     }
-
-
-
   }, [loggedInUserData]);
 
   useEffect(() => {
@@ -212,10 +211,9 @@ export default function Page({ params }) {
     setDub(dubV);
     setRecentTimestamp(0);
 
-
     // console.log("Hello world!!",provider, episodeId, selectedEpisodeId);
 
-    return () => { };
+    return () => {};
   }, [provider, zoroId, gogoSubId, gogoDubId, serverV, dubV]);
 
   useEffect(() => {
@@ -288,7 +286,20 @@ export default function Page({ params }) {
 
   useEffect(() => {
     (async () => {
-      if (!provider) return;
+      const currentIndex = episodesData?.findIndex(
+        (ep) =>
+          ep?.episodeId === zoroEpisodeId ||
+          ep?.gogoDubId === gogoDubEpisodeId ||
+          ep?.gogoSubId === gogoSubEpisodeId
+      );
+
+      
+      if (!provider) router.replace("/not-found");
+      
+      setIsNextEpisodeAvailable(true);
+      setIsPrevEpisodeAvailable(true);
+      if(currentIndex === 0) setIsPrevEpisodeAvailable(false);
+      else if(currentIndex === episodesData?.length - 1) setIsNextEpisodeAvailable(false);
 
       if (provider === "zoro" && zoroEpisodeId) {
         const cachedServerData = getSessionWithExpiry(
@@ -305,14 +316,17 @@ export default function Page({ params }) {
           //   subLength && dub != "1"
           // );
           router.replace(
-            updateParams([{ key: "dub", val: updateDubVal(cachedServerData) }], false)
+            updateParams(
+              [{ key: "dub", val: updateDubVal(cachedServerData) }],
+              false
+            )
           );
 
           setServerData(cachedServerData);
           if (!serverV)
             setServer(
               cachedServerData?.sub?.[0]?.serverName ||
-              cachedServerData?.raw?.[0]?.serverName
+                cachedServerData?.raw?.[0]?.serverName
             );
           // return;
         } else {
@@ -320,17 +334,17 @@ export default function Page({ params }) {
             `/api/v1/${provider}/servers/${zoroEpisodeId}`
           );
 
-
           router.replace(
-            updateParams([
-              { key: "dub", val: updateDubVal(serverData?.data?.data) },
-            ], false)
+            updateParams(
+              [{ key: "dub", val: updateDubVal(serverData?.data?.data) }],
+              false
+            )
           );
 
           setServerData(serverData?.data?.data);
           setServer(
             serverData?.data?.data?.sub?.[0]?.serverName ||
-            serverData?.data?.data?.raw?.[0]?.serverName
+              serverData?.data?.data?.raw?.[0]?.serverName
           );
           console.log("server", serverData?.data?.data?.sub?.[0]?.serverName);
           setSessionWithExpiry(
@@ -340,14 +354,12 @@ export default function Page({ params }) {
           ); //24 hrs
         }
       }
-
     })();
 
     return () => {
       // setServerData(null);
     };
   }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
-
 
   const updateParams = (paramsList, resetT = true) => {
     const newParams = new URLSearchParams(searchParams);
@@ -359,7 +371,8 @@ export default function Page({ params }) {
     return pathname + "?" + newParams.toString();
   };
 
-  const getNextEpisode = () => {
+
+  const getPrevEpisode = () => {
     const currentIndex = episodesData?.findIndex(
       (ep) =>
         ep?.episodeId === zoroEpisodeId ||
@@ -367,7 +380,32 @@ export default function Page({ params }) {
         ep?.gogoSubId === gogoSubEpisodeId
     );
 
+    
 
+    if (currentIndex !== -1 && currentIndex > 0 ) {
+      const ep = episodesData[currentIndex - 1]; // Return the prev episode's ID
+      const url = updateParams([
+        { key: "z-id", val: ep?.episodeId },
+        { key: "g-sub-id", val: ep?.gogoSubId },
+        { key: "g-dub-id", val: ep?.gogoDubId },
+        { key: "n", val: currentIndex - 1 },
+      ]);
+
+      router.push(url);
+    } else {
+      setIsPrevEpisodeAvailable(false);
+      return null; // No prev episodes available
+    }
+
+  }
+
+  const getNextEpisode = () => {
+    const currentIndex = episodesData?.findIndex(
+      (ep) =>
+        ep?.episodeId === zoroEpisodeId ||
+        ep?.gogoDubId === gogoDubEpisodeId ||
+        ep?.gogoSubId === gogoSubEpisodeId
+    );
 
     if (currentIndex !== -1 && currentIndex < episodesData.length - 1) {
       const ep = episodesData[currentIndex + 1]; // Return the next episode's ID
@@ -384,18 +422,14 @@ export default function Page({ params }) {
     }
   };
 
-
-
   const updatePlayerOptions = (newOpt) => {
     localStorage.setItem("player_options", JSON.stringify(newOpt));
     setMediaPlayerState(newOpt);
-    if (isUserLoggedIn)
-      debounceMediaPlayerUpdate(newOpt);
+    if (isUserLoggedIn) debounceMediaPlayerUpdate(newOpt);
     else {
       toast.success("Changes saved!");
     }
-
-  }
+  };
 
   // console.log(episodesData);
 
@@ -471,7 +505,11 @@ export default function Page({ params }) {
     const currentTime = player?.currentTime;
 
     const t = currentTime;
-    if ((Math.floor(t) % 5 == 0) && (Math.floor(t) !== Math.floor(recentTimestamp))) {    //save timestamp after every 5 seconds
+    if (
+      Math.floor(t) % 5 == 0 &&
+      Math.floor(t) !== Math.floor(recentTimestamp)
+    ) {
+      //save timestamp after every 5 seconds
       console.log(recentTimestamp);
       setRecentTimestamp(t);
     }
@@ -483,14 +521,10 @@ export default function Page({ params }) {
     const outroStart = streamingData?.outro?.start;
     const outroEnd = streamingData?.outro?.end;
 
-
     if (!mediaPlayerState?.isAutoSkip) {
       if (currentTime < introEnd && currentTime > introStart) {
         setShowSkipButton("Intro");
-      } else if (
-        currentTime > outroStart &&
-        currentTime < outroEnd
-      ) {
+      } else if (currentTime > outroStart && currentTime < outroEnd) {
         setShowSkipButton("Outro");
       } else setShowSkipButton("");
 
@@ -506,7 +540,7 @@ export default function Page({ params }) {
     if (currentTime > outroStart && currentTime < outroEnd) {
       player.currentTime = outroEnd; // Skip to the end
     }
-  }
+  };
 
   const updateDubVal = (serData) => {
     const subLength = serData?.sub?.length;
@@ -575,16 +609,25 @@ export default function Page({ params }) {
                   load="eager"
                   autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
                   ref={player}
-                  keyTarget='player'
+                  keyTarget="player"
                   storage="media-player"
                   buffer
                   title={streamingData?.malId}
-                  src={process.env.NEXT_PUBLIC_GOOD_PROXY + encodeURIComponent(streamingData?.sources?.[0]?.url)}
+                  src={
+                    process.env.NEXT_PUBLIC_GOOD_PROXY +
+                    encodeURIComponent(streamingData?.sources?.[0]?.url)
+                  }
                   className="h-full"
                   playsInline
                   crossOrigin
                   streamType="on-demand"
-                  onLoadedMetadata={(e)=> {console.log("duration of this episode is ",e.target.duration); setDuration(e.target.duration)}}
+                  onLoadedMetadata={(e) => {
+                    console.log(
+                      "duration of this episode is ",
+                      e.target.duration
+                    );
+                    setDuration(e.target.duration);
+                  }}
                   onProviderChange={(provider, event) => {
                     if (isHLSProvider(provider)) {
                       provider.config = {
@@ -594,8 +637,7 @@ export default function Page({ params }) {
                         fragLoadingMaxRetry: 5,
                         maxMaxBufferLength: 600,
                         maxBufferLength: 20,
-
-                      }
+                      };
                     }
                   }}
                   // crossOrigin="anonymous"
@@ -604,7 +646,6 @@ export default function Page({ params }) {
                   onError={(e) =>
                     toast.error(`${e.message}, Try Another Server.`)
                   }
-
                   onEnded={() =>
                     mediaPlayerState?.isAutoNext && getNextEpisode()
                   } //only fetch next episode if the auto next state is set to true.
@@ -612,10 +653,10 @@ export default function Page({ params }) {
                     handleTimeUpdate(v, event);
                   }}
 
-                // onHlsError={()=>{
-                //   toast.error("Error while loading the file, Try another Provider or try after some time.");
-                //   console.log("Some error occured in playing the file.");
-                // }}
+                  // onHlsError={()=>{
+                  //   toast.error("Error while loading the file, Try another Provider or try after some time.");
+                  //   console.log("Some error occured in playing the file.");
+                  // }}
                 >
                   <MediaProvider>
                     {streamingData?.tracks
@@ -641,6 +682,24 @@ export default function Page({ params }) {
                       )?.[0]?.file
                     }
                     slots={{
+                      beforeCaptionButton: (
+                        <div className="change episodes flex gap-4 mx-4 text-xl">
+                          <button
+                            disabled={!isPrevEpisodeAvailable}
+                            className="hover:scale-110 duration-150 ease-in disabled:text-gray-400"
+                            onClick={getPrevEpisode}
+                          >
+                            <FaStepBackward />
+                          </button>
+                          <button
+                            disabled={!isNextEpisodeAvailable}
+                            className="hover:scale-110 duration-150 ease-in disabled:text-gray-400"
+                            onClick={getNextEpisode}
+                          >
+                            <FaStepForward />
+                          </button>
+                        </div>
+                      ),
                       afterCaptions: showSkipButton && (
                         <button
                           className="md:text-lg w-fit h-fit absolute right-4 bottom-8 md:right-12 md:bottom-24 px-2 py-1 border-white border-2 rounded-md font-semibold backdrop-blur-lg bg-black/10 flex"
@@ -702,14 +761,15 @@ export default function Page({ params }) {
 
               {provider === "zoro" && (
                 <button
-                  className={`md:mx-1 ${mediaPlayerState?.isAutoSkip
-                    ? "text-sky-400 font-semibold"
-                    : "font-[300]"
-                    } `}
+                  className={`md:mx-1 ${
+                    mediaPlayerState?.isAutoSkip
+                      ? "text-sky-400 font-semibold"
+                      : "font-[300]"
+                  } `}
                   onClick={() =>
                     updatePlayerOptions({
                       ...mediaPlayerState,
-                      isAutoSkip: !(mediaPlayerState?.isAutoSkip),
+                      isAutoSkip: !mediaPlayerState?.isAutoSkip,
                     })
                   }
                 >
@@ -719,14 +779,15 @@ export default function Page({ params }) {
               )}
 
               <button
-                className={`md:mx-1 ${mediaPlayerState?.isAutoNext
-                  ? "text-sky-400 font-semibold"
-                  : "font-[300]"
-                  } `}
+                className={`md:mx-1 ${
+                  mediaPlayerState?.isAutoNext
+                    ? "text-sky-400 font-semibold"
+                    : "font-[300]"
+                } `}
                 onClick={() =>
                   updatePlayerOptions({
                     ...mediaPlayerState,
-                    isAutoNext: !(mediaPlayerState?.isAutoNext),
+                    isAutoNext: !mediaPlayerState?.isAutoNext,
                   })
                 }
               >
@@ -734,14 +795,15 @@ export default function Page({ params }) {
               </button>
 
               <button
-                className={`md:mx-1 ${mediaPlayerState?.isAutoPlay
-                  ? "text-sky-400 font-semibold"
-                  : "font-[300]"
-                  } `}
+                className={`md:mx-1 ${
+                  mediaPlayerState?.isAutoPlay
+                    ? "text-sky-400 font-semibold"
+                    : "font-[300]"
+                } `}
                 onClick={() =>
                   updatePlayerOptions({
                     ...mediaPlayerState,
-                    isAutoPlay: !(mediaPlayerState?.isAutoPlay),
+                    isAutoPlay: !mediaPlayerState?.isAutoPlay,
                   })
                 }
               >
@@ -753,28 +815,41 @@ export default function Page({ params }) {
                   <TbPlayerTrackNextFilled /> Next Episode
                 </button>} */}
 
-                {recentTimestamp > 0 && <ShareModal t= {recentTimestamp}  buttonText="Share this Scene" title={`Checkout this Amazing Scene from ${content?.title_english || content?.title}`} />}
-                <ShareModal buttonText="Share this episode" title={`Checkout this Amazing Episode from ${content?.title_english || content?.title}`} />
+                {recentTimestamp > 0 && (
+                  <ShareModal
+                    t={recentTimestamp}
+                    buttonText="Share this Scene"
+                    title={`Checkout this Amazing Scene from ${
+                      content?.title_english || content?.title
+                    }`}
+                  />
+                )}
+                <ShareModal
+                  buttonText="Share this episode"
+                  title={`Checkout this Amazing Episode from ${
+                    content?.title_english || content?.title
+                  }`}
+                />
               </div>
-
             </div>
           </div>
 
-          {episodesData && <ProviderContainer content={content} id={params?.id} />}
+          {episodesData && (
+            <ProviderContainer content={content} id={params?.id} />
+          )}
 
           <div className="note text-sm flex text-nowrp items-center  self-center text-gray-400">
             *Note: Episode boxes with{" "}
             <div className="rounded w-5 h-3 bg-sky-400 mx-2"></div> color are
             filler episodes!
           </div>
-
         </div>
 
-        <div className="md:hidden block my-12"><Metadata content={content} id={params?.id}/></div>
-
-
+        <div className="md:hidden block my-12">
+          <Metadata content={content} id={params?.id} />
+        </div>
       </div>
-        {params?.id && <Suggested id={params?.id} />}
+      {params?.id && <Suggested id={params?.id} />}
     </div>
   );
 }

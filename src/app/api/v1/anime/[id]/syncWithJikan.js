@@ -15,6 +15,7 @@ export async function syncQdrant(id, resPayload) {
 
     const jikanResp = await jikanLimiter.schedule(() => jikan.loadAnime(id, 'full')); // Use when not using caching
     // const jikanResp = await jikan.loadAnime(id, 'full');
+    // console.log(jikanResp.data.title);
     
     const jikanData = jikanResp.data;
     let updatePayload = {
