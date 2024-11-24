@@ -89,7 +89,7 @@ export default function WatchlistBar() {
                   href={`/anime/${anime?.animeId}`}
                   className="rounded-lg px-2 py-1 flex gap-2 items-center  bg-primary-100/50"
                 >
-                  <div className="overflow-x-clip flex text-ellipsis whitespace-nowrap max-w-48">
+                  <div className="overflow-x-hidden text-ellipsis whitespace-nowrap max-w-48">
                     {anime?.animeName}
                   </div>
                   <Link
