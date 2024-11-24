@@ -194,6 +194,7 @@ export const addAnimeToUserWatchListCached = ({
     watchListInfo.animeList.push({
       animeId: anime.animeId,
       addedAt: anime.addedAt,
+      animeName: anime.animeName,
     });
     setWatchListInfoByIdInfoCached({
       watchListInfo: watchListInfo,
@@ -219,6 +220,7 @@ export const addAnimeToUserWatchListCached = ({
         userWatchLists[ind].animeList.push({
           animeId: anime.animeId,
           addedAt: anime.addedAt,
+          animeName: anime.animeName,
         });
     }
 

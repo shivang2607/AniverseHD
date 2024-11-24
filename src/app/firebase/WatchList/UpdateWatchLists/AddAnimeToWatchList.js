@@ -259,7 +259,7 @@ async function addAnime({
       (obj) => obj.animeId === animeId
     );
     const newAnimeList=watchListInfo.animeList;
-    newAnimeList.push({animeId:animeId,addedAt:animeObject.addedAt});
+    newAnimeList.push({animeId:animeId,addedAt:animeObject.addedAt,animeName:animeObject.animeName});
 
     if (animeObject2 == undefined) {
       const docRef = doc(

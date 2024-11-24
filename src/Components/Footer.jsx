@@ -14,7 +14,7 @@ export default function Footer() {
         </div>
 
         <p className="info my-8 mx-auto md:w-[90%] md:block hidden  text-sm text-gray-400 tracking-wider">
-            This website does not store any streaming files or data on its server. Our <Link href="/recommendations" className='font-semibold '>recommendation system</Link>  is entirely developed by us. However, all streaming content is sourced from independent third parties not affiliated with this site.
+            This website does not store any streaming files on its server. Our <Link href="/recommendations" className='font-semibold '>recommendation system</Link>  is entirely developed and owned by us, However, all streaming content is sourced from independent third parties not affiliated with this site.
         </p>
     </div>
   )

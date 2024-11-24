@@ -323,7 +323,7 @@ export default function ProviderContainer({
         </select>
       </div>
 
-      <div className="episode-list grid md:grid-cols-4 grid-cols-2 gap-2 m-3 md:max-h-screen h-[40vh] overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
+      <div className="episode-list grid md:grid-cols-4 grid-cols-2 gap-2 m-3 md:max-h-screen max-h-[40vh]  overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
         {episodes
           ?.slice(
             (episodesPerWindow * episodeRangeIndex),
