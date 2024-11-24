@@ -55,9 +55,9 @@ export default function WatchlistBar() {
   return (
     <>
     {!hideWatchlistBar &&
-    <div className="w-full p-1 bg-black/5. flex gap-4  items-center text-sm mt-2">
+    <div className="w-full p-1 bg-black/5. flex md:gap-4 gap-2  items-center md:text-sm text-xs md:mt-2">
       <BiSolidHide
-        className="text-2xl text-primary-300 ml-3 cursor-pointer"
+        className="!text-2xl text-primary-300 ml-3 cursor-pointer"
         onClick={() => toggleHideWatchlistBar()}
       />
 
@@ -66,7 +66,7 @@ export default function WatchlistBar() {
         id="list"
         value={selectedId}
         onChange={(e) => setSelectedId(e.target.value)}
-        className=" px-1 bg-cbg-300/15 mx-5 text-sm rounded-full scrollbar-thin"
+        className=" px-1 bg-cbg-300/15 md:mx-5 text-sm w-24 md:w-auto rounded-full scrollbar-thin"
       >
         {loggedInUserWatchListsInfo?.map((list) => {
           return (
@@ -89,7 +89,7 @@ export default function WatchlistBar() {
                   href={`/anime/${anime?.animeId}`}
                   className="rounded-lg px-2 py-1 flex gap-2 items-center  bg-primary-100/50"
                 >
-                  <div className="overflow-x-hidden text-ellipsis whitespace-nowrap max-w-48">
+                  <div className="overflow-x-hidden text-ellipsis whitespace-nowrap md:max-w-48 max-w-36">
                     {anime?.animeName}
                   </div>
                   <Link
