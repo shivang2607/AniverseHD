@@ -46,6 +46,7 @@ import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAn
 import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
+import Metadata from "./Metadata";
 
 export default function Page({ params }) {
 
