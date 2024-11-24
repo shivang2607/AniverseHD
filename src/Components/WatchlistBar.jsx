@@ -19,6 +19,7 @@ export default function WatchlistBar() {
     setSelectedId,
     listData,
     setListData,
+    hideWatchlistBar,
   } = useUserStore();
 
   useEffect(() => {
@@ -52,6 +53,8 @@ export default function WatchlistBar() {
   };
 
   return (
+    <>
+    {!hideWatchlistBar &&
     <div className="w-full p-1 bg-black/5. flex gap-4  items-center text-sm mt-2">
       <BiSolidHide
         className="text-xl text-primary-300 ml-3 cursor-pointer"
@@ -79,6 +82,7 @@ export default function WatchlistBar() {
           listData
             ?.slice()
             ?.reverse()
+            ?.slice(0, 20)
             ?.map((anime) => {
               return (
                 <Link
@@ -110,7 +114,9 @@ export default function WatchlistBar() {
         ) : (
           <div>No Data Available</div>
         )}
+
       </div>
     </div>
+     }</>
   );
 }

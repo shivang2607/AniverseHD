@@ -231,7 +231,7 @@ const Navbar = () => {
           </button>
         </div>
       </div>
-    {isUserLoggedIn && !hideWatchlistBar && <WatchlistBar  />}
+    {isUserLoggedIn  && <WatchlistBar  />}
     </nav>
 
     </>
