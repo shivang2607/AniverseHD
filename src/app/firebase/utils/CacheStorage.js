@@ -3,6 +3,8 @@ import {
   Constant_Var_sessionStorage_key_userWatchListsInfo,
   Constant_Var_sessionStorage_key_watchListAnimeListById,
   Constant_Var_sessionStorage_key_watchListInfoById,
+  Constant_Var_starterWatchLists_favourite,
+  Constant_Var_starterWatchLists_recent,
 } from "@/utils/constants";
 
 /** Misscelanious  */
@@ -28,7 +30,6 @@ const getSessionStorageParsedItem = (key) => {
 const findWatchListIndex = ({ userWatchLists, watchListId }) => {
   return userWatchLists.findIndex((watchList) => watchList.id === watchListId);
 };
-
 
 const updateUserPropertyCached = (property, value) => {
   let userData = getUserInfoCached();
@@ -77,11 +78,11 @@ export const changePhotoUrlCached = ({ photoUrl }) => {
   setUserInfoCached(userData);
 };
 
-export const changeUserPlayOptionsCached = ({playerOptions}) => {
+export const changeUserPlayOptionsCached = ({ playerOptions }) => {
   let userData = getUserInfoCached();
   if (!userData) return;
 
-   userData.playerOptions=playerOptions;
+  userData.playerOptions = playerOptions;
 
   setUserInfoCached({ userData });
 };
@@ -145,11 +146,11 @@ export const setWatchListAnimeListByIdCached = ({
   );
 };
 
-export const removeWatchlistAnimeListCached=({watchListId})=>{
+export const removeWatchlistAnimeListCached = ({ watchListId }) => {
   sessionStorage.removeItem(
     `${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`
   );
-}
+};
 
 export const addAnimeToUserWatchListCached = ({
   watchListId,
@@ -165,6 +166,9 @@ export const addAnimeToUserWatchListCached = ({
     watchListId: watchListId,
   });
   watchListInfo.updatedAt = updatedAt;
+  const isRecent =
+    watchListInfo.isSpecialStarter &&
+    watchListInfo.watchListName === Constant_Var_starterWatchLists_recent;
 
   // Check if anime already exists in the watchListAnimeList
   const animeExistsInWatchList =
@@ -195,6 +199,8 @@ export const addAnimeToUserWatchListCached = ({
       animeId: anime.animeId,
       addedAt: anime.addedAt,
       animeName: anime.animeName,
+      ...(isRecent ? { url: anime.url } : {}),
+      ...(isRecent ? { episodeTimestamp: anime.episodeTimestamp } : {}),
     });
     setWatchListInfoByIdInfoCached({
       watchListInfo: watchListInfo,
@@ -221,6 +227,8 @@ export const addAnimeToUserWatchListCached = ({
           animeId: anime.animeId,
           addedAt: anime.addedAt,
           animeName: anime.animeName,
+          ...(isRecent ? { url: anime.url } : {}),
+          ...(isRecent ? { episodeTimestamp: anime.episodeTimestamp } : {}),
         });
     }
 
@@ -245,12 +253,10 @@ export const addAnimeToWatchListByIdCachedInBatch = ({
   }
   watchListAnimeList.sort((a, b) => {
     if (a.updatedAt.seconds !== b.updatedAt.seconds) {
-      return a.updatedAt.seconds - b.updatedAt.seconds; 
+      return a.updatedAt.seconds - b.updatedAt.seconds;
     }
     return a.updatedAt.nanoseconds - b.updatedAt.nanoseconds;
-  }
-  
-  );
+  });
   setWatchListAnimeListByIdCached({
     watchlistAnimeList: watchListAnimeList,
     watchListId: watchListId,
@@ -314,7 +320,6 @@ export const removeAnimeFromUserWatchListCached = ({
   return;
 };
 
-
 /**user watchlist alteration   issue, not adding in session storage when new watchlist is created*/
 export const addUserWatchlistCached = ({
   watchListInfo,
@@ -342,7 +347,12 @@ export const deleteUserWatchlistCached = ({ watchListId, userId }) => {
   removeWatchListInfoByIdInfoCached({ watchListId: watchListId });
 };
 
-export const updatePublicPrivateCached = ({ watchListId, type, updatedAt,userId }) => {
+export const updatePublicPrivateCached = ({
+  watchListId,
+  type,
+  updatedAt,
+  userId,
+}) => {
   let watchListInfo = getWatchListInfoByIdInfoCached({
     watchListId: watchListId,
   });

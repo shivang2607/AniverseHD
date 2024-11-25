@@ -260,12 +260,13 @@ const useUserStore = create((set, get) => ({
   },
 
   login: async () => {
-    const res = await SignInGooglePopUp();
+    const res = await SignInGooglePopUp((res)=> console.log("status: ",res));
 
     if (res.status === Constant_Var_success) {
       await get().loadLoggedInUserDataAndWatchLists(); // Use get() to call the function
       // shhow success toast
     } else {
+      console.log(res);
       // show error toast
     }
   },

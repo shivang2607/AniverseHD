@@ -86,11 +86,12 @@ export default function WatchlistBar() {
             ?.slice()
             ?.reverse()
             ?.slice(0, count)
-            ?.map((anime) => {
+            ?.map((anime,ind) => {
               return (
                 <Link
                   href={`/anime/${anime?.animeId}`}
                   className="rounded-lg px-2 py-1 flex gap-2 items-center  bg-primary-100/50"
+                  key={ind}
                 >
                   <div className="overflow-x-hidden text-ellipsis whitespace-nowrap md:max-w-48 max-w-36">
                     {anime?.animeName}

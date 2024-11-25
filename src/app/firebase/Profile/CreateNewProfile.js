@@ -24,6 +24,7 @@ import uploadImageToFirebaseStorage from "../utils/UploadImageToFirebaseStorage"
 import UserProfileModel from "../DocumentModels/UserProfileModel";
 import WatchListModel from "../DocumentModels/WatchListModel";
 
+
 /**
  * Global flag to prevent multiple profile creations at the same time.
  * This avoids race conditions where multiple profiles might be created simultaneously.
@@ -138,6 +139,7 @@ async function createWatchListInBatch(
 
   const watchListDocument = WatchListModel({
     ownerUid: userData.details.uid,
+    ownerName:userData.details.name,
     watchListName: watchListName,
     type: type,
     isSpecialStarter: isSpecialStarter,
