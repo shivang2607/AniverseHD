@@ -47,7 +47,7 @@ export default function Recommendation() {
   };
 
   return (
-    <div className="md:w-[73%] w-[100vw] flex flex-col gap-4 py-4 mx-4">
+    <div className="md:w-[73%] w-[100vw] min-h-screen flex flex-col gap-4 py-4 mx-4">
       
       <div className={`fixed h-screen w-screen top-0 z-20 backdrop-blur-sm ${isFilterOpen?"visible":"hidden"}`}></div>
 

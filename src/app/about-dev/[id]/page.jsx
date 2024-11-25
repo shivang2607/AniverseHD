@@ -9,10 +9,10 @@ import { FaLinkedin } from 'react-icons/fa';
 const devData = [
   {
     name: "Shivang Khandelwal",
-    desc: "Hello My name is Shivang Khandelwal and I developed the Recommendation System, Streaming and Anime details Logic and other related functionality",
-    imgUrl: "/ShivangProfile.jpg",
-    discord: "",
-    linkedIn: "",
+    desc: "Hey there! I'm Shivang Khandelwal, a Fullstack Developer and a big fan of Machine Learning. I built the Recommendation Model to help suggest anime, and made sure the anime and streaming data runs smoothly with some cool caching and optimization tricks. I also built and design logic for Home Page, recommendation page, anime details page, streaming page, and the one you're checking out right now. I really hope you're enjoying the site, and if you do, feel free to share it with your friends! Thanks for visiting!",
+    imgUrl: "/ShivangProfile new.jpg",
+    discord: "https://discordapp.com/users/shivang4301",
+    linkedIn: "https://www.linkedin.com/in/shivang-khandelwal-0a58951bb",
   },
   {
     name: "Abhay Lodhi",
@@ -23,7 +23,7 @@ const devData = [
   },
 ];
 
-const devId = "gdid";
+const devId = process.env.GDID || "gdid-2611";
 
 export default function Page({ params }) {
   const router = useRouter();
@@ -67,7 +67,7 @@ export default function Page({ params }) {
       {params?.id?.toLowerCase() === `uid-${generateUniqueNumber()}` ? (
         <div className='w-full min-h-screen my-8 flex flex-col gap-16 pt-24'>
           <h1 className='text-3xl font-bold tracking-wide mx-auto flex'>About Developers</h1>
-          <div className='mx-auto md:w-5/6 w-full flex md:flex-row flex-col gap-12 p-4'>
+          <div className='mx-auto  w-full flex md:flex-row flex-col gap-12 p-4'>
             {devData.map(dev => (
               <div
                 key={dev.name}

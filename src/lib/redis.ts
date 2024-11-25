@@ -2,9 +2,9 @@ import Redis from 'ioredis';
 import { redisUrl } from './configuration';
 
 const redisClient = new Redis(redisUrl, {
-  connectTimeout: 20000,  // 20 seconds timeout for initial connection
+  connectTimeout: 30000,  // 30 seconds timeout for initial connection
   retryStrategy: (times) => {
-    const delay = Math.min(times * 50, 2000);
+    const delay = Math.min(times * 100, 5000);
     return delay;
   },
 });
@@ -19,6 +19,10 @@ redisClient.on('connect', () => {
 
 redisClient.on('end', () => {
   console.warn('Redis connection closed');
+});
+
+redisClient.on('exit', () => {
+  redisClient.quit();
 });
 
 redisClient.on('reconnecting', (times) => {

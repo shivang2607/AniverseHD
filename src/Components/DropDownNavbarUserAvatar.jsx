@@ -20,7 +20,7 @@ const DropDownNavbarUserAvatar = () => {
   return (
     <div className="relative z-50  items-center flex">
       <button onClick={handleDropdownToggle} className="focus:outline-none">
-        <div className="relative md:!w-11 md:!h-11 w-8 h-8 items-center border-white border-2 rounded-full">
+        <div className="relative md:!w-11 md:!h-11 w-10 h-10 mx-3 items-center border-white border-2 rounded-full">
           {/* Example Profile Image, replace with actual image */}
           <Image
             src={loggedInUserData?.photoUrl}

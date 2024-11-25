@@ -39,7 +39,7 @@ export async function addQdrantAnime(id) {
 
     // *corsProxy url isint working plus you need to do error handling here, also iski vajah se jaha /anime/id vaali api call ho rahi h vaha undefined retuen ho raha h which should not happen at all to isko bhi address krna h
     
-    const corsProxyUrl = process.env.ENV === 'DEV' ? process.env.CUSTOM_PROXY_URL : '';
+    const corsProxyUrl = process.env.ENV === "DEV" ? process.env.CUSTOM_PROXY_URL : '';
     const headers = { 'Origin': '*' };
     let payload = jikanResp;
     
