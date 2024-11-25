@@ -96,7 +96,7 @@ export default function FilterPanel() {
   };
 
   return (
-    <div className={`py-2  md:z-0 z-20 bg-cbg-200 ml-2  items-start md:static  top-0 md:h-fit fixed h-screen overflow-y-scroll md:scrollbar-thin md:overflow-auto  backdrop-blur-sm ${isFilterOpen? "translate-x-0":"-translate-x-full"}  w-3/4 transition-all ease-in duration-300 -left-2 md:translate-x-0  md:right-0 md:w-[25%] `} >
+    <div className={`py-2  md:z-0 pt-16 md:pt-2 z-20 md:mt-3  bg-cbg-200 ml-2  items-start md:static right-0 top-0 md:h-fit fixed h-screen overflow-y-scroll md:scrollbar-thin md:overflow-auto  backdrop-blur-sm ${isFilterOpen? "translate-x-0":"-translate-x-full"}  w-3/4 transition-all ease-in duration-300 -left-2 md:translate-x-0  md:right-0 md:w-[25%] `} >
       <h1 className="w-full justify-center items-center  px-2 text-2xl flex my-4 bg-cbg-100 text-pretty text-primary-400 font-bold tracking-wide py-2 ">
         Filters <button className="ml-auto self-end md:hidden flex items-center text-3xl my-auto" onClick={toggleFilterOpen}><IoMdCloseCircle/></button>
       </h1>

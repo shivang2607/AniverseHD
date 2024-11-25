@@ -11,7 +11,7 @@ import { Constant_Var_success } from '@/utils/constants'
 
 export default function RecentCard({anime, grid=false}) {
 
-    const {RecentWatchListId, loadLoggedInUserRecentWatchList} = useUserStore();
+    const {RecentWatchListId, loadLoggedInUserRecentWatchList, loadLoggedInUserWatchLists} = useUserStore();
 
     
 
@@ -23,6 +23,7 @@ export default function RecentCard({anime, grid=false}) {
             animeId: anime?.animeId,
           });
         loadLoggedInUserRecentWatchList();
+        loadLoggedInUserWatchLists();
         
         if (result.status !== Constant_Var_success){
             toast.error("Can't Remove Anime from Recent Watch list")

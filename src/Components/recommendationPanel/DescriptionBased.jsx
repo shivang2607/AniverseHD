@@ -126,7 +126,7 @@ export default function DescriptionBased() {
             </>
           )}
         </button>
-        <Toaster
+        {/* <Toaster
           toastOptions={{
             style: {
               borderRadius: "10px",
@@ -136,7 +136,7 @@ export default function DescriptionBased() {
               
             },
           }}
-        />
+        /> */}
       </div>
 
       {loading ? (

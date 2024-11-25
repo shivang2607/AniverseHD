@@ -22,6 +22,8 @@ export default function WatchlistBar() {
     hideWatchlistBar,
   } = useUserStore();
 
+  const count = 20;
+
   useEffect(() => {
     setSelectedId(RecentWatchListId);
   }, [isUserLoggedIn]);
@@ -36,6 +38,7 @@ export default function WatchlistBar() {
       
     }
   }, [selectedId, loggedInUserWatchListsInfo]);
+
 
 
   const handleRemove = async (e, id) => {
@@ -55,9 +58,9 @@ export default function WatchlistBar() {
   return (
     <>
     {!hideWatchlistBar &&
-    <div className="w-full p-1 bg-black/5. flex md:gap-4 gap-2  items-center md:text-sm text-xs md:mt-2">
+    <div className="w-full p-1 mx-2  bg-black/5. md:pr-10 rounded-md overflow-clip flex md:gap-4 gap-2  items-center md:text-sm text-xs md:mt-2">
       <BiSolidHide
-        className="!text-2xl text-primary-300 ml-3 cursor-pointer"
+        className="!text-2xl w-10 text-primary-300 ml-3 cursor-pointer"
         onClick={() => toggleHideWatchlistBar()}
       />
 
@@ -66,7 +69,7 @@ export default function WatchlistBar() {
         id="list"
         value={selectedId}
         onChange={(e) => setSelectedId(e.target.value)}
-        className=" px-1 bg-cbg-300/15 md:mx-5 text-sm w-24 md:w-auto rounded-full scrollbar-thin"
+        className=" px-1 bg-transparent md:mx-5 text-sm w-24 md:w-auto rounded-full scrollbar-thin"
       >
         {loggedInUserWatchListsInfo?.map((list) => {
           return (
@@ -82,7 +85,7 @@ export default function WatchlistBar() {
           listData
             ?.slice()
             ?.reverse()
-            ?.slice(0, 20)
+            ?.slice(0, count)
             ?.map((anime) => {
               return (
                 <Link
@@ -96,7 +99,6 @@ export default function WatchlistBar() {
                     href={`/watch/${anime.animeId}?provider=zoro`}
                     className="text-lg"
                     onClick={(e) => {
-                      e.preventDefault();
                       e.stopPropagation();
                     }}
                   >

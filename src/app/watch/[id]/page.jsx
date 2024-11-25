@@ -620,7 +620,7 @@ export default function Page({ params }) {
                     encodeURIComponent(streamingData?.sources?.[0]?.url)
                   }
                   className="h-full"
-                  playsInline
+                  playsInline = {true}
                   crossOrigin
                   streamType="on-demand"
                   onLoadedMetadata={(e) => {

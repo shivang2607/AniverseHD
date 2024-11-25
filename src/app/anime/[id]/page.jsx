@@ -26,6 +26,7 @@ import {
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/components/ZustandStores/userStore";
+import ShareModal from "@/components/utils/ShareModal";
 
 export default function Anime({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -215,6 +216,9 @@ export default function Anime({ params }) {
                       <div className="type flex  items-center">
                         <RxDotFilled /> {anime?.type?.toUpperCase() || "?"}
                       </div>
+                      <div className="flex "> 
+                      <ShareModal />
+                    </div>
                     </>
                   )}
                 </div>
@@ -251,6 +255,8 @@ export default function Anime({ params }) {
                         />
                       )}
                     </div>
+
+                    
 
                     <Toaster
                       toastOptions={{

@@ -129,7 +129,7 @@ const UserInfo = ({ id }) => {
                   Create WatchList
                 </button>
                 <div
-                  className="flex flex-row items-center bg-sky-500 md:py-2 md:px-3 md:mr-2 py-1.5 px-2.5 mr-2.5 rounded-md w-fit h-fit text-primary-600 md:text-md  sm:text-sm font-bold"
+                  className="flex cursor-pointer flex-row items-center bg-sky-500 md:py-2 md:px-3 md:mr-2 py-1.5 px-2.5 mr-2.5 rounded-md w-fit h-fit text-primary-600 md:text-md  sm:text-sm font-bold"
                   onClick={handleOpenEditUserProfileModal}
                 >
                   Edit Profile <FaRegEdit className="ml-2" />

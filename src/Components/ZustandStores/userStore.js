@@ -25,7 +25,7 @@ const useUserStore = create((set, get) => ({
   loadingData: false,
   RecentWatchListId: null,
   RecentWatchListData: null,
-  hideWatchlistBar : false, 
+  hideWatchlistBar : true, 
   selectedId : null,
   listData : [],
   

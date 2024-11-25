@@ -72,6 +72,7 @@ const ResponsiveCarousal = () => {
           pauseOnMouseEnter: true,
         }}
         navigation={true}
+        
       >
         {topFavorite?.map((anime, index) => {
           return (
@@ -128,6 +129,7 @@ const ResponsiveCarousal = () => {
             </SwiperSlide>
           );
         })}
+        
       </Swiper>:
       <div className="flex h-full w-full items-center justify-center">
         
