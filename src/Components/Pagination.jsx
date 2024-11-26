@@ -58,7 +58,7 @@ const Pagination = ({ totalPages,currentPage,setCurrentPage }) => {
       <button
         onClick={handlePrev}
         disabled={currentPage === 1}
-        className="px-2 py-1 mx-4  text-primary-100 text-xl rounded disabled:text-gray-4000"
+        className="px-2 py-1 cursor-pointer mx-4  text-primary-100 text-xl rounded disabled:text-gray-4000"
       >
         <FaChevronLeft/>
       </button>
@@ -80,7 +80,7 @@ const Pagination = ({ totalPages,currentPage,setCurrentPage }) => {
       <button
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className="px-2 py-1 !mx-4 text-primary-100 text-xl rounded disabled:text-gray-400"
+        className="px-2 cursor-pointer py-1 !mx-4 text-primary-100 text-xl rounded disabled:text-gray-400"
       >
         <FaChevronRight/>
       </button>

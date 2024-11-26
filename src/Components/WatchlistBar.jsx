@@ -7,6 +7,7 @@ import { MdCancel } from "react-icons/md";
 import { BiSolidHide } from "react-icons/bi";
 import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
 import { Constant_Var_success } from "@/utils/constants";
+import toast from "react-hot-toast";
 
 export default function WatchlistBar() {
   const {
@@ -97,7 +98,7 @@ export default function WatchlistBar() {
                     {anime?.animeName}
                   </div>
                   <Link
-                    href={`/watch/${anime.animeId}?provider=zoro`}
+                    href={selectedId === RecentWatchListId ? `${anime?.url}&t=${anime?.episodeTimestamp}` : `/watch/${anime.animeId}?provider=zoro`}
                     className="text-lg"
                     onClick={(e) => {
                       e.stopPropagation();

@@ -3,7 +3,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 import { MdMovie } from "react-icons/md";
-import { IoMdTimer } from "react-icons/io";
+import { IoMdClose, IoMdTimer } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 import { MdDeleteOutline } from "react-icons/md";
 import useUserStore from "@/components/ZustandStores/userStore";
@@ -36,23 +36,23 @@ export default function WatchListCard({ anime, watchListId }) {
         <div className="z-10 bg-non hover:backdrop-brightness-75 rounded-md overflow-hidden hover:backdrop-blur-sm  o0 bg-gradient-radial from-transparent to-black via-transparent transition-all duration-200 ease-in-out  absolute h-full w-full">
           <div className="content flex flex-col  w-full h-full z-10">
             <div className="flex">
+              <div className="flex mr-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">
+                {anime?.animeAgeRating?.split(" ")[0].toUpperCase() || "NA"}
+              </div>
               <div className="flex flex-col">
                 <button
-                  className="flex mr-auto m-2 px-1 rounded-sm z-20 text-red-500 text-2xl font-bold"
+                  className="z-20 absolute m-1 right-0 rounded-full border-[1px] border-cbg-100  bg-primary-500 p-1"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     handleRemoveAnime(anime.animeId,watchListId);
                   }}
                 >
-                  <MdDeleteOutline/>
+                  <IoMdClose className='text-cbg-100'/>
                 </button>
         
               </div>
              
-              <div className="flex ml-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">
-                {anime?.animeAgeRating?.split(" ")[0].toUpperCase() || "NA"}
-              </div>
             </div>
             <div className="absolute  play hover:opacity-100 opacity-0 flex h-full w-full items-center justify-center ">
               <FaPlay size={50} className="text-primary-400 opacity-85" />
