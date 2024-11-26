@@ -54,7 +54,7 @@ const WatchListPagination = ({ selectedWatchList }) => {
   const reloadWatchListData = async () => {};
 
   return (
-    <div className="flex flex-col justify-center md:mx-20 sm:mx-10 mx-5 my-10">
+    <div className="flex flex-col justify-center  sm:mx-10  my-10">
       {list ? (
         list.length > 0 ? (
           <div
