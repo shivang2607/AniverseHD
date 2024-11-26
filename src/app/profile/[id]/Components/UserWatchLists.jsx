@@ -121,7 +121,7 @@ const UserWatchLists = ({ id }) => {
     <>
       {userStarterWatchLists && userCustomWatchLists && selectedWatchList ? (
         <div>
-          <div className="flex flex-row mt-5 ml-5">
+          <div className="flex flex-row mt-5 mx-2">
             <WatchListsTabs
               StarterWatchLists={userStarterWatchLists}
               CustomWatchLists={userCustomWatchLists}

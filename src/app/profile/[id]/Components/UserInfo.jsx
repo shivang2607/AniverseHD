@@ -105,14 +105,14 @@ const UserInfo = ({ id }) => {
                 </div>
 
                 {isUserLoggedIn && loggedInUserId === id && (
-                  <div className="flex flex-row w-fit sm:mt-2 mt-1 sm:hidden">
+                  <div className="flex flex-row w-fit sm:mt-2 mt-1 sm:hidden items-center">
                     <button
                       className="bg-primary-100 md:py-2 md:px-3 py-1 px-2 mr-2 rounded-md w-fit h-fit text-primary-600 md:text-lg  sm:text-sm text-xs font-bold"
                       onClick={handleOpenCreateWatchListModal}
                     >
                       Create WatchList
                     </button>
-                    <div className="bg-primary-100 md:pt-1.5 md:pr-1.5 md:pl-2.5 md:pb-2.5 sm:pt-1 sm:pr-1 sm:pl-2 sm:pb-2  pt-1 pr-0.5 pl-1.5 pb-1.5 md:text-lg sm:text-sm text-xs rounded-md cursor-pointer text-primary-600 h-fit font-bold">
+                    <div className="bg-sky-500 md:pt-1.5 md:pr-1.5 md:pl-2.5 md:pb-2.5 sm:pt-1 sm:pr-1 sm:pl-2 sm:pb-2  pt-1 pr-0.5 pl-1.5 pb-1.5 md:text-lg sm:text-sm text-xs rounded-md cursor-pointer text-primary-600 h-fit b  font-bold">
                       <FaRegEdit onClick={handleOpenEditUserProfileModal} />
                     </div>
                   </div>

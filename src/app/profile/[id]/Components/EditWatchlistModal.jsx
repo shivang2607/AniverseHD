@@ -8,18 +8,19 @@ import { IoMdClose } from "react-icons/io";
 import React, { useEffect, useState } from "react";
 import useUserStore from "@/components/ZustandStores/userStore";
 import toast from "react-hot-toast";
+import ChangeWatchListName from "@/app/firebase/WatchList/UpdateWatchLists/ChangeWatchListName";
 
-export default function EditWatchlistModal({isOpen, onClose, oldName}) {
+export default function EditWatchlistModal({isOpen, onClose, id, oldName}) {
 
 
-    const {} = useUserStore();
-  const [watchlistName, setWatchlistName] = useState(oldName);
+    const {loadLoggedInUserWatchLists} = useUserStore();
+  const [watchlistName, setWatchlistName] = useState();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(()=>{
     setWatchlistName(oldName);
-  }, []);
+  }, [oldName]);
 
   if (!isOpen) return null;
 
@@ -32,39 +33,37 @@ export default function EditWatchlistModal({isOpen, onClose, oldName}) {
   }
 
   async function handleSubmit(event) {
-//     event.preventDefault(); // Prevent form from reloading the page
+    event.preventDefault(); // Prevent form from reloading the page
 
-//     // Validate watchlist name
-//     if (watchlistName.trim() === "") {
-//       setError("Watchlist name cannot be empty");
-//       return;
-//     }
-//     setLoading(true);
-//     setError(""); // Clear any previous errors
+    // Validate watchlist name
+    if (watchlistName.trim() === "") {
+      setError("Watchlist name cannot be empty");
+      return;
+    }
+    setLoading(true);
+    setError(""); // Clear any previous errors
 
-//     const formData = new FormData();
-//     formData.set("watchlist-name", watchlistName);
-//     formData.set("watchlist-type", watchlistType);
+    const formData = new FormData();
+    formData.set("watchlist-name", watchlistName);
 
-//     // Start loader for creating
-//     const resp = await CreateWatchList({
-//      watchListName:formData.get("watchlist-name").trim(),
-//       type:formData.get("watchlist-type")
-//   });
+    // Start loader for creating
+    const resp = await ChangeWatchListName({
+           watchListId: id,
+           watchListName: watchlistName,
+         });
 
-//     if (resp.status === Constant_Var_success) {
-//       // Show Toast (Success)
-//       console.log("Success", resp.response);
-//     } else {
-//       // Show Toast (Error)
-//       console.log("Error", resp.response);
-//     }
-//     setError("");
-//     setWatchlistName("");
-//     setWatchlistType(Constant_Var_firebase_fieldValue_public);
-//     setLoading(false);
-//     loadLoggedInUserWatchLists();
-//     onClose();
+    if (resp.status === Constant_Var_success) {
+      // Show Toast (Success)
+      console.log("Success", resp.response);
+    } else {
+      // Show Toast (Error)
+      console.log("Error", resp.response);
+    }
+    setError("");
+    setWatchlistName("");
+    setLoading(false);
+    loadLoggedInUserWatchLists();
+    onClose();
   }
 
 

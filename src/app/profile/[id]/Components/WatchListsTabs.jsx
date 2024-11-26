@@ -59,8 +59,8 @@ const WatchListsTabs = ({
 
 
   return (
-    <div className="flex flex-row w-full justify-between z-20">
-      <div className="watchlist-tabs flex flex-row w-4/5 scrollbar-none overflow-x-scroll space-x-3 py-2">
+    <div className="flex flex-col-reverse mx-auto   md:flex-row w-full justify-center md:justify-between z-20">
+      <div className="watchlist-tabs  flex bg-gradient-to-l bg-primary-400/10 flex-row w-full my-2 md:w-4/5 scrollbar-none overflow-x-scroll  gap-3 py-2 shadow-inner  rounded-xl md:px-2 border-r-[1px] border-primary-300 shadow-primay-100 ">
         {StarterWatchLists?.map((ele, ind) => (
           <div
             key={ele.id}
@@ -91,7 +91,7 @@ const WatchListsTabs = ({
       </div>
 
       {isUserLoggedIn && loggedInUserId === paramsUserId && (
-        <div className="flex my-auto mx-4 text-sm gap-2">
+        <div className="flex my-2 md:my-auto md:mx-4 text-sm gap-2">
           <select value={selectedWatchList?.type} onChange={UpdatePublicPrivate} className="px-2 cursor-pointer py-1 rounded-lg bg-cbg-300 text-gray-200">
             <option value={Constant_Var_firebase_fieldValue_private}>
               {Constant_Var_firebase_fieldValue_private}
@@ -122,7 +122,7 @@ const WatchListsTabs = ({
           {selectedWatchList?.id && <ShareModal buttonText="Share" url={window.location.origin + `/watchlist/${selectedWatchList.id}`}/>}
         </div>
       )}
-      <EditWatchlistModal isOpen={isEditModalOpen} onClose={()=>setIsEditModalOpen(false)} oldName={selectedWatchList?.watchListName}/>
+       <EditWatchlistModal isOpen={isEditModalOpen} id={selectedWatchList.id} onClose={()=>setIsEditModalOpen(false)} oldName={selectedWatchList?.watchListName}/>
     </div>
   );
 };

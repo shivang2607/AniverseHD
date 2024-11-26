@@ -54,7 +54,7 @@ const Profile = ({ params }) => {
   // }, []);
 
   return (
-    <div className="w-full min-h-[100vh]">
+    <div className="w-full min-h-screen">
       <UserInfo id={params.id} />
       <UserWatchLists id={params.id} />
       <Toaster
