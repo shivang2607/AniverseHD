@@ -381,3 +381,38 @@ export const updatePublicPrivateCached = ({
 
   return;
 };
+
+export const updateWatchListName = ({
+  watchListId,
+  watchListName,
+  updatedAt,
+  userId,
+}) => {
+  let watchListInfo = getWatchListInfoByIdInfoCached({
+    watchListId: watchListId,
+  });
+  let userWatchLists = getUserWatchListsInfoCached({ userId: userId });
+  watchListInfo.updatedAt = updatedAt;
+
+  if (watchListInfo) {
+    watchListInfo.watchListName = watchListName;
+    setWatchListInfoByIdInfoCached({
+      watchListInfo: watchListInfo,
+      watchListId: watchListId,
+    });
+  }
+
+  //adding only animeid and timestamp to watchListInfo in user watchLists cache
+  if (userWatchLists) {
+    let ind = findWatchListIndex({
+      userWatchLists: userWatchLists,
+      watchListId: watchListId,
+    });
+
+    if (ind != -1) userWatchLists[ind].watchListName = watchListName;
+
+    setUserWatchListsInfoCached({ watchLists: userWatchLists, userId: userId });
+  }
+
+  return;
+};
