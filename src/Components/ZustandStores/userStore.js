@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 
 const useUserStore = create((set, get) => ({
-  isUserLoggedIn: null,
+  isUserLoggedIn: false,
   loggedInUserId: null,
   loggedInUserData: null,
   loggedInUserWatchListsInfo: null,

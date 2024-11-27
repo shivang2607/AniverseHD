@@ -36,7 +36,7 @@ export default function page({params}) {
                     setWatchlistData(watchListDataResponse.response);
                     console.log("Complete Watchlist Data:", watchListDataResponse.response);
                 } else {
-                    console.error("Error fetching complete watchlist:", watchListDataResponse);
+                    console.error("Error fetching complete watchlist:", watchListDataResponse.response);
                 }
             } catch (error) {
                 // Catch any unexpected errors (e.g., network issues)

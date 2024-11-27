@@ -120,9 +120,10 @@ export default async function GetWatchListDataById({
 
     let response = null;
     //Checking if the watchList is public or current user is the owner
+    const userAuth= (await getUserAuth());
     if (
       watchListInfo.response.type === Constant_Var_firebase_fieldValue_public ||
-      (await getUserAuth())?.details.uid === watchListInfo.response.ownerUid
+     (userAuth && userAuth.details.uid === watchListInfo.response.ownerUid)
     ) {
 
         response = await Helper({

@@ -35,10 +35,11 @@ export default function MainCard({ anime , imageHeight=72}) {
           <Image
             fill
             src={
-              anime?.animePhoto ||
               anime?.main_picture ||
               anime?.images?.webp?.large_image_url ||
-              anime?.images?.webp?.large_image_url
+              anime?.images?.webp?.large_image_url ||
+               anime?.animePhoto?.webp?.large_image_url ||
+              anime?.animePhoto?.webp?.large_image_url || anime?.animePhoto || ""
             }
             alt={anime?.title_english || anime?.animeName || "Anime title"}
             className="object-cover "
