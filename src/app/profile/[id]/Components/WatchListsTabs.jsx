@@ -64,11 +64,10 @@ const WatchListsTabs = ({
         {StarterWatchLists?.map((ele, ind) => (
           <div
             key={ele.id}
-            className={`px-4 py-1 flex items-center gap-2 rounded-lg cursor-pointer text-nowrap text-sm font-semibold transition-all duration-200 ease-in-out text-cbg-200 transform ${
-              selectedWatchList.id === ele.id
+            className={`px-4 py-1 flex items-center gap-2 rounded-lg cursor-pointer text-nowrap text-sm font-semibold transition-all duration-200 ease-in-out text-cbg-200 transform ${selectedWatchList.id === ele.id
                 ? "bg-primary-200  border-gray-500 shadow-md"
                 : "bg-gray-300  border border-gray-600   hover:shadow-lg hover:scale-105"
-            }`}
+              }`}
             onClick={() => setSelectedWatchList(ele)}
           >
             {ele.watchListName}
@@ -78,11 +77,10 @@ const WatchListsTabs = ({
         {CustomWatchLists.map((ele, ind) => (
           <div
             key={ele.id}
-            className={`px-4 py-1 flex items-center gap-2 rounded-lg cursor-pointer text-nowrap text-sm font-semibold transition-all duration-200 ease-in-out text-cbg-200 transform ${
-              selectedWatchList.id === ele.id
+            className={`px-4 py-1 flex items-center gap-2 rounded-lg cursor-pointer text-nowrap text-sm font-semibold transition-all duration-200 ease-in-out text-cbg-200 transform ${selectedWatchList.id === ele.id
                 ? "bg-primary-200  border-gray-500 shadow-md"
                 : "bg-gray-300  border border-gray-600   hover:shadow-lg hover:scale-105"
-            }`}
+              }`}
             onClick={() => setSelectedWatchList(ele)}
           >
             {ele.watchListName}
@@ -104,25 +102,27 @@ const WatchListsTabs = ({
 
           {!selectedWatchList.isSpecialStarter && (
             <>
-            <button
-            className="px-2 py-1 flex items-center gap-2 bg-sky-500 text-white rounded-md font-semibold hover:bg-sky-600 transition-all"
-            onClick={()=>setIsEditModalOpen(true)}
-          >
-           <FaRegEdit /> Edit
-          </button>
-            <button
-              className="px-2 py-1 flex items-center gap-2 bg-red-500 text-white rounded-md font-semibold hover:bg-red-600 transition-all"
-              onClick={DeleteCurrentWatchList}
-            >
-              <IoMdClose className="text-lg"/>Delete
-            </button>
+              <button
+                className="px-2 py-1 flex items-center gap-2 bg-sky-500 text-white rounded-md font-semibold hover:bg-sky-600 transition-all"
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                <FaRegEdit /> Edit
+              </button>
+              <button
+                className="px-2 py-1 flex items-center gap-2 bg-red-500 text-white rounded-md font-semibold hover:bg-red-600 transition-all"
+                onClick={DeleteCurrentWatchList}
+              >
+                <IoMdClose className="text-lg" />Delete
+              </button>
 
             </>
           )}
-          {Constant_Var_firebase_fieldValue_public === selectedWatchList.type && <ShareModal buttonText="Share" url={window.location.origin + `/watchlist/${selectedWatchList.id}`}/>}
+          {Constant_Var_firebase_fieldValue_public === selectedWatchList.type && 
+          
+          <ShareModal buttonText="Share" modalTitle="Share this Watchlist" title="Checkout this Awesome Watchlist :" url={window.location.origin + `/watchlist/${selectedWatchList.id}`} />}
         </div>
       )}
-       <EditWatchlistModal isOpen={isEditModalOpen} id={selectedWatchList.id} onClose={()=>setIsEditModalOpen(false)} oldName={selectedWatchList?.watchListName}/>
+      <EditWatchlistModal isOpen={isEditModalOpen} id={selectedWatchList.id} onClose={() => setIsEditModalOpen(false)} oldName={selectedWatchList?.watchListName} />
     </div>
   );
 };
