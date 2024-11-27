@@ -152,7 +152,7 @@ export default function ListDropDown({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleOnClickList(list?.id, list?.watchListName, isAnimeInList);
+                    list?.id && handleOnClickList(list?.id, list?.watchListName, isAnimeInList);
                   }}
                 >
                   <div>{list?.watchListName}</div>{" "}

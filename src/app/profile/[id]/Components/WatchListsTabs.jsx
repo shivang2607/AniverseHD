@@ -119,7 +119,7 @@ const WatchListsTabs = ({
 
             </>
           )}
-          {selectedWatchList?.id && <ShareModal buttonText="Share" url={window.location.origin + `/watchlist/${selectedWatchList.id}`}/>}
+          {Constant_Var_firebase_fieldValue_public === selectedWatchList.type && <ShareModal buttonText="Share" url={window.location.origin + `/watchlist/${selectedWatchList.id}`}/>}
         </div>
       )}
        <EditWatchlistModal isOpen={isEditModalOpen} id={selectedWatchList.id} onClose={()=>setIsEditModalOpen(false)} oldName={selectedWatchList?.watchListName}/>

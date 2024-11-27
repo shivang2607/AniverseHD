@@ -46,8 +46,12 @@ const ShareModal = ({
       if(!url){
         const path = window.location.origin + getAbsoluteURLPath(pathname, searchParams);
         setFullURL(t ? path + `&t=${t}` : path);
+        return;
         // console.log(fullURL);
       }
+      setFullURL(url);
+
+      
     }, [[url, pathname, searchParams, t]]);
 
 
