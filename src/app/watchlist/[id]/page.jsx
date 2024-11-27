@@ -4,6 +4,7 @@ import GetWatchListInfoById from '@/app/firebase/WatchList/WatchListDocument/Get
 import MainCard from '@/components/mainCard';
 import WatchListCard from '@/components/watchListCard';
 import { Constant_Var_success } from '@/utils/constants';
+import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -11,6 +12,7 @@ export default function page({params}) {
 
     const [watchlistData, setWatchlistData] = useState();
     const [watchlistInfo, setWatchlistInfo] = useState();
+    const [error, setError] = useState();
     
     useEffect(()=>{
         if(!(params?.id)){
@@ -33,10 +35,12 @@ export default function page({params}) {
                 }
         
                 if (watchListDataResponse.status === Constant_Var_success) {
+                    setError();
                     setWatchlistData(watchListDataResponse.response);
                     console.log("Complete Watchlist Data:", watchListDataResponse.response);
                 } else {
                     console.error("Error fetching complete watchlist:", watchListDataResponse.response);
+                    setError(watchListDataResponse.response);
                 }
             } catch (error) {
                 // Catch any unexpected errors (e.g., network issues)
@@ -59,7 +63,14 @@ export default function page({params}) {
       </div>
       }
 
-      {watchlistData && 
+      {error ? 
+      <div className='error flex flex-col w-full gap-3 text-2xl font-semibold tracking-wide text-primary-500 mx-auto my-8'>
+        <div className="img relative rounded-xl overflow-hidden flex mx-auto w-96 h-80">
+        <Image src={"/saying NO anime.png"} alt='Error Image' fill/></div>
+        <div className='md:w-1/2 flex mx-auto justify-center'>Error : {error.message}</div>
+      </div>
+      :
+       watchlistData && 
         <div className='w-full rounded-xl self-center bg-cbg-200 grid md:grid-cols-6 grid-cols-2 p-1 md:p-4 min-h-full gap-2'>
             {watchlistData.length > 0 ? watchlistData.map(anime => {
                 return(

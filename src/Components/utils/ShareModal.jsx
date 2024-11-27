@@ -51,13 +51,13 @@ const ShareModal = ({
       }
       setFullURL(url);
 
-      
+
     }, [[url, pathname, searchParams, t]]);
 
 
 
   const handleOnCopy = ()=>{
-    navigator.clipboard.writeText(fullURL);
+    navigator.clipboard?.writeText(fullURL);
     toast.success("Link Copied to Clipboard");
   }
 
