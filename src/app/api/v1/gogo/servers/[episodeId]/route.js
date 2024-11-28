@@ -1,6 +1,8 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
 
+export const runtime = "edge";
+
 export async function GET(req, {params}){
     const episodeId = params.episodeId;
     
