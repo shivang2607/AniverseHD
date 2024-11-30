@@ -1,12 +1,8 @@
-# syntax=docker.io/docker/dockerfile:1
-
-# Base Alpine Node.js image
-FROM node:18-alpine AS base
+# Use a Debian-based Node.js image
+FROM node:18-bullseye AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-# Install required libraries (libc6-compat for compatibility)
-RUN apk add --no-cache libc6-compat libcurl libunwind
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
