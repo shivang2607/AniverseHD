@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import getAnime from "../../anime/[id]/mainFunction";
 import redisClient from "@/lib/redis"; // Use the singleton instance directly
 
-export const runtime = "edge";
+
 
 const watchOptions = {
   max: 500,

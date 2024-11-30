@@ -8,8 +8,6 @@ const nextConfig = {
     serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
 },
   images: {
-    loader: 'custom',
-    loaderFile: './imageLoader.ts',
     
     remotePatterns: [
       {

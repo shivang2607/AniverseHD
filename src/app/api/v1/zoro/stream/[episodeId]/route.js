@@ -2,7 +2,7 @@ import axios from "axios";
 import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
+
 
 const option = {
   max: 500,

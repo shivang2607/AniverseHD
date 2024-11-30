@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import getAnime from "./mainFunction";
 
-export const runtime = "edge";
+
 
 
 

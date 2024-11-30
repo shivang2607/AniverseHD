@@ -8,7 +8,7 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
-export default function page({params}) {
+export default function Page({params}) {
 
     const [watchlistData, setWatchlistData] = useState();
     const [watchlistInfo, setWatchlistInfo] = useState();

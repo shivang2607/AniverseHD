@@ -3,7 +3,7 @@ import Bottleneck from "bottleneck";
 import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
+
 
 const animeOptions = {
     max:10,

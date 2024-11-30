@@ -4,7 +4,7 @@ import { pipeline } from "@xenova/transformers";
 import axios from "axios";
 import { LRUCache } from "lru-cache";
 
-export const runtime = "edge";
+
 
 const options = {
   max:300,
