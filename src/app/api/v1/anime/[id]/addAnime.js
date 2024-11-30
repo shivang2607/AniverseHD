@@ -4,6 +4,8 @@ import axios from "axios";
 import Bottleneck from "bottleneck";
 import redisClient from "@/lib/redis"; // Import the singleton Redis client instance
 
+
+
 // This function simply turns a sentence into embeddings.
 async function encodeText(text) {
     const extractor = await pipeline("feature-extraction", "Xenova/bge-small-en-v1.5");

@@ -50,7 +50,7 @@ export default function Page({params}) {
         
 
 
-    }, []);     //! params aayega dependency array m...baar baar page refresh na ho dev k waqt isiliye hataya mene.
+    }, [params]);   
   return (
     <div className='pt-24 text-lg flex w-full  flex-col gap-4 min-h-screen md:px-4 p-2'>
       {watchlistInfo &&
