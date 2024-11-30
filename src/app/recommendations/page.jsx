@@ -2,7 +2,6 @@
 import MainCard from "@/components/mainCard";
 import RecommendationSearchComponent from "@/components/recommendationPanel/SearchComponentRecommendation";
 import SharinganLoader from "@/components/sharinganLoader";
-import useRecommendationStore from "@/components/utils/store";
 import Image from "next/image";
 import React from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -13,6 +12,7 @@ import { RxReset } from "react-icons/rx";
 import { Hourglass } from "react-loader-spinner";
 import { MdFilterList, MdFilterListOff } from "react-icons/md";
 import { TypeAnimation } from "react-type-animation";
+import useRecommendationStore from "@/components/utils/store";
 
 export default function Recommendation() {
 
@@ -47,7 +47,7 @@ export default function Recommendation() {
   };
 
   return (
-    <div className="md:w-[73%] w-[100vw] flex flex-col gap-4 py-4 mx-4">
+    <div className="md:w-[73%] w-[100vw] min-h-screen flex flex-col gap-4 py-4 mx-4">
       
       <div className={`fixed h-screen w-screen top-0 z-20 backdrop-blur-sm ${isFilterOpen?"visible":"hidden"}`}></div>
 
@@ -116,6 +116,7 @@ export default function Recommendation() {
               background: "#b6d7d4",
               border: "1px solid ",
               color: "#041C32",
+              
             },
           }}
         />

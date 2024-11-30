@@ -7,6 +7,7 @@ import {
 import { IoMdClose } from "react-icons/io";
 import React, { useState } from "react";
 import useUserStore from "@/components/ZustandStores/userStore";
+import toast from "react-hot-toast";
 
 const CreateWatchListModal = ({ isOpen, onClose }) => {
   const {loadLoggedInUserWatchLists} = useUserStore();
@@ -18,6 +19,14 @@ const CreateWatchListModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleChange = (newName) => {
+    if(newName?.length > 50){
+        toast.error("Watchlist name cannot exceed 50 characters.", {id: 2});
+        return;
+    }
+    setWatchlistName(newName);
+  }
 
   async function handleSubmit(event) {
     event.preventDefault(); // Prevent form from reloading the page
@@ -77,7 +86,7 @@ const CreateWatchListModal = ({ isOpen, onClose }) => {
                 }`}
                 placeholder="Enter watchlist name"
                 value={watchlistName}
-                onChange={(e) => setWatchlistName(e.target.value)}
+                onChange={(e) => handleChange(e.target.value)}
               />
               {error && watchlistName.trim() === "" && (
                 <p className="text-red-500 sm:text-xs text-[10px] mt-1 ml-1 !w-fit">

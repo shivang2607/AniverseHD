@@ -128,16 +128,17 @@ export default function AnimeBased() {
             </>
           )}
         </button>
-        <Toaster
+        {/* <Toaster
           toastOptions={{
             style: {
               borderRadius: "10px",
               background: "#b6d7d4",
               border: "1px solid ",
               color: "#041C32",
+              
             },
           }}
-        />
+        /> */}
       </div>
         </div>
             {selectedAnime && <div className="selected-card  h-fit flex flex-row-reverse gap-2 rounded-md">

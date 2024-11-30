@@ -43,6 +43,7 @@ export default async function CreateWatchList({watchListName, type}) {
     const docRef = doc(collection(db, Constant_Var_firebase_collectionName_watchLists));
     const watchListInfo = WatchListModel({
       ownerUid: userData.details.uid,
+      ownerName:userData.details.name,
       watchListName: watchListName,
       type: type,
       isSpecialStarter: false,

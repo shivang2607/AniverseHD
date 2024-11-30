@@ -1,5 +1,5 @@
 import { auth, db } from "../../utils/firebaseinit";
-import { arrayUnion, doc, writeBatch } from "firebase/firestore";
+import { arrayUnion, doc, Timestamp, writeBatch } from "firebase/firestore";
 import getUserAuth from "../../utils/GetUserAuth";
 import {
   Constant_Var_RecentWatchlistSize,
@@ -37,6 +37,8 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  * @param {string|null} params.animeAgeRating - The age rating of the anime (can be null).
  * @param {number|null} params.animeStartYear - The starting year of the anime (can be null).
  * @param {number|null} params.animeLength - The number of episodes or runtime of the anime (can be null).
+ * @param {string|null} params.url - Url of episode for recent watchlist
+ * @param {object|null} params.episodeTimestamp - Timestamp of episode for recent watchlist
  *
  * @returns {Promise<{status:string,response:any}>} - Returns a promise that resolves to an object containing:
  *   - {string} status - Indicates the success or failure of the operation, will be Constant_Var_success on success or Constant_Var_error on failure.
@@ -75,8 +77,25 @@ export default async function AddAnimeToWatchList({
   animeStartYear = null,
   animeLength = null,
   url = null,
+  episodeTimestamp = null,
+  duration = null,
 }) {
   try {
+    console.log(
+      watchListId,
+      animeId,
+      animeName,
+      animePhoto,
+      animeGenre,
+      animeType,
+      animeScore,
+      animeAgeRating,
+      animeStartYear,
+      animeLength,
+      url,
+      episodeTimestamp,
+      duration
+    );
     // Validate the parameters
     validateParams({
       watchListId,
@@ -90,6 +109,7 @@ export default async function AddAnimeToWatchList({
       animeStartYear,
       animeLength,
       url,
+      episodeTimestamp,
     });
 
     const userData = await getUserAuth();
@@ -115,6 +135,8 @@ export default async function AddAnimeToWatchList({
       animeStartYear: animeStartYear,
       animeLength: animeLength,
       url: url,
+      episodeTimestamp: episodeTimestamp,
+      duration: duration,
     });
     const currTimestamp = animeObject.addedAt;
 
@@ -130,9 +152,9 @@ export default async function AddAnimeToWatchList({
         ) {
           // for special recent watch list, it have a fixed size
 
-          if (url === null)
+          if (url === null || episodeTimestamp == null || duration == null)
             throw new Error(
-              "Url cannot be null when watchlist is starter recent"
+              "Url and episodeTimestamp cannot be null when watchlist is starter recent"
             );
 
           const doesExists = watchListInfo.response.animeList?.find(
@@ -225,6 +247,9 @@ async function addAnime({
 }) {
   try {
     const batch = withBatch || writeBatch(db);
+    const isRecent =
+      watchListInfo.isSpecialStarter &&
+      watchListInfo.watchListName === Constant_Var_starterWatchLists_recent;
     const docRef = doc(
       db,
       Constant_Var_firebase_collectionName_watchLists,
@@ -238,6 +263,14 @@ async function addAnime({
     const animeObject2 = watchListInfo.animeList.find(
       (obj) => obj.animeId === animeId
     );
+    const newAnimeList = watchListInfo.animeList;
+    newAnimeList.push({
+      animeId: animeId,
+      addedAt: animeObject.addedAt,
+      animeName: animeObject.animeName,
+      ...(isRecent ? { url: animeObject.url } : {}),
+      ...(isRecent ? { episodeTimestamp: animeObject.episodeTimestamp } : {}),
+    });
 
     if (animeObject2 == undefined) {
       const docRef = doc(
@@ -246,10 +279,7 @@ async function addAnime({
         watchListId
       );
       batch.update(docRef, {
-        animeList: arrayUnion({
-          animeId: animeId,
-          addedAt: animeObject.addedAt,
-        }),
+        animeList: newAnimeList,
         updatedAt: currTimestamp,
       });
     } else {
@@ -272,11 +302,10 @@ async function addStarterNonRecentAnime({
   watchListInfo,
   watchListId,
   currTimestamp,
-  userId
+  userId,
 }) {
   try {
     const userWatchLists = (await GetLoggedUserWatchListsInfo()) || [];
-
 
     if (userWatchLists.status === Constant_Var_error)
       throw userWatchLists.response;
@@ -343,7 +372,7 @@ async function addStarterNonRecentAnime({
         animeId: animeId,
         userId: userId,
         watchListId: item,
-        updatedAt:currTimestamp,
+        updatedAt: currTimestamp,
       });
     });
 
@@ -359,7 +388,7 @@ async function addToStarterRecentWatchList({
   watchListInfo,
   watchListId,
   currTimestamp,
-  userId
+  userId,
 }) {
   try {
     if (!watchListId) throw new Error(Constant_Var_errorMessage_missingParams);
@@ -409,7 +438,7 @@ async function addToStarterRecentWatchList({
         animeId: earliestAnimeObj.animeId,
         userId: userId,
         watchListId: watchListId,
-        updatedAt:currTimestamp
+        updatedAt: currTimestamp,
       });
     } else {
       const respAdd = await addAnime({
@@ -449,6 +478,9 @@ async function updateAnimeInWatchList({
       Constant_Var_firebase_collectionName_animeList,
       animeId
     );
+    const isRecent =
+      watchListInfo.isSpecialStarter &&
+      watchListInfo.watchListName === Constant_Var_starterWatchLists_recent;
 
     // Filter out fields that are null or undefined and exclude 'addedAt'
     let filteredAnimeObject = Object.fromEntries(
@@ -464,14 +496,21 @@ async function updateAnimeInWatchList({
     // Modify the animeList array by updating the `addedAt` for the matching `animeId`
     const updatedAnimeList = watchListInfo.animeList.map((anime) => {
       if (anime.animeId === animeId) {
-        return { ...anime, addedAt: animeObject.addedAt };
+        return {
+          ...anime,
+          ...(isRecent ? { url: animeObject.url } : {}),
+          ...(isRecent
+            ? { episodeTimestamp: animeObject.episodeTimestamp }
+            : {}),
+          addedAt: animeObject.addedAt,
+        };
       }
       return anime;
     });
 
     batch.update(
       doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId),
-      { animeList: updatedAnimeList, updatedAt: currTimestamp }
+      { animeList: updatedAnimeList, addedAtAt: currTimestamp }
     );
 
     if (withBatch) return { status: Constant_Var_success, response: null };
@@ -510,18 +549,22 @@ function validateParams({
   }
 
   // Anime Photo can be null
-  if (animePhoto !== null && typeof animePhoto !== "object") {
-    throw new Error("Invalid animePhoto (should be an object or null)");
+  if (
+    animePhoto !== null &&
+    typeof animePhoto !== "object" &&
+    typeof animePhoto !== "string"
+  ) {
+    throw new Error("Invalid animePhoto (should be an object or string)");
   }
 
   // Anime Genre can be null
   if (animeGenre !== null && !Array.isArray(animeGenre)) {
-    throw new Error("Invalid animeGenre (should be an array or null)");
+    throw new Error("Invalid animeGenre (should be an array )");
   }
 
   // Anime Type can be null
   if (animeType !== null && typeof animeType !== "string") {
-    throw new Error("Invalid animeType (should be a string or null)");
+    throw new Error("Invalid animeType (should be a string)");
   }
 
   // Anime Score can be null
@@ -535,7 +578,11 @@ function validateParams({
   }
 
   // Anime Start Year can be null
-  if (animeStartYear !== null && typeof animeStartYear !== "number") {
+  if (
+    animeStartYear !== null &&
+    typeof animeStartYear !== "number" &&
+    typeof animeStartYear !== "string"
+  ) {
     throw new Error("Invalid animeStartYear (should be a number or null)");
   }
 

@@ -15,6 +15,7 @@ export async function syncQdrant(id, resPayload) {
 
     const jikanResp = await jikanLimiter.schedule(() => jikan.loadAnime(id, 'full')); // Use when not using caching
     // const jikanResp = await jikan.loadAnime(id, 'full');
+    // console.log(jikanResp.data.title);
     
     const jikanData = jikanResp.data;
     let updatePayload = {
@@ -36,22 +37,43 @@ export async function syncQdrant(id, resPayload) {
     };
 
     // https://cors-anywhere.herokuapp.com/ (old proxy)
+    //https://api.allorigins.win/raw?url= (another proxy)
     // cors.sh , (other proxy , only needed in development phase)
-    // console.log(resPayload.Sites);
-    if (!(resPayload.Sites)) {
-        // console.log("HI")
-        const corsProxyUrl = process.env.ENV === 'DEV' ? 'https://api.allorigins.win/raw?url=' : '';
-        const headers = {
-            'Origin': '*'
-        };
-        const malSyncData = await limiter.schedule(() => axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, { headers }));
-        updatePayload = {
-            ...updatePayload,
-            "Sites": malSyncData?.data?.Sites
-        };
-        // console.log(updatePayload.Sites);
-        // console.log(malSyncData);
+    console.log("Sites", resPayload.Sites);
+
+    
+    
+    //checks if Sites is undefined, null or falsy or {} i.e. empty object
+    if (!resPayload.Sites || (Object.keys(resPayload.Sites).length === 0 && resPayload.Sites.constructor === Object)) {
+        const corsProxyUrl = process.env.ENV === 'DEV' ? process.env.CUSTOM_PROXY_URL : '';
+        const headers = { 'Origin': '*' };
+    
+        try {
+            // Attempt to fetch the data through the proxy
+            const malSyncData = await limiter.schedule(() =>
+                axios.get(`${corsProxyUrl}https://api.malsync.moe/mal/anime/${id}`, { headers })
+            );
+    
+            // Check if malSyncData exists and contains the expected data
+            if (malSyncData?.data?.Sites?.Gogoanime || malSyncData?.data?.Sites?.Zoro ) {
+                updatePayload = {
+                    ...updatePayload,
+                    "Sites": malSyncData.data.Sites
+                };
+            } else {
+                console.error('No Sites data found in the response.');
+                // Optional: Set a default value for Sites if required
+                // updatePayload.Sites = {}; // or [] based on your requirements
+            }
+    
+            console.log("malsync data", malSyncData);
+        } catch (error) {
+            // Log the error and set error response
+            console.error('Failed to fetch data from the site:', error.message);
+            // updatePayload.Sites = {}; // Optional: Provide fallback/default data
+        }
     }
+    
 
     if (!(resPayload?.relations)) {
         updatePayload = {

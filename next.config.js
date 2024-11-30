@@ -8,6 +8,7 @@ const nextConfig = {
     serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
 },
   images: {
+    
     remotePatterns: [
       {
         protocol: "https",

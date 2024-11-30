@@ -19,14 +19,19 @@ const ResponsiveCarousal = () => {
     // Check if data exists in session storage
     const sessionData = sessionStorage.getItem("topAnimeData");
     if (sessionData) {
+      console.log("this is session data", JSON.parse(sessionData)); 
       setTopFavorite(JSON.parse(sessionData));
       return;
     } 
       axios.get("/api/v1/get-top-anime")
         .then((response) => {
-          const data = response?.data.data;
+          const data = response?.data?.data;
+          //! IMPLEMENT TRY CATCH HERE FOR ERRORS IN SESSION STORAGE PARSING
           setTopFavorite(data);
-          sessionStorage.setItem("topAnimeData", JSON.stringify(data));
+          console.log(data);
+          if(data){
+          sessionStorage.setItem("topAnimeData",  JSON.stringify(data));  
+          }
         })
         .catch((error) => {
           console.error("Error fetching top anime:", error);
@@ -67,6 +72,7 @@ const ResponsiveCarousal = () => {
           pauseOnMouseEnter: true,
         }}
         navigation={true}
+        
       >
         {topFavorite?.map((anime, index) => {
           return (
@@ -105,7 +111,7 @@ const ResponsiveCarousal = () => {
                   
 
                   <div className="reroute flex md:gap-6 gap-3 items-center mt-5">
-                    <Link href="#" className="rounded-lg p-2 text-nowrap  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
+                    <Link href={`/watch/${anime?.mal_id}?provider=zoro`} className="rounded-lg p-2 text-nowrap  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
                     <Link href={`/anime/${anime?.mal_id}`} className="rounded-lg  p-2 md:text-base text-sm  md:gap-2 items-center flex text-primary-600 bg-cbg-300 tracking-wide">Details <FaChevronRight/></Link>
                   </div>
                 
@@ -123,6 +129,7 @@ const ResponsiveCarousal = () => {
             </SwiperSlide>
           );
         })}
+        
       </Swiper>:
       <div className="flex h-full w-full items-center justify-center">
         

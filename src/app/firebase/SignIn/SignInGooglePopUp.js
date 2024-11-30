@@ -87,6 +87,7 @@ export default async function SignInGooglePopUp(statusCallback) {
 
 async function CreateProfileIfNotExists(statusCallback) {
   try {
+    // if (statusCallback) statusCallback("creatingPe");
     const [respUserInfo, respUserWatchLists] = await Promise.all([
       GetLoggedUserData(),
       GetLoggedUserWatchListsInfo(),

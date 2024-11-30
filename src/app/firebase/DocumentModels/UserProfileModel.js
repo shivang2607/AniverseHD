@@ -23,6 +23,11 @@ function UserProfileModel({uid, name, email , photoURL, coverURL}) {
     photoUrl: photoURL,
     coverUrl: coverURL,
     uid: uid,
+    playerOptions:{ 
+      autoPlay:true,
+      autoSkipIntro:false,
+      autoNext:true,
+    }
   };
 
   return document; // Return the object that can be sent to Firestore

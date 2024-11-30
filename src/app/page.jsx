@@ -5,39 +5,34 @@ import React, { useEffect } from "react";
 import TopAiringCarousal from "@/components/TopAiringCarousal";
 import RecommendationPanel from "@/components/recommendationPanel/RecommendationPanel";
 import AllTop from "@/components/AllTop";
+import RecentWatching from "@/components/RecentWatching";
+import jikanjs from "@mateoaranda/jikanjs";
+import ScheduleComponent from "@/components/ScheduleComponent/ScheduleComponent";
 
 
 export default function Page() {
 
+
+
   useEffect(() => {
     async function f() {
-      const res2 = await axios.get("api/v1/anime/31490");
-      const res = await axios.get("/api/v1/watch/1");
-      console.log("response for watch anime api : ", res.data);
-      const streamingData = await axios.get(
-        `/api/v1/gogo/stream/${res.data.gogoSub.episodes[0].id}`
-      );
-      const streamingZoro = await axios.get(
-        `api/v1/zoro/stream/${res.data.zoro.episodes[0].episodeId}`,
-        {
-          params: {
-            // server:"vidstreaming",  //both parameters are optional parameters : vidstreaming is working, streamtape is working as well, other servers cant be guranteed to work
-            category: "sub", //default is sub, other options are "dub", "raw"
-          },
-        }
-      );
-      console.log("streaming data :: ", streamingData?.data);
-      console.log("zoro streaming data:", streamingZoro?.data);
-    }
+      
+      const apiUrl = "https://api.jikan.moe/v4/";
+      const res = await axios.get(`${apiUrl}schedules?filter=friday&sfw=true`);
+      console.log(res);
+      }
+
     // f()
   }, []);
 
   return (
     <div>
       <ResponsiveCarousal />
+      <RecentWatching/>
       <TopAiringCarousal />
       <RecommendationPanel />
       <AllTop />
+      <ScheduleComponent/>
     </div>
   );
 }

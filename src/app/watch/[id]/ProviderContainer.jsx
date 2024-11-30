@@ -5,6 +5,17 @@ import { usePathname, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { useEffect } from "react";
 import Skeleton from "react-loading-skeleton";
+import { FaClosedCaptioning } from "react-icons/fa6";
+import { FaMicrophoneAlt } from "react-icons/fa";
+import Image from "next/image";
+import { IoStar } from "react-icons/io5";
+import { MdOutlineSportsScore } from "react-icons/md";
+import { PiVideoFill } from "react-icons/pi";
+import { IoMdTimer } from "react-icons/io";
+import { RxDotFilled } from "react-icons/rx";
+import toast from "react-hot-toast";
+import ShareModal from "@/components/utils/ShareModal";
+import Metadata from "./Metadata";
 
 
 
@@ -34,6 +45,7 @@ const useDebouncedEffect = (callback, dependencies, delay, setStreamingData) => 
 
 
 export default function ProviderContainer({
+  content, id
   // episodes,
   // serverData,
   // // prov = "gogo",
@@ -47,18 +59,21 @@ export default function ProviderContainer({
 
   const searchParams = useSearchParams();
   const provider = searchParams.get("provider") || "zoro";
+  const n = searchParams.get("n") || 0;
   const pathname = usePathname();
+  const episodesPerWindow = 50;
 
 
   const {
     episodes,
+    setEpisodesData,
   serverData,
   // prov = "gogo",
   setSelectedProvider,
   zoroEpisodeId, setZoroEpisodeId,
   gogoSubEpisodeId, setGogoSubEpisodeId,
   gogoDubEpisodeId, setGogoDubEpisodeId,
-  dub,
+  // dub,
   streamingData, setStreamingData,
   serverLoading, setServerLoading,
   setStreamLoading,
@@ -70,13 +85,29 @@ export default function ProviderContainer({
   }));
 
   const serverV = searchParams.get('server');
+  const dub = searchParams.get('dub');
   // const [server, setServer] = useState(searchParams.get('server'));
   // const [serverLoading, setServerLoading] = useState(false);
-  const [episodeRangeIndex, setEpisodeRangeIndex] = useState(0); //according to this index range of episodes in the eindow will be shown this will be changed through the dropdown of the select box, and the range is 50 by default and is static for now, you can change this range statically or can make this range dynamic as well.
+  
+  const [episodeRangeIndex, setEpisodeRangeIndex] = useState(0); //according to this index range of episodes in the window will be shown , this will be changed through the dropdown of the select box, and the range is episodesPerWindow by default and is static for now, you can change this range statically or can make this range dynamic as well.
 
+
+  useEffect(()=>{
+    return () => {
+      console.log("useEffect cleanup triggered");
+      setEpisodesData([]);
+      setStreamingData([]);
+    };
+  }, []);
+
+
+  useEffect(()=>{
+    // console.log(Math.floor(n/episodesPerWindow));
+    setEpisodeRangeIndex(Math.floor(n/episodesPerWindow));
+  }, [n]);
 
   // const memoizedDub = useMemo(() => dub, [dub]);
-  console.log("This is server data",serverData);
+  // console.log("This is server data",serverData);
 
   useDebouncedEffect(() => {
     if (!zoroEpisodeId && !gogoDubEpisodeId && !gogoSubEpisodeId) return;
@@ -86,7 +117,7 @@ export default function ProviderContainer({
       gogoSubId: gogoSubEpisodeId,
       gogoDubId: gogoDubEpisodeId,
     });
-  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], 50, setStreamingData); // 50ms delay
+  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], episodesPerWindow, setStreamingData); // 50ms delay
   
   
   const fetchStreamingData = async(ep)=>{
@@ -98,11 +129,16 @@ export default function ProviderContainer({
         console.log(provider, dub, server);
         const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
           params: {
-            category: dub ? "dub" : "sub",
+            category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
             server: server || 'hd-1'
           }
         });
         
+        if(data?.data?.status){
+          console.log(data?.data)
+          console.log("Bad Gateway, try reloading the page!");
+          return;
+        }
         setStreamingData(data?.data);
         console.log("zoro ka streaming api vaala data",data?.data);
       }
@@ -120,8 +156,9 @@ export default function ProviderContainer({
 
   
 
-  const updateParams = (paramsList)=>{
+  const updateParams = (paramsList, resetT=true)=>{
     const newParams = new URLSearchParams(searchParams); 
+    if(resetT) newParams.delete("t");
     paramsList.forEach(par => {
       newParams.set(par.key, par.val);
     });
@@ -129,10 +166,16 @@ export default function ProviderContainer({
     return pathname + '?' + newParams.toString();
   }
   
-  // console.log("this is server:", server);
+  // console.log("this is content  :", content);
 
   return (
-    <div className="w-full rounded-lg bg-cbg-200 flex flex-col py-8 gap-2">
+    <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">
+       <Image src={content?.images?.webp?.large_image_url} fill className=" h-full w-full blur-md  -z-10" alt={content?.title_english}/>
+      <div className="md:w-[90%] w-full mx-auto justify-between md:gap-0 gap-12 flex mb-8  flex-col md:flex-row">
+        
+      <div className="hidden md:block"><Metadata content={content} id={id}/></div>
+
+
       <div className="provider-server-select self-center flex flex-col gap-8">
         <div className="button self-center flex gap-2 text-gray-200 ">
           <Link
@@ -140,9 +183,10 @@ export default function ProviderContainer({
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md ${
               provider === "zoro" ? "bg-primary-100" : ""
-            }  `}
+            }  `} 
             onClick={() => {
               setSelectedProvider("zoro");
+              
               // setServerLoading(true);
             }}
           >
@@ -165,14 +209,14 @@ export default function ProviderContainer({
 
         <div className="availableServers self-center flex flex-col">
         {(serverData?.sub || provider==="gogo") &&<div className="sub flex font-semibold text-sm items-center p-2 gap-4">
-               <h2>SUB:</h2>
+               <h2 className="flex gap-2 items-center"><FaClosedCaptioning className="text-lg text-primary-300"/> {(serverData?.sub?.length > 0) ? "SUB:" : "RAW:"}</h2>
               <div className="flex gap-3">
                 {provider==="gogo" && 
                 <Link
                 href={updateParams([{key: "dub", val:''}, {key:"server", val: "default-sub"}])} 
                 scroll={false} 
                 aria-disabled = {serverLoading}
-                className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub ? "bg-sky-300 text-gray-900":""}`}
+                className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub ? "bg-primary-100 text-gray-100":""}`}
                 // onClick={()=>fetchStreamingData({
                 //   episodeId : zoroEpisodeId,
                 //   gogoSubId: gogoSubEpisodeId,
@@ -181,14 +225,31 @@ export default function ProviderContainer({
                 >Default</Link>
                 }
                 {
-                  provider==="zoro" && serverData?.sub?.map(ser=>{
+                  provider==="zoro" && (serverData?.sub?.length > 0) ? serverData?.sub?.map(ser=>{
                     // console.log("ser first", ser);
                     return (
                       <Link 
                       key={ser?.serverName || ser?.name}
                       href={updateParams([{key: "dub", val:''}, {key:"server", val: ser?.serverName || ser?.name}])} 
                       scroll={false} 
-                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub && (server===ser?.serverName || server===ser?.name) ? "bg-sky-300 text-gray-900":""}`}
+                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
+                      // onClick={()=>fetchStreamingData({
+                      //   episodeId : zoroEpisodeId,
+                      //   gogoSubId: gogoSubEpisodeId,
+                      //   gogoDubId: gogoDubEpisodeId
+                      // })}
+                      >{ser?.serverName || ser?.name}</Link>
+                    )
+                  }) :
+
+                  serverData?.raw && serverData?.raw?.map(ser=>{
+                    // console.log("ser first", ser);
+                    return (
+                      <Link 
+                      key={ser?.serverName || ser?.name}
+                      href={updateParams([{key: "dub", val:'-1'}, {key:"server", val: ser?.serverName || ser?.name}])} 
+                      scroll={false} 
+                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub==="-1" && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
                       //   episodeId : zoroEpisodeId,
                       //   gogoSubId: gogoSubEpisodeId,
@@ -197,20 +258,21 @@ export default function ProviderContainer({
                       >{ser?.serverName || ser?.name}</Link>
                     )
                   })
+                  
                 }
               </div>
             </div>
         }
 
             {(serverData?.dub || provider==="gogo") && <div className="sub flex font-semibold text-sm items-center p-2 gap-4">
-              <h2>DUB:</h2>
+              <h2 className="flex gap-2 items-center"><FaMicrophoneAlt className="text-lg text-primary-300"/> DUB:</h2>
               <div className="flex gap-3">
 
               {provider==="gogo" && 
                 <Link
                 href={updateParams([{key: "dub", val:'1'}, {key:"server", val: "default-dub"}])} 
                 scroll={false} 
-                className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub  ? "bg-sky-300 text-gray-900":""}`}
+                className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub  ? "bg-primary-100 text-gray-100":""}`}
                 // onClick={()=>fetchStreamingData({
                 //   episodeId : zoroEpisodeId,
                 //   gogoSubId: gogoSubEpisodeId,
@@ -226,7 +288,7 @@ export default function ProviderContainer({
                       <Link key={ser?.serverName || ser?.name} 
                       scroll={false} 
                       href={updateParams([{key: "dub", val:'1'}, {key:"server", val: ser?.serverName || ser?.name}])} 
-                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub && (server===ser?.serverName || server===ser?.name) ? "bg-sky-300 text-gray-900":""}`}
+                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
                       //   episodeId : zoroEpisodeId,
                       //   gogoSubId: gogoSubEpisodeId,
@@ -242,6 +304,7 @@ export default function ProviderContainer({
                 }
         </div>
       </div>
+      </div>
 
       <div className="w-52">
         <select
@@ -249,22 +312,22 @@ export default function ProviderContainer({
           value={episodeRangeIndex}
           onChange={(e) => setEpisodeRangeIndex(parseInt(e.target.value))}
         >
-          {[...Array(Math.ceil(episodes?.length / 50))].map((e, i) => {
+          {[...Array(Math.ceil(episodes?.length / episodesPerWindow))].map((e, i) => {
             // console.log(i);
             return (
               <option key={i} value={i} className="p-2 m-2">
-                Eps {50 * i + 1} - {Math.min(episodes?.length, 50 * (i + 1))}
+                Eps {episodesPerWindow * i + 1} - {Math.min(episodes?.length, episodesPerWindow * (i + 1))}
               </option>
             );
           })}
         </select>
       </div>
 
-      <div className="episode-list grid grid-cols-4 gap-2 m-3 max-h-screen overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
+      <div className="episode-list grid md:grid-cols-4 grid-cols-2 gap-2 m-3 md:max-h-screen max-h-[40vh]  overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
         {episodes
           ?.slice(
-            50 * episodeRangeIndex,
-            Math.min(episodes?.length, 50 * (episodeRangeIndex + 1))
+            (episodesPerWindow * episodeRangeIndex),
+            Math.min(episodes?.length, episodesPerWindow * (episodeRangeIndex + 1))
           )
           ?.map((ep,i) => {
             return (
@@ -281,10 +344,10 @@ export default function ProviderContainer({
                   zoroEpisodeId === ep?.episodeId ||
                   gogoSubEpisodeId === ep?.gogoSubId ||
                   gogoDubEpisodeId === ep?.gogoDubId
-                    ? "text-primary-100 font-semibold bg-black/50"
+                    ? ep?.isFiller ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
                     : "font-[350] bg-black/30"
                 }
-                    ${ep?.isFiller ? "bg-sky-400" : ""} `}
+                    ${ep?.isFiller ? "bg-sky-400/30 " : ""} `}
                 onClick={() =>{
                   // fetchStreamingData(ep);
                 }

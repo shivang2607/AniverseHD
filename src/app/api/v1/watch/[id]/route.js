@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import getAnime from "../../anime/[id]/mainFunction";
 import redisClient from "@/lib/redis"; // Use the singleton instance directly
 
+
+
 const watchOptions = {
   max: 500,
   ttl: 1000 * 60 * 60 * 2, // 2 hrs
@@ -44,6 +46,7 @@ export async function GET(req, { params }) {
       themes,
       type,
       score,
+      episodes,
       aired,
       airing,
       synopsis,
@@ -116,6 +119,7 @@ export async function GET(req, { params }) {
       themes,
       type,
       score,
+      episodes,
       aired,
       airing,
       synopsis,
@@ -125,12 +129,12 @@ export async function GET(req, { params }) {
       main_picture,
       rating,
       start_year,
-    };
+    }; 
 
     // Caching logic handling
     if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to)) {
       console.log("current anime is finished more than 6 months ago");
-      await redisClient.set(`watch-${id}`, JSON.stringify(finalResponse), "EX", 60 * 60 * 24 * 7); // Cache for 7 days
+      id && await redisClient.set(`watch-${id}`, JSON.stringify(finalResponse), "EX", 60 * 60 * 24 * 7); // Cache for 7 days
     }
     watchCache.set(`watch-${id}`, finalResponse);
     return NextResponse.json(finalResponse);

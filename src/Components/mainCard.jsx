@@ -9,7 +9,7 @@ import ListDropDown from "./utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
 
-export default function MainCard({ anime }) {
+export default function MainCard({ anime , imageHeight=72}) {
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
 
@@ -24,12 +24,12 @@ export default function MainCard({ anime }) {
     }
     toast.error(result?.response?.message, { duration: 3000 });
   };
-  // console.log(anime);
+  // console.log("this is an anime ",anime);
   return (
     <div className="image-container  my-1 w-full  h-fit pb-3 rounded-md  flex flex-col  hover:shadow-m overflow-hidden">
       <Link
-        href={`/anime/${anime?.mal_id}`}
-        className=" flex relative flex-col gap-2 h-72  rounded-md overflow-hidden duration-300 transition-all w-full   "
+        href={`/anime/${anime?.mal_id || anime?.animeId}`}
+        className={ `flex relative flex-col gap-2 h-${imageHeight}  rounded-md overflow-hidden duration-300 transition-all w-full   `}
       >
         <div className="image relative rounded-md overflow-hidden  h-full w-full ">
           <Image
@@ -37,9 +37,11 @@ export default function MainCard({ anime }) {
             src={
               anime?.main_picture ||
               anime?.images?.webp?.large_image_url ||
-              anime?.images?.webp?.large_image_url
+              anime?.images?.webp?.large_image_url ||
+               anime?.animePhoto?.webp?.large_image_url ||
+              anime?.animePhoto?.webp?.large_image_url || anime?.animePhoto || ""
             }
-            alt={anime?.title_english || "Anime title"}
+            alt={anime?.title_english || anime?.animeName || "Anime title"}
             className="object-cover "
           />
         </div>
@@ -69,7 +71,7 @@ export default function MainCard({ anime }) {
               </div>
              
               <div className="flex ml-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">
-                {anime?.rating?.split(" ")[0].toUpperCase() || "NA"}
+                {anime?.animeAgeRating?.split(" ")[0].toUpperCase() || anime?.rating?.split(" ")[0].toUpperCase() || "NA"}
               </div>
             </div>
             <div className="absolute  play hover:opacity-100 opacity-0 flex h-full w-full items-center justify-center ">
@@ -77,10 +79,10 @@ export default function MainCard({ anime }) {
             </div>
             <div className="flex mt-auto m-2 gap-1 text-xs">
               <div className="score bg-sky-700 text-gray-200 font-semibold px-1   rounded-sm">
-                {anime?.score?.toFixed(2) || "NA"}
+                {anime?.animeScore || anime?.score?.toFixed(2) || "NA"}
               </div>
               <div className="bg-primary-300 text-cbg-100 font-semibold px-1  rounded-sm">
-                {Math.floor(
+                {anime?.animeStartYear || Math.floor(
                   anime?.aired?.prop?.from?.year || anime?.start_year
                 ) || "NA"}
               </div>
@@ -90,15 +92,15 @@ export default function MainCard({ anime }) {
       </Link>
       <div className="metacontent flex flex-col gap- p-2">
         <Link
-          href={`/anime/${anime?.mal_id}`}
+          href={`/anime/${anime?.animeId || anime?.mal_id}`}
           className="title text-lg tracking-wide font-semibold line-clamp-1 text-gray-200"
         >
-          {anime?.title_english || anime?.title || "NA"}
+          {anime?.title_english || anime?.title || anime?.animeName || "NA"}
         </Link>
         <div className="details flex text-sm  items-center w-full gap-2 text-gray-400">
           <p className="  flex gap-1 items-center">
             <MdMovie className="" />
-            {anime?.type?.toUpperCase() || "NA"}
+            {anime?.type?.toUpperCase() || anime?.animeType || "NA"}
           </p>
           {/* {animeData?.episodes && ( */}
           <div className="gap-1 flex items-center mx-2">
@@ -106,7 +108,7 @@ export default function MainCard({ anime }) {
               <IoMdTimer className=" font-bold" />
             </div>
             <span className=" text-sm text-nowrap">
-              {anime?.duration || anime?.episode_duration?.split(" ")[2]}
+              {anime?.duration || anime?.episode_duration?.split(" ")[2] || "NA"}
               {/* {animeData.episodes ? `${animeData?.episodes} ep`  :  "NA"} */}
             </span>
           </div>
@@ -120,6 +122,7 @@ export default function MainCard({ anime }) {
                     background: "#b6d7d4",
                     border: "1px solid ",
                     color: "#041C32",
+              
                   },
                 }}
               />

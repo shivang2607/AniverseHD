@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { SkeletonTheme } from 'react-loading-skeleton'
 import Footer from '@/components/Footer'
+import WatchlistBar from '@/components/WatchlistBar'
 
 const inter = Inter({ subsets: ['latin'] })
 

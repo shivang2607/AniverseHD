@@ -1,7 +1,7 @@
 
 export const Constant_Var_success = "success";
 export const Constant_Var_error = "error";
-export let Constant_Var_RecentWatchlistSize = 4;
+export let Constant_Var_RecentWatchlistSize = 40;
 
 // # Session Storage Variables #
 export const Constant_Var_sessionStorage_key_userWatchListsInfo  = "userwatchLists";
@@ -57,3 +57,140 @@ export const starterWatchLists = [
 
 export  const Constant_Var_starterWatchLists_recent="Recent";
 export  const Constant_Var_starterWatchLists_favourite="Favourite";
+
+// # Search API Enums as Key-Value Arrays #
+export const Constant_Enum_animeSearchQueryType = [
+  { key: "Tv", value: "tv" },
+  { key: "Movie", value: "movie" },
+  { key: "OVA", value: "ova" },
+  { key: "Special", value: "special" },
+  { key: "ONA", value: "ona" },
+  { key: "Music", value: "music" },
+  { key: "CM", value: "cm" },
+  { key: "PV", value: "pv" },
+  { key: "Tv Special", value: "tv_special" }
+];
+
+export const Constant_Enum_animeSearchQueryStatus = [
+  { key: "Airing", value: "airing" },
+  { key: "Complete", value: "complete" },
+  { key: "Upcoming", value: "upcoming" }
+];
+
+export const Constant_Enum_animeSearchQueryRating = [
+  { key: "G", value: "g" },          // All Ages
+  { key: "PG", value: "pg" },        // Children
+  { key: "PG13", value: "pg13" },    // Teens 13 or older
+  { key: "R17", value: "r17" },      // 17+ (violence & profanity)
+  { key: "R", value: "r" },          // Mild Nudity
+  { key: "RX", value: "rx" }         // Hentai
+];
+
+export const Constant_Enum_animeSearchQueryOrderBy = [
+  { key: "MAL Id", value: "mal_id" },
+  { key: "Title", value: "title" },
+  { key: "Start Date", value: "start_date" },
+  { key: "End Date", value: "end_date" },
+  { key: "Episodes", value: "episodes" },
+  { key: "Score", value: "score" },
+  { key: "Scored by", value: "scored_by" },
+  { key: "Rank", value: "rank" },
+  { key: "Popularity", value: "popularity" },
+  { key: "Members", value: "members" },
+  { key: "Favourites", value: "favorites" }
+];
+
+export const Constant_Enum_searchQuerySort = [
+  { key: "Ascending", value: "asc" },
+  { key: "Decending", value: "desc" }
+];
+
+export const Constant_Var_genresList=[
+  {
+    key: "Action",
+    value: 1
+  },
+  {
+    key: "Adventure",
+    value: 2
+  },
+  {
+    key: "Avant Garde",
+    value: 5
+  },
+  {
+    key: "Award Winning",
+    value: 46
+  },
+  {
+    key: "Boys Love",
+    value: 28
+  },
+  {
+    key: "Comedy",
+    value: 4
+  },
+  {
+    key: "Drama",
+    value: 8
+  },
+  {
+    key: "Fantasy",
+    value: 10
+  },
+  {
+    key: "Girls Love",
+    value: 26
+  },
+  {
+    key: "Gourmet",
+    value: 47
+  },
+  {
+    key: "Horror",
+    value: 14
+  },
+  {
+    key: "Mystery",
+    value: 7
+  },
+  {
+    key: "Romance",
+    value: 22
+  },
+  {
+    key: "Sci-Fi",
+    value: 24
+  },
+  {
+    key: "Slice of Life",
+    value: 36
+  },
+  {
+    key: "Sports",
+    value: 30
+  },
+  {
+    key: "Supernatural",
+    value: 37
+  },
+  {
+    key: "Suspense",
+    value: 41
+  }
+];
+
+// # Query Params Defaults #
+export const Constant_Var_defaultPage = 1;
+export const Constant_Var_defaultLimit = 25;
+
+// # Boolean Flags #
+export const Constant_Var_flag_unapproved = true;
+export const Constant_Var_flag_sfw = true;
+
+// # Date Formats #
+export const Constant_Var_dateFormat = {
+  YEAR: "YYYY",
+  MONTH: "YYYY-MM",
+  FULL: "YYYY-MM-DD"
+};

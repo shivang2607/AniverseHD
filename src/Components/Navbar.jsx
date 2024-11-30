@@ -13,9 +13,13 @@ import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import useUserStore from "./ZustandStores/userStore";
+import GetWatchListById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
+import UpdatePlayOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
+import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
+import WatchlistBar from "./WatchlistBar";
 
 const Navbar = () => {
-  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists} = useUserStore();
+  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists,RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar} = useUserStore();
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -31,9 +35,7 @@ const Navbar = () => {
     login();
   };
 
-  const test = async () => {
-  //  setIsUserLoggedIn(true);
-  };
+
 
   const handleScroll = () => {
     if (["/recommendations"].some((path) => path === currentPath)) return;
@@ -76,24 +78,26 @@ const Navbar = () => {
     // loadUserData();
     loadLoggedInUserDataAndWatchLists();
   }, []);
+
  
+  useEffect(()=>{
+    if(RecentWatchListId)
+    loadLoggedInUserRecentWatchList();
+  },[RecentWatchListId])
 
   return (
+    <>
     <nav
-      className={`${
-        ["/recommendations"].some((path) => path === currentPath)
-          ? "static"
-          : "fixed"
-      } py-1 border-b-[1px] border-b-primary-100 w-full z-20 transition-transform duration-300 backdrop-blur-sm ${
-        showNavbar ? "translate-y-0" : "-translate-y-full"
-      } ${isBackgroundVisible ? "bg-black/30" : "bg-opacity-0"}`}
+      className={`fixed py-1 border-[1.5px] border-primary-100 w-[97%] self-center items-center md:mx-6 mx-1 block justify-center ${isOpen ? "rounded-xl" : "rounded-full"}   my-2  z-50 transition-transform duration-300 backdrop-blur-sm ${
+        showNavbar ? "translate-y-0" : "-translate-y-[120%]"
+      } ${isBackgroundVisible ? "bg-cbg-100/70" : "bg-cbg-100/30"}`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="w-full mx-auto px-4 sm:px-6 ">
+        <div className="flex items-center justify-between h-fit py-1">
           <div className="flex w-full items-center">
             <div className="flex-shrink-0">
               <Link href="/">
-                <div className="logo relative w-52 h-10">
+                <div className="logo relative md:w-48 w-40 h-7 md:h-8">
                   <Image
                     src="/logo-primary.png"
                     quality={100}
@@ -129,7 +133,7 @@ const Navbar = () => {
               </div>
             </div>
           </div>
-          <div className="flex items-center flex-row-reverse md:flex-row gap-8">
+          <div className="flex items-center  flex-row-reverse md:flex-row md:gap-8">
             <div className="ml-auto flex md:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
@@ -162,12 +166,7 @@ const Navbar = () => {
               </button>
             </div>
 
-            <button
-              className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
-              onClick={test}
-            >
-              test
-            </button>
+            
             {!isUserLoggedIn ? (
               <button
                 className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
@@ -183,8 +182,8 @@ const Navbar = () => {
       </div>
 
       {/* //? MOBILE VIEW IS FROM BELOW */}
-      <div className={`${isOpen ? "flex" : "hidden"} md:hidden w-full`}>
-        <div className="px-2 pt-2 pb-3 space-y-1 w-full  sm:px-1">
+      <div className={`${isOpen ? "flex" : "hidden"} md:hidden w-full overflow-hidden`}>
+        <div className="px-2 pt-2 pb-3 space-y-1 w-full flex flex-col gap-4  sm:px-1">
           <Link
             href="/"
             className=" hover:text-white block px-3  rounded-md text-base font-medium"
@@ -206,15 +205,18 @@ const Navbar = () => {
           <div className="relative w-[80%] m-2">
             <SearchComponent />
           </div>
-          <button
+          {!isUserLoggedIn && <button
             className="md:w-full block bg-primary-200 !my-3  mx-2 rounded-lg text-gray-800 w-1/6 justify-center hover:bg-primary-100 px-3 py-2  text-sm font-medium"
             onClick={handleSignIn}
           >
             Login
-          </button>
+          </button>}
         </div>
       </div>
+    {isUserLoggedIn  && <WatchlistBar  />}
     </nav>
+
+    </>
   );
 };
 

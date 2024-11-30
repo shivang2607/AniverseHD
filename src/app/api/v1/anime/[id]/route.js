@@ -3,6 +3,7 @@ import getAnime from "./mainFunction";
 
 
 
+// export const runtime = 'experimental-edge'
 
 
 export async function GET(req, {params}){

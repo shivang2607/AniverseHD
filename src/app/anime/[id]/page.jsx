@@ -24,25 +24,53 @@ import {
   Constant_Var_success,
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
+import { useRouter } from "next/navigation";
+import useUserStore from "@/components/ZustandStores/userStore";
+import ShareModal from "@/components/utils/ShareModal";
 
 export default function Anime({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
+  const [recentData, setRecentData] = useState();
   const { anime, fetchAnime } = useAnimeStore((state) => ({
     fetchAnime: state.fetchAnime,
     anime: state.getAnimeById(params.id),
   }));
 
+  const router = useRouter();
+
+  const { RecentWatchListData } = useUserStore();
+
   useEffect(() => {
-    console.log("response anime data", anime);
-    if (!params.id || anime) return;
-    params?.id && fetchAnime(params.id);
+    const fetchData = async () => {
+      console.log("response anime data", anime);
 
-    // setRelations(filteredRelations);
+      if (!params?.id || anime) return;
 
-    // console.log("relations h bhaai", filteredRelations);
-  }, [params.id, fetchAnime, anime]);
+      const res = await fetchAnime(params.id);
+
+      // Check if the response status is 404, then redirect to /not-found
+      if (res?.status === 404) {
+        router.replace("/not-found");
+      }
+    };
+
+    fetchData();
+
+    return () => {};
+  }, [params?.id, anime]);
+
+  useEffect(() => {
+    const filteredData = RecentWatchListData?.filter(
+      (obj) => obj?.animeId === `${params?.id}`
+    );
+    if(filteredData?.length > 0){
+      setRecentData(filteredData[0]);
+      console.log(filteredData[0]);
+    }
+    
+  }, [RecentWatchListData]);
 
   const filteredRelations = anime?.relations
     ?.map((item) => ({
@@ -53,7 +81,7 @@ export default function Anime({ params }) {
 
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
-    
+
     if (result.status === Constant_Var_success) {
       setWatchListData(result?.response);
       setIsWatchListOpen((prev) => !prev);
@@ -61,7 +89,9 @@ export default function Anime({ params }) {
     } else if (
       result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
     ) {
-      const signInResp = await SignInGooglePopUp((status) => {console.log("login status:",status)});
+      const signInResp = await SignInGooglePopUp((status) => {
+        console.log("login status:", status);
+      });
 
       if (signInResp.status === Constant_Var_success) return;
       else toast.error(signInResp?.response?.message, { duration: 3000 });
@@ -186,19 +216,28 @@ export default function Anime({ params }) {
                       <div className="type flex  items-center">
                         <RxDotFilled /> {anime?.type?.toUpperCase() || "?"}
                       </div>
+                      <div className="flex "> 
+                      <ShareModal />
+                    </div>
                     </>
                   )}
                 </div>
 
                 {anime ? (
                   <div className="flex mt-4 gap-4 justify-center md:justify-start">
-                    <Link
-                      href={`/watch/${params?.id}?provider=zoro`}
-                      className="watchnow flex gap-2 items-center bg-primary-500  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
-                    >
-                      <FaPlayCircle />
-                      Watch now
-                    </Link>
+                    {anime?.Sites && (
+                      <Link
+                        href={
+                          recentData
+                            ? `${recentData?.url}&t=${recentData?.episodeTimestamp}`
+                            : `/watch/${params?.id}?provider=zoro`
+                        }
+                        className="watchnow flex gap-2 items-center bg-primary-500  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
+                      >
+                        <FaPlayCircle />
+                        Watch Now
+                      </Link>
+                    )}
                     <div className="flex flex-col">
                       <button
                         className="watchnow flex gap-2 items-center bg-gray-200  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
@@ -216,6 +255,8 @@ export default function Anime({ params }) {
                         />
                       )}
                     </div>
+
+                    
 
                     <Toaster
                       toastOptions={{

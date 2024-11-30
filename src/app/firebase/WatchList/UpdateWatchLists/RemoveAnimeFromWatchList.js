@@ -64,11 +64,20 @@ export default async function RemoveAnimeFromWatchList({
     // Ensure the user owns the watchlist
     if (watchListInfo.response.ownerUid === userData.details.uid) {
       let batch = batchFromAddfunc || writeBatch(db); // see if batch is comming from parent
+      
+      let animeExistsInWatchList= false;
+      const animeListNew=[];
+      for(let i=0; i<watchListInfo.response.animeList.length;++i){
+        let obj=watchListInfo.response.animeList[i];
+        if(obj.animeId!==animeId){
+          animeListNew.push(obj);
+        }else{
+          animeExistsInWatchList=true;
+        }
+      }
 
-      const animeListNew = watchListInfo.response.animeList.filter(
-        (obj) => obj.animeId !== animeId
-      );
-
+      if(!animeExistsInWatchList)   return { status: Constant_Var_success, response: null };
+     
       // Deleteing from animeList Field
       const docRef = doc(
         db,
@@ -96,6 +105,7 @@ export default async function RemoveAnimeFromWatchList({
         return { status: Constant_Var_success, response: null };
       }
 
+      await batch.commit();
       removeAnimeFromUserWatchListCached({
         animeId: animeId,
         userId: userData.details.uid,
@@ -103,7 +113,7 @@ export default async function RemoveAnimeFromWatchList({
         updatedAt: currTimestamp,
       });
 
-      await batch.commit();
+     
 
 
       return { status: Constant_Var_success, response: null };
