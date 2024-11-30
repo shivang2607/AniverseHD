@@ -1,6 +1,6 @@
 'use client'
 import RecentCard from '@/components/RecentCard';
-import useUserStore from '@/Components/ZustandStores/userStore'
+import useUserStore from '@/components/ZustandStores/userStore'
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react'
 

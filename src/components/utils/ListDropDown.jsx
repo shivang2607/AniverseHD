@@ -8,6 +8,7 @@ import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/
 import { Constant_Var_success } from "@/utils/constants";
 import useUserStore from "../ZustandStores/userStore";
 
+
 export default function ListDropDown({
   anime,
   isOpen,

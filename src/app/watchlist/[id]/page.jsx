@@ -2,7 +2,6 @@
 import GetWatchListDataById from '@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById';
 import GetWatchListInfoById from '@/app/firebase/WatchList/WatchListDocument/GetWatchListInfoById';
 import MainCard from '@/components/mainCard';
-import WatchListCard from '@/components/watchListCard';
 import { Constant_Var_success } from '@/utils/constants';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
@@ -50,7 +49,7 @@ export default function Page({params}) {
         
 
 
-    }, []);     //! params aayega dependency array m...baar baar page refresh na ho dev k waqt isiliye hataya mene.
+    }, [params]);   
   return (
     <div className='pt-24 text-lg flex w-full  flex-col gap-4 min-h-screen md:px-4 p-2'>
       {watchlistInfo &&

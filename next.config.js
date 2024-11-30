@@ -1,17 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false,
-  compiler: {
-    removeConsole: process.env.NODE_ENV === "production"
-  },
+  output: "standalone",
+  reactStrictMode: true, // Set this to true for better error handling and optimization.
+  
   experimental: {
     serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
-},
+  },
+
   images: {
     remotePatterns: [
       {
         protocol: "https",
         hostname: "**",
+        port: "",
+        pathname: "/**",
       },
       {
         protocol: 'https',
@@ -42,15 +44,27 @@ const nextConfig = {
         hostname: 'aniwatchtv.to',
         port: '',
         pathname: '/**',
-      },   
+      },
       {
         protocol: 'https',
         hostname: 'media2.giphy.com',
         port: '',
         pathname: '/**',
-      },   
+      },
     ],
-},
+  },
+
+  // Additional options can go here as needed
+  // For example, you might want to configure custom headers, redirects, etc.
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/old-url',
+  //       destination: '/new-url',
+  //       permanent: true,
+  //     },
+  //   ];
+  // },
 }
 
-module.exports = nextConfig
+module.exports = nextConfig;
