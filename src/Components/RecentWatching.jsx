@@ -1,15 +1,15 @@
 'use client'
 import React from 'react'
-import useUserStore from './ZustandStores/userStore'
 import RecentCard from './RecentCard';
 import { FaAnglesRight } from 'react-icons/fa6';
 import Link from 'next/link';
+import useUserStore from './ZustandStores/userStore';
 
 export default function RecentWatching() {
 
     const {RecentWatchListData} = useUserStore();
     const defaultLength = 10;
-    
+    console.log("Recent watchlist data is => ",RecentWatchListData);
 
 
   return (

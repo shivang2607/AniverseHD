@@ -8,7 +8,7 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
-export default function page({params}) {
+export default function Page({params}) {
 
     const [watchlistData, setWatchlistData] = useState();
     const [watchlistInfo, setWatchlistInfo] = useState();
@@ -50,7 +50,7 @@ export default function page({params}) {
         
 
 
-    }, []);     //! params aayega dependency array m...baar baar page refresh na ho dev k waqt isiliye hataya mene.
+    }, [params]);   
   return (
     <div className='pt-24 text-lg flex w-full  flex-col gap-4 min-h-screen md:px-4 p-2'>
       {watchlistInfo &&
