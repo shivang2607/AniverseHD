@@ -2,7 +2,6 @@
 import GetWatchListDataById from '@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById';
 import GetWatchListInfoById from '@/app/firebase/WatchList/WatchListDocument/GetWatchListInfoById';
 import MainCard from '@/components/mainCard';
-import WatchListCard from '@/components/watchListCard';
 import { Constant_Var_success } from '@/utils/constants';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react'

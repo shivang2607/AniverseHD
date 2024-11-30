@@ -7,21 +7,3 @@ README.md
 .git
 
 
-# Dockerfile
-# .dockerignore
-# node_modules
-# npm-debug.log
-# README.md
-# .next
-# build
-# VSCodeCounter
-# .git
-# .env*.local
-# .vercel
-# .embold
-
-# # debug
-# npm-debug.log*
-# yarn-debug.log*
-# yarn-error.log*
-# .pnpm-debug.log*
