@@ -3,11 +3,6 @@ const nextConfig = {
   output: "standalone",
   reactStrictMode: true, // Set this to true for better error handling and optimization.
   
-  // Remove console logs only in production and only for client-side code.
-  compiler: {
-    removeConsole: process.env.NODE_ENV === "production" && !process.env.NEXT_PRIVATE_SERVER, // Ensure server-side logs are not removed
-  },
-
   experimental: {
     serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
   },
