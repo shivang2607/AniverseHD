@@ -10,7 +10,7 @@ const devData = [
   {
     name: "Shivang Khandelwal",
     desc: "Hey there! I'm Shivang Khandelwal, a Fullstack Developer and a big fan of Machine Learning. I built the Recommendation Model to help suggest anime, and made sure the anime and streaming data runs smoothly with some cool caching and optimization tricks. I handled the backend for streaming and all anime related data and built and design UI & logic for Home Page, recommendation page, anime details page, streaming page, all anime list pages and the one you're checking out right now. I really hope you're enjoying the site, and if you do, feel free to share it with your friends and add our website to your favourites ;) Thanks for visiting!",
-    imgUrl: "/ShivangProfile new.jpg",
+    imgUrl: "/shivangProfileNew.jpg",
     discord: "https://discordapp.com/users/shivang4301",
     linkedIn: "https://www.linkedin.com/in/shivang-khandelwal-0a58951bb",
   },
