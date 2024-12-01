@@ -19,7 +19,7 @@ const ResponsiveCarousal = () => {
     // Check if data exists in session storage
     const sessionData = sessionStorage.getItem("topAnimeData");
     if (sessionData) {
-      console.log("this is session data", JSON.parse(sessionData)); 
+      // console.log("this is session data", JSON.parse(sessionData)); 
       setTopFavorite(JSON.parse(sessionData));
       return;
     } 
@@ -28,7 +28,6 @@ const ResponsiveCarousal = () => {
           const data = response?.data?.data;
           //! IMPLEMENT TRY CATCH HERE FOR ERRORS IN SESSION STORAGE PARSING
           setTopFavorite(data);
-          console.log(data);
           if(data){
           sessionStorage.setItem("topAnimeData",  JSON.stringify(data));  
           }

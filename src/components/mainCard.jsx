@@ -16,7 +16,7 @@ export default function MainCard({ anime , imageHeight=72}) {
 
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
-    console.log(result?.response);
+    // console.log(result?.response);
     if (result.status === "success") {
       setWatchListData(result?.response);
       setIsWatchListOpen((prev) => !prev);

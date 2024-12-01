@@ -18,7 +18,7 @@ export default async function getAnime(id) {
 
   const lruCachedData = animeCache.get(`qdrant-anime-${id}`);
   if (lruCachedData) { // data found in lrucache
-    console.log("cache hit: response sent from lrucache");
+    console.log("LRU cache hit");
     return lruCachedData;
   }
 
@@ -26,7 +26,7 @@ export default async function getAnime(id) {
     const cachedResult = await redisClient.get(`qdrant-anime-${id}`);
     if (cachedResult) { // data found in redis cache
       const parsedCacheResult = JSON.parse(cachedResult);
-      console.log('cache hit : response sent from REDIS cached result for anime id ', id);
+      console.log('REDIS cache hit for anime id ', id);
       animeCache.set(`qdrant-anime-${id}`, parsedCacheResult);
       return parsedCacheResult;
     }
@@ -39,7 +39,7 @@ export default async function getAnime(id) {
     console.log('cache miss: response sent from qdrant api call');
     const resPayload = await getQdrantAnime(id);
     if (resPayload.add) { // that means anime is not present in qdrant database and that it has been added from the addQdrantAnime function written in addAnime.js file.
-      console.log("Hello");
+      
       return resPayload.resultBhaai;
     }
     const updatedData = await syncQdrant(id, resPayload.payload);

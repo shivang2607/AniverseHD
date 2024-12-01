@@ -15,7 +15,7 @@ export default function RecentWatching() {
   return (
     <>
     {RecentWatchListData?.length > 0 && <div className=" flex-col flex gap-4 p-4 md:mt-16 mt-8 mb-2 ">
-      {console.log("Recent watcfhlist data", RecentWatchListData)}
+
         <div className='flex w-full items-center justify-between'>
       <h1 className="text-primary-500 flex font-semibold text-2xl tracking-wide">
         Recently Watched

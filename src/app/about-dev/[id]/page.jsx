@@ -96,7 +96,7 @@ export default function Page({ params }) {
         </div>
       ) : (
         <div className='pt-24 min-h-screen mx-auto flex'>
-          {console.log(params?.id)}
+          
           {/* If paramId is devId, show the link */}
           {params?.id?.toLowerCase() === devId &&  (
             <Link href={`/about-dev/uid-${generateUniqueNumber()}`} className='text-2xl flex mx-auto'>

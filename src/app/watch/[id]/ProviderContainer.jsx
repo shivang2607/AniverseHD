@@ -94,7 +94,6 @@ export default function ProviderContainer({
 
   useEffect(()=>{
     return () => {
-      console.log("useEffect cleanup triggered");
       setEpisodesData([]);
       setStreamingData([]);
     };
@@ -125,8 +124,6 @@ export default function ProviderContainer({
     setStreamLoading(true);
     try {
       if(provider==="zoro"){
-        console.log(ep?.episodeId)
-        console.log(provider, dub, server);
         const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
           params: {
             category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
@@ -135,12 +132,9 @@ export default function ProviderContainer({
         });
         
         if(data?.data?.status){
-          console.log(data?.data)
-          console.log("Bad Gateway, try reloading the page!");
           return;
         }
         setStreamingData(data?.data);
-        console.log("zoro ka streaming api vaala data",data?.data);
       }
       else{
         const data = await axios.get(`/api/v1/${provider}/stream/${dub?ep?.gogoDubId:ep?.gogoSubId}?server=${server}`);

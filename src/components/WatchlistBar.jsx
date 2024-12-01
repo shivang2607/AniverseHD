@@ -34,7 +34,6 @@ export default function WatchlistBar() {
       const data = loggedInUserWatchListsInfo?.filter(
         (lst) => lst.id === selectedId
       );
-      console.log(data);
       setListData(data?.[0]?.animeList);
       
     }

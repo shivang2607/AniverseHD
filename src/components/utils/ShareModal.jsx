@@ -42,7 +42,6 @@ const ShareModal = ({
     const closeModal = () => setIsOpen(false);
 
     useEffect(()=>{
-        console.log("This is timestamp recieved by shareModal", t);
       if(!url){
         const path = window.location.origin + getAbsoluteURLPath(pathname, searchParams);
         setFullURL(t ? path + `&t=${t}` : path);

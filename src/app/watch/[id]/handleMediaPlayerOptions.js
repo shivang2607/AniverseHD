@@ -24,10 +24,8 @@ const HandleUpdateMediaPlayerOptions = () => {
         const result = await UpdatePlayerOptions(updatedOptions);
 
         if (result.status === 'success') {
-          console.log('Play options updated successfully.');
           toast.success("Changes saved Successfully!");
         } else {
-            console.log(opt, result);
           toast.error('Failed to save changes!');
         }
       } catch (error) {

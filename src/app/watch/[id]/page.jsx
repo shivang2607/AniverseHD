@@ -126,10 +126,6 @@ export default function Page({ params }) {
     }
 
     return () => {
-      console.log(
-        "cleanup of watch triggered, user logged in is ",
-        isUserLoggedIn
-      );
       const f = async () => {
         const content = contentRef.current;
         const result = await AddAnimeToWatchList({
@@ -152,7 +148,6 @@ export default function Page({ params }) {
             ) || "NA",
           animeLength: content?.episodes || content?.episode || null,
         });
-        console.log("RESULT OF ADDING ANIME IN RECENT WATCHLIST ", result);
         // if (result?.status === Constant_Var_success) {
         //   toast.success("Watchlist Updated Successfully!!", {
         //     id: "1",
@@ -256,7 +251,6 @@ export default function Page({ params }) {
           return;
         }
 
-        console.log(`data for /watch/${params?.id}`, data);
         setContent(data);
         // console.log("This is content data", response, data);
 
@@ -348,7 +342,7 @@ export default function Page({ params }) {
             serverData?.data?.data?.sub?.[0]?.serverName ||
               serverData?.data?.data?.raw?.[0]?.serverName
           );
-          console.log("server", serverData?.data?.data?.sub?.[0]?.serverName);
+          // console.log("server", serverData?.data?.data?.sub?.[0]?.serverName);
           setSessionWithExpiry(
             `serverData-${provider}-${zoroEpisodeId}`,
             serverData?.data?.data,
@@ -468,9 +462,8 @@ export default function Page({ params }) {
           : streamingData?.outro?.end;
 
       if (typeof skipToTime === "number") {
-        console.log("Current time before skip:", player.currentTime); // Should now work correctly
         player.currentTime = skipToTime; // Skip to the end of the intro or outro
-        console.log("Current time after skip:", player.currentTime);
+        
       } else {
         console.error("Invalid time value for skipping.");
       }
@@ -492,7 +485,6 @@ export default function Page({ params }) {
       result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
     ) {
       const signInResp = await SignInGooglePopUp((status) => {
-        console.log("login status:", status);
       });
 
       if (signInResp.status === Constant_Var_success) return;
@@ -512,7 +504,7 @@ export default function Page({ params }) {
       Math.floor(t) !== Math.floor(recentTimestamp)
     ) {
       //save timestamp after every 5 seconds
-      console.log(recentTimestamp);
+      
       setRecentTimestamp(t);
     }
 
@@ -621,10 +613,7 @@ export default function Page({ params }) {
                   crossOrigin
                   streamType="on-demand"
                   onLoadedMetadata={(e) => {
-                    console.log(
-                      "duration of this episode is ",
-                      e.target.duration
-                    );
+                   
                     setDuration(e.target.duration);
                   }}
                   onProviderChange={(provider, event) => {
@@ -703,10 +692,7 @@ export default function Page({ params }) {
                         <button
                           className="md:text-lg w-fit h-fit absolute right-4 bottom-8 md:right-12 md:bottom-24 px-2 py-1 border-white border-2 rounded-md font-semibold backdrop-blur-lg bg-black/10 flex"
                           onClick={() => {
-                            console.log(
-                              player?.current?.currentTime,
-                              streamingData?.intro?.end
-                            );
+                           
                             player.current.currentTime =
                               showSkipButton === "Intro"
                                 ? streamingData?.intro?.end

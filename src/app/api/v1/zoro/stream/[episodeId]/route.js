@@ -16,8 +16,6 @@ export async function GET(req, { params }) {
   const searchParams = req.nextUrl.searchParams;
   const ep = searchParams.get("ep");
   const server = searchParams.get("server") || '';
-  console.log("id", id);
-  console.log("ep", ep);
   const category = searchParams.get("category") || "sub";
 
   const episodeId = `${id}?ep=${ep}`;
@@ -34,7 +32,6 @@ export async function GET(req, { params }) {
   }
 
   try {
-    console.log(`${process.env.ANIWATCH_SCRAPER_URL}/api/v2/hianime/episode/sources?animeEpisodeId=${episodeId}&server=${server}&category=${category}`);
     const res = await axios.get(
       `${process.env.ANIWATCH_SCRAPER_URL}/api/v2/hianime/episode/sources?animeEpisodeId=${episodeId}&server=${server}&category=${category}`,
       // {
@@ -43,7 +40,6 @@ export async function GET(req, { params }) {
       //   },
       // }
     );
-    console.log(res?.data);
     zoroCache.set(`zoro-${episodeId}-${server}-${category}`, res?.data?.data);
     return NextResponse.json(res.data?.data);
 

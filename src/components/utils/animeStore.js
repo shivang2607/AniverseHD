@@ -13,7 +13,7 @@ const useAnimeStore = create((set, get) => ({
     }
 
     const response = await axios.get(`/api/v1/anime/${id}`);
-    console.log("This is the response from the anime details API", response);
+    // console.log("This is the response from the anime details API", response);
     if(!(response?.data) || Object.keys(response?.data).length === 0){
       return {status: 404, message: "Anime not found with the given Id"};
     }

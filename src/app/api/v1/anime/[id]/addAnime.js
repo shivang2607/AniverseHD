@@ -97,7 +97,6 @@ export async function addQdrantAnime(id) {
     );
 
     if (uploadPoint.data.status === 'ok') {
-        console.log("New anime added successfully!!");
         redisClient.set(`qdrant-anime-${id}`, JSON.stringify(payload), 'EX', 60 * 60 * 24 * 7); // Cache for 7 days.
     }
 
