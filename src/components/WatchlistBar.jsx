@@ -73,7 +73,7 @@ export default function WatchlistBar() {
       >
         {loggedInUserWatchListsInfo?.map((list) => {
           return (
-            <option key={list.id} value={list.id} className="p-2 m-2">
+            <option key={list.id} value={list.id} className="p-2 bg-cbg-100/80 m-2">
               {list?.watchListName}
             </option>
           );

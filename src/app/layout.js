@@ -47,7 +47,6 @@ export const metadata = {
       'Discover the best anime streaming platform with AniverseHD. Customize your anime experience and share it with friends.',
     image: 'https://www.aniversehd.com/twitter-image.jpg',
   },
-  viewport: 'width=device-width, initial-scale=1.0',
 };
 
 

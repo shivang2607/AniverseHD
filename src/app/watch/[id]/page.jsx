@@ -607,7 +607,13 @@ export default function Page({ params }) {
                   storage="media-player"
                   buffer
                   title={streamingData?.malId}
-                  src={streamingData?.sources?.[0]?.url}
+                  src={
+                    provider === "gogo"
+                      ? `https://goodproxy.goodproxy.workers.dev/fetch?url=${streamingData?.sources?.[0]?.url}` 
+                      // !probably I have to add my own proxy here
+                      : streamingData?.sources?.[0]?.url
+                  }
+                  
                   className="h-full"
                   playsInline = {true}
                   crossOrigin
@@ -625,6 +631,7 @@ export default function Page({ params }) {
                         fragLoadingMaxRetry: 5,
                         maxMaxBufferLength: 600,
                         maxBufferLength: 20,
+                       
                       };
                     }
                   }}
