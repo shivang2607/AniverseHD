@@ -1,12 +1,14 @@
 import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
 import { Constant_Var_genresList } from "@/utils/constants";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const GenreFilter = () => {
   const { genres, toggleGenre } = useAnimeSearchFilterStore();
   const [isOpen, setIsOpen] = useState(false); // State to toggle dropdown visibility
-
+  useEffect(()=>{
+    console.log("generes updated",genres)
+  },[genres])
   return (
     <div className="flex flex-col w-64">
     <div

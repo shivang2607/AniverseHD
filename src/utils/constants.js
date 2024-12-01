@@ -108,75 +108,75 @@ export const Constant_Enum_searchQuerySort = [
 export const Constant_Var_genresList=[
   {
     key: "Action",
-    value: 1
+    value: '1'
   },
   {
     key: "Adventure",
-    value: 2
+    value: '2'
   },
   {
     key: "Avant Garde",
-    value: 5
+    value: '5'
   },
   {
     key: "Award Winning",
-    value: 46
+    value: '46'
   },
   {
     key: "Boys Love",
-    value: 28
+    value: '28'
   },
   {
     key: "Comedy",
-    value: 4
+    value: '4'
   },
   {
     key: "Drama",
-    value: 8
+    value: '8'
   },
   {
     key: "Fantasy",
-    value: 10
+    value: '10'
   },
   {
     key: "Girls Love",
-    value: 26
+    value: '26'
   },
   {
     key: "Gourmet",
-    value: 47
+    value: '47'
   },
   {
     key: "Horror",
-    value: 14
+    value: '14'
   },
   {
     key: "Mystery",
-    value: 7
+    value: '7'
   },
   {
     key: "Romance",
-    value: 22
+    value: '22'
   },
   {
     key: "Sci-Fi",
-    value: 24
+    value: '24'
   },
   {
     key: "Slice of Life",
-    value: 36
+    value: '36'
   },
   {
     key: "Sports",
-    value: 30
+    value: '30'
   },
   {
     key: "Supernatural",
-    value: 37
+    value: '37'
   },
   {
     key: "Suspense",
-    value: 41
+    value: '41'
   }
 ];
 
