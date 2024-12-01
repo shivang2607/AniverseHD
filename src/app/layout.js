@@ -10,11 +10,45 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: {
-    template: 'AniverseHD/ %s',
-    default: 'AniverseHD'
+    template: 'AniverseHD | %s',
+    default: 'Stream Anime, Create & Share Watchlists - AniverseHD',
   },
-  description: 'Anime Recommendations and streaming website',
-}
+
+  icons:'logo-teal-stretched.png'
+  ,
+  description: 'Stream your favorite anime in HD, create and share personalized watchlists, and get smart recommendations. Explore a world of anime with AniverseHD.',
+  keywords: [
+    'anime streaming',
+    'anime watchlist',
+    'anime recommendations',
+    'stream anime HD',
+    'custom anime playlists',
+    'share anime watchlists',
+    'top anime streaming site',
+  ],
+  openGraph: {
+    title: 'Stream Anime, Create & Share Watchlists - AniverseHD',
+    description:
+      'Dive into the ultimate anime experience with AniverseHD. Watch anime in HD, create custom watchlists, and get personalized recommendations.',
+    url: 'https://www.aniversehd.com',
+    images: [
+      {
+        url: 'https://www.aniversehd.com/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'AniverseHD - Stream Anime, Create & Share Watchlists',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Stream Anime, Create & Share Watchlists - AniverseHD',
+    description:
+      'Discover the best anime streaming platform with AniverseHD. Customize your anime experience and share it with friends.',
+    image: 'https://www.aniversehd.com/twitter-image.jpg',
+  },
+  viewport: 'width=device-width, initial-scale=1.0',
+};
 
 
 //* SKELETON THEME COLORS HAS TO BE CHANGED MANUALLY EVERYTIME WHENEVER THE THEME IS CHANGED ACCORDINGLY IF NEEDED */
