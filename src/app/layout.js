@@ -31,6 +31,11 @@ export default function RootLayout({ children }) {
           {children}
           </SkeletonTheme>
           <Footer/>
+
+          {/* <!-- Cloudflare Web Analytics --> */}
+          <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "fc05a7dc03db45c2aafe3bb385a757fb"}'></script>
+          {/* <!-- End Cloudflare Web Analytics --> */}
+          
       </body>
       {/* <GoogleTagManager gtmId='GTM-PBQJWMRT'/> */}
     </html>

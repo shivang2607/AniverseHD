@@ -615,10 +615,7 @@ export default function Page({ params }) {
                   storage="media-player"
                   buffer
                   title={streamingData?.malId}
-                  src={
-                    process.env.NEXT_PUBLIC_GOOD_PROXY +
-                    encodeURIComponent(streamingData?.sources?.[0]?.url)
-                  }
+                  src={streamingData?.sources?.[0]?.url}
                   className="h-full"
                   playsInline = {true}
                   crossOrigin
