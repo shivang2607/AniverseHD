@@ -11,7 +11,7 @@ export const metadata = {
   openGraph: {
     title: 'Anime Recommendations - Find Your Next Favorite Show | AniverseHD',
     description:
-      'Looking for your next anime to binge? Use AniverseHD’s recommendation engine to find the best anime tailored to your taste. Explore, stream, and enjoy today!',
+      'Looking for your next anime to binge? Use AniverseHD recommendation engine to find the best anime tailored to your taste. Explore, stream, and enjoy today!',
     url: 'https://www.aniversehd.com/recommendations',
     images: [
       {

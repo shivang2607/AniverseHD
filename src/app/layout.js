@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata = {
   title: {
     template: 'AniverseHD | %s',
-    default: 'Stream Anime, Create & Share Watchlists - AniverseHD',
+    default: 'AniverseHD : Stream Anime, Create & Share Watchlists - AniverseHD',
   },
 
   icons:'logo-teal-stretched.png'
