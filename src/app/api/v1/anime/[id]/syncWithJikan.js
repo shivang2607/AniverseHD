@@ -148,8 +148,10 @@ export async function syncQdrant(id, resPayload) {
         "gif_images": updatePayload?.gif_images || resPayload?.gif_images || null,
     };
 
+    if(responsePayload){
     await redisClient.set(`qdrant-anime-${id}`, JSON.stringify(responsePayload), 'EX', 60 * 60 * 24 * 7); // 7 days
     console.log("response sent after updating Qdrant");
+    }
     // console.log(responsePayload.Sites);
     return responsePayload;
 }

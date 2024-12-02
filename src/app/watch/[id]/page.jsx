@@ -245,7 +245,7 @@ export default function Page({ params }) {
 
         // Check if the data object has an 'error' key
         if (data?.error) {
-          console.error(`Error in response data: ${data.error}`);
+          console.error(`Error in response data for ${provider}:`, data.error);
           setAnimeNotAvailable(true);
           // Optionally, you could set some error state here or throw an error to handle it elsewhere
           return;
@@ -827,7 +827,7 @@ export default function Page({ params }) {
           </div>
 
           {episodesData && (
-            <ProviderContainer content={content} id={params?.id} />
+            <ProviderContainer content={content} id={params?.id} setAnimeNotAvailable = {setAnimeNotAvailable} />
           )}
 
           <div className="note text-sm flex text-nowrp items-center  self-center text-gray-400">

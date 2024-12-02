@@ -45,7 +45,7 @@ const useDebouncedEffect = (callback, dependencies, delay, setStreamingData) => 
 
 
 export default function ProviderContainer({
-  content, id
+  content, id, setAnimeNotAvailable
   // episodes,
   // serverData,
   // // prov = "gogo",
@@ -123,7 +123,8 @@ export default function ProviderContainer({
 
     setStreamLoading(true);
     try {
-      if(provider==="zoro"){
+      if(provider==="zoro" && ep?.episodeId){
+        setAnimeNotAvailable(false);
         const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
           params: {
             category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
@@ -136,10 +137,15 @@ export default function ProviderContainer({
         }
         setStreamingData(data?.data);
       }
-      else{
-        const data = await axios.get(`/api/v1/${provider}/stream/${dub?ep?.gogoDubId:ep?.gogoSubId}?server=${server}`);
+      else if(provider==="gogo" && (ep?.gogoDubId || ep?.gogoSubId)){
+        setAnimeNotAvailable(false);
+        const data = await axios.get(`/api/v1/${provider}/stream/${dub?ep?.gogoDubId:ep?.gogoSubId}?server=${server}`); //! server ko abhi get nahi kiya h gogo vale ko isiliye default dikha raha h...servers vali api ready h use krna h display krana h UI pr and yah jo server paramter h last m api call m vo gogo ka server krna h selected abhi to zoro ka hoga.
         setStreamingData(data?.data);
         console.log("gogo ki streaming api vaala data", data?.data);
+      }
+      else{
+        setAnimeNotAvailable(true);
+        toast.error("Episode Is not available for this provider")
       }
     } catch (error) {
       console.log("couldn't fetch streaming data, ",error);
