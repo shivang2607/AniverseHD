@@ -494,10 +494,9 @@ export default function Page({ params }) {
   };
 
   const handleTimeUpdate = (v, event) => {
-    if (!streamingData?.intro) return;
     const player = event.target;
     const currentTime = player?.currentTime;
-
+    
     const t = currentTime;
     if (
       Math.floor(t) % 5 == 0 &&
@@ -507,7 +506,8 @@ export default function Page({ params }) {
       
       setRecentTimestamp(t);
     }
-
+    
+    if (!streamingData?.intro) return;
     // console.log(currentTime, v);
     // Define the intro and outro timestamps
     const introStart = streamingData?.intro?.start;
