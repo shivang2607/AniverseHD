@@ -28,7 +28,8 @@ const useAnimeSearchFilterStore = create((set, get) => ({
   setSearchResults: (results) => set({ searchResults: results }),
   setPage: (page) => set({ page }),
   setLimit: (limit) => set({ limit }),
-  setQuery: (q) => set({ q }),
+  setQuery: (q) =>{ console.log("changing",q);
+    set({ q })},
   setType: (type) => set({ type }),
   setScore: (score) => set({ score }),
   setMinScore: (min_score) => set({ min_score }),

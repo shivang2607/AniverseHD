@@ -47,23 +47,15 @@ const Page = () => {
       page:Number(pageQ),
       limit:Number(limitQ)
     };
-
     console.log(filters,pageQ);
 
     setAllFilters(filters)
-
-    search(); // In case page number does not change the ShowCards component automatically callsnext pagess
+    search();
     return () => {
       console.log("reseting");
       resetFilters();
     };
   }, [searchParams]);
-
-  useEffect(()=>{
-    console.log("query updated",page)
-  },[page])
-
-
 
   return (
     <div className="pt-20 sm:px-10 px-3 flex md:flex-row flex-col">

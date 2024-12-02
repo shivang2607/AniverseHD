@@ -31,7 +31,7 @@ const Filters = () => {
   } = useAnimeSearchFilterStore();
 
   function handleSearch() {
-    const queryParams = new URLSearchParams(searchParams.toString());
+    const queryParams = new URLSearchParams();
 
     if (page) queryParams.set("page", page.toString());
     if (limit) queryParams.set("limit", limit.toString());
@@ -62,6 +62,7 @@ const Filters = () => {
     <div className="flex flex-col md:w-[25%] w-[0%]">
       <input
         className="bg-slate-700 text-white"
+        value={q}
         onChange={(e) => setQuery(e.target.value)}
       />
       <GenreFilter />
