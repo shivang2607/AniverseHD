@@ -19,14 +19,14 @@ export async function GET(req, { params }) {
 
   const cachedData = watchCache.get(`watch-${id}`);
   if (cachedData) {
-    console.log("LRU watch anime cache hit", cachedData);
+    console.log("LRU watch anime cache hit");
     return NextResponse.json(cachedData);
   }
 
   try {
     const redisCache = await redisClient.get(`watch-${id}`);
     if (redisCache) {
-      console.log("Redis watch anime cache hit", redisCache);
+      console.log("Redis watch anime cache hit");
       const parsedCacheResult = JSON.parse(redisCache);
       watchCache.set(`watch-${id}`, parsedCacheResult);
       return NextResponse.json(parsedCacheResult);
