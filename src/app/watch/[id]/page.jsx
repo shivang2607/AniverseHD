@@ -773,9 +773,9 @@ export default function Page({ params }) {
                   </MediaProvider>
                   <DefaultVideoLayout
                     thumbnails={
-                      streamingData?.tracks?.filter(
+                      process.env.NEXT_PUBLIC_GOOD_PROXY + (streamingData?.tracks?.filter(
                         (t) => t.kind === "thumbnails"
-                      )?.[0]?.file
+                      )?.[0]?.file)
                     }
                     slots={{
                       beforeCaptionButton: (
