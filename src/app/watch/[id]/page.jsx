@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
 import {
@@ -110,6 +110,7 @@ export default function Page({ params }) {
   const [isNextEpisodeAvailable, setIsNextEpisodeAvailable] = useState(true);
   const [isPrevEpisodeAvailable, setIsPrevEpisodeAvailable] = useState(false);
   const [recentTimestamp, setRecentTimestamp] = useState(0);
+  const [downloadLink, setDownloadLink] = useState();
   const [duration, setDuration] = useState();
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
@@ -117,6 +118,8 @@ export default function Page({ params }) {
   const contentRef = useRef(content);
   // const [isAutoSkip, setIsAutoSkip] = useState(true);
 
+
+  //cleanup function saves the timestamp and url to the user Recent watchlist thereby adding the current episode with current timestamp in the Recent watchlist of the user
   useEffect(() => {
     const cachedPlayerOptions = JSON.parse(
       localStorage.getItem("player_options")
@@ -194,6 +197,7 @@ export default function Page({ params }) {
     }
   }, [loggedInUserData]);
 
+  //just updates the useState values from streamStore  to the params value of the corresponding variables
   useEffect(() => {
     if (!provider) {
       window.alert("No provider provided in params");
@@ -213,6 +217,8 @@ export default function Page({ params }) {
     return () => {};
   }, [provider, zoroId, gogoSubId, gogoDubId, serverV, dubV]);
 
+
+  //below functions gets the necessary data from both provider like episodes content at the page load, mergeProviderData is used in this useEffect  
   useEffect(() => {
     if (!params?.id) return;
 
@@ -280,13 +286,16 @@ export default function Page({ params }) {
     })();
   }, [params]);
 
+
+  //below useEffect updates the server data whenever any of the dependency changes
   useEffect(() => {
     (async () => {
+      setAnimeNotAvailable(false);
       const currentIndex = episodesData?.findIndex(
         (ep) =>
-          ep?.episodeId === zoroEpisodeId ||
-          ep?.gogoDubId === gogoDubEpisodeId ||
-          ep?.gogoSubId === gogoSubEpisodeId
+          (ep?.episodeId === zoroEpisodeId && zoroEpisodeId) ||
+          (ep?.gogoDubId === gogoDubEpisodeId && gogoDubEpisodeId) ||
+          (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
       );
 
       
@@ -295,7 +304,7 @@ export default function Page({ params }) {
       setIsNextEpisodeAvailable(true);
       setIsPrevEpisodeAvailable(true);
       if(currentIndex === 0) setIsPrevEpisodeAvailable(false);
-      else if(currentIndex === episodesData?.length - 1) setIsNextEpisodeAvailable(false);
+      if(currentIndex === episodesData?.length - 1) setIsNextEpisodeAvailable(false);
 
       if (provider === "zoro" && zoroEpisodeId) {
         const cachedServerData = getSessionWithExpiry(
@@ -304,20 +313,12 @@ export default function Page({ params }) {
         if (cachedServerData) {
           // console.log("cached servers data : ", cachedServerData);
           // if sub is not available then cahnge the default server and dub flag to the raw
-          const subLength = cachedServerData?.sub?.length;
-          // console.log(
-          //   "subLength is ",
-          //   subLength,
-          //   "condition is ",
-          //   subLength && dub != "1"
-          // );
           router.replace(
             updateParams(
               [{ key: "dub", val: updateDubVal(cachedServerData) }],
               false
             )
           );
-
           setServerData(cachedServerData);
           if (!serverV)
             setServer(
@@ -325,31 +326,121 @@ export default function Page({ params }) {
                 cachedServerData?.raw?.[0]?.serverName
             );
           // return;
-        } else {
-          const serverData = await axios.get(
-            `/api/v1/${provider}/servers/${zoroEpisodeId}`
-          );
+        } else{
+          console.log("entered zoro server fetch block with data => ", provider, zoroEpisodeId);
+          if (zoroEpisodeId) {
+            try {
+              // Make the API call to get the server data
+              const serverData = await axios.get(`/api/v1/${provider}/servers/${zoroEpisodeId}`);
+              // console.log("This is Zoro server data: ", serverData);
+          
+              // Ensure the server data exists and has the expected structure
+              if (serverData?.data?.data) {
+                // Update the router URL parameters (e.g., dub value)
+                router.replace(
+                  updateParams(
+                    [{ key: "dub", val: updateDubVal(serverData?.data?.data) }],
+                    false
+                  )
+                );
+          
+                // Set the server data and server name
+                setServerData(serverData?.data?.data);
+                setServer(
+                  serverData?.data?.data?.sub?.[0]?.serverName ||
+                  serverData?.data?.data?.raw?.[0]?.serverName
+                );
+          
+                // Cache the server data with an expiry of 2 hours
+                setSessionWithExpiry(
+                  `serverData-${provider}-${zoroEpisodeId}`,
+                  serverData?.data?.data,
+                  1000 * 60 * 60 * 2  // 2 hours expiry
+                );
+              } else {
+                // Handle the case where serverData doesn't have the expected structure
+                
+                toast.error("Failed to fetch server data. Please try again.");
+              }
+            } catch (error) {
+              // Catch any errors that occur during the API request or data handling
+              console.error("Error fetching Zoro server data:", error);
+              // toast.error(" Error occurred while fetching server data. Please try again.");
+            }
+          }
+          
+        }
+      }
 
+
+      //for gogo server data
+      else if(provider === "gogo" && (gogoSubEpisodeId || gogoDubEpisodeId)){
+        try {
+          const cachekey = `serverData-${provider}-${gogoSubEpisodeId}-${gogoDubEpisodeId}`;
+          const cachedServerData = getSessionWithExpiry(cachekey);
+          if (cachedServerData) {
+            router.replace(
+              updateParams(
+                [{ key: "dub", val: updateDubVal(cachedServerData) }],
+                false
+              )
+            );
+            setServerData(cachedServerData);
+            if (!serverV)
+              setServer(cachedServerData?.sub?.[0]?.name);
+            // return;
+          } 
+          else if(gogoDubEpisodeId || gogoSubEpisodeId){
+            console.log("entered gogo server fetch block with data => ", provider, gogoDubEpisodeId, gogoSubEpisodeId);
+            let serverDataSub, serverDataDub;
+            if(gogoSubEpisodeId && gogoSubEpisodeId!=="null"){
+              serverDataSub = await axios.get(`/api/v1/${provider}/servers/${gogoSubEpisodeId}`);
+
+            }
+            if(gogoDubEpisodeId && gogoDubEpisodeId!=="null"){
+              serverDataDub = await axios.get(`/api/v1/${provider}/servers/${gogoDubEpisodeId}`);
+
+            }
+
+
+          const formatedResponse = {sub: serverDataSub?.data,dub: serverDataDub?.data}
+          const subServerName = formatedResponse?.sub?.[0]?.name;
+          const dubServerName = formatedResponse?.dub?.[0]?.name;
+          // console.log(subServerName, dubServerName);
           router.replace(
             updateParams(
-              [{ key: "dub", val: updateDubVal(serverData?.data?.data) }],
+              [{ key: "dub", val: updateDubVal(formatedResponse) }],
               false
             )
           );
 
-          setServerData(serverData?.data?.data);
-          setServer(
-            serverData?.data?.data?.sub?.[0]?.serverName ||
-              serverData?.data?.data?.raw?.[0]?.serverName
-          );
-          // console.log("server", serverData?.data?.data?.sub?.[0]?.serverName);
-          setSessionWithExpiry(
-            `serverData-${provider}-${zoroEpisodeId}`,
-            serverData?.data?.data,
-            1000 * 60 * 60 * 24
-          ); //24 hrs
+          setServer(dub ? dubServerName : subServerName);
+          setServerData(formatedResponse); 
+          if(formatedResponse){ 
+            setSessionWithExpiry(
+            cachekey,
+            formatedResponse,
+            1000 * 60 * 60 * 2
+          ); //2 hrs
+        }
+
+        }
+
+        } catch (error) {
+          // toast.error(error.message);
+          console.log("error while fetching server data => ", error);
         }
       }
+
+      else  {
+        if(content?.title){
+        toast.error("Anime not available", {id: '2'});
+        setAnimeNotAvailable(true);
+        }
+      }
+
+     
+
     })();
 
     return () => {
@@ -357,23 +448,26 @@ export default function Page({ params }) {
     };
   }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
 
+
+  //this function update the url params, it has resetT as true which will remove timestamp t parameter by default
   const updateParams = (paramsList, resetT = true) => {
     const newParams = new URLSearchParams(searchParams);
     if (resetT) newParams.delete("t");
     paramsList.forEach((par) => {
-      newParams.set(par.key, par.val);
+      newParams.set(par.key, par.val ? par.val : '');
     });
 
     return pathname + "?" + newParams.toString();
   };
 
 
+  //self explainatory
   const getPrevEpisode = () => {
     const currentIndex = episodesData?.findIndex(
       (ep) =>
-        ep?.episodeId === zoroEpisodeId ||
-        ep?.gogoDubId === gogoDubEpisodeId ||
-        ep?.gogoSubId === gogoSubEpisodeId
+        (ep?.episodeId === zoroEpisodeId && zoroEpisodeId) ||
+        (ep?.gogoDubId === gogoDubEpisodeId && gogoDubEpisodeId) ||
+        (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
     );
 
     
@@ -395,12 +489,14 @@ export default function Page({ params }) {
 
   }
 
+
+  //self explainatory
   const getNextEpisode = () => {
     const currentIndex = episodesData?.findIndex(
       (ep) =>
-        ep?.episodeId === zoroEpisodeId ||
-        ep?.gogoDubId === gogoDubEpisodeId ||
-        ep?.gogoSubId === gogoSubEpisodeId
+        (ep?.episodeId === zoroEpisodeId && zoroEpisodeId) ||
+        (ep?.gogoDubId === gogoDubEpisodeId && gogoDubEpisodeId) ||
+        (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
     );
 
     if (currentIndex !== -1 && currentIndex < episodesData.length - 1) {
@@ -418,6 +514,8 @@ export default function Page({ params }) {
     }
   };
 
+
+  //this function updates player options in firebase and in local storage like skip intro, auto next and autoplay
   const updatePlayerOptions = (newOpt) => {
     localStorage.setItem("player_options", JSON.stringify(newOpt));
     setMediaPlayerState(newOpt);
@@ -429,6 +527,7 @@ export default function Page({ params }) {
 
   // console.log(episodesData);
 
+  //since zoro data has few things like zoroId episodes data like title etc and gogo data has data like gogodub and gogo sub...this function merges both of the providers episodes data into one object
   const mergeProviderData = (zoro, gogoDub, gogoSub) => {
     const gds = gogoDub?.episodes?.length; //gogo dub size
     const gss = gogoSub?.episodes?.length; //gogo sub size
@@ -454,26 +553,9 @@ export default function Page({ params }) {
     } else setEpisodesData(null);
   };
 
-  const handleSkipIntro = () => {
-    if (player) {
-      const skipToTime =
-        showSkipButton === "intro"
-          ? streamingData?.intro?.end
-          : streamingData?.outro?.end;
 
-      if (typeof skipToTime === "number") {
-        player.currentTime = skipToTime; // Skip to the end of the intro or outro
-        
-      } else {
-        console.error("Invalid time value for skipping.");
-      }
 
-      setShowSkipButton(""); // Hide the button after skipping
-    } else {
-      console.error("Player not found!");
-    }
-  };
-
+  //self explainatory
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
 
@@ -493,6 +575,7 @@ export default function Page({ params }) {
     toast.error(result?.response?.message, { duration: 3000 });
   };
 
+  //for each timestamp this function is triggered
   const handleTimeUpdate = (v, event) => {
     const player = event.target;
     const currentTime = player?.currentTime;
@@ -507,7 +590,10 @@ export default function Page({ params }) {
       setRecentTimestamp(t);
     }
     
-    if (!streamingData?.intro) return;
+    if (!streamingData?.intro){
+      setShowSkipButton("");
+      return;
+    } 
     // console.log(currentTime, v);
     // Define the intro and outro timestamps
     const introStart = streamingData?.intro?.start;
@@ -536,6 +622,26 @@ export default function Page({ params }) {
     }
   };
 
+
+
+  //below function and usememo is to get src url of m3u8 file according to the provider
+  const getStreamingSource = ()=>{
+    if(provider === "zoro"){
+      setDownloadLink();
+      return streamingData?.sources?.[0]?.url;
+    } 
+    else if(provider === "gogo"){
+      const defaultSrcData =  streamingData?.sources?.filter(src => src?.quality === 'default');
+      setDownloadLink(streamingData?.download);
+      // console.log("gogo src data",defaultSrcData);
+      return `https://goodproxy.goodproxy.workers.dev/fetch?url=${defaultSrcData?.[0]?.url}`; 
+    }
+    
+  }
+  //* using use Memo to cache the streaming url result, because apparantly media player was calling this function after every few seconds
+  const streamingSrc = useMemo(() => getStreamingSource(), [provider, streamingData]);
+
+  //In case if dub is not available for a episode the we will automatically change the router to the sub..this function utility handles the dub val (either 1, 0, -1)
   const updateDubVal = (serData) => {
     const subLength = serData?.sub?.length;
     const dubLength = serData?.dub?.length;
@@ -598,7 +704,7 @@ export default function Page({ params }) {
                 <ImCross color="red" /> {streamingData?.message}
               </div>
             ) : (
-              <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
+              streamingSrc && <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
                 <MediaPlayer
                   load="eager"
                   autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
@@ -607,12 +713,7 @@ export default function Page({ params }) {
                   storage="media-player"
                   buffer
                   title={streamingData?.malId}
-                  src={
-                    provider === "gogo"
-                      ? `https://goodproxy.goodproxy.workers.dev/fetch?url=${streamingData?.sources?.[0]?.url}` 
-                      // !probably I have to add my own proxy here
-                      : streamingData?.sources?.[0]?.url
-                  }
+                  src={streamingSrc}
                   
                   className="h-full"
                   playsInline = {true}

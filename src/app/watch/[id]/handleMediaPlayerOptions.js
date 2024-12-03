@@ -15,7 +15,7 @@ const HandleUpdateMediaPlayerOptions = () => {
     debounceRef.current = setTimeout(async () => {
       try {
 
-        //* opt and updateOPtions have differnet kjey names, because Me and abhay has used different key names on our sides.
+        //* opt and updateOPtions have differnet key names, because Me and abhay has used different key names on our sides.
         const updatedOptions = {
             autoPlay: opt?.isAutoPlay,
             autoNext: opt?.isAutoNext,
