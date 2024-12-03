@@ -609,8 +609,8 @@ export default function Page({ params }) {
                   title={streamingData?.malId}
                   src={
                     provider === "gogo"
-                      ? `https://goodproxy.goodproxy.workers.dev/fetch?url=${streamingData?.sources?.[0]?.url}` 
-                      // !probably I have to add my own proxy here
+                      ? `${process.env.NEXT_PUBLIC_GOOD_PROXY}${streamingData?.sources?.[0]?.url}` 
+                      // !probably I have to add my own proxy here => update: I added my own proxy
                       : streamingData?.sources?.[0]?.url
                   }
                   
