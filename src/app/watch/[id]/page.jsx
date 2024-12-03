@@ -634,7 +634,7 @@ export default function Page({ params }) {
       const defaultSrcData =  streamingData?.sources?.filter(src => src?.quality === 'default');
       setDownloadLink(streamingData?.download);
       // console.log("gogo src data",defaultSrcData);
-      return `https://goodproxy.goodproxy.workers.dev/fetch?url=${defaultSrcData?.[0]?.url}`; 
+      return `${process.env.NEXT_PUBLIC_GOOD_PROXY}${defaultSrcData?.[0]?.url}`; 
     }
     
   }
