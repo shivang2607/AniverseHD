@@ -714,8 +714,13 @@ export default function Page({ params }) {
                   storage="media-player"
                   buffer
                   title={streamingData?.malId}
-                  src={streamingSrc}
-                  download = {true}
+                  src={
+                    provider === "gogo"
+                      ? `${process.env.NEXT_PUBLIC_GOOD_PROXY}${streamingData?.sources?.[0]?.url}` 
+                      // !probably I have to add my own proxy here => update: I added my own proxy
+                      : streamingData?.sources?.[0]?.url
+                  }
+                  
                   className="h-full"
                   playsInline = {true}
                   crossOrigin
@@ -774,9 +779,9 @@ export default function Page({ params }) {
                   </MediaProvider>
                   <DefaultVideoLayout
                     thumbnails={
-                      streamingData?.tracks?.filter(
+                      process.env.NEXT_PUBLIC_GOOD_PROXY + (streamingData?.tracks?.filter(
                         (t) => t.kind === "thumbnails"
-                      )?.[0]?.file
+                      )?.[0]?.file)
                     }
                     slots={{
                       beforeCaptionButton: (
