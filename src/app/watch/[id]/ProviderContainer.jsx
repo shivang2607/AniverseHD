@@ -189,7 +189,7 @@ export default function ProviderContainer({
       <div className="provider-server-select self-center flex flex-col gap-8">
         <div className="button self-center flex gap-2 text-gray-200 ">
           <Link
-            href = {updateParams([{key:"provider", val: "zoro"},{ key:"server", val:''}])}
+            href = {updateParams([{key:"provider", val: "zoro"},{ key:"server", val:''}], false)}
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md ${
               provider === "zoro" ? "bg-primary-100" : ""
@@ -203,7 +203,7 @@ export default function ProviderContainer({
             Provider-Z
           </Link>
           <Link
-            href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:''}])}
+            href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:''}], false)}
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md  ${
               provider === "gogo" ? "bg-primary-100" : ""
@@ -228,7 +228,7 @@ export default function ProviderContainer({
                     return (
                       <Link 
                       key={ser?.serverName || ser?.name}
-                      href={updateParams([{key: "dub", val:''}, {key:"server", val: ser?.serverName || ser?.name}])} 
+                      href={updateParams([{key: "dub", val:''}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
                       scroll={false} 
                       className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
@@ -245,7 +245,7 @@ export default function ProviderContainer({
                     return (
                       <Link 
                       key={ser?.serverName || ser?.name}
-                      href={updateParams([{key: "dub", val:'-1'}, {key:"server", val: ser?.serverName || ser?.name}])} 
+                      href={updateParams([{key: "dub", val:'-1'}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
                       scroll={false} 
                       className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub==="-1" && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
@@ -274,7 +274,7 @@ export default function ProviderContainer({
                     return (
                       <Link key={ser?.serverName || ser?.name} 
                       scroll={false} 
-                      href={updateParams([{key: "dub", val:'1'}, {key:"server", val: ser?.serverName || ser?.name}])} 
+                      href={updateParams([{key: "dub", val:'1'}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
                       className={`rounded whitespace-nowrap text-ellipsis px-2 py-1 items-center bg-cbg-400 ${dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
                       //   episodeId : zoroEpisodeId,
