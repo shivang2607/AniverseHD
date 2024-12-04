@@ -14,10 +14,10 @@ const gogoCache = new LRUCache(option);
 export async function GET(req, {params}){
     const episodeId = params.episodeId;
     const searchParams = req.nextUrl.searchParams;
-    const server = searchParams.get('server');
+    const serverName = searchParams.get('server').toLowerCase();
 
     // console.log(server, episodeId);
-    const cachedData = gogoCache.get(`gogo-${episodeId}`);
+    const cachedData = gogoCache.get(`gogo-${episodeId}-${serverName}`);
     if(cachedData){
         console.log("Cache hit for Gogo streaming api");
         return NextResponse.json(cachedData);

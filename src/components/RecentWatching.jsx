@@ -9,7 +9,7 @@ export default function RecentWatching() {
 
     const {RecentWatchListData} = useUserStore();
     const defaultLength = 10;
-    console.log("Recent watchlist data is => ",RecentWatchListData);
+    // console.log("Recent watchlist data is => ",RecentWatchListData);
 
 
   return (
