@@ -6,7 +6,7 @@ import redisClient from "@/lib/redis"; // Use the singleton instance directly
 
 const watchOptions = {
   max: 500,
-  ttl: 1000 * 60 * 60 * 2, // 2 hours
+  ttl: 1000 * 60 * 60 * 1, // 1 hour
 };
 const watchCache = new LRUCache(watchOptions);
 
@@ -82,18 +82,26 @@ export async function GET(req, { params }) {
       })
     );
 
-    const gogoEpsSubPromise = gogoIdSub
-      ? axios.get(`${scrapeUrl}/anime/gogoanime/info/${gogoIdSub}`)
-      : Promise.resolve({ data: {} });
-
-    const gogoEpsDubPromise = gogoIdDub
-      ? axios.get(`${scrapeUrl}/anime/gogoanime/info/${gogoIdDub}`)
-      : Promise.resolve({ data: {} });
-
-    const [gogoEpsSub, gogoEpsDub] = await Promise.all([
-      gogoEpsSubPromise,
-      gogoEpsDubPromise,
-    ]);
+    const gogoEpsSubPromise = async () => {
+      try {
+        return gogoIdSub ? await axios.get(`${scrapeUrl}/anime/gogoanime/info/${gogoIdSub}`) : null;
+      } catch (error) {
+        console.error("Error fetching Gogoanime Sub:", error);
+        return null;
+      }
+    };
+    
+    const gogoEpsDubPromise = async () => {
+      try {
+        return gogoIdDub ? await axios.get(`${scrapeUrl}/anime/gogoanime/info/${gogoIdDub}`) : null;
+      } catch (error) {
+        console.error("Error fetching Gogoanime Dub:", error);
+        return null;
+      }
+    };
+    
+    const [gogoEpsSub, gogoEpsDub] = await Promise.all([gogoEpsSubPromise(), gogoEpsDubPromise()]);
+    
 
     const finalResponse = {
       zoro: {
@@ -137,7 +145,7 @@ export async function GET(req, { params }) {
           `watch-${id}`,
           JSON.stringify(finalResponse),
           "EX",
-          60 * 60 * 24 * 30 * 6 //cache for 6 months
+          60 * 60 * 24 * 7 //cache for 7 days, this is only 7 days because its possible that corrupt or incorrect or incomplete data is present in gogo or zoro providers data 
         ));
     }
 
