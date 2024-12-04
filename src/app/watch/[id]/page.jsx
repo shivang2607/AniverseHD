@@ -47,7 +47,8 @@ import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
-import { FaStepBackward, FaStepForward } from "react-icons/fa";
+import { FaDownload, FaStepBackward, FaStepForward } from "react-icons/fa";
+import Link from "next/link";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -713,7 +714,12 @@ export default function Page({ params }) {
                   storage="media-player"
                   buffer
                   title={streamingData?.malId}
-                  src={streamingSrc}
+                  src={
+                    provider === "gogo"
+                      ? `${process.env.NEXT_PUBLIC_GOOD_PROXY}${streamingData?.sources?.[0]?.url}` 
+                      // !probably I have to add my own proxy here => update: I added my own proxy
+                      : streamingData?.sources?.[0]?.url
+                  }
                   
                   className="h-full"
                   playsInline = {true}
@@ -811,6 +817,9 @@ export default function Page({ params }) {
                           Skip {showSkipButton}
                         </button>
                       ),
+                      downloadButton: downloadLink && (
+                        <Link href={downloadLink} target="_blank" rel="noopener noreferrer" className="text-xl items-center flex mx-3" ><FaDownload/></Link>
+                      )
                     }}
                     icons={defaultLayoutIcons}
                   />
