@@ -7,9 +7,18 @@ import {
   Constant_Var_starterWatchLists_recent,
 } from "@/utils/constants";
 
+
+/** there are a total of 4 type of items:-
+ * 1.) UserInfo
+ * 2.) User's All watchLists' Info
+ * 3.) WatchList Info by Id
+ * 4.) WatchList's AnimeList data
+ * */ 
+
+
 /** Misscelanious  */
-const getSessionStorageParsedItem = (key) => {
-  const item = sessionStorage.getItem(key);
+const getCachedData = (key) => {
+  const item = localStorage.getItem(key);
 
   if (!item || item === "undefined") {
     console.warn(`Item for key: ${key} is not found in sessionStorage.`);
@@ -27,6 +36,14 @@ const getSessionStorageParsedItem = (key) => {
   }
 };
 
+const setCacheData = (key,data) => {
+   localStorage.setItem(key, JSON.stringify(data));
+};
+
+const removeCachedData=(key)=>{
+  localStorage.removeItem(key)
+}
+
 const findWatchListIndex = ({ userWatchLists, watchListId }) => {
   return userWatchLists.findIndex((watchList) => watchList.id === watchListId);
 };
@@ -38,20 +55,17 @@ const updateUserPropertyCached = (property, value) => {
   setUserInfoCached({ userData });
 };
 
+
 /** User Profile INfo */
 export const getUserInfoCached = () => {
-  const userData = getSessionStorageParsedItem(
+  const userData = getCachedData(
     Constant_Var_sessionStorage_key_loggedInUser
   );
   return userData;
 };
 
 export const setUserInfoCached = ({ userData }) => {
-  // console.log("setting data",userData);
-  sessionStorage.setItem(
-    Constant_Var_sessionStorage_key_loggedInUser,
-    JSON.stringify(userData)
-  );
+  setCacheData(Constant_Var_sessionStorage_key_loggedInUser,userData)
 };
 
 export const changeUserNameCached = ({ userName }) => {
@@ -86,9 +100,11 @@ export const changeUserPlayOptionsCached = ({ playerOptions }) => {
 
   setUserInfoCached({ userData });
 };
+
+
 /** User WatchLists Info */
 export const getUserWatchListsInfoCached = ({ userId }) => {
-  const userWatchlists = getSessionStorageParsedItem(
+  const userWatchlists = getCachedData(
     `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`
   );
 
@@ -96,15 +112,13 @@ export const getUserWatchListsInfoCached = ({ userId }) => {
 };
 
 export const setUserWatchListsInfoCached = ({ watchLists, userId }) => {
-  sessionStorage.setItem(
-    `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`,
-    JSON.stringify(watchLists)
-  );
+  setCacheData(`${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`,watchLists)
 };
+
 
 /** WatchListInfo By Id */
 export const getWatchListInfoByIdInfoCached = ({ watchListId }) => {
-  const watchlistInfo = getSessionStorageParsedItem(
+  const watchlistInfo = getCachedData(
     `${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`
   );
 
@@ -115,21 +129,19 @@ export const setWatchListInfoByIdInfoCached = ({
   watchListInfo,
   watchListId,
 }) => {
-  sessionStorage.setItem(
-    `${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`,
-    JSON.stringify(watchListInfo)
-  );
+  setCacheData(`${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`,watchListInfo)
 };
 
 export const removeWatchListInfoByIdInfoCached = ({ watchListId }) => {
-  sessionStorage.removeItem(
+  removeCachedData(
     `${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`
   );
 };
 
+
 /** User watchList Anime list By WatchList Id */
 export const getWatchListAnimeListByIdCached = ({ watchListId }) => {
-  const watchlistAnimeList = getSessionStorageParsedItem(
+  const watchlistAnimeList = getCachedData(
     `${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`
   );
 
@@ -140,14 +152,11 @@ export const setWatchListAnimeListByIdCached = ({
   watchlistAnimeList,
   watchListId,
 }) => {
-  sessionStorage.setItem(
-    `${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`,
-    JSON.stringify(watchlistAnimeList)
-  );
+  setCacheData(`${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`,watchlistAnimeList)
 };
 
 export const removeWatchlistAnimeListCached = ({ watchListId }) => {
-  sessionStorage.removeItem(
+  removeCachedData(
     `${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`
   );
 };
@@ -320,7 +329,8 @@ export const removeAnimeFromUserWatchListCached = ({
   return;
 };
 
-/**user watchlist alteration   issue, not adding in session storage when new watchlist is created*/
+
+/**User watchlist alteration   issue, not adding in session storage when new watchlist is created*/
 export const addUserWatchlistCached = ({
   watchListInfo,
   watchListId,

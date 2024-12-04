@@ -71,6 +71,7 @@ const useUserStore = create((set, get) => ({
         loadingData: false,
         RecentWatchListId: null,
       });
+      // console.log("userinfo",respUserInfo.response, "userWatchlist:",respUserWatchLists.response)
     }
   },
 
@@ -92,6 +93,10 @@ const useUserStore = create((set, get) => ({
         loggedInUserWatchListsInfo: null,
         loadingData: false,
       });
+      toast.error("Error loading User Data", {
+        id: "1",
+        duration: 3000,
+      });
     }
   },
 
@@ -112,6 +117,10 @@ const useUserStore = create((set, get) => ({
         loggedInUserId: null,
         loggedInUserWatchListsInfo: null,
         loadingData: false,
+      });
+      toast.error("Error loading User WathLists", {
+        id: "1",
+        duration: 3000,
       });
     }
   },

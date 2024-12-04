@@ -1,7 +1,7 @@
 
 export const Constant_Var_success = "success";
 export const Constant_Var_error = "error";
-export let Constant_Var_RecentWatchlistSize = 40;
+export const Constant_Var_RecentWatchlistSize = 4;
 
 // # Session Storage Variables #
 export const Constant_Var_sessionStorage_key_userWatchListsInfo  = "userwatchLists";

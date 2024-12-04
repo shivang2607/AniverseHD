@@ -195,7 +195,7 @@ export default async function AddAnimeToWatchList({
               throw addRecentResp.response;
           }
         } else {
-          // for starter special Anime, they can't exists in more than one special watchLists except Recent WatchList
+          // for starter special Anime, they can't exists in more than one special watchLists except Recent and Favourite WatchList
           const addAnimeResp = await addStarterNonRecentAnime({
             animeId: animeId,
             animeObject: animeObject,
@@ -209,7 +209,8 @@ export default async function AddAnimeToWatchList({
             throw addAnimeResp.response;
         }
       } else {
-        //for custom watchLists, a anime can exists in multiple custom watchLists
+        /**for custom watchLists, a anime can exists in multiple custom watchLists (also favourite can have multiple watchlists as well and it does not require limited size like recent, so same as custom watchList)*/
+
         const addAnimeResp = await addAnime({
           animeObject: animeObject,
           watchListInfo: watchListInfo.response,
@@ -396,50 +397,58 @@ async function addToStarterRecentWatchList({
     const batch = writeBatch(db);
 
     if (watchListInfo.animeList.length >= Constant_Var_RecentWatchlistSize) {
-      const earliestAnimeObj = watchListInfo.animeList.reduce((prev, curr) => {
-        // Compare based on seconds first, then nanoseconds if seconds are equal
-        if (
-          curr.addedAt.seconds < prev.addedAt.seconds ||
-          (curr.addedAt.seconds === prev.addedAt.seconds &&
-            curr.addedAt.nanoseconds < prev.addedAt.nanoseconds)
-        ) {
-          return curr;
+
+      watchListInfo.animeList.sort((a, b) => {
+        if (a.addedAt.seconds !== b.addedAt.seconds) {
+          return a.addedAt.seconds - b.addedAt.seconds;
         }
-        return prev;
+        return a.addedAt.nanoseconds - b.addedAt.nanoseconds;
       });
 
-      const promises = [
+      const numToRemove = watchListInfo.animeList.length - Constant_Var_RecentWatchlistSize;
+
+      const earliestAnimeObjs = watchListInfo.animeList.slice(0, numToRemove);
+
+      const removePromises = earliestAnimeObjs.map((anime) =>
         RemoveAnimeFromWatchList({
           watchListId: watchListId,
-          animeId: earliestAnimeObj.animeId,
+          animeId: anime.animeId,
           batchFromAddfunc: batch,
           currTimestamp: currTimestamp,
-        }),
-        addAnime({
-          animeObject: animeObject,
-          animeId: animeId,
-          watchListId: watchListId,
-          watchListInfo: watchListInfo,
-          withBatch: batch,
-          currTimestamp: currTimestamp,
-        }),
-      ];
+        })
+      );
 
-      const [respRemove, respAdd] = await Promise.all(promises);
+      const addPromise = addAnime({
+        animeObject: animeObject,
+        animeId: animeId,
+        watchListId: watchListId,
+        watchListInfo: watchListInfo,
+        withBatch: batch,
+        currTimestamp: currTimestamp,
+      });
 
-      // Check if both were successful
-      if (respRemove.status !== Constant_Var_success) throw respRemove.response;
+      const responses = await Promise.all([...removePromises, addPromise]);
 
+      for (let i = 0; i < earliestAnimeObjs.length; i++) {
+        const respRemove = responses[i];
+        if (respRemove.status !== Constant_Var_success)
+          throw respRemove.response;
+      }
+
+      const respAdd = responses[earliestAnimeObjs.length];
       if (respAdd.status !== Constant_Var_success) throw respAdd.response;
 
       await batch.commit();
 
-      removeAnimeFromUserWatchListCached({
-        animeId: earliestAnimeObj.animeId,
-        userId: userId,
-        watchListId: watchListId,
-        updatedAt: currTimestamp,
-      });
+
+      for (let i = 0; i < earliestAnimeObjs.length; i++) {
+        removeAnimeFromUserWatchListCached({
+          animeId: earliestAnimeObjs[i].animeId,
+          userId: userId,
+          watchListId: watchListId,
+          updatedAt: currTimestamp,
+        });
+      }
     } else {
       const respAdd = await addAnime({
         animeObject: animeObject,

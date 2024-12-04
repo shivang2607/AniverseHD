@@ -1,3 +1,4 @@
+// import redisClient from "@/lib/redis";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
@@ -28,8 +29,10 @@ const useAnimeSearchFilterStore = create((set, get) => ({
   setSearchResults: (results) => set({ searchResults: results }),
   setPage: (page) => set({ page }),
   setLimit: (limit) => set({ limit }),
-  setQuery: (q) =>{ console.log("changing",q);
-    set({ q })},
+  setQuery: (q) => {
+    console.log("changing", q);
+    set({ q });
+  },
   setType: (type) => set({ type }),
   setScore: (score) => set({ score }),
   setMinScore: (min_score) => set({ min_score }),
@@ -243,20 +246,36 @@ const useAnimeSearchFilterStore = create((set, get) => ({
 
     try {
       set({ searchResults: null });
-      // Make the API call
-      const response = await fetch(
-        `https://api.jikan.moe/v4/anime?${params.toString()}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch data from the API");
-      }
+      const jikanSearchFiltersUrl = `https://api.jikan.moe/v4/anime?${params.toString()}`;
+      // const cachedResult = redisClient.get(jikanSearchFiltersUrl);
 
-      // Parse the response
-      const data = await response.json();
+      // if (cachedResult) {
+      //   // data found in redis cache
+      //   const parsedCacheResult = JSON.parse(cachedResult);
+      //   console.log("redis-cache-hit, data:", parsedCacheResult);
+      //   // Update the store with the search results
+      //   set({ searchResults: parsedCacheResult });
+      // } else {
+      //   console.log("redis-cache-miss");
+        // Make the API call
+        const response = await fetch(jikanSearchFiltersUrl);
+        if (!response.ok) {
+          throw new Error("Failed to fetch data from the API");
+        }
 
+        // Parse the response
+        const data = await response.json();
+        // Update the store with the search results
+        set({ searchResults: data });
+
+      //   redisClient.set(
+      //     jikanSearchFiltersUrl,
+      //     response,
+      //     "EX",
+      //     60 * 60 * 24 * 7
+      //   );
+      // }
       // console.log(data,data?.data,"success");
-      // Update the store with the search results
-      set({ searchResults: data });
     } catch (error) {
       toast.error(error.message, {
         id: "1",
