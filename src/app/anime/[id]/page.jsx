@@ -44,7 +44,6 @@ export default function Anime({ params }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("response anime data", anime);
 
       if (!params?.id || anime) return;
 
@@ -67,7 +66,7 @@ export default function Anime({ params }) {
     );
     if(filteredData?.length > 0){
       setRecentData(filteredData[0]);
-      console.log(filteredData[0]);
+      // console.log(filteredData[0]);
     }
     
   }, [RecentWatchListData]);

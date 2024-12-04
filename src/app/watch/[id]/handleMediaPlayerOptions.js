@@ -15,7 +15,7 @@ const HandleUpdateMediaPlayerOptions = () => {
     debounceRef.current = setTimeout(async () => {
       try {
 
-        //* opt and updateOPtions have differnet kjey names, because Me and abhay has used different key names on our sides.
+        //* opt and updateOPtions have differnet key names, because Me and abhay has used different key names on our sides.
         const updatedOptions = {
             autoPlay: opt?.isAutoPlay,
             autoNext: opt?.isAutoNext,
@@ -24,10 +24,8 @@ const HandleUpdateMediaPlayerOptions = () => {
         const result = await UpdatePlayerOptions(updatedOptions);
 
         if (result.status === 'success') {
-          console.log('Play options updated successfully.');
           toast.success("Changes saved Successfully!");
         } else {
-            console.log(opt, result);
           toast.error('Failed to save changes!');
         }
       } catch (error) {

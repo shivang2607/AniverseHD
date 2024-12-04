@@ -7,15 +7,8 @@ import SearchComponent from "./recommendationPanel/SearchComponent";
 import { FaSearch } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
-import { Constant_Var_success } from "@/utils/constants";
-import GetLoggedUserData from "@/app/firebase/Profile/GetLoggedUserData";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
-import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
 import useUserStore from "./ZustandStores/userStore";
-import GetWatchListById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
-import UpdatePlayOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
-import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import WatchlistBar from "./WatchlistBar";
 
 const Navbar = () => {
@@ -169,7 +162,7 @@ const Navbar = () => {
             
             {!isUserLoggedIn ? (
               <button
-                className=" bg-primary-200 md:block hidden text-gray-800 font-semibold hover:bg-primary-100 px-5 py-1.5 rounded-lg text-md "
+                className=" bg-primary-200 md:block  text-gray-800 md:font-semibold hover:bg-primary-100 md:px-5 md:py-1.5 p-1 mx-3 px-2 text-sm md:text-base rounded-lg text-md "
                 onClick={handleSignIn}
               >
                 Login
@@ -183,7 +176,10 @@ const Navbar = () => {
 
       {/* //? MOBILE VIEW IS FROM BELOW */}
       <div className={`${isOpen ? "flex" : "hidden"} md:hidden w-full overflow-hidden`}>
-        <div className="px-2 pt-2 pb-3 space-y-1 w-full flex flex-col gap-4  sm:px-1">
+        <div className="px-2 pt-5 pb-3 space-y-1 w-full flex flex-col gap-4  sm:px-1">
+        <div className="relative w-[80%] m-2">
+            <SearchComponent />
+          </div>
           <Link
             href="/"
             className=" hover:text-white block px-3  rounded-md text-base font-medium"
@@ -202,9 +198,7 @@ const Navbar = () => {
           >
             Recommendations
           </Link>
-          <div className="relative w-[80%] m-2">
-            <SearchComponent />
-          </div>
+          
           {!isUserLoggedIn && <button
             className="md:w-full block bg-primary-200 !my-3  mx-2 rounded-lg text-gray-800 w-1/6 justify-center hover:bg-primary-100 px-3 py-2  text-sm font-medium"
             onClick={handleSignIn}

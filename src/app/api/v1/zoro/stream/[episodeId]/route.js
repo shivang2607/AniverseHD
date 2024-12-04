@@ -16,8 +16,6 @@ export async function GET(req, { params }) {
   const searchParams = req.nextUrl.searchParams;
   const ep = searchParams.get("ep");
   const server = searchParams.get("server") || '';
-  console.log("id", id);
-  console.log("ep", ep);
   const category = searchParams.get("category") || "sub";
 
   const episodeId = `${id}?ep=${ep}`;
@@ -43,15 +41,18 @@ export async function GET(req, { params }) {
       //   },
       // }
     );
-    console.log(res?.data);
+    if(res?.data?.data){
     zoroCache.set(`zoro-${episodeId}-${server}-${category}`, res?.data?.data);
-    return NextResponse.json(res.data?.data);
+    }
+    return NextResponse.json(res?.data?.data);
 
   } catch (error) {
     console.log(error);
     return NextResponse.json({
-      ...error.response.data,
-      status: error.response.status,
+      ...error?.response?.data,
+      status: error?.response?.status,
+      ...error?.response?.data,
+      status: error?.response?.status,
     });
   }
 }

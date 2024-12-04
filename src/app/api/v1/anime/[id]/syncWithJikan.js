@@ -39,7 +39,7 @@ export async function syncQdrant(id, resPayload) {
     // https://cors-anywhere.herokuapp.com/ (old proxy)
     //https://api.allorigins.win/raw?url= (another proxy)
     // cors.sh , (other proxy , only needed in development phase)
-    console.log("Sites", resPayload.Sites);
+    // console.log("Sites", resPayload.Sites);
 
     
     
@@ -66,7 +66,7 @@ export async function syncQdrant(id, resPayload) {
                 // updatePayload.Sites = {}; // or [] based on your requirements
             }
     
-            console.log("malsync data", malSyncData);
+            // console.log("malsync data of zoro", malSyncData?.data?.Sites?.zoro);
         } catch (error) {
             // Log the error and set error response
             console.error('Failed to fetch data from the site:', error.message);
@@ -137,7 +137,7 @@ export async function syncQdrant(id, resPayload) {
             }
         });
     // console.log("response payload update when relations is found", updatePayloadRes);
-    console.log("cache miss for anime id");
+    // console.log("cache miss for anime id");
 
     const responsePayload = {
         ...jikanData,
@@ -148,8 +148,10 @@ export async function syncQdrant(id, resPayload) {
         "gif_images": updatePayload?.gif_images || resPayload?.gif_images || null,
     };
 
+    if(responsePayload){
     await redisClient.set(`qdrant-anime-${id}`, JSON.stringify(responsePayload), 'EX', 60 * 60 * 24 * 7); // 7 days
     console.log("response sent after updating Qdrant");
+    }
     // console.log(responsePayload.Sites);
     return responsePayload;
 }

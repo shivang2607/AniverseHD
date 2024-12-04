@@ -69,7 +69,7 @@ export async function POST(req){
           {status: 400 })
 
           if(recommendCache.get(key)){
-            console.log("cache hit")
+            console.log("recommendation cache hit")
             return NextResponse.json(recommendCache.get(key));
           }
           console.log("cache miss")

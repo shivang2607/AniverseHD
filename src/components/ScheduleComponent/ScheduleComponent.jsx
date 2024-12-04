@@ -27,8 +27,8 @@ export default function ScheduleComponent() {
               if (cachedData) {
                   // If data exists in localStorage, use it
                   setScheduledData(JSON.parse(cachedData));
-                  console.log(scheduledData);
-                  console.log(`Using cached data for ${selectedDay} in week ${currentWeek}`);
+                 
+                 
                 } else {
                     // Otherwise, make the API request
                     (async () => {
@@ -36,10 +36,10 @@ export default function ScheduleComponent() {
                         try {
                             const res = await axios.get(`${apiUrl}schedules?filter=${selectedDay.toLowerCase()}&sfw=true`);
                             setScheduledData(res.data);
-                            console.log(res.data);
+                            
                             // Cache the data in localStorage
                             localStorage.setItem(`scheduledData-${currentWeek}-${selectedDay}`, JSON.stringify(res.data));
-                            console.log(`Fetched and cached data for ${selectedDay} in week ${currentWeek}`);
+                          
                         } catch (error) {
                             console.error("Error fetching data:", error);
                         }

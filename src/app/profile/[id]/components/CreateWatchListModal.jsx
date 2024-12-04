@@ -51,7 +51,6 @@ const CreateWatchListModal = ({ isOpen, onClose }) => {
 
     if (resp.status === Constant_Var_success) {
       // Show Toast (Success)
-      console.log("Success", resp.response);
     } else {
       // Show Toast (Error)
       console.log("Error", resp.response);

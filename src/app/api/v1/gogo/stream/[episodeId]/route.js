@@ -14,20 +14,22 @@ const gogoCache = new LRUCache(option);
 export async function GET(req, {params}){
     const episodeId = params.episodeId;
     const searchParams = req.nextUrl.searchParams;
-    const server = searchParams.get('server');
+    const serverName = searchParams.get('server').toLowerCase();
 
     // console.log(server, episodeId);
-    const cachedData = gogoCache.get(`gogo-${episodeId}`);
+    const cachedData = gogoCache.get(`gogo-${episodeId}-${serverName}`);
     if(cachedData){
         console.log("Cache hit for Gogo streaming api");
         return NextResponse.json(cachedData);
     }
 
     try {
-        // console.log("shivang")
+        console.log(`${process.env.SCRAPER_URL}/anime/gogoanime/watch/${episodeId}`);
         const res = await axios.get(`${process.env.SCRAPER_URL}/anime/gogoanime/watch/${episodeId}`);
         // console.log(res?.data);
+        if(res?.data){
         gogoCache.set(`gogo-${episodeId}`, res?.data);
+        }
         return NextResponse.json(res.data);
 
     } catch (error) {

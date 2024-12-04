@@ -33,7 +33,7 @@ const WatchListsTabs = ({
     });
 
     if (resp.status === Constant_Var_success) {
-      console.log(resp.status);
+      
       loadLoggedInUserWatchLists();
     } else {
       console.error("error", resp.response);
@@ -49,7 +49,7 @@ const WatchListsTabs = ({
     });
 
     if (resp.status === Constant_Var_success) {
-      console.log(resp.status);
+      
       loadLoggedInUserWatchLists();
     } else {
       console.error("error", resp.response);

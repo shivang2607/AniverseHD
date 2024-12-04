@@ -10,7 +10,7 @@ const devData = [
   {
     name: "Shivang Khandelwal",
     desc: "Hey there! I'm Shivang Khandelwal, a Fullstack Developer and a big fan of Machine Learning. I built the Recommendation Model to help suggest anime, and made sure the anime and streaming data runs smoothly with some cool caching and optimization tricks. I handled the backend for streaming and all anime related data and built and design UI & logic for Home Page, recommendation page, anime details page, streaming page, all anime list pages and the one you're checking out right now. I really hope you're enjoying the site, and if you do, feel free to share it with your friends and add our website to your favourites ;) Thanks for visiting!",
-    imgUrl: "/ShivangProfile new.jpg",
+    imgUrl: "/shivangProfileNew.jpg",
     discord: "https://discordapp.com/users/shivang4301",
     linkedIn: "https://www.linkedin.com/in/shivang-khandelwal-0a58951bb",
   },
@@ -67,18 +67,18 @@ export default function Page({ params }) {
       {params?.id?.toLowerCase() === `uid-${generateUniqueNumber()}` ? (
         <div className='w-full min-h-screen my-8 flex flex-col gap-16 pt-24'>
           <h1 className='text-3xl font-bold tracking-wide mx-auto flex'>About Developers</h1>
-          <div className='mx-auto  w-full flex md:flex-row flex-col gap-12 p-4'>
+          <div className='mx-auto  w-full md:w-[90%]  flex md:flex-row flex-col gap-12 p-4'>
             {devData.map(dev => (
               <div
                 key={dev.name}
                 className='md:w-1/2 w-5/6 mx-auto min-h-96 flex flex-col md:flex-row rounded-xl overflow-hidden bg-cbg-300/40'
               >
-                <div className="profile relative md:w-1/2 h-80 md:h-full">
+                <div className="profile relative md:w-full md:h-2/3 h-80 my-auto md:mx-8 rounded-xl overflow-hidden ">
                   <Image src={dev.imgUrl} alt={dev.name} fill className='object-cover object-center' />
                 </div>
-                <div className="content flex md:w-1/2 p-5 flex-col gap-3">
+                <div className="content flex md:w-full p-5 flex-col gap-3">
                   <h2 className='text-xl font-semibold mx-auto text-primary-100 text-pretty self-center flex'>{dev.name}</h2>
-                  <div className="desc flex text-justify text-sm">{dev.desc}</div>
+                  <div className="desc flex  text-sm md:text-xs">{dev.desc}</div>
 
                   <div className="profileLinks w-full mt-8 justify-center items-center flex gap-12">
                     <Link href={dev.discord}>
@@ -96,7 +96,7 @@ export default function Page({ params }) {
         </div>
       ) : (
         <div className='pt-24 min-h-screen mx-auto flex'>
-          {console.log(params?.id)}
+          
           {/* If paramId is devId, show the link */}
           {params?.id?.toLowerCase() === devId &&  (
             <Link href={`/about-dev/uid-${generateUniqueNumber()}`} className='text-2xl flex mx-auto'>

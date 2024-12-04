@@ -37,7 +37,6 @@ const WatchListPagination = ({ selectedWatchList }) => {
       });
       if (resp.status === Constant_Var_success) {
         setList(resp.response);
-        // console.log(resp.response, "hello");
       } else {
         setError(true);
         console.error(resp.response);

@@ -26,7 +26,7 @@ export default function ListDropDown({
            watchListId: id,
            animeId: `${anime?.mal_id}`,
          });
-         console.log(result);
+        //  console.log(result);
          if (result?.status === Constant_Var_success) {
           toast.success("Watchlist Updated Successfully!!", {
             id: "1",
@@ -64,7 +64,7 @@ export default function ListDropDown({
     } else {
       toast.error(result?.response?.message, { duration: 3000, id: "2 " });
     }
-    console.log(result?.response);
+    // console.log(result?.response);
   }
 
   loadLoggedInUserWatchLists(); //this will sync the zustand store with the latest data 
@@ -79,7 +79,7 @@ export default function ListDropDown({
           lst?.watchListName !== "Recent"
       );
 
-      console.log(anime);
+      // console.log(anime);
       // Create an array of promises for removing the anime from each watchlist
       const removalPromises = listsToRemoveFrom.map((list) => {
         return RemoveAnimeFromWatchList({
@@ -91,7 +91,7 @@ export default function ListDropDown({
       // Execute all promises concurrently
       const results = await Promise.all(removalPromises);
 
-      console.log(results);
+      // console.log(results);
       // Check if all removals were successful
       const allSuccessful = results.every((result) => {
         return result.status === Constant_Var_success;
@@ -102,7 +102,7 @@ export default function ListDropDown({
           id: "1",
           duration: 3000,
         });
-        console.log("Anime successfully removed from watchlists.");
+        // console.log("Anime successfully removed from watchlists.");
         setIsOpen(false);
       } else {
         //! also show the reason for error,
@@ -130,7 +130,7 @@ export default function ListDropDown({
     }
   };
 
-  console.log(watchListData);
+
 
   return (
     <>

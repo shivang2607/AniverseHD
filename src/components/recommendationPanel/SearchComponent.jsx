@@ -81,7 +81,7 @@ const SearchComponent = ({viewAll=true}) => {
           className=" tracking-wide  text-gray-700 outline-primary-200 px-3 py-2.5 rounded-lg h-full w-full"
         />
         {debouncedSearchTerm !== "" && (
-          <div className="absolute !scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thin scrollbar-track-rounded-full top-full mt-2 left-0 w-full p-2 bg-cbg-300 max-h-[30vh] md:max-h-[50vh] overflow-y-scroll  rounded-md flex flex-col z-20 text-gray-800  ">
+          <div className="absolute !scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thin scrollbar-track-rounded-full top-full mt-2 left-0 w-full p-2 bg-cbg-300 max-h-[25vh] md:max-h-[50vh] overflow-y-scroll  rounded-md flex flex-col z-20 text-gray-800  ">
             {loading ? (
               <MagnifyingGlass
                 visible={true}

@@ -45,7 +45,7 @@ const useDebouncedEffect = (callback, dependencies, delay, setStreamingData) => 
 
 
 export default function ProviderContainer({
-  content, id
+  content, id, setAnimeNotAvailable
   // episodes,
   // serverData,
   // // prov = "gogo",
@@ -94,7 +94,6 @@ export default function ProviderContainer({
 
   useEffect(()=>{
     return () => {
-      console.log("useEffect cleanup triggered");
       setEpisodesData([]);
       setStreamingData([]);
     };
@@ -117,16 +116,15 @@ export default function ProviderContainer({
       gogoSubId: gogoSubEpisodeId,
       gogoDubId: gogoDubEpisodeId,
     });
-  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], episodesPerWindow, setStreamingData); // 50ms delay
+  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], 100, setStreamingData); // 50ms delay
   
   
   const fetchStreamingData = async(ep)=>{
 
     setStreamLoading(true);
     try {
-      if(provider==="zoro"){
-        console.log(ep?.episodeId)
-        console.log(provider, dub, server);
+      if(provider==="zoro" && ep?.episodeId){
+        setAnimeNotAvailable(false);
         const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
           params: {
             category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
@@ -135,18 +133,30 @@ export default function ProviderContainer({
         });
         
         if(data?.data?.status){
-          console.log(data?.data)
-          console.log("Bad Gateway, try reloading the page!");
           return;
         }
         setStreamingData(data?.data);
-        console.log("zoro ka streaming api vaala data",data?.data);
       }
-      else{
-        const data = await axios.get(`/api/v1/${provider}/stream/${dub?ep?.gogoDubId:ep?.gogoSubId}?server=${server}`);
-        setStreamingData(data?.data);
-        console.log("gogo ki streaming api vaala data", data?.data);
+      else if(provider==="gogo" && (ep?.gogoDubId || ep?.gogoSubId)){
+        setAnimeNotAvailable(false);
+        try {
+          const data = await axios.get(`/api/v1/${provider}/stream/${dub ? ep?.gogoDubId : ep?.gogoSubId}`, {
+            params: {
+              server: server || ''
+            }
+          });
+          if(data?.data?.status){
+            toast.error("Anime not available, Try Another Server or Provider")
+            return;
+          }
+          setStreamingData(data?.data);
+          console.log("gogo ki streaming api vaala data", data);
+          
+        } catch (error) {
+          // toast.error(error.message);
+        }
       }
+      
     } catch (error) {
       console.log("couldn't fetch streaming data, ",error);
     }
@@ -160,7 +170,7 @@ export default function ProviderContainer({
     const newParams = new URLSearchParams(searchParams); 
     if(resetT) newParams.delete("t");
     paramsList.forEach(par => {
-      newParams.set(par.key, par.val);
+      newParams.set(par.key, par.val ? par.val : '');
     });
 
     return pathname + '?' + newParams.toString();
@@ -179,7 +189,7 @@ export default function ProviderContainer({
       <div className="provider-server-select self-center flex flex-col gap-8">
         <div className="button self-center flex gap-2 text-gray-200 ">
           <Link
-            href = {updateParams([{key:"provider", val: "zoro"},{ key:"server", val:''}])}
+            href = {updateParams([{key:"provider", val: "zoro"},{ key:"server", val:''}], false)}
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md ${
               provider === "zoro" ? "bg-primary-100" : ""
@@ -193,7 +203,7 @@ export default function ProviderContainer({
             Provider-Z
           </Link>
           <Link
-            href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:"hd-1"}])}
+            href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:''}], false)}
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md  ${
               provider === "gogo" ? "bg-primary-100" : ""
@@ -207,30 +217,18 @@ export default function ProviderContainer({
           </Link>
         </div>
 
-        <div className="availableServers self-center flex flex-col">
-        {(serverData?.sub || provider==="gogo") &&<div className="sub flex font-semibold text-sm items-center p-2 gap-4">
+        <div className="availableServers mx self-center flex flex-col">
+        {(serverData?.sub) &&<div className="sub flex font-semibold text-sm items-center p-2 gap-4">
                <h2 className="flex gap-2 items-center"><FaClosedCaptioning className="text-lg text-primary-300"/> {(serverData?.sub?.length > 0) ? "SUB:" : "RAW:"}</h2>
-              <div className="flex gap-3">
-                {provider==="gogo" && 
-                <Link
-                href={updateParams([{key: "dub", val:''}, {key:"server", val: "default-sub"}])} 
-                scroll={false} 
-                aria-disabled = {serverLoading}
-                className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub ? "bg-primary-100 text-gray-100":""}`}
-                // onClick={()=>fetchStreamingData({
-                //   episodeId : zoroEpisodeId,
-                //   gogoSubId: gogoSubEpisodeId,
-                //   gogoDubId: gogoDubEpisodeId
-                // })}
-                >Default</Link>
-                }
+              <div className="flex gap-3 flex-wrap">
+               
                 {
-                  provider==="zoro" && (serverData?.sub?.length > 0) ? serverData?.sub?.map(ser=>{
+                  (serverData?.sub?.length > 0) ? serverData?.sub?.map(ser=>{
                     // console.log("ser first", ser);
                     return (
                       <Link 
                       key={ser?.serverName || ser?.name}
-                      href={updateParams([{key: "dub", val:''}, {key:"server", val: ser?.serverName || ser?.name}])} 
+                      href={updateParams([{key: "dub", val:''}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
                       scroll={false} 
                       className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
@@ -247,7 +245,7 @@ export default function ProviderContainer({
                     return (
                       <Link 
                       key={ser?.serverName || ser?.name}
-                      href={updateParams([{key: "dub", val:'-1'}, {key:"server", val: ser?.serverName || ser?.name}])} 
+                      href={updateParams([{key: "dub", val:'-1'}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
                       scroll={false} 
                       className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub==="-1" && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
@@ -264,31 +262,20 @@ export default function ProviderContainer({
             </div>
         }
 
-            {(serverData?.dub || provider==="gogo") && <div className="sub flex font-semibold text-sm items-center p-2 gap-4">
+            {(serverData?.dub ) && <div className="sub flex font-semibold text-sm items-center p-2 gap-4">
               <h2 className="flex gap-2 items-center"><FaMicrophoneAlt className="text-lg text-primary-300"/> DUB:</h2>
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap ">
 
-              {provider==="gogo" && 
-                <Link
-                href={updateParams([{key: "dub", val:'1'}, {key:"server", val: "default-dub"}])} 
-                scroll={false} 
-                className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub  ? "bg-primary-100 text-gray-100":""}`}
-                // onClick={()=>fetchStreamingData({
-                //   episodeId : zoroEpisodeId,
-                //   gogoSubId: gogoSubEpisodeId,
-                //   gogoDubId: gogoDubEpisodeId
-                // })}
-                >Default</Link>
-                }
+             
 
 
               {
-                  provider==="zoro" && serverData?.dub?.map(ser=>{
+                   serverData?.dub?.map(ser=>{
                     return (
                       <Link key={ser?.serverName || ser?.name} 
                       scroll={false} 
-                      href={updateParams([{key: "dub", val:'1'}, {key:"server", val: ser?.serverName || ser?.name}])} 
-                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
+                      href={updateParams([{key: "dub", val:'1'}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
+                      className={`rounded whitespace-nowrap text-ellipsis px-2 py-1 items-center bg-cbg-400 ${dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
                       // onClick={()=>fetchStreamingData({
                       //   episodeId : zoroEpisodeId,
                       //   gogoSubId: gogoSubEpisodeId,
@@ -341,9 +328,9 @@ export default function ProviderContainer({
                 ])}
                 key={ep?.episodeId}
                 className={`w-full   text-xs p-4 cursor-pointer my-1 rounded-md  tracking-wider  flex gap-2 ${
-                  zoroEpisodeId === ep?.episodeId ||
-                  gogoSubEpisodeId === ep?.gogoSubId ||
-                  gogoDubEpisodeId === ep?.gogoDubId
+                  (zoroEpisodeId === ep?.episodeId  && zoroEpisodeId) ||
+                  (gogoSubEpisodeId === ep?.gogoSubId && gogoSubEpisodeId) ||
+                  (gogoDubEpisodeId === ep?.gogoDubId && gogoDubEpisodeId)
                     ? ep?.isFiller ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
                     : "font-[350] bg-black/30"
                 }

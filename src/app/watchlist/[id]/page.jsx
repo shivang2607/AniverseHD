@@ -28,7 +28,7 @@ export default function Page({params}) {
         
                 if (watchListInfoResponse.status === Constant_Var_success) {
                     setWatchlistInfo(watchListInfoResponse.response);
-                    console.log('Watchlist info:', watchListInfoResponse.response);
+                    // console.log('Watchlist info:', watchListInfoResponse.response);
                 } else {
                     console.error('Error fetching watchlist info:', watchListInfoResponse.response);
                 }
@@ -36,7 +36,7 @@ export default function Page({params}) {
                 if (watchListDataResponse.status === Constant_Var_success) {
                     setError();
                     setWatchlistData(watchListDataResponse.response);
-                    console.log("Complete Watchlist Data:", watchListDataResponse.response);
+                    // console.log("Complete Watchlist Data:", watchListDataResponse.response);
                 } else {
                     console.error("Error fetching complete watchlist:", watchListDataResponse.response);
                     setError(watchListDataResponse.response);

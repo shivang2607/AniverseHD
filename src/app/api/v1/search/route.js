@@ -19,7 +19,7 @@ export async function GET(req){
     }
 
     if(cache.get(query)){
-      console.log("cache hit");
+      console.log("search cache cache hit");
        return NextResponse.json(cache.get(query));
     }
 

@@ -19,7 +19,7 @@ export default function Page() {
       
       const apiUrl = "https://api.jikan.moe/v4/";
       const res = await axios.get(`${apiUrl}schedules?filter=friday&sfw=true`);
-      console.log(res);
+    
       }
 
     // f()
