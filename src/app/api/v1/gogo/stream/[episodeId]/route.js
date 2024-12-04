@@ -24,10 +24,12 @@ export async function GET(req, {params}){
     }
 
     try {
-        // console.log("shivang")
+        console.log(`${process.env.SCRAPER_URL}/anime/gogoanime/watch/${episodeId}`);
         const res = await axios.get(`${process.env.SCRAPER_URL}/anime/gogoanime/watch/${episodeId}`);
         // console.log(res?.data);
+        if(res?.data){
         gogoCache.set(`gogo-${episodeId}`, res?.data);
+        }
         return NextResponse.json(res.data);
 
     } catch (error) {

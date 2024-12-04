@@ -32,6 +32,7 @@ export async function GET(req, { params }) {
   }
 
   try {
+    console.log(`${process.env.ANIWATCH_SCRAPER_URL}/api/v2/hianime/episode/sources?animeEpisodeId=${episodeId}&server=${server}&category=${category}`);
     const res = await axios.get(
       `${process.env.ANIWATCH_SCRAPER_URL}/api/v2/hianime/episode/sources?animeEpisodeId=${episodeId}&server=${server}&category=${category}`,
       // {
@@ -40,14 +41,16 @@ export async function GET(req, { params }) {
       //   },
       // }
     );
+    if(res?.data?.data){
     zoroCache.set(`zoro-${episodeId}-${server}-${category}`, res?.data?.data);
-    return NextResponse.json(res.data?.data);
+    }
+    return NextResponse.json(res?.data?.data);
 
   } catch (error) {
     console.log(error);
     return NextResponse.json({
-      ...error.response.data,
-      status: error.response.status,
+      ...error?.response?.data,
+      status: error?.response?.status,
     });
   }
 }
