@@ -48,7 +48,7 @@ export async function GET(req, { params }) {
     console.log(error);
     return NextResponse.json({
       ...error?.response?.data,
-      status: error.response.status,
+      status: error?.response?.status,
     });
   }
 }

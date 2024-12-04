@@ -47,7 +47,8 @@ import { getAbsoluteURLPath } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
-import { FaStepBackward, FaStepForward } from "react-icons/fa";
+import { FaDownload, FaStepBackward, FaStepForward } from "react-icons/fa";
+import Link from "next/link";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -714,7 +715,7 @@ export default function Page({ params }) {
                   buffer
                   title={streamingData?.malId}
                   src={streamingSrc}
-                  
+                  download = {true}
                   className="h-full"
                   playsInline = {true}
                   crossOrigin
@@ -811,6 +812,9 @@ export default function Page({ params }) {
                           Skip {showSkipButton}
                         </button>
                       ),
+                      downloadButton: downloadLink && (
+                        <Link href={downloadLink} target="_blank" rel="noopener noreferrer" className="text-xl items-center flex mx-3" ><FaDownload/></Link>
+                      )
                     }}
                     icons={defaultLayoutIcons}
                   />
