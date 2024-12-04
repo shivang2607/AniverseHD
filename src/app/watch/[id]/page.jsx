@@ -714,12 +714,7 @@ export default function Page({ params }) {
                   storage="media-player"
                   buffer
                   title={streamingData?.malId}
-                  src={
-                    provider === "gogo"
-                      ? `${process.env.NEXT_PUBLIC_GOOD_PROXY}${streamingData?.sources?.[0]?.url}` 
-                      // !probably I have to add my own proxy here => update: I added my own proxy
-                      : streamingData?.sources?.[0]?.url
-                  }
+                  src={streamingSrc}
                   
                   className="h-full"
                   playsInline = {true}
