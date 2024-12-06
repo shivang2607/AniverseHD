@@ -916,6 +916,7 @@ export default function Page({ params }) {
                   <ShareModal
                     t={recentTimestamp}
                     buttonText="Share this Scene"
+                    modalTitle="Share this anime scene"
                     title={`Checkout this Amazing Scene from ${
                       content?.title_english || content?.title
                     }`}
