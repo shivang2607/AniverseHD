@@ -29,7 +29,7 @@ export default function ListDropDown({
         //  console.log(result);
          if (result?.status === Constant_Var_success) {
           toast.success("Watchlist Updated Successfully!!", {
-            id: "1",
+            id: "5",
             duration: 3000,
           });
           setIsOpen(false);
