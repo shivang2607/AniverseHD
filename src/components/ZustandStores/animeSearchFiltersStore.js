@@ -1,7 +1,18 @@
 // import redisClient from "@/lib/redis";
+import { LRUCache } from "lru-cache";
 import toast from "react-hot-toast";
 import { create } from "zustand";
-
+// import { Redis } from "@upstash/redis";
+// import { REDIS_UPSTASH_URL } from "@/utils/constants";
+const options = {
+  max: 500,
+  ttl: 1000 * 60 * 60 * 24,
+};
+// const redis = new Redis({
+//   url: REDIS_UPSTASH_URL,
+//   token: process.env.NEXT_PUBLIC_REDIS_UPSTASH_TOKEN,
+// });
+const cache = new LRUCache(options);
 const useAnimeSearchFilterStore = create((set, get) => ({
   searchResults: null,
   page: 1,
@@ -29,10 +40,7 @@ const useAnimeSearchFilterStore = create((set, get) => ({
   setSearchResults: (results) => set({ searchResults: results }),
   setPage: (page) => set({ page }),
   setLimit: (limit) => set({ limit }),
-  setQuery: (q) => {
-    console.log("changing", q);
-    set({ q });
-  },
+  setQuery: (q) => set({ q }),
   setType: (type) => set({ type }),
   setScore: (score) => set({ score }),
   setMinScore: (min_score) => set({ min_score }),
@@ -50,79 +58,25 @@ const useAnimeSearchFilterStore = create((set, get) => ({
   setEndDate: (end_date) => set({ end_date }),
   setThemes: (themes) => set({ themes }),
   setDemographics: (demographics) => set({ demographics }),
-  setAllFilters: (filters) =>
+  setAllFilters: (filters) => {
     set((state) => {
       return {
-        q:
-          filters.q !== undefined && filters.q !== state.q
-            ? filters.q
-            : state.q,
-        type:
-          filters.type !== undefined && filters.type !== state.type
-            ? filters.type
-            : state.type,
-        min_score:
-          filters.min_score !== undefined &&
-          filters.min_score !== state.min_score
-            ? filters.min_score
-            : state.min_score,
-        max_score:
-          filters.max_score !== undefined &&
-          filters.max_score !== state.max_score
-            ? filters.max_score
-            : state.max_score,
-        status:
-          filters.status !== undefined && filters.status !== state.status
-            ? filters.status
-            : state.status,
-        rating:
-          filters.rating !== undefined && filters.rating !== state.rating
-            ? filters.rating
-            : state.rating,
-        genres:
-          filters.genres !== undefined && filters.genres !== state.genres
-            ? filters.genres
-            : state.genres,
-        genres_exclude:
-          filters.genres_exclude !== undefined &&
-          filters.genres_exclude !== state.genres_exclude
-            ? filters.genres_exclude
-            : state.genres_exclude,
-        order_by:
-          filters.order_by !== undefined && filters.order_by !== state.order_by
-            ? filters.order_by
-            : state.order_by,
-        sort:
-          filters.sort !== undefined && filters.sort !== state.sort
-            ? filters.sort
-            : state.sort,
-        letter:
-          filters.letter !== undefined && filters.letter !== state.letter
-            ? filters.letter
-            : state.letter,
-        producers:
-          filters.producers !== undefined &&
-          filters.producers !== state.producers
-            ? filters.producers
-            : state.producers,
-        start_date:
-          filters.start_date !== undefined &&
-          filters.start_date !== state.start_date
-            ? filters.start_date
-            : state.start_date,
-        end_date:
-          filters.end_date !== undefined && filters.end_date !== state.end_date
-            ? filters.end_date
-            : state.end_date,
-        themes:
-          filters.themes !== undefined && filters.themes !== state.themes
-            ? filters.themes
-            : state.themes,
-        demographics:
-          filters.demographics !== undefined &&
-          filters.demographics !== state.demographics
-            ? filters.demographics
-            : state.demographics,
+        q: filters.q,
+        type: filters.type,
+        min_score: filters.min_score,
+        max_score: filters.max_score,
+        status: filters.status,
+        rating: filters.rating,
+        genres: filters.genres,
+        genres_exclude: filters.genres_exclude,
+        order_by: filters.order_by,
+        sort: filters.sort,
+        letter: filters.letter,
+        producers: filters.producers,
+        start_date: filters.start_date,
+        end_date: filters.end_date,
+        themes: filters.themes,
+        demographics: filters.demographics,
         page:
           typeof filters.page === "number" &&
           filters.page > 0 &&
@@ -136,7 +90,8 @@ const useAnimeSearchFilterStore = create((set, get) => ({
             ? filters.limit
             : state.limit,
       };
-    }),
+    });
+  },
 
   toggleGenre: (genreId) => {
     const { genres } = get();
@@ -145,12 +100,14 @@ const useAnimeSearchFilterStore = create((set, get) => ({
       return;
     }
 
-    if (genres.some((e) => e == genreId)) {
-      set({ genres: genres.filter((e) => e !== genreId) });
+    if (genres.includes(genreId)) {
+      const updatedGenres = genres.filter((e) => e !== genreId);
+      set({ genres: updatedGenres });
     } else {
-      set({ genres: genres.concat([genreId]) });
+      set({ genres: [...genres, genreId] });
     }
   },
+
   toggleTheme: (themeId) => {
     const { themes } = get();
     if (themes == null) {
@@ -159,7 +116,9 @@ const useAnimeSearchFilterStore = create((set, get) => ({
     }
 
     if (themes.some((e) => e == themeId)) {
-      set({ themes: themes.filter((e) => e !== themeId) });
+      const updatedThemes = themes.filter((e) => e !== themeId);
+
+      set({ themes: updatedThemes.length ? updatedThemes : [] });
     } else {
       set({ themes: themes.concat([themeId]) });
     }
@@ -174,6 +133,14 @@ const useAnimeSearchFilterStore = create((set, get) => ({
 
     if (demographics.some((e) => e == demographicId)) {
       set({ demographics: demographics.filter((e) => e !== demographicId) });
+
+      const updatedDemographics = demographics.filter(
+        (e) => e !== demographicId
+      );
+
+      set({
+        demographics: updatedDemographics.length ? updatedDemographics : [],
+      });
     } else {
       set({ demographics: demographics.concat([demographicId]) });
     }
@@ -238,8 +205,9 @@ const useAnimeSearchFilterStore = create((set, get) => ({
     if (letter !== null) params.append("letter", letter);
     if (producers !== null && producers.length > 0)
       params.append("producers", producers);
-    if (start_date !== null) params.append("start_date", start_date);
-    if (end_date !== null) params.append("end_date", end_date);
+
+    if (start_date !== null) params.append("start_date", `${start_date}-01-01`);
+    if (end_date !== null) params.append("end_date", `${end_date}-12-31`);
 
     params.append("page", page);
     params.append("limit", limit);
@@ -247,35 +215,24 @@ const useAnimeSearchFilterStore = create((set, get) => ({
     try {
       set({ searchResults: null });
       const jikanSearchFiltersUrl = `https://api.jikan.moe/v4/anime?${params.toString()}`;
-      // const cachedResult = redisClient.get(jikanSearchFiltersUrl);
+      let data = null;
+      const cacheData = cache.get(jikanSearchFiltersUrl);
 
-      // if (cachedResult) {
-      //   // data found in redis cache
-      //   const parsedCacheResult = JSON.parse(cachedResult);
-      //   console.log("redis-cache-hit, data:", parsedCacheResult);
-      //   // Update the store with the search results
-      //   set({ searchResults: parsedCacheResult });
-      // } else {
-      //   console.log("redis-cache-miss");
-        // Make the API call
+      // const cacheData = await redis.get(jikanSearchFiltersUrl);
+      if (cacheData) {
+        data = cacheData;
+      } else {
         const response = await fetch(jikanSearchFiltersUrl);
         if (!response.ok) {
           throw new Error("Failed to fetch data from the API");
         }
 
-        // Parse the response
-        const data = await response.json();
-        // Update the store with the search results
-        set({ searchResults: data });
+        data = await response.json();
+        // await redis.set(jikanSearchFiltersUrl, data);
+        cache.set(jikanSearchFiltersUrl,data)
+      }
 
-      //   redisClient.set(
-      //     jikanSearchFiltersUrl,
-      //     response,
-      //     "EX",
-      //     60 * 60 * 24 * 7
-      //   );
-      // }
-      // console.log(data,data?.data,"success");
+      set({ searchResults: data });
     } catch (error) {
       toast.error(error.message, {
         id: "1",

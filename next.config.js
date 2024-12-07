@@ -5,7 +5,9 @@ const nextConfig = {
   
   experimental: {
     serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
+    missingSuspenseWithCSRBailout: false,
   },
+  
 
   images: {
     remotePatterns: [

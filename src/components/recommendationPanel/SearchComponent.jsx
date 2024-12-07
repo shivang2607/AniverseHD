@@ -39,7 +39,7 @@ const SearchComponent = ({viewAll=true}) => {
       try {
         if(debouncedSearchTerm==="")return;
         const response = await axios.get(
-          `/api/v1/search?q=${debouncedSearchTerm}`,
+          `/api/v1/search?q=${debouncedSearchTerm}&limit=10`,
           { signal } // Link the signal
         );
 

@@ -15,6 +15,7 @@
     "@next/font": "13.1.5",
     "@nextui-org/react": "^1.0.0-beta.12",
     "@react-aria/ssr": "^3.4.1",
+    "@upstash/redis": "^1.34.3",
     "@vercel/analytics": "^0.1.11",
     "@vidstack/react": "^1.12.11",
     "@xenova/transformers": "^2.17.1",

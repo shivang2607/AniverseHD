@@ -18,11 +18,11 @@ const ShowCards = () => {
   };
 
   return (
-    <div className="py-10 md:w-[75%] w-[100%] md:pl-5 pl-0">
-      {searchResults ? (
+    <div className="md:pt-10 pt-3 pb-10 w-full">
+      {searchResults && searchResults.data ? (
         searchResults.data.length > 0 ? (
           <div className="flex flex-col">
-            <div className="md:px-10 px-0 grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
+            <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
             {searchResults.data?.map((ele, ind) => {
             const imageHeight = window.innerWidth < 568 ? 44 : 56; // 36px for mobile, 56px for larger screens
             return (
@@ -41,7 +41,7 @@ const ShowCards = () => {
             />
           </div>
         ) : (
-          <div> No Data availabe</div>
+          <div className="h-screen"> No Data!!</div>
         )
       ) : (
         <div className="md:px-10 px-0 grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
