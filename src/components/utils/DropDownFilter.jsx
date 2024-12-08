@@ -48,7 +48,7 @@ export default function AnimeFilterDropdown({
 
       {/* Dropdown Options */}
       {isOpen && (
-        <ul className="w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto scrollbar-none absolute">
+        <ul className="w-full mt-2 z-10 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto scrollbar-none absolute">
           {options.map((option, index) => (
             <li
               key={index}

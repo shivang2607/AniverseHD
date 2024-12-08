@@ -83,7 +83,7 @@ const Page = () => {
     
         <div className={`md:hidden absolute bg-opacity-50 flex justify-center items-center z-40 ${isFiltersVisible? "translate-x-0  bg-opacity-50 backdrop-blur-lg bg-slate-500/25":"-translate-x-full"} w-full  transition-all ease-in duration-300 h-full `}>
           <div className="h-fit min-w-80 sticky bottom-0">
-            <Filters />
+            <Filters open={setIsFiltersVisible} />
             </div>
         </div>
     

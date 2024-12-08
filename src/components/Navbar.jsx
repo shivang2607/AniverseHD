@@ -90,9 +90,9 @@ const Navbar = () => {
   return (
     <>
     <nav
-      className={`fixed inset-x-0 mx-auto py-1 border-[1px] border-primary-100 lg:w-[80%] md:w-[90%] w-[95%] max-w-7xl self-center items-center block justify-center ${isOpen ? "rounded-xl" : "rounded-full"} my-2 z-50 transition-transform duration-300 backdrop-blur-sm ${
-        showNavbar ? "translate-y-0" : "-translate-y-[120%]"
-      } ${isBackgroundVisible ? "bg-cbg-100/70" : "bg-cbg-100/30"}`}
+        className={`fixed py-1 border-[1.5px] border-primary-100 w-[97%] self-center items-center md:mx-6 mx-1 block justify-center ${isOpen ? "rounded-xl" : "rounded-full"}   my-2  z-50 transition-transform duration-300 backdrop-blur-sm ${
+          showNavbar ? "translate-y-0" : "-translate-y-[120%]"
+        } ${isBackgroundVisible ? "bg-cbg-100/70" : "bg-cbg-100/30"}`}
     >
       <div className="w-full mx-auto px-4 sm:px-6 ">
         <div className="flex items-center justify-between h-fit py-1">

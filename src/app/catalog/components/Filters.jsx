@@ -11,8 +11,9 @@ import StatusFilter from "./StatusFilter";
 import TypeFilter from "./TypeFilter";
 import { Query } from "firebase/firestore";
 import QuerySearch from "./QuerySearch";
+import { IoIosSearch } from "react-icons/io";
 
-const Filters = () => {
+const Filters = ({open}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const {
@@ -40,6 +41,7 @@ const Filters = () => {
   const [currOpened, setCurrOpened] = useState(null);
 
   function handleSearch() {
+    
     const queryParams = new URLSearchParams();
 
     if (page) queryParams.set("page", page.toString());
@@ -66,12 +68,13 @@ const Filters = () => {
       queryParams.set("demographics", demographics.join(","));
 
     router.push(`?${queryParams.toString()}`);
+    open && open(false)
   }
 
   return (
-    <div className="flex flex-col my-10 h-fit w-full gap-y-3 bg-opacity-50 backdrop-blur-lg bg-slate-500/25 rounded-md p-4 z-10">
+    <div className="flex flex-col my-10 h-fit w-full gap-y-3 bg-opacity-50 backdrop-blur-lg bg-slate-500/25 rounded-md p-4 z-10 text-sm">
       <h1 className="text-2xl text-primary-100 font-bold font-sans">Filters</h1>
-      <QuerySearch />
+      <QuerySearch handleSearch={handleSearch}/>
       <GenreFilter currOpened={currOpened} setCurrOpened={setCurrOpened} />
       <DemographicsFilter
         currOpened={currOpened}

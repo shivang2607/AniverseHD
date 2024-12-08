@@ -14,7 +14,9 @@ const cache = new LRUCache(options)
 export async function GET(req){
     const searchParams = req.nextUrl.searchParams;
     const query = searchParams.get('q');
-    const limit=searchParams.get('limit') || 20
+    const limit=searchParams.get('limit') || "20";
+
+    // console.log("limit",limit)
     if(typeof query !== "string"){
         return NextResponse.json({error:"Expected String type for search parameter!"}, {status:400});
     }
@@ -40,7 +42,7 @@ export async function GET(req){
                     ]
                   },
                   "with_payload": ["start_year", "score", "type", "rating",  "images.webp", "main_picture", "title_english"],
-                  "limit": limit
+                  "limit": Number(limit)
             },
             {
                 headers: {
