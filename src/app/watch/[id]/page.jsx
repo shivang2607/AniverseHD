@@ -435,7 +435,7 @@ export default function Page({ params }) {
 
       else  {
         if(content?.title){
-        toast.error("Anime not available", {id: '2'});
+        toast.error("Anime not available");
         setAnimeNotAvailable(true);
         }
       }
