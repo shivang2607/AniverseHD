@@ -5,6 +5,8 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { SkeletonTheme } from 'react-loading-skeleton'
 import Footer from '@/components/Footer'
 import WatchlistBar from '@/components/WatchlistBar'
+import GlobalError from 'next/dist/client/components/error-boundary'
+import GlobalLoader from '@/components/GlobalLoader'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -62,6 +64,7 @@ export default function RootLayout({ children }) {
       <SkeletonTheme baseColor="#39475b" highlightColor="#535f70" duration={1}>
           <Navbar/>
           {children}
+          <GlobalLoader/>
           </SkeletonTheme>
           <Footer/>
 

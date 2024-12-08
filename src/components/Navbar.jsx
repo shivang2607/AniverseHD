@@ -10,6 +10,7 @@ import Image from "next/image";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 import useUserStore from "./ZustandStores/userStore";
 import WatchlistBar from "./WatchlistBar";
+import useGlobalLoader from "./ZustandStores/useGlobalLoader";
 
 const Navbar = () => {
   const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists,RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar} = useUserStore();
@@ -23,9 +24,17 @@ const Navbar = () => {
   const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
   // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   // const [loggedInUserData, setLoggedInUserData] = useState(null);
-
+  const { setLoaderText, setIsLoaderVisible,setImageUrl } = useGlobalLoader();
   const handleSignIn = async () => {
-    login();
+    setIsLoaderVisible(true);
+    setImageUrl(" /userProfileImage7.jpg")
+    await login((status)=>{
+      setLoaderText(status)
+    });
+
+    setIsLoaderVisible(false)
+    setLoaderText(null)
+    setImageUrl(null)
   };
 
 

@@ -216,7 +216,7 @@ const useAnimeSearchFilterStore = create((set, get) => ({
       set({ searchResults: null });
       const jikanSearchFiltersUrl = `https://api.jikan.moe/v4/anime?${params.toString()}`;
       let data = null;
-      const cacheData = cache.get(jikanSearchFiltersUrl);
+      const cacheData = null;
 
       // const cacheData = await redis.get(jikanSearchFiltersUrl);
       if (cacheData) {
@@ -229,7 +229,7 @@ const useAnimeSearchFilterStore = create((set, get) => ({
 
         data = await response.json();
         // await redis.set(jikanSearchFiltersUrl, data);
-        cache.set(jikanSearchFiltersUrl,data)
+        // cache.set(jikanSearchFiltersUrl,data)
       }
 
       set({ searchResults: data });

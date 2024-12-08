@@ -7,7 +7,6 @@ import {
   Constant_Var_errorMessage_loggedInUserDoesNostExistsYet,
   Constant_Var_success,
 } from "@/utils/constants";
-import { useRouter } from "next/router";
 import CreateNewProfile from "../Profile/CreateNewProfile";
 import GetLoggedUserData from "../Profile/GetLoggedUserData";
 import GetLoggedUserWatchListsInfo from "../WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
@@ -47,7 +46,7 @@ export default async function SignInGooglePopUp(statusCallback) {
     });
 
     // Notify that sign-in has started
-    if (statusCallback) statusCallback("signingIn");
+    if (statusCallback) statusCallback("Signing In");
 
     const result = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -66,7 +65,7 @@ export default async function SignInGooglePopUp(statusCallback) {
     );
 
     // Notify that profile creation check has started
-    if (statusCallback) statusCallback("checkingProfile");
+    if (statusCallback) statusCallback("Checking Account Exists");
 
     const checkUser = await CreateProfileIfNotExists((profileStatus) => {
       if (statusCallback) statusCallback(profileStatus);
@@ -101,7 +100,7 @@ async function CreateProfileIfNotExists(statusCallback) {
       respUserInfo.response.message === respUserWatchLists.response.message &&
       respUserWatchLists.response.message === Constant_Var_errorMessage_loggedInUserDoesNostExistsYet
     ) {
-      if (statusCallback) statusCallback("creatingProfile");
+      if (statusCallback) statusCallback("Creating Account");
 
       const profileCreationResponse = await CreateNewProfile();
 

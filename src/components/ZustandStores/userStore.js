@@ -16,6 +16,9 @@ import {
 } from "@/utils/constants";
 import toast from "react-hot-toast";
 import { create } from "zustand";
+import useGlobalLoader from "./useGlobalLoader";
+
+
 
 const useUserStore = create((set, get) => ({
   isUserLoggedIn: false,
@@ -268,8 +271,9 @@ const useUserStore = create((set, get) => ({
     }
   },
 
-  login: async () => {
-    const res = await SignInGooglePopUp((res)=> console.log("status: ",res));
+  login: async (callback) => {
+   
+    const res = await SignInGooglePopUp((res)=> {callback(res)});
 
     if (res.status === Constant_Var_success) {
       await get().loadLoggedInUserDataAndWatchLists(); // Use get() to call the function
