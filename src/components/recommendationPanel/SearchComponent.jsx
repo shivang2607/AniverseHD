@@ -72,7 +72,7 @@ const SearchComponent = ({viewAll=true}) => {
 
   return (
     <>
-      <div className="h-full w-full relative flex gap-1 flex-col">
+      <div className="h-full w-full relative flex gap-1 z-40 flex-col">
         <input
           type="text"
           placeholder="Search..."
@@ -81,7 +81,7 @@ const SearchComponent = ({viewAll=true}) => {
           className=" tracking-wide  text-gray-700 outline-primary-200 px-3 py-2.5 rounded-lg h-full w-full"
         />
         {debouncedSearchTerm !== "" && (
-          <div className="absolute !scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thin scrollbar-track-rounded-full top-full mt-2 left-0 w-full p-2 bg-cbg-300 max-h-[25vh] md:max-h-[50vh] overflow-y-scroll  rounded-md flex flex-col z-20 text-gray-800  ">
+          <div className="absolute !scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thin scrollbar-track-rounded-full top-full mt-2 left-0 w-full p-2 bg-cbg-300 max-h-[20vh] md:max-h-[50vh] overflow-y-scroll  rounded-md flex flex-col z-20 text-gray-800  ">
             {loading ? (
               <MagnifyingGlass
                 visible={true}
@@ -141,7 +141,7 @@ const SearchComponent = ({viewAll=true}) => {
                 )
               }) }
               {
-               viewAll && <Link href={`./catalog?q=${query}`} className="w-full py-2 items-center gap-2 flex rounded-md mt-4 bg-primary-500 text-cbg-200 justify-center ">View All <FaChevronRight size={13}/></Link>
+               viewAll && <Link href={`./catalog?q=${query}`} className="w-full py-2 items-center gap-2 flex rounded-md mt-4 bg-primary-500 text-cbg-200 justify-center " onClick={()=>setQuery("")}>View All <FaChevronRight size={13}/></Link>
                 
                 }</>:
               <div className="text-gray-200 flex mx-auto">No Results found !!</div>
