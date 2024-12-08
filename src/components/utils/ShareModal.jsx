@@ -86,7 +86,7 @@ const ShareModal = ({
 
             <div className="copyText flex mx-auto self-center justify-between md:w-1/2 w-full items-center gap-4">
             <label type="text" name="" id="" value={fullURL} disabled={true} className=' text-ellipsis rounded-md whitespace-nowrap bg-gray-500 text-sm overflow-hidden my-3 w-full /4 px-2 py-1' >{fullURL}</label>
-            <IoCopy className='text-2xl text-primary-300 cursor-pointer hover:scale-110 ease-in duration-100' onClick={()=>handleOnCopy}/>
+            <IoCopy className='text-2xl text-primary-300 cursor-pointer hover:scale-110 ease-in duration-100' onClick={()=>handleOnCopy()}/>
            
 
             </div>
