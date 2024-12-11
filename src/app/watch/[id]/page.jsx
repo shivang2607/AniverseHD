@@ -661,6 +661,8 @@ export default function Page({ params }) {
     return "";
   };
 
+  console.log(streamingData);
+
   return (
     <div className="py-16">
       <div className="content py-2 md:px-4 flex flex-col gap-4">

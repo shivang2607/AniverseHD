@@ -145,7 +145,7 @@ export async function GET(req, { params }) {
           `watch-${id}`,
           JSON.stringify(finalResponse),
           "EX",
-          60 * 60 * 24 * 7 //cache for 7 days, this is only 7 days because its possible that corrupt or incorrect or incomplete data is present in gogo or zoro providers data 
+          60 * 60 * 24 * 1 //cache for 1 day, this is only 1 day because its possible that corrupt or incorrect or incomplete data is present in gogo or zoro providers data 
         ));
     }
 
