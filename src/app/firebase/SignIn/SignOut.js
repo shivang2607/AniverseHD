@@ -3,6 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../utils/firebaseinit";
 import Cookies from "js-cookie";
 import { Constant_Var_error, Constant_Var_success } from "@/utils/constants";
+import { removeAllCachedUserData } from "../utils/CacheStorage";
 
 export default async function SignOut() {
   try {
@@ -18,5 +19,5 @@ export default async function SignOut() {
 
 export function ClearSessionandCookies(){
     Cookies.remove("user");
-    sessionStorage.clear();
+    removeAllCachedUserData();
 }
