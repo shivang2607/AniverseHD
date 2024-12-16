@@ -1,6 +1,6 @@
 export const Constant_Var_success = "success";
 export const Constant_Var_error = "error";
-export const Constant_Var_RecentWatchlistSize = 4;
+export const Constant_Var_RecentWatchlistSize = 40;
 export const REDIS_UPSTASH_URL="https://thankful-ghost-38693.upstash.io"
 
 // # Session Storage Variables #

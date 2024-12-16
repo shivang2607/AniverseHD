@@ -97,7 +97,7 @@ export default async function GetLoggedUserWatchListsInfo() {
     else
       throw new Error(Constant_Var_errorMessage_loggedInUserDoesNostExistsYet);
 
-    window.location.reload();
+    // window.location.reload();
     return { status: Constant_Var_success, response: result };
   } catch (error) {
     return { response: error, status: Constant_Var_error };

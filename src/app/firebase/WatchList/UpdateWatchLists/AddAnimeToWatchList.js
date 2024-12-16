@@ -139,7 +139,7 @@ export default async function AddAnimeToWatchList({
       duration: duration,
     });
     const currTimestamp = animeObject.addedAt;
-
+    console.log(currTimestamp,"timestamp");
     if (watchListInfo.response.ownerUid === userData.details.uid) {
       if (
         watchListInfo.response.isSpecialStarter &&
@@ -398,15 +398,16 @@ async function addToStarterRecentWatchList({
 
     if (watchListInfo.animeList.length >= Constant_Var_RecentWatchlistSize) {
 
-      watchListInfo.animeList.sort((a, b) => {
-        if (a.addedAt.seconds !== b.addedAt.seconds) {
-          return a.addedAt.seconds - b.addedAt.seconds;
-        }
-        return a.addedAt.nanoseconds - b.addedAt.nanoseconds;
-      });
+      // watchListInfo.animeList.sort((a, b) => {
+      //   if (a.addedAt.seconds !== b.addedAt.seconds) {
+      //     return a.addedAt.seconds - b.addedAt.seconds;
+      //   }
+      //   return a.addedAt.nanoseconds - b.addedAt.nanoseconds;
+      // });
 
-      const numToRemove = watchListInfo.animeList.length - Constant_Var_RecentWatchlistSize;
+      const numToRemove = watchListInfo.animeList.length - Constant_Var_RecentWatchlistSize + 1;
 
+      console.log(numToRemove,"hello",watchListInfo.animeList.length);
       const earliestAnimeObjs = watchListInfo.animeList.slice(0, numToRemove);
 
       const removePromises = earliestAnimeObjs.map((anime) =>
@@ -503,23 +504,20 @@ async function updateAnimeInWatchList({
     batch.update(docRef, filteredAnimeObject);
 
     // Modify the animeList array by updating the `addedAt` for the matching `animeId`
-    const updatedAnimeList = watchListInfo.animeList.map((anime) => {
-      if (anime.animeId === animeId) {
-        return {
-          ...anime,
-          ...(isRecent ? { url: animeObject.url } : {}),
-          ...(isRecent
-            ? { episodeTimestamp: animeObject.episodeTimestamp }
-            : {}),
-          addedAt: animeObject.addedAt,
-        };
-      }
-      return anime;
-    });
+    let updatedAnimeList= watchListInfo.animeList.filter((anime)=> anime.animeId!==animeId);
+    const newanime=watchListInfo.animeList.filter((anime)=> anime.animeId===animeId)[0];
 
+    if(isRecent){
+      newanime.url= animeObject.url;
+      newanime.episodeTimestamp=animeObject.episodeTimestamp
+    }
+    newanime.addedAt=animeObject.addedAt;
+
+    updatedAnimeList.push(newanime);
+   
     batch.update(
       doc(db, Constant_Var_firebase_collectionName_watchLists, watchListId),
-      { animeList: updatedAnimeList, addedAtAt: currTimestamp }
+      { animeList: updatedAnimeList, updatedAt: currTimestamp }
     );
 
     if (withBatch) return { status: Constant_Var_success, response: null };

@@ -9,11 +9,11 @@ const GlobalLoader = () => {
     <div
       className={`${
         isLoaderVisible
-          ? "fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-lg"
+          ? "fixed inset-0 z-50 flex items-center justify-center bg-white/5 backdrop-blur-md"
           : "hidden"
       }`}
     >
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 w-full">
         {imageUrl  && (
           <img
             src={imageUrl }
@@ -22,9 +22,9 @@ const GlobalLoader = () => {
           />
         )}
         {loaderText  && (
-          <p className="text-xl font-semibold text-gray-800">{loaderText + ".."}</p>
+          <p className="text-xl font-semibold text-white">{loaderText + ".."}</p>
         )}
-        <div className="w-28 h-1 mx-auto bg-blue-500 rounded-full animate-pulse"></div>
+        <div className="max-w-40 w-[50%] h-1 mx-auto bg-blue-500 rounded-full animate-pulse"></div>
       </div>
     </div>
   );

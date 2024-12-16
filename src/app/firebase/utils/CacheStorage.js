@@ -7,17 +7,16 @@ import {
   Constant_Var_starterWatchLists_recent,
 } from "@/utils/constants";
 
-
 /** there are a total of 4 type of items:-
  * 1.) UserInfo
  * 2.) User's All watchLists' Info
  * 3.) WatchList Info by Id
  * 4.) WatchList's AnimeList data
- * */ 
-
+ * */
 
 /** Misscelanious  */
 const getCachedData = (key) => {
+  // return null;
   const item = localStorage.getItem(key);
 
   if (!item || item === "undefined") {
@@ -36,13 +35,29 @@ const getCachedData = (key) => {
   }
 };
 
-const setCacheData = (key,data) => {
-   localStorage.setItem(key, JSON.stringify(data));
+const setCacheData = (key, data) => {
+  // return;
+  localStorage.setItem(key, JSON.stringify(data));
 };
 
-const removeCachedData=(key)=>{
-  localStorage.removeItem(key)
-}
+const removeCachedData = (key) => {
+  localStorage.removeItem(key);
+};
+
+export const removeAllCachedUserData = () => {
+  const removePre = [
+    Constant_Var_sessionStorage_key_loggedInUser,
+    Constant_Var_sessionStorage_key_userWatchListsInfo,
+    Constant_Var_sessionStorage_key_watchListAnimeListById,
+    Constant_Var_sessionStorage_key_watchListInfoById,
+  ];
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && removePre.some(prefix => key.startsWith(prefix))) {
+      removeCachedData(key);
+    }
+  }
+};
 
 const findWatchListIndex = ({ userWatchLists, watchListId }) => {
   return userWatchLists.findIndex((watchList) => watchList.id === watchListId);
@@ -55,17 +70,14 @@ const updateUserPropertyCached = (property, value) => {
   setUserInfoCached({ userData });
 };
 
-
 /** User Profile INfo */
 export const getUserInfoCached = () => {
-  const userData = getCachedData(
-    Constant_Var_sessionStorage_key_loggedInUser
-  );
+  const userData = getCachedData(Constant_Var_sessionStorage_key_loggedInUser);
   return userData;
 };
 
 export const setUserInfoCached = ({ userData }) => {
-  setCacheData(Constant_Var_sessionStorage_key_loggedInUser,userData)
+  setCacheData(Constant_Var_sessionStorage_key_loggedInUser, userData);
 };
 
 export const changeUserNameCached = ({ userName }) => {
@@ -101,7 +113,6 @@ export const changeUserPlayOptionsCached = ({ playerOptions }) => {
   setUserInfoCached({ userData });
 };
 
-
 /** User WatchLists Info */
 export const getUserWatchListsInfoCached = ({ userId }) => {
   const userWatchlists = getCachedData(
@@ -112,9 +123,11 @@ export const getUserWatchListsInfoCached = ({ userId }) => {
 };
 
 export const setUserWatchListsInfoCached = ({ watchLists, userId }) => {
-  setCacheData(`${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`,watchLists)
+  setCacheData(
+    `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`,
+    watchLists
+  );
 };
-
 
 /** WatchListInfo By Id */
 export const getWatchListInfoByIdInfoCached = ({ watchListId }) => {
@@ -129,7 +142,10 @@ export const setWatchListInfoByIdInfoCached = ({
   watchListInfo,
   watchListId,
 }) => {
-  setCacheData(`${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`,watchListInfo)
+  setCacheData(
+    `${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`,
+    watchListInfo
+  );
 };
 
 export const removeWatchListInfoByIdInfoCached = ({ watchListId }) => {
@@ -137,7 +153,6 @@ export const removeWatchListInfoByIdInfoCached = ({ watchListId }) => {
     `${Constant_Var_sessionStorage_key_watchListInfoById}/${watchListId}`
   );
 };
-
 
 /** User watchList Anime list By WatchList Id */
 export const getWatchListAnimeListByIdCached = ({ watchListId }) => {
@@ -152,7 +167,10 @@ export const setWatchListAnimeListByIdCached = ({
   watchlistAnimeList,
   watchListId,
 }) => {
-  setCacheData(`${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`,watchlistAnimeList)
+  setCacheData(
+    `${Constant_Var_sessionStorage_key_watchListAnimeListById}/${watchListId}`,
+    watchlistAnimeList
+  );
 };
 
 export const removeWatchlistAnimeListCached = ({ watchListId }) => {
@@ -328,7 +346,6 @@ export const removeAnimeFromUserWatchListCached = ({
 
   return;
 };
-
 
 /**User watchlist alteration   issue, not adding in session storage when new watchlist is created*/
 export const addUserWatchlistCached = ({
