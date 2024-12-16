@@ -19,7 +19,7 @@ export default function WatchListCard({ anime, watchListId }) {
   return (
     <div className="image-container  my-1 w-full  h-fit pb-3 rounded-md  flex flex-col  hover:shadow-m overflow-hidden">
       <Link
-        href={anime.url? `${anime?.url}`:`/watch/${anime?.animeId}?provider=zoro`}
+        href={anime.url? `${anime?.url}`:`/watch/${anime?.animeId}?provider=${process.env.NEXT_PUBLIC_PROVIDER || "zoro"}`}
         className=" flex relative flex-col gap-2 h-56  rounded-md overflow-hidden duration-300 transition-all w-full   "
       >
         <div className="image relative rounded-md overflow-hidden  h-full w-full ">

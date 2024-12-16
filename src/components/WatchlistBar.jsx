@@ -97,7 +97,7 @@ export default function WatchlistBar() {
                     {anime?.animeName}
                   </div>
                   <Link
-                    href={selectedId === RecentWatchListId ? `${anime?.url}&t=${anime?.episodeTimestamp}` : `/watch/${anime.animeId}?provider=zoro`}
+                    href={selectedId === RecentWatchListId ? `${anime?.url}&t=${anime?.episodeTimestamp}` : `/watch/${anime.animeId}?provider=${process.env.NEXT_PUBLIC_PROVIDER || "zoro"}`}
                     className="text-lg"
                     onClick={(e) => {
                       e.stopPropagation();
