@@ -229,7 +229,7 @@ export default function Anime({ params }) {
                         href={
                           recentData
                             ? `${recentData?.url}&t=${recentData?.episodeTimestamp}`
-                            : `/watch/${params?.id}?provider=zoro`
+                            : `/watch/${params?.id}?provider=${process.env.NEXT_PUBLIC_PROVIDER || "zoro"}`
                         }
                         className="watchnow flex gap-2 items-center bg-primary-500  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
                       >

@@ -23,7 +23,7 @@ export default function RecentWatching() {
       {RecentWatchListData?.length > defaultLength && <Link href="/recently-watching" className='self-end  my-auto ml-auto flex gap-1 items-center'>View More <FaAnglesRight className='text-primary-200'/></Link>}
       </div>
       {/* grid grid-cols-2 md:grid-cols-5 */}
-      <div className="results  flex overflow-x-auto gap-4 my-2 md:scrollbar-hidden ">
+      <div className="results  flex overflow-x-auto gap-4 my-2 md:scrollbar-none ">
         {RecentWatchListData?.slice()?.reverse()?.slice(0, defaultLength)?.map(anime=>{
           return <RecentCard anime={anime} key={anime.animeId}/>
         })} 
