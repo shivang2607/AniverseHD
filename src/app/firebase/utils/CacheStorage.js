@@ -121,7 +121,7 @@ export const changeUserPlayOptionsCached = ({ playerOptions }) => {
 
 /** User WatchLists Info */
 export const getUserWatchListsInfoCached = ({ userId }) => {
-  return;
+  return null;
   const userWatchlists = getCachedData(
     `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`
   );
