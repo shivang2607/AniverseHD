@@ -72,15 +72,18 @@ const updateUserPropertyCached = (property, value) => {
 
 /** User Profile INfo */
 export const getUserInfoCached = () => {
+  return null;
   const userData = getCachedData(Constant_Var_sessionStorage_key_loggedInUser);
   return userData;
 };
 
 export const setUserInfoCached = ({ userData }) => {
+  return;
   setCacheData(Constant_Var_sessionStorage_key_loggedInUser, userData);
 };
 
 export const changeUserNameCached = ({ userName }) => {
+  return;
   let userData = getUserInfoCached();
   if (!userData) return;
 
@@ -89,6 +92,7 @@ export const changeUserNameCached = ({ userName }) => {
 };
 
 export const changeCoverUrlCached = ({ coverUrl }) => {
+  return;
   let userData = getUserInfoCached();
   if (!userData) return;
 
@@ -97,6 +101,7 @@ export const changeCoverUrlCached = ({ coverUrl }) => {
 };
 
 export const changePhotoUrlCached = ({ photoUrl }) => {
+  return;
   let userData = getUserInfoCached();
   if (!userData) return;
 
@@ -105,6 +110,7 @@ export const changePhotoUrlCached = ({ photoUrl }) => {
 };
 
 export const changeUserPlayOptionsCached = ({ playerOptions }) => {
+  return;
   let userData = getUserInfoCached();
   if (!userData) return;
 
@@ -115,6 +121,7 @@ export const changeUserPlayOptionsCached = ({ playerOptions }) => {
 
 /** User WatchLists Info */
 export const getUserWatchListsInfoCached = ({ userId }) => {
+  return null;
   const userWatchlists = getCachedData(
     `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`
   );
@@ -123,6 +130,7 @@ export const getUserWatchListsInfoCached = ({ userId }) => {
 };
 
 export const setUserWatchListsInfoCached = ({ watchLists, userId }) => {
+  return;
   setCacheData(
     `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`,
     watchLists
