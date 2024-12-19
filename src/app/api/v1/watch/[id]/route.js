@@ -139,13 +139,13 @@ export async function GET(req, { params }) {
     };
 
     if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to)) {
-      console.log("Caching finished anime for 7 days in Redis");
-      id &&
+      console.log("Caching finished anime for 5 days in Redis");
+      id && finalResponse?.zoro?.episodes?.length>0 && finalResponse?.gogoSub?.episodes?.length>0 &&
         (await redisClient.set(
           `watch-${id}`,
           JSON.stringify(finalResponse),
           "EX",
-          60 * 60 * 24 * 1 //cache for 1 day, this is only 1 day because its possible that corrupt or incorrect or incomplete data is present in gogo or zoro providers data 
+          60 * 60 * 24 * 5 //cache for 5 day, this is only 5 day because its possible that corrupt or incorrect or incomplete data is present in gogo or zoro providers data 
         ));
     }
 
