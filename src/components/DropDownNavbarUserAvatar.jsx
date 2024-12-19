@@ -26,7 +26,7 @@ const DropDownNavbarUserAvatar = () => {
             src={loggedInUserData?.photoUrl}
             alt="User Profile"
             fill
-            className="rounded-full"
+            className="rounded-full object-cover"
           />
         </div>
       </button>
