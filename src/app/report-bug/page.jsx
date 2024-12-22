@@ -21,7 +21,7 @@ export default function Page() {
                error: <b>Could not report bug.</b>,
              }
            );
-       
+       setBugContent("");
     }
 
     return (
