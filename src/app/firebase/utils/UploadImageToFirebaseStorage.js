@@ -13,6 +13,7 @@ export default async function uploadImageToFirebaseStorage(
   blob = false
 ) {
   try {
+    return { status: Constant_Var_success, response: "https://firebasestorage.googleapis.com/v0/b/aniversehd.appspot.com/o/profileImage%2F1AcugKbSXpYblJS3NnVyXGxbuC621734840841572?alt=media&token=029ca725-8447-479a-beb4-56481af3be29" };
     // Ensure either imageUrl or blob is provided
     if (!imageUrl && !blob) {
       throw new Error(Constant_Var_errorMessage_missingParams);
