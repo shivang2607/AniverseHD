@@ -16,7 +16,7 @@ import {
 
 /** Misscelanious  */
 const getCachedData = (key) => {
-  // return null;
+  return null;
   const item = localStorage.getItem(key);
 
   if (!item || item === "undefined") {
@@ -36,7 +36,7 @@ const getCachedData = (key) => {
 };
 
 const setCacheData = (key, data) => {
-  // return;
+  return;
   localStorage.setItem(key, JSON.stringify(data));
 };
 
