@@ -131,7 +131,17 @@ const UserWatchLists = ({ id }) => {
             />
           </div>
 
-          <WatchListPagination selectedWatchList={selectedWatchList} key={selectedWatchList.id} />
+          <WatchListPagination
+            selectedWatchList={selectedWatchList}
+            key={selectedWatchList.id}
+          />
+        </div>
+      ) : userStarterWatchLists &&
+        userCustomWatchLists &&
+        userStarterWatchLists.length === 0 &&
+        userCustomWatchLists.length === 0 ? (
+        <div className="flex py-60 items-center justify-center text-center  bg-white/30 backdrop-blur-sm text-white text-3xl ">
+         {isUserLoggedIn && loggedInUserId === id? "No WatchLists Found": "No Public WatchLists Availabe"}
         </div>
       ) : (
         <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
