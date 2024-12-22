@@ -41,7 +41,7 @@ export default function ListDropDown({
       // console.log("these are images",anime?.images);
     const result = await AddAnimeToWatchList({
       watchListId: id,
-      animeId: `${anime?.mal_id}`,
+      animeId: anime?.mal_id ? `${anime?.mal_id}` : null,
       animeName: anime?.title_english || anime?.title,
       animePhoto: anime?.main_picture || anime?.images || {},
       animeGenre: anime?.genres || [],

@@ -661,7 +661,7 @@ export default function Page({ params }) {
     return "";
   };
 
-  console.log(streamingData);
+  // console.log(streamingData);
 
   return (
     <div className="py-16">

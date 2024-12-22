@@ -113,24 +113,31 @@ const Navbar = () => {
               {/* <h1 className="text-xl font-bold ">AniverseHD</h1> */}
             </div>
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
+              <div className="ml-10 flex items-baseline space-x-2">
                 <Link
                   href="/"
-                  className=" hover:text-white px-3  rounded-md text-md font-light"
+                  className=" hover:text-white px-2  rounded-md text-md font-light"
                 >
                   Home
                 </Link>
                 <Link
                   href="/catalog"
-                  className=" hover:text-white px-3  rounded-md text-md font-light"
+                  className=" hover:text-white px-2  rounded-md text-md font-light"
                 >
                   Catalog
                 </Link>
                 <Link
                   href="/recommendations"
-                  className=" hover:text-white px-3  rounded-md text-md font-light"
+                  className=" hover:text-white px-2  rounded-md text-md font-light"
                 >
                   Recommendations
+                </Link>
+
+                <Link
+                  href="/report-bug"
+                  className=" hover:text-white px-2 text-nowrap flex rounded-md text-md font-light"
+                >
+                  Report Bug
                 </Link>
               </div>
             </div>
@@ -206,6 +213,13 @@ const Navbar = () => {
             className=" hover:text-white block px-3 rounded-md text-base font-medium"
           >
             Recommendations
+          </Link>
+
+          <Link
+            href="/report-bug"
+            className=" hover:text-white block px-3 rounded-md text-base font-medium"
+          >
+            Report Bug
           </Link>
           
           {!isUserLoggedIn && <button
