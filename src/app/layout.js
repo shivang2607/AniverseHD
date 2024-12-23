@@ -72,6 +72,9 @@ export default function RootLayout({ children }) {
           <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "fc05a7dc03db45c2aafe3bb385a757fb"}'></script>
           {/* <!-- End Cloudflare Web Analytics --> */}
           
+          {/* <!-- Cloudflare Web Analytics --> for abhay */}
+          <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "170d25d6bd5647b0b0211213bf548407"}'></script>
+          {/* <!-- End Cloudflare Web Analytics --> */}
       </body>
       {/* <GoogleTagManager gtmId='GTM-PBQJWMRT'/> */}
     </html>
