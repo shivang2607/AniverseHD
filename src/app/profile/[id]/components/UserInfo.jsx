@@ -11,9 +11,12 @@ import {
   Constant_Var_success,
 } from "@/utils/constants";
 import { useRouter } from "next/navigation";
+import useGlobalLoader from "@/components/ZustandStores/useGlobalLoader";
 
 const UserInfo = ({ id }) => {
   const { isUserLoggedIn, loggedInUserId, loggedInUserData } = useUserStore();
+  const { setLoaderText, setIsLoaderVisible,setImageUrl } = useGlobalLoader();
+    
   const [isCreateWatchListModalOpen, setIsCreateWatchListModalOpen] =
     useState(false);
   const [iseditUserProfileModalOpen, setIsEditUserProfileModalOpen] =
@@ -38,7 +41,11 @@ const UserInfo = ({ id }) => {
         throw new Error("Error Loading User Profile");
       }
     } catch (error) {
-      //show toast
+      toast.error("Error Loading Profile", {
+        id: "2",
+        duration: 3000,
+      });
+      // console.error("Error Loading Profile:", error);
     }
   }
 
@@ -79,9 +86,21 @@ const UserInfo = ({ id }) => {
     setIsCreateWatchListModalOpen(false);
   };
 
+  useEffect(()=>{
+    if(userInfo){
+      setIsLoaderVisible(true);
+      setImageUrl(" /userProfileImage7.jpg")
+      setLoaderText("Loading User Data")
+    }else{
+      setIsLoaderVisible(false);
+      setImageUrl(null)
+      setLoaderText(null)
+    }
+  },[userInfo])
+
   return (
     <>
-      {userInfo ? (
+      {userInfo && (
         <div
           style={{
             backgroundImage: `url('${userInfo.coverUrl}')`,
@@ -151,11 +170,13 @@ const UserInfo = ({ id }) => {
             </>
           )}
         </div>
-      ) : (
-        <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
-          {"...Loading"}
-        </div>
-      )}
+      ) 
+      // : (
+      //   <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
+      //     {"...Loading"}
+      //   </div>
+      // )
+      }
     </>
   );
 };

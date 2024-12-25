@@ -7,13 +7,17 @@ import {
 } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import WatchListsTabs from "./WatchListsTabs";
 import WatchListPagination from "./WatchListPagination";
+import useGlobalLoader from "@/components/ZustandStores/useGlobalLoader";
+import FailCaseLoader from "@/components/FailCaseLoader";
+import toast from "react-hot-toast";
 
 const UserWatchLists = ({ id }) => {
-  const { isUserLoggedIn, loggedInUserId, loggedInUserWatchListsInfo} =
+  const { isUserLoggedIn, loggedInUserId, loggedInUserWatchListsInfo } =
     useUserStore();
+  const { setLoaderText, setIsLoaderVisible, setImageUrl } = useGlobalLoader();
   const [userStarterWatchLists, setUserStarterWatchLists] = useState(null);
   const [userCustomWatchLists, setUserCustomWatchLists] = useState(null);
   const [selectedWatchList, setSelectedWatchList] = useState(null);
@@ -42,28 +46,33 @@ const UserWatchLists = ({ id }) => {
         }
         setUserCustomWatchLists(custom);
         setUserStarterWatchLists(starter);
-        if(starter.length>0)
-        setSelectedWatchList(starter[0]);
-        else if(custom.length>0) setSelectedWatchList(custom[0]);
-      }
-      else if (
+        if (starter.length > 0) setSelectedWatchList(starter[0]);
+        else if (custom.length > 0) setSelectedWatchList(custom[0]);
+      } else if (
         respUserWatchLists.response.message ===
         Constant_Var_errorMessage_userDoesNotExistWithThisId
       )
         router.push("/404");
       else {
-        console.log("userInfoerror error", respUserWatchLists.response);
+        // console.log("userInfoerror error", respUserWatchLists.response);
         throw new Error("Error Loading User Profile");
       }
     } catch (error) {
       //show toast
+      toast.error("Error Loading Profile", {
+        id: "4",
+        duration: 3000,
+      });
     }
   }
 
   useEffect(() => {
     //loading other user data
     async function loadUserData() {
-      if (isUserLoggedIn!==null && (isUserLoggedIn===false || loggedInUserId !== id)) {
+      if (
+        isUserLoggedIn !== null &&
+        (isUserLoggedIn === false || loggedInUserId !== id)
+      ) {
         await loadOtherUser();
       }
     }
@@ -87,20 +96,20 @@ const UserWatchLists = ({ id }) => {
             starter.push(obj);
           }
         }
-        
+
         /* for keeping selectedWatchList same between rerenders due to anime removal, in case of delete watchlist the selectedWatchList is set with a new watchList */
         // console.log("he",selectedWatchList,custom,starter,userCustomWatchLists,userStarterWatchLists);
         if (
           selectedWatchList === null ||
-          (custom.length + starter.length) !==
-            (userCustomWatchLists.length + userStarterWatchLists.length)
+          custom.length + starter.length !==
+            userCustomWatchLists.length + userStarterWatchLists.length
         ) {
           setSelectedWatchList(starter[0]);
         } else {
           let sel = starter.filter((ele) => {
             return ele.id === selectedWatchList.id;
           });
-          if(sel.length==0)
+          if (sel.length == 0)
             sel = custom.filter((ele) => {
               return ele.id === selectedWatchList.id;
             });
@@ -111,43 +120,67 @@ const UserWatchLists = ({ id }) => {
 
         setUserCustomWatchLists(custom);
         setUserStarterWatchLists(starter);
-
       }
     }
     loadUserData();
   }, [loggedInUserWatchListsInfo]);
 
+  useEffect(() => {
+    if (userStarterWatchLists == null || userCustomWatchLists == null) {
+      setIsLoaderVisible(true);
+      setImageUrl(" /userProfileImage7.jpg");
+      setLoaderText("Loading User Data");
+    } else {
+      setIsLoaderVisible(false);
+      setImageUrl(null);
+      setLoaderText(null);
+    }
+  }, [selectedWatchList, userStarterWatchLists, userCustomWatchLists]);
+
   return (
     <>
-      {userStarterWatchLists && userCustomWatchLists && selectedWatchList ? (
-        <div>
-          <div className="flex flex-row mt-5 mx-2">
-            <WatchListsTabs
-              StarterWatchLists={userStarterWatchLists}
-              CustomWatchLists={userCustomWatchLists}
-              setSelectedWatchList={setSelectedWatchList}
+      {
+        userStarterWatchLists && userCustomWatchLists && selectedWatchList ? (
+          <div>
+            <div className="flex flex-row mt-5 mx-2">
+              <WatchListsTabs
+                StarterWatchLists={userStarterWatchLists}
+                CustomWatchLists={userCustomWatchLists}
+                setSelectedWatchList={setSelectedWatchList}
+                selectedWatchList={selectedWatchList}
+                paramsUserId={id}
+              />
+            </div>
+
+            <WatchListPagination
               selectedWatchList={selectedWatchList}
-              paramsUserId={id}
+              key={selectedWatchList.id}
             />
           </div>
-
-          <WatchListPagination
-            selectedWatchList={selectedWatchList}
-            key={selectedWatchList.id}
-          />
-        </div>
-      ) : userStarterWatchLists &&
-        userCustomWatchLists &&
-        userStarterWatchLists.length === 0 &&
-        userCustomWatchLists.length === 0 ? (
-        <div className="flex py-60 items-center justify-center text-center  bg-white/30 backdrop-blur-sm text-white text-3xl ">
-         {isUserLoggedIn && loggedInUserId === id? "No WatchLists Found": "No Public WatchLists Availabe"}
-        </div>
-      ) : (
-        <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
-          {"...Loading"}
-        </div>
-      )}
+        ) : (
+          userStarterWatchLists &&
+          userCustomWatchLists &&
+          userStarterWatchLists.length === 0 &&
+          userCustomWatchLists.length === 0 && (
+            <div className="w-full h-[60vh]">
+              {" "}
+              <FailCaseLoader
+                imageUrl={"/NoData.gif"}
+                loaderText={
+                  isUserLoggedIn && loggedInUserId === id
+                    ? "No WatchLists Found"
+                    : "No Public WatchLists Availabe"
+                }
+              />
+            </div>
+          )
+        )
+        // : (
+        //   <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
+        //     {"...Loading"}
+        //   </div>
+        // )
+      }
     </>
   );
 };

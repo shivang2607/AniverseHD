@@ -52,7 +52,10 @@ const WatchListsTabs = ({
       
       loadLoggedInUserWatchLists();
     } else {
-      console.error("error", resp.response);
+      toast.error("Error Updating Type", {
+        id: "3",
+        duration: 3000,
+      });
     }
   }
 

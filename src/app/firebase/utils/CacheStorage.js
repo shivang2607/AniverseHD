@@ -279,23 +279,29 @@ export const addAnimeToWatchListByIdCachedInBatch = ({
 }) => {
   let watchListAnimeList = getWatchListAnimeListByIdCached({
     watchListId: watchListId,
+  }) || [];
+
+  const animeIdSet = new Set(watchListAnimeList.map((anime) => anime.animeId));
+
+  animeList.forEach((anime) => {
+    if (!animeIdSet.has(anime.animeId)) {
+      watchListAnimeList.push(anime);
+      animeIdSet.add(anime.animeId);
+    }
   });
 
-  if (watchListAnimeList) {
-    watchListAnimeList = watchListAnimeList.concat(animeList);
-  } else {
-    watchListAnimeList = animeList;
-  }
   watchListAnimeList.sort((a, b) => {
     if (a.updatedAt.seconds !== b.updatedAt.seconds) {
       return a.updatedAt.seconds - b.updatedAt.seconds;
     }
     return a.updatedAt.nanoseconds - b.updatedAt.nanoseconds;
   });
+
   setWatchListAnimeListByIdCached({
     watchlistAnimeList: watchListAnimeList,
     watchListId: watchListId,
   });
+
   return;
 };
 
