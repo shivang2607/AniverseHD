@@ -1,4 +1,6 @@
 import GetWatchListDataById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
+import CustomLoader from "@/components/CustomLoader";
+import FailCaseLoader from "@/components/FailCaseLoader";
 import Pagination from "@/components/Pagination";
 import WatchListCard from "@/components/watchListCard";
 import { Constant_Var_success } from "@/utils/constants";
@@ -9,7 +11,7 @@ const WatchListPagination = ({ selectedWatchList }) => {
   const pageSize = 12;
   const [offset, setOffset] = useState(0);
   const [error, setError] = useState(false);
-  const [currentPage,setCurrentPage]=useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   let prevWatchListId = useRef(null);
 
   useEffect(() => {
@@ -28,7 +30,8 @@ const WatchListPagination = ({ selectedWatchList }) => {
         setOffset(newOffset);
         return;
       }
-
+      setList(null);
+      // console.log("watchlist changed",offset,selectedWatchList);
       const resp = await GetWatchListDataById({
         watchListId: selectedWatchList.id,
         offset: newOffset,
@@ -36,19 +39,22 @@ const WatchListPagination = ({ selectedWatchList }) => {
         // getAll:true
       });
       if (resp.status === Constant_Var_success) {
-        setList(resp.response);
+        setTimeout(() => {
+          setList(resp.response);
+          setError(false);
+        }, 500);
       } else {
         setError(true);
-        console.error(resp.response);
+        // console.error(resp.response);
       }
     }
 
     loadWatchListData();
   }, [offset, selectedWatchList]);
 
-  useEffect(()=>{
-   setOffset((currentPage-1)*pageSize);
-  },[currentPage])
+  useEffect(() => {
+    setOffset((currentPage - 1) * pageSize);
+  }, [currentPage]);
 
   const reloadWatchListData = async () => {};
 
@@ -62,18 +68,20 @@ const WatchListPagination = ({ selectedWatchList }) => {
             {list.map((ele, ind) => (
               <WatchListCard
                 anime={ele}
-                key={ele.id}
+                key={ele.animeId}
                 watchListId={selectedWatchList.id}
               />
             ))}
           </div>
         ) : (
-          <div className="h-full w-full">No Data</div>
+          <div className="w-full h-[60vh]"> <FailCaseLoader imageUrl={"/NoData.gif"} loaderText={"Empty List"}/></div>
         )
       ) : !error ? (
-        <div className="h-full w-full">Loading</div>
+        <div className="h-[70vh] -my-10 -mx-4">
+          <CustomLoader imageUrl={"/userProfileImage5.jpg"} loaderText={"Loading WatchList"}/>
+        </div>
       ) : (
-        <div className="h-full w-full">Error Loading Data</div>
+        <div className="w-full h-[60vh]"> <FailCaseLoader imageUrl={"/NoData.gif"} loaderText={"Error Loading WatchList"}/></div>
       )}
 
       {selectedWatchList && selectedWatchList.animeList.length > 0 && (

@@ -16,12 +16,11 @@ import {
 } from "@/utils/constants";
 import toast from "react-hot-toast";
 import { create } from "zustand";
-import useGlobalLoader from "./useGlobalLoader";
 
 
 
 const useUserStore = create((set, get) => ({
-  isUserLoggedIn: false,
+  isUserLoggedIn: null,
   loggedInUserId: null,
   loggedInUserData: null,
   loggedInUserWatchListsInfo: null,

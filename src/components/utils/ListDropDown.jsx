@@ -135,7 +135,7 @@ export default function ListDropDown({
   return (
     <>
       {isOpen && (
-        <div className="absolute z-30 h-60 w-40 overflow-y-scroll md:scrollbar-thin md:scrollbar-track-transparent  bg-cbg-300 text-sm flex flex-col  rounded-lg py-2  mt-10  ">
+        <div className="absolute z-30 h-[80%] max-h-60 w-40 overflow-y-scroll md:scrollbar-thin md:scrollbar-track-transparent  bg-cbg-300 text-sm flex flex-col  rounded-lg py-2  mt-10  ">
           {watchListData
             ?.filter((lst) => lst?.watchListName !== "Recent")
             ?.map((list) => {
