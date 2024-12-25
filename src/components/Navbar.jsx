@@ -11,6 +11,7 @@ import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
 import useUserStore from "./ZustandStores/userStore";
 import WatchlistBar from "./WatchlistBar";
 import useGlobalLoader from "./ZustandStores/useGlobalLoader";
+import { Constant_Var_localstorage_version } from "@/utils/constants";
 
 const Navbar = () => {
   const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists,RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar} = useUserStore();
@@ -85,7 +86,15 @@ const Navbar = () => {
   useEffect(()=>{
     if(RecentWatchListId)
     loadLoggedInUserRecentWatchList();
-  },[RecentWatchListId])
+  },[RecentWatchListId]);
+
+  useEffect(()=>{
+    const localstorage_version= localStorage.getItem("version");
+    if(!localstorage_version || localstorage_version !== Constant_Var_localstorage_version){
+      localStorage.clear();
+      localStorage.setItem("version",Constant_Var_localstorage_version);
+    }
+  },[]);
 
   return (
     <>

@@ -284,3 +284,7 @@ export const Constant_Var_dateFormat = {
   MONTH: "YYYY-MM",
   FULL: "YYYY-MM-DD",
 };
+
+// # Local Storage Variables Version #
+
+export const Constant_Var_localstorage_version = "1.0.0";
