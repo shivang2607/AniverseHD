@@ -77,7 +77,7 @@ const UserWatchLists = ({ id }) => {
       }
     }
     loadUserData();
-  }, [loggedInUserWatchListsInfo]);
+  }, [loggedInUserId,isUserLoggedIn]);
 
   useEffect(() => {
     // loading loggedInuser Data
@@ -135,7 +135,7 @@ const UserWatchLists = ({ id }) => {
       setImageUrl(null);
       setLoaderText(null);
     }
-  }, [selectedWatchList, userStarterWatchLists, userCustomWatchLists]);
+  }, [userStarterWatchLists, userCustomWatchLists]);
 
   return (
     <>
