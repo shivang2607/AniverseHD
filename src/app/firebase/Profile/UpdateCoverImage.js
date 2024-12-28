@@ -37,7 +37,7 @@ export default async function UpdateCoverImage({blob = false, imageUrl = false})
     }
 
     const resp = await uploadImageToFirebaseStorage(
-      `/coverImage/${userData.details.uid}${new Date().getTime()}`,
+      `/coverImage/${userData.details.uid}/${new Date().getTime()}`,
       imageUrl,
       blob
     );
@@ -55,7 +55,7 @@ export default async function UpdateCoverImage({blob = false, imageUrl = false})
     changeCoverUrlCached({coverUrl:resp.response});
     const respDelete = await DeleteImageFromFirebaseStorage(oldData.coverUrl);
 
-    if (respDelete.status === Constant_Var_error) throw respDelete.response;
+    // if (respDelete.status === Constant_Var_error) throw respDelete.response;
 
     return { status: Constant_Var_success, response: resp.response };
   } catch (error) {
