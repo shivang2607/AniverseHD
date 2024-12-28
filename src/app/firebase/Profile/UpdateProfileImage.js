@@ -58,7 +58,7 @@ export default async function UpdateProfileImage({
     changePhotoUrlCached({photoUrl:resp.response});
     const respDelete = await DeleteImageFromFirebaseStorage(oldData.photoUrl);
 
-    if(respDelete.status===Constant_Var_error) throw respDelete.response;
+    // if(respDelete.status===Constant_Var_error) throw respDelete.response;
 
     return { status: Constant_Var_success, response: resp.response };
   } catch (error) {

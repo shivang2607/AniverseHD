@@ -66,6 +66,10 @@ const EditUserProfileModal = ({
     if (resp.status === Constant_Var_success) {
       //success Toast
       setProfileImage({ file: null, preview: resp.response });
+      toast.success("Profile ImageUpdated Successfully", {
+        id: "10",
+        duration: 2000,
+      });
       // console.log("Image Uploaded Succesfully", resp.response);
     } else {
       //error toast
@@ -97,6 +101,10 @@ const EditUserProfileModal = ({
     if (resp.status === Constant_Var_success) {
       //success Toast
       setCoverImage({ file: null, preview: resp.response });
+      toast.success("Cover ImageUpdated Successfully", {
+        id: "11",
+        duration: 2000,
+      });
       // console.log("Image Uploaded Succesfully", resp.response);
     } else {
       //error toast
