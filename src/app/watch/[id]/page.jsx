@@ -532,7 +532,7 @@ export default function Page({ params }) {
   const mergeProviderData = (zoro, gogoDub, gogoSub) => {
     const gds = gogoDub?.episodes?.length; //gogo dub size
     const gss = gogoSub?.episodes?.length; //gogo sub size
-    if (zoro?.episodes) {
+    if (zoro?.episodes?.length > 0) {
       const newMergedData = zoro?.episodes?.map((ep, idx) => {
         return {
           ...ep,
@@ -542,7 +542,7 @@ export default function Page({ params }) {
       });
       setEpisodesData(newMergedData);
       // console.log("this is merged data with zoro", newMergedData);
-    } else if (gogoSub?.episodes) {
+    } else if (gogoSub?.episodes?.length > 0) {
       const newMergedData = gogoSub?.episodes?.map((ep, idx) => {
         return {
           ...ep,
