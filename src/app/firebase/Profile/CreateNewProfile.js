@@ -61,12 +61,12 @@ export default async function CreateNewProfile() {
 
     //Uploading profile Image to firebase storage
     const resp = await uploadImageToFirebaseStorage(
-      `/profileImage/${userData.details.uid}${new Date().getTime()}`,
+      `/profileImage/${userData.details.uid}/${new Date().getTime()}`,
       getRandomProfileImageUrl()
     );
 
     const coverResp = await uploadImageToFirebaseStorage(
-      `/coverImage/${userData.details.uid}${new Date().getTime()}`,
+      `/coverImage/${userData.details.uid}/${new Date().getTime()}`,
       "/cover_test.png"
     );
 
