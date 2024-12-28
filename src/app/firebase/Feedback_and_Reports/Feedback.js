@@ -11,6 +11,7 @@ import {
  *
  * @param {Object} params - The input parameters.
  * @param {string} params.Message - The Bug Message.
+ * @param {string} params.Stars - The Bug Message.
  *
  * @returns {Promise<{status:string,response:any}>} - A promise that resolves to an object containing:
  *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success, or `Constant_Var_error` on failure.
@@ -23,7 +24,8 @@ import {
  *
  * async function FeedBackExample() {
  *   const FeedBackMessage = "WatchLists feature looks amazing, please add a mal watchlist sync feature too.";
- *   const result = await FeedBack({ Message: FeedBackMessage });
+ * const stars = 5;
+ *   const result = await FeedBack({ Message: FeedBackMessage, Stars: stars});
  *
  *   if (result.status === Constant_Var_success) {
  *     console.log("FeedBack sent successfully!");
@@ -34,10 +36,10 @@ import {
  *
  * FeedBackExample();
  */
-export default async function FeedBack({ Message }) {
+export default async function FeedBack({ Message, Stars }) {
   try {
 
-    validateParams({ Message:Message });
+    validateParams({ Message:Message, Stars:Stars });
     // Check if user cookies exist
     const userData = await getUserAuth();
     if (!userData) {
@@ -46,7 +48,8 @@ export default async function FeedBack({ Message }) {
     const docRef = doc(collection(db, "feedbacks"));
     const feedbackObject = {
         message: Message,
-        sentBy: userData.details.uid ,
+        sentBy: userData.details.uid,
+        stars: Stars,
         sentAt: Timestamp.now(),
     }
 
@@ -59,8 +62,12 @@ export default async function FeedBack({ Message }) {
 };
 
 
-function validateParams({ Message }) {
+function validateParams({ Message, Stars }) {
   if (typeof Message !== 'string' || Message.trim() === '') {
     throw new Error("'Message' must be a non-empty string");
+  }
+
+  if (typeof Stars !== 'number' || Stars < 0 || Stars > 5) {
+    throw new Error("'Message' must be a number between 0 and 5");
   }
 }
