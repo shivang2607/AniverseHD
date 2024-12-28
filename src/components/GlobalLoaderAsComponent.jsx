@@ -1,9 +1,8 @@
 "use client";
 import React from "react";
-import useGlobalLoader from "./ZustandStores/useGlobalLoader";
 
-const GlobalLoader = () => {
-  const { isLoaderVisible, imageUrl, loaderText } = useGlobalLoader();
+
+const GlobalLoaderAsComponent = ({isLoaderVisible, imageUrl, loaderText}) => {
 
   return (
     <div
@@ -30,4 +29,4 @@ const GlobalLoader = () => {
   );
 };
 
-export default GlobalLoader;
+export default GlobalLoaderAsComponent;

@@ -6,7 +6,7 @@ import { SkeletonTheme } from 'react-loading-skeleton'
 import Footer from '@/components/Footer'
 import WatchlistBar from '@/components/WatchlistBar'
 import GlobalError from 'next/dist/client/components/error-boundary'
-import GlobalLoader from '@/components/GlobalLoader'
+import GlobalLoader from '@/components/utils/GlobalLoader'
 
 const inter = Inter({ subsets: ['latin'] })
 

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import ReportBug from '../firebase/ReportBug/reportBug';
+import ReportBug from '../firebase/Feedback_and_Reports/reportBug';
 import { Constant_Var_success } from '@/utils/constants';
 import toast, { Toaster } from 'react-hot-toast';
 

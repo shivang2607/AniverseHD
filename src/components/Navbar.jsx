@@ -93,6 +93,7 @@ const Navbar = () => {
     if(!localstorage_version || localstorage_version !== Constant_Var_localstorage_version){
       localStorage.clear();
       localStorage.setItem("version",Constant_Var_localstorage_version);
+      sessionStorage.clear();
     }
   },[]);
 

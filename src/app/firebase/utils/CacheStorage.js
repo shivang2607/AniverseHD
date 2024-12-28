@@ -20,7 +20,7 @@ const getCachedData = (key) => {
   const item = localStorage.getItem(key);
 
   if (!item || item === "undefined") {
-    console.warn(`Item for key: ${key} is not found in sessionStorage.`);
+    console.warn(`Item for key: ${key} is not found in localStorage.`);
     return null; // Return null or handle accordingly when the key is missing
   }
 
@@ -28,7 +28,7 @@ const getCachedData = (key) => {
     return JSON.parse(item);
   } catch (error) {
     console.error(
-      `Failed to parse item from sessionStorage for key: ${key}`,
+      `Failed to parse item from localStorage for key: ${key}`,
       error
     );
     return null; // Return null when JSON parsing fails
@@ -57,7 +57,54 @@ export const removeAllCachedUserData = () => {
       removeCachedData(key);
     }
   }
+
+  sessionStorage.clear();
 };
+
+const getSessionCachedData = (key) => {
+  const item = sessionStorage.getItem(key);
+
+  if (!item || item === "undefined") {
+    console.warn(`Item for key: ${key} is not found in sessionStorage.`);
+    return null; // Return null or handle accordingly when the key is missing
+  }
+
+  try {
+    const parsedItem = JSON.parse(item);
+
+    // Check if the parsed item has an expiration time
+    if (parsedItem.expirationTime) {
+      const currentTime = new Date().getTime();
+
+      if (currentTime > parsedItem.expirationTime) {
+        console.warn(`Item for key: ${key} has expired.`);
+        sessionStorage.removeItem(key); // Remove expired data
+        return null; // Return null for expired data
+      }
+    }
+
+    // Return the actual value if valid
+    return parsedItem.value || parsedItem;
+  } catch (error) {
+    console.error(
+      `Failed to parse item from sessionStorage for key: ${key}`,
+      error
+    );
+    return null; // Return null when JSON parsing fails
+  }
+};
+
+
+const setSessionCacheData = (key, value) => {
+  // return;
+  const expirationTime = new Date().getTime() + 10 * 60 * 1000;
+    const data = {
+        value: value,
+        expirationTime: expirationTime
+    };
+  sessionStorage.setItem(key, JSON.stringify(data));
+};
+
 
 const findWatchListIndex = ({ userWatchLists, watchListId }) => {
   return userWatchLists.findIndex((watchList) => watchList.id === watchListId);
@@ -72,18 +119,18 @@ const updateUserPropertyCached = (property, value) => {
 
 /** User Profile INfo */
 export const getUserInfoCached = () => {
-  return null;
-  const userData = getCachedData(Constant_Var_sessionStorage_key_loggedInUser);
+  // return null;
+  const userData = getSessionCachedData(Constant_Var_sessionStorage_key_loggedInUser);
   return userData;
 };
 
 export const setUserInfoCached = ({ userData }) => {
-  return;
-  setCacheData(Constant_Var_sessionStorage_key_loggedInUser, userData);
+  // return;
+  setSessionCacheData(Constant_Var_sessionStorage_key_loggedInUser, userData);
 };
 
 export const changeUserNameCached = ({ userName }) => {
-  return;
+  // return;
   let userData = getUserInfoCached();
   if (!userData) return;
 
@@ -92,7 +139,7 @@ export const changeUserNameCached = ({ userName }) => {
 };
 
 export const changeCoverUrlCached = ({ coverUrl }) => {
-  return;
+  // return;
   let userData = getUserInfoCached();
   if (!userData) return;
 
@@ -101,7 +148,7 @@ export const changeCoverUrlCached = ({ coverUrl }) => {
 };
 
 export const changePhotoUrlCached = ({ photoUrl }) => {
-  return;
+  // return;
   let userData = getUserInfoCached();
   if (!userData) return;
 
@@ -110,7 +157,7 @@ export const changePhotoUrlCached = ({ photoUrl }) => {
 };
 
 export const changeUserPlayOptionsCached = ({ playerOptions }) => {
-  return;
+  // return;
   let userData = getUserInfoCached();
   if (!userData) return;
 
@@ -121,8 +168,8 @@ export const changeUserPlayOptionsCached = ({ playerOptions }) => {
 
 /** User WatchLists Info */
 export const getUserWatchListsInfoCached = ({ userId }) => {
-  return null;
-  const userWatchlists = getCachedData(
+  // return null;
+  const userWatchlists = getSessionCachedData(
     `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`
   );
 
@@ -130,8 +177,8 @@ export const getUserWatchListsInfoCached = ({ userId }) => {
 };
 
 export const setUserWatchListsInfoCached = ({ watchLists, userId }) => {
-  return;
-  setCacheData(
+  // return;
+  setSessionCacheData(
     `${Constant_Var_sessionStorage_key_userWatchListsInfo}/${userId}`,
     watchLists
   );

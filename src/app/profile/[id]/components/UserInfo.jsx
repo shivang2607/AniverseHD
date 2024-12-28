@@ -87,14 +87,17 @@ const UserInfo = ({ id }) => {
   };
 
   useEffect(()=>{
+    // console.log(userInfo)
     if(userInfo){
-      setIsLoaderVisible(true);
-      setImageUrl(" /userProfileImage7.jpg")
-      setLoaderText("Loading User Data")
-    }else{
+      // console.log("userInfo not null")
       setIsLoaderVisible(false);
       setImageUrl(null)
       setLoaderText(null)
+    }else{
+      // console.log("userInfo null")
+      setIsLoaderVisible(true);
+      setImageUrl(" /userProfileImage7.jpg")
+      setLoaderText("Loading User Data")      
     }
   },[userInfo])
 
