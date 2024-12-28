@@ -1,16 +1,22 @@
 'use client'
 import React, { useState } from 'react'
 import ReportBug from '../firebase/Feedback_and_Reports/reportBug';
-import { Constant_Var_success } from '@/utils/constants';
+import useUserStore from '@/components/ZustandStores/userStore';
+// import { Constant_Var_success } from '@/utils/constants';
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function Page() {
     const [bugContent, setBugContent] = useState("");
+    const {isUserLoggedIn} = useUserStore();
 
     const handleSubmit = async () => {
         if(bugContent.trim() == ''){
              toast.error("Please type some content.");
              return;
+        }
+        if(!isUserLoggedIn){
+            toast.error("Please Login to Submit report :)");
+            return;
         }
         // console.log(bugContent);
         toast.promise(
