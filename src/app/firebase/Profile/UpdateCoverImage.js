@@ -37,7 +37,7 @@ export default async function UpdateCoverImage({blob = false, imageUrl = false})
     }
 
     const resp = await uploadImageToFirebaseStorage(
-      `/coverImage/${userData.details.uid}${new Date().getTime()}`,
+      `/coverImage/${userData.details.uid}/${new Date().getTime()}`,
       imageUrl,
       blob
     );

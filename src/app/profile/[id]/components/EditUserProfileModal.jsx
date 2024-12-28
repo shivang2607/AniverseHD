@@ -6,6 +6,7 @@ import UpdateProfileImage from "@/app/firebase/Profile/UpdateProfileImage";
 import UpdateCoverImage from "@/app/firebase/Profile/UpdateCoverImage";
 import UpdateName from "@/app/firebase/Profile/UpdateName";
 import useUserStore from "@/components/ZustandStores/userStore";
+import toast from "react-hot-toast";
 
 const EditUserProfileModal = ({
   isOpen,
@@ -65,11 +66,14 @@ const EditUserProfileModal = ({
     if (resp.status === Constant_Var_success) {
       //success Toast
       setProfileImage({ file: null, preview: resp.response });
-      console.log("Image Uploaded Succesfully", resp.response);
+      // console.log("Image Uploaded Succesfully", resp.response);
     } else {
       //error toast
       setProfileImage({ ...profileImage, file: null });
-      console.log(resp.response, "error");
+      toast.error("Error Updating Profile Image", {
+        id: "8",
+        duration: 3000,
+      });
     }
 
     loadLoggedInUserData();
@@ -93,11 +97,14 @@ const EditUserProfileModal = ({
     if (resp.status === Constant_Var_success) {
       //success Toast
       setCoverImage({ file: null, preview: resp.response });
-      console.log("Image Uploaded Succesfully", resp.response);
+      // console.log("Image Uploaded Succesfully", resp.response);
     } else {
       //error toast
       setCoverImage({ ...coverImage, file: null });
-      console.log(resp.response, "error");
+      toast.error("Error Updating Cover Image", {
+        id: "9",
+        duration: 3000,
+      });
     }
     loadLoggedInUserData();
     setLoading(false);

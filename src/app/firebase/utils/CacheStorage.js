@@ -144,7 +144,7 @@ export const changeCoverUrlCached = ({ coverUrl }) => {
   if (!userData) return;
 
   userData.coverUrl = coverUrl;
-  setUserInfoCached(userData);
+  setUserInfoCached({userData:userData});
 };
 
 export const changePhotoUrlCached = ({ photoUrl }) => {
@@ -153,7 +153,7 @@ export const changePhotoUrlCached = ({ photoUrl }) => {
   if (!userData) return;
 
   userData.photoUrl = photoUrl;
-  setUserInfoCached(userData);
+  setUserInfoCached({userData:userData});
 };
 
 export const changeUserPlayOptionsCached = ({ playerOptions }) => {
@@ -163,7 +163,7 @@ export const changeUserPlayOptionsCached = ({ playerOptions }) => {
 
   userData.playerOptions = playerOptions;
 
-  setUserInfoCached({ userData });
+  setUserInfoCached({ userData: userData });
 };
 
 /** User WatchLists Info */

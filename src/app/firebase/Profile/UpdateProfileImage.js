@@ -41,7 +41,7 @@ export default async function UpdateProfileImage({
     }
 
     const resp = await uploadImageToFirebaseStorage(
-      `/profileImage/${userData.details.uid}${new Date().getTime()}`,
+      `/profileImage/${userData.details.uid}/${new Date().getTime()}`,
       imageUrl,
       blob
     );
