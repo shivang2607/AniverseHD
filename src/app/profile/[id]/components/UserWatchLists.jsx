@@ -169,7 +169,7 @@ const UserWatchLists = ({ id }) => {
                 loaderText={
                   isUserLoggedIn && loggedInUserId === id
                     ? "No WatchLists Found"
-                    : "No Public WatchLists Availabe"
+                    : "No Public WatchLists Available"
                 }
               />
             </div>

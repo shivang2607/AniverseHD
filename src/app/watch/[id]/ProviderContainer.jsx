@@ -84,6 +84,7 @@ export default function ProviderContainer({
     episodes : state.episodesData
   }));
 
+  // console.log(episodes);
   const serverV = searchParams.get('server');
   const dub = searchParams.get('dub');
   // const [server, setServer] = useState(searchParams.get('server'));
