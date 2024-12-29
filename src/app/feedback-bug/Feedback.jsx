@@ -3,10 +3,11 @@ import ReactStars from "react-rating-stars-component";
 import FeedBack from '../firebase/Feedback_and_Reports/Feedback';
 import useUserStore from '@/components/ZustandStores/userStore';
 import toast from 'react-hot-toast';
+import { Constant_Var_success } from '@/utils/constants';
 
 export default function Feedback() {
 
-    const [rating, setRating] = useState();
+    const [rating, setRating] = useState(0);
     const [feedbackContent, setFeedbackContent] = useState("");
     const {isUserLoggedIn} = useUserStore();
 
@@ -14,23 +15,35 @@ export default function Feedback() {
         setRating(newRating);
     }
 
-    const handleSubmit = () => {
-        if(!isUserLoggedIn){
+    const handleSubmit = async () => {
+        if (!isUserLoggedIn) {
             toast.error("Please Login to Submit Feedback :)");
             return;
         }
-
-        toast.promise(
-            FeedBack({ Message: feedbackContent.trim(), Stars: rating }),
-             {
-               loading: 'Submitting...',
-               success: <b>Feedback Submitted Successfully!</b>,
-               error: <b>Could not Submit Feedback.</b>,
-             }
-           );
-       setFeedbackContent("");
+        if(feedbackContent.trim() == ""){
+            toast.error("Please type some Feedback");
+            return;
+        }
     
-    }
+        await toast.promise(
+            new Promise(async (resolve, reject) => {
+                const resp = await FeedBack({ Message: feedbackContent.trim(), Stars: rating });
+    
+                if (resp.status === Constant_Var_success) {
+                    resolve(); 
+                } else {
+                    reject(); 
+                }
+            }),
+            {
+                loading: 'Submitting...',
+                success: <b>Feedback Submitted Successfully!</b>,
+                error: <b>Could not Submit Feedback.</b>,
+            }
+        );
+    
+        setFeedbackContent(""); 
+    };
 
   return (
     <>

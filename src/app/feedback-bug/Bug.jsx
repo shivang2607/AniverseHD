@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import ReportBug from '../firebase/Feedback_and_Reports/reportBug';
 import useUserStore from '@/components/ZustandStores/userStore';
+import { Constant_Var_success } from '@/utils/constants';
 
 export default function Bug() {
     const [bugContent, setBugContent] = useState("");
@@ -18,7 +19,15 @@ export default function Bug() {
         }
         // console.log(bugContent);
         toast.promise(
-            ReportBug({ Message: bugContent }),
+           new Promise(async (resolve, reject) => {
+                const resp = await ReportBug({ Message: bugContent });
+              
+                    if (resp.status === Constant_Var_success) {
+                          resolve(); 
+                    } else {
+                          reject(); 
+                    }
+              }),
              {
                loading: 'Reporting...',
                success: <b>Bug Reported Successfully!</b>,

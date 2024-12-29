@@ -40,9 +40,9 @@ export default async function ReportBug({ Message }) {
     validateParams({ Message:Message });
     // Check if user cookies exist
     const userData = await getUserAuth();
-    // if (!userData) {
-    //   throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
-    // }
+    if (!userData) {
+      throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
+    }
     const docRef = doc(collection(db, "bugs"));
     const bugObject = {
         message: Message,
