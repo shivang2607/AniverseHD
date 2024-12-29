@@ -144,10 +144,10 @@ const Navbar = () => {
                 </Link>
 
                 <Link
-                  href="/report-bug"
+                  href="/feedback-bug"
                   className=" hover:text-white px-2 text-nowrap flex rounded-md text-md font-light"
                 >
-                  Report Bug
+                  Feedback/Bug
                 </Link>
               </div>
             </div>
@@ -226,10 +226,10 @@ const Navbar = () => {
           </Link>
 
           <Link
-            href="/report-bug"
+            href="/feedback-bug"
             className=" hover:text-white block px-3 rounded-md text-base font-medium"
           >
-            Report Bug
+            Feedback/Report Bug
           </Link>
           
           {!isUserLoggedIn && <button

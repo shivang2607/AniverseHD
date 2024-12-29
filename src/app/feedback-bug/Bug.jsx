@@ -1,11 +1,9 @@
-'use client'
 import React, { useState } from 'react'
+import toast from 'react-hot-toast';
 import ReportBug from '../firebase/Feedback_and_Reports/reportBug';
 import useUserStore from '@/components/ZustandStores/userStore';
-// import { Constant_Var_success } from '@/utils/constants';
-import toast, { Toaster } from 'react-hot-toast';
 
-export default function Page() {
+export default function Bug() {
     const [bugContent, setBugContent] = useState("");
     const {isUserLoggedIn} = useUserStore();
 
@@ -29,10 +27,9 @@ export default function Page() {
            );
        setBugContent("");
     }
-
-    return (
-        <div className='pt-16 min-h-screen w-full px-4 items-center  text-sm flex flex-col gap-4'>
-            <h1 className='font-semibold text-primary-200 tracking-wide text-xl my-6'>
+  return (
+    <>
+        <h1 className='font-semibold text-primary-200 tracking-wide text-xl my-3'>
                 Report Bug/ Issue you faced
             </h1>
             <textarea placeholder='Please write your issue here...'
@@ -45,16 +42,6 @@ export default function Page() {
                 onClick={() => handleSubmit()}>
                 Submit
             </button>
-            <Toaster
-                toastOptions={{
-                    style: {
-                        borderRadius: "10px",
-                        background: "#b6d7d4",
-                        border: "1px solid ",
-                        color: "#041C32",
-                    },
-                }}
-            />
-        </div>
-    )
+    </>
+  )
 }
