@@ -100,7 +100,7 @@ const Navbar = () => {
   return (
     <>
     <nav
-        className={`fixed  py-1 border-[1.5px] border-primary-100 w-[97%] self-center items-center md:mx-6 mx-1 block justify-center ${isOpen ? "rounded-xl" : "rounded-full"}   my-2  z-50 transition-transform duration-300 backdrop-blur-sm ${
+        className={`fixed  py-1 border-[1.5px] border-primary-100 w-[97%] self-center items-center md:mx-6 mx-1 block justify-center ${isOpen || searchOpen ? "rounded-xl" : "rounded-full"}   my-2  z-50 transition-transform duration-300 backdrop-blur-sm ${
           showNavbar ? "translate-y-0" : "-translate-y-[120%]"
         } ${isBackgroundVisible ? "bg-cbg-100/70" : "bg-cbg-100/30"}`}
     >
@@ -147,26 +147,16 @@ const Navbar = () => {
                   href="/feedback-bug"
                   className=" hover:text-white px-2 text-nowrap flex rounded-md text-md font-light"
                 >
-                  Feedback/Bug
+                  Feedback/Report Bug
                 </Link>
               </div>
             </div>
           </div>
           <div className="flex items-center  flex-row-reverse md:flex-row md:gap-8">
-            <div className="ml-auto flex md:hidden">
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
-              >
-                {isOpen ? (
-                  <HiX className="h-6 w-6" />
-                ) : (
-                  <HiMenu className="h-6 w-6" />
-                )}
-              </button>
-            </div>
+            
+
             <div className="searchpanel flex gap-2 items-center">
-              <div
+              {/* <div
                 className={`w-80 transition-all duration-200 transform ${
                   searchOpen
                     ? "translate-x-0 opacity-100 visible"
@@ -174,7 +164,7 @@ const Navbar = () => {
                 } md:block hidden`}
               >
                 <SearchComponent />
-              </div>
+              </div> */}
               <button onClick={() => setSearchOpen(!searchOpen)}>
                 <FaSearch
                   className={`${
@@ -197,11 +187,25 @@ const Navbar = () => {
               <DropDownNavbarUserAvatar />
             )}
           </div>
+
+          <div className="ml-auto flex lg:hidden">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
+              >
+                {isOpen ? (
+                  <HiX className="h-6 w-6" />
+                ) : (
+                  <HiMenu className="h-6 w-6" />
+                )}
+              </button>
+            </div>
+
         </div>
       </div>
 
       {/* //? MOBILE VIEW IS FROM BELOW */}
-      <div className={`${isOpen ? "flex" : "hidden"} md:hidden w-full overflow-hidden`}>
+      <div className={`${isOpen ? "flex" : "hidden"} lg:hidden w-full overflow-hidden`}>
         <div className="px-2 pt-5 pb-3 space-y-1 w-full flex flex-col gap-4  sm:px-1">
         <div className="relative w-[80%] m-2">
             <SearchComponent />
@@ -240,6 +244,15 @@ const Navbar = () => {
           </button>}
         </div>
       </div>
+
+      <div className={`searchpanel px-4 ${searchOpen ? "md:flex hidden  transition-all duration-200 transform  translate-x-0":"hidden"} w-full mx-auto  justify-center gap-2 items-center`}>
+              <div
+                className={`w-full my-2   md:block hidden`}
+              >
+                <SearchComponent />
+              </div>
+              
+            </div>
     {isUserLoggedIn  && <WatchlistBar  />}
     </nav>
 

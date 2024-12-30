@@ -38,7 +38,7 @@ export default async function getAnime(id) {
   try {
     console.log('cache miss: response sent from qdrant api call');
     const resPayload = await getQdrantAnime(id);
-    if (resPayload.add) { // that means anime is not present in qdrant database and that it has been added from the addQdrantAnime function written in addAnime.js file.
+    if (resPayload.add) { // that means anime is not present in qdrant database and that it has to be added from the addQdrantAnime function written in addAnime.js file.
       
       return resPayload.resultBhaai;
     }
