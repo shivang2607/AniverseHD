@@ -11,7 +11,7 @@ import {
  *
  * @param {Object} params - The input parameters.
  * @param {string} params.Message - The Bug Message.
- * @param {string} params.Stars - The Bug Message.
+ * @param {number} params.Stars - The Stars.
  *
  * @returns {Promise<{status:string,response:any}>} - A promise that resolves to an object containing:
  *   - `status` {string}: A constant representing the status of the operation. Will be `Constant_Var_success` on success, or `Constant_Var_error` on failure.
@@ -68,6 +68,6 @@ function validateParams({ Message, Stars }) {
   }
 
   if (typeof Stars !== 'number' || Stars < 0 || Stars > 5) {
-    throw new Error("'Message' must be a number between 0 and 5");
+    throw new Error("'Stars' must be a number between 0 and 5");
   }
 }
