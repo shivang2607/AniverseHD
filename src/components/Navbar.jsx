@@ -100,9 +100,9 @@ const Navbar = () => {
   return (
     <>
     <nav
-        className={`fixed  py-1 border-[1.5px] border-primary-100 w-[97%] self-center items-center md:mx-6 mx-1 block justify-center ${isOpen || searchOpen ? "rounded-xl" : "rounded-full"}   my-2  z-50 transition-transform duration-300 backdrop-blur-sm ${
+        className={`fixed my-2 md:my-0  py-1 md:py-0 border-[1.5px] md:border-none border-primary-100  w-[97%] md:w-full self-center items-center md:m-none mx-1 md:mx-0 block justify-center ${isOpen || searchOpen ? "rounded-none" : "rounded-full md:rounded-none"}     z-50 transition-transform duration-300 backdrop-blur-sm ${
           showNavbar ? "translate-y-0" : "-translate-y-[120%]"
-        } ${isBackgroundVisible ? "bg-cbg-100/70" : "bg-cbg-100/30"}`}
+        } ${isBackgroundVisible ? "bg-cbg-100/80" : "bg-cbg-100/50"}`}
     >
       <div className="w-full mx-auto px-4 sm:px-6 ">
         <div className="flex items-center justify-between h-fit py-1">
@@ -188,7 +188,7 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="ml-auto flex lg:hidden">
+          <div className="ml-auto flex md:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
@@ -205,7 +205,7 @@ const Navbar = () => {
       </div>
 
       {/* //? MOBILE VIEW IS FROM BELOW */}
-      <div className={`${isOpen ? "flex" : "hidden"} lg:hidden w-full overflow-hidden`}>
+      <div className={`${isOpen ? "flex" : "hidden"} md:hidden w-full overflow-hidden`}>
         <div className="px-2 pt-5 pb-3 space-y-1 w-full flex flex-col gap-4  sm:px-1">
         <div className="relative w-[80%] m-2">
             <SearchComponent />
