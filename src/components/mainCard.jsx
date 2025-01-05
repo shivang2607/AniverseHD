@@ -69,6 +69,7 @@ export default function MainCard({ anime , imageHeight=72}) {
                   />
                 )}
               </div>
+
              
               <div className="flex ml-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">
                 {anime?.animeAgeRating?.split(" ")[0].toUpperCase() || anime?.rating?.split(" ")[0].toUpperCase() || "NA"}
@@ -79,7 +80,7 @@ export default function MainCard({ anime , imageHeight=72}) {
             </div>
             <div className="flex mt-auto m-2 gap-1 text-xs">
               <div className="score bg-sky-700 text-gray-200 font-semibold px-1   rounded-sm">
-                { typeof anime?.animeScore === "number" ? anime.animeScore.toFixed(2) :( anime?.animeScore || "NA")}
+                { typeof anime?.score === "number" ? anime.score.toFixed(2) :( anime?.score || "NA")}
               </div>
               <div className="bg-primary-300 text-cbg-100 font-semibold px-1  rounded-sm">
                 {anime?.animeStartYear || Math.floor(
