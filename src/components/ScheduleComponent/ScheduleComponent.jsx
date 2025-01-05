@@ -3,6 +3,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import ScheduleCard from './ScheduleCard';
 import { uniqueId } from 'lodash';
+import { getWithExpiry, setWithExpiry } from '../utils/storage';
 
 export default function ScheduleComponent() {
 
@@ -22,7 +23,7 @@ export default function ScheduleComponent() {
       useEffect(() => {
           if (selectedDay) {
               const currentWeek = getCurrentWeekNumber();
-              const cachedData = localStorage.getItem(`scheduledData-${currentWeek}-${selectedDay}`);
+              const cachedData = getWithExpiry(`scheduledData-${currentWeek}-${selectedDay}`);
               
               if (cachedData) {
                   // If data exists in localStorage, use it
@@ -38,7 +39,7 @@ export default function ScheduleComponent() {
                             setScheduledData(res.data);
                             
                             // Cache the data in localStorage
-                            localStorage.setItem(`scheduledData-${currentWeek}-${selectedDay}`, JSON.stringify(res.data));
+                            setWithExpiry(`scheduledData-${currentWeek}-${selectedDay}`, JSON.stringify(res.data), 1000 * 60 * 60 * 24 * 2); //cache for 2 days
                           
                         } catch (error) {
                             console.error("Error fetching data:", error);
