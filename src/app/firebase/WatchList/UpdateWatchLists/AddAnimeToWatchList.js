@@ -33,10 +33,10 @@ import GetWatchListInfoById from "../WatchListDocument/GetWatchListInfoById";
  * @param {Object|null} params.animePhoto - The photo URL or image path of the anime (can be null).
  * @param {Array|null} params.animeGenre - The genre of the anime (can be null).
  * @param {string|null} params.animeType - The type or category of the anime (can be null).
- * @param {number|null} params.animeScore - The score of the anime (can be null).
+ * @param {number|string|null} params.animeScore - The score of the anime (can be null).
  * @param {string|null} params.animeAgeRating - The age rating of the anime (can be null).
- * @param {number|null} params.animeStartYear - The starting year of the anime (can be null).
- * @param {number|null} params.animeLength - The number of episodes or runtime of the anime (can be null).
+ * @param {number|string|null} params.animeStartYear - The starting year of the anime (can be null).
+ * @param {number|string|null} params.animeLength - The number of episodes or runtime of the anime (can be null).
  * @param {string|null} params.url - Url of episode for recent watchlist
  * @param {object|null} params.episodeTimestamp - Timestamp of episode for recent watchlist
  *
@@ -575,7 +575,7 @@ function validateParams({
   }
 
   // Anime Score can be null
-  if (animeScore !== null && typeof animeScore !== "number") {
+  if (animeScore !== null && typeof animeScore !== "number" && typeof animeScore !== "string") {
     throw new Error("Invalid animeScore (should be a number or null)");
   }
 
@@ -594,7 +594,7 @@ function validateParams({
   }
 
   // Anime Length can be null
-  if (animeLength !== null && typeof animeLength !== "number") {
+  if (animeLength !== null && typeof animeLength !== "number" && typeof animeLength !== "string") {
     throw new Error("Invalid animeLength (should be a number or null)");
   }
 
