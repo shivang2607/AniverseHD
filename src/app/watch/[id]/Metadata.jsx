@@ -43,7 +43,7 @@ export default function Metadata({id, content}) {
                       {content?.score && (
                         <div className="score rounded flex items-center bg-sky-400 p- px-1 text-cbg-200 font-semibold">
                           <MdOutlineSportsScore className="text-xl" />{" "}
-                          {content?.score?.toFixed(2)}
+                          {typeof content?.score === "number" ? content?.score.toFixed(2) :( content?.score || "NA")}
                         </div>
                       )}
                       <div className="episodes flex gap-1 bg-primary-300 text-cbg-200 font-semibold rounded px-1 items-center">

@@ -27,7 +27,7 @@ export default function CardComponent({ anime }) {
           </div>
           <div className="absolute bottom-0 left-0 flex z-10 gap-1 p-1 text-[0.65rem] rounded-sm overflow-hidden">
             <div className="bg-sky-700 text-gray-200 font-semibold px-1   rounded-sm">
-              {animeData?.score?.toFixed(2) || "NA"}
+            { typeof animeData?.score === "number" ? animeData.score.toFixed(2) :( animeData?.score || "NA")}
             </div>
             <div className="bg-primary-300 text-cbg-100 font-semibold px-1  rounded-sm">
               {Math.floor(animeData?.start_year) || "NA"}

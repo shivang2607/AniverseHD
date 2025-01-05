@@ -64,7 +64,7 @@ export default function ScheduleCard({anime}) {
             </div>
             <div className="flex mt-auto m-2 gap-1 text-xs">
               <div className="score bg-sky-700 text-gray-200 font-semibold px-1   rounded-sm">
-                {anime?.score?.toFixed(2) || "NA"}
+              {typeof anime?.score === "number" ? anime.score.toFixed(2) :( anime?.score || "NA")}
               </div>
               <div className="bg-primary-300 text-cbg-100 font-semibold px-1  rounded-sm">
                 {Math.floor(

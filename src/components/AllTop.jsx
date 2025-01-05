@@ -47,7 +47,7 @@ const TopAnimeSection = ({ title, data, category }) => (
                   <div className="metadata rounded-sm gap-1 overflow-hidden items-center font-semibold flex">
                     <div className="score px-1 py-[0.18rem] flex gap-1 items-center bg-sky-600 text-gray-200">
                       <MdSportsScore size={16} />
-                      {anime?.score?.toFixed(2) || "NA"}
+                      {typeof anime?.score === "number" ? anime.score.toFixed(2) :( anime?.score || "NA")}
                     </div>
                     <div className="episodes px-1 py-[0.18rem] flex gap-1 items-center bg-primary-400 text-black">
                       <PiVideoFill size={15} />

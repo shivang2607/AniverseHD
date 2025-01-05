@@ -131,7 +131,7 @@ const SearchComponent = ({viewAll=true}) => {
 
                           <span className="flex gap-1  text-primary-400">
                           <b className="flex items-center text-gray-300">&bull;</b>
-                          {score? score.toFixed(2) : "NA"}
+                          {typeof score === "number" ? score.toFixed(2) :( score || "NA")}
                           </span>
 
 

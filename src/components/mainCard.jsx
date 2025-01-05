@@ -79,7 +79,7 @@ export default function MainCard({ anime , imageHeight=72}) {
             </div>
             <div className="flex mt-auto m-2 gap-1 text-xs">
               <div className="score bg-sky-700 text-gray-200 font-semibold px-1   rounded-sm">
-                {anime?.animeScore || anime?.score?.toFixed(2) || "NA"}
+                { typeof anime?.animeScore === "number" ? anime.animeScore.toFixed(2) :( anime?.animeScore || "NA")}
               </div>
               <div className="bg-primary-300 text-cbg-100 font-semibold px-1  rounded-sm">
                 {anime?.animeStartYear || Math.floor(

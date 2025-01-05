@@ -202,7 +202,7 @@ export default function Anime({ params }) {
                       {anime?.score && (
                         <div className="score rounded flex items-center bg-sky-400 p- px-1 text-cbg-200 font-semibold">
                           <MdOutlineSportsScore className="text-xl" />{" "}
-                          {anime?.score?.toFixed(2)}
+                          {typeof anime?.score === "number" ? anime.score.toFixed(2) :( anime?.score || "NA")}
                         </div>
                       )}
                       <div className="episodes flex gap-1 bg-primary-300 text-cbg-200 font-semibold rounded px-1 items-center">
