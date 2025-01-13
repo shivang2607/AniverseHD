@@ -20,8 +20,9 @@ export default function Feedback() {
             toast.error("Please Login to Submit Feedback :)");
             return;
         }
-        if(feedbackContent.trim() == ""){
-            toast.error("Please type some Feedback");
+
+        if (!rating){
+            toast.error("Please give rating");
             return;
         }
     
