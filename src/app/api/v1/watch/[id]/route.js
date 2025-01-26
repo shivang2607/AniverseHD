@@ -6,7 +6,7 @@ import redisClient from "@/lib/redis"; // Use the singleton instance directly
 
 const watchOptions = {
   max: 500,
-  ttl: 1000 * 60 * 60 * 1, // 1 hour
+  ttl: 1000 * 60 * 10, // 10 min
 };
 const watchCache = new LRUCache(watchOptions);
 
