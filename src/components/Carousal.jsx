@@ -73,7 +73,6 @@ const ResponsiveCarousal = () => {
         navigation={true}
         
       >
-        {console.log("Top Airing => ",topAiring)}
         {topAiring?.map((anime, index) => {
           return (
             <SwiperSlide key={anime?.mal_id}>
