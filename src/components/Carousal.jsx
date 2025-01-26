@@ -13,23 +13,23 @@ import Link from "next/link";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 
 const ResponsiveCarousal = () => {
-  const [topFavorite, setTopFavorite] = useState();
+  const [topAiring, setTopAiring] = useState();
 
   useEffect(() => {
     // Check if data exists in session storage
-    const sessionData = sessionStorage.getItem("topAnimeData");
+    const sessionData = sessionStorage.getItem("top_airing");
     if (sessionData) {
       // console.log("this is session data", JSON.parse(sessionData)); 
-      setTopFavorite(JSON.parse(sessionData));
+      setTopAiring(JSON.parse(sessionData));
       return;
     } 
-      axios.get("/api/v1/get-top-anime")
+      axios.get("/api/v1/get-top-anime?filter=airing")
         .then((response) => {
           const data = response?.data?.data;
           //! IMPLEMENT TRY CATCH HERE FOR ERRORS IN SESSION STORAGE PARSING
-          setTopFavorite(data);
+          setTopAiring(data);
           if(data){
-          sessionStorage.setItem("topAnimeData",  JSON.stringify(data));  
+          sessionStorage.setItem("top_airing",  JSON.stringify(data));  
           }
         })
         .catch((error) => {
@@ -50,7 +50,7 @@ const ResponsiveCarousal = () => {
 
   return (
     <div className="w-full h-80 md:h-96 lg:h-[87vh]">
-      {topFavorite ? <Swiper
+      {topAiring ? <Swiper
         className="h-full mySwiper"
         modules={[Autoplay, Pagination, Navigation]}
         style={{
@@ -73,7 +73,7 @@ const ResponsiveCarousal = () => {
         navigation={true}
         
       >
-        {topFavorite?.map((anime, index) => {
+        {topAiring?.map((anime, index) => {
           return (
             <SwiperSlide key={anime?.mal_id}>
               <div
@@ -86,7 +86,7 @@ const ResponsiveCarousal = () => {
                 <div className="w-full flex justify-between items-baseline h-full backdrop-blur-sm bg-black bg-opacity-30 md:gap-12 gap-4 bg-gradient-to-r from-black to-transparent    md:px-28 px-4">
                 
                 <div className=" content flex flex-col   mt-auto md:m-auto mb-12 text-base gap-4 md:gap-6 w-2/3">
-                  <div className="numbering text-primary-500 underline text-sm  tracking-wider md:text-base">#{index+1} Favorite</div>
+                  <div className="numbering text-primary-500 underline text-sm  tracking-wider md:text-base">#{index+1} Airing</div>
 
                   <div className="title md:text-3xl text-lg font-bold md:w-[70%]  line-clamp-2  overflow-ellipsis  leading-relaxed text-white">{anime?.title_english || anime?.title}
                   </div>

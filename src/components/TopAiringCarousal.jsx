@@ -11,27 +11,27 @@ import Skeleton from "react-loading-skeleton";
 import { getSessionWithExpiry, setSessionWithExpiry } from "./utils/storage";
 
 export default function TopAiringCarousal() {
-  const [topAiring, setTopAiring] = useState();
+  const [topFavorite, setTopFavorite] = useState();
 
   useEffect(() => {
-    const cachedData = getSessionWithExpiry('top_airing');
+    const cachedData = getSessionWithExpiry('topAnimeData');
     if(cachedData){
-      setTopAiring(cachedData);
+      setTopFavorite(cachedData);
       return;
     }
-    axios.get("/api/v1/get-top-anime?filter=airing").then((response) => {
-      setTopAiring(response?.data?.data);
-      setSessionWithExpiry('top_airing', response?.data?.data, 60 * 60 * 1000 * 24); //24hrs
+    axios.get("/api/v1/get-top-anime").then((response) => {
+      setTopFavorite(response?.data?.data);
+      setSessionWithExpiry('topAnimeData', response?.data?.data, 60 * 60 * 1000 * 24); //24hrs
     });
   }, []);
 
   return (
     <div className="my-1 p-4  flex flex-col gap-4">
       <h1 className="text-primary-500 font-semibold text-2xl tracking-wide">
-        Top Airing
+        Top Favorite
       </h1>
       <div className="cards ">
-        {topAiring ? (
+        {topFavorite ? (
           <Swiper
             className="h-full w-full  mySwiper"
             modules={[Autoplay, Navigation]}
@@ -65,8 +65,8 @@ export default function TopAiringCarousal() {
               },
             }}
           >
-            {Array.isArray(topAiring) &&
-              topAiring?.map((anime, id) => {
+            {Array.isArray(topFavorite) &&
+              topFavorite?.map((anime, id) => {
                 return (
                   <SwiperSlide key={anime?.mal_id} className="">
                     <div className="md:h-[60vh] h-52 gap-1 items-baseline flex flex-col">
