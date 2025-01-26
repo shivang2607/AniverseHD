@@ -63,8 +63,8 @@ export default async function FeedBack({ Message, Stars }) {
 
 
 function validateParams({ Message, Stars }) {
-  if (typeof Message !== 'string' || Message.trim() === '') {
-    throw new Error("'Message' must be a non-empty string");
+  if (typeof Message !== 'string') {
+    throw new Error("'Message' must be a string");
   }
 
   if (typeof Stars !== 'number' || Stars < 0 || Stars > 5) {
