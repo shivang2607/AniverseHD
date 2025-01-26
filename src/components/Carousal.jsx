@@ -20,7 +20,7 @@ const ResponsiveCarousal = () => {
     const sessionData = sessionStorage.getItem("top_airing");
     if (sessionData) {
       // console.log("this is session data", JSON.parse(sessionData)); 
-      setTopAiring(JSON.parse(sessionData));
+      setTopAiring(JSON.parse(sessionData)?.value);
       return;
     } 
       axios.get("/api/v1/get-top-anime?filter=airing")
@@ -73,6 +73,7 @@ const ResponsiveCarousal = () => {
         navigation={true}
         
       >
+        {console.log("Top Airing => ",topAiring)}
         {topAiring?.map((anime, index) => {
           return (
             <SwiperSlide key={anime?.mal_id}>
