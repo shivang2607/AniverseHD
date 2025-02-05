@@ -2,7 +2,7 @@
 import axios from "axios";
 import ResponsiveCarousal from "../components/Carousal";
 import React, { useEffect } from "react";
-import TopFavoriteCarousal from "@/components/TopFavoriteCarousal";
+import TopAiringCarousal from "@/components/TopAiringCarousal";
 import RecommendationPanel from "@/components/recommendationPanel/RecommendationPanel";
 import AllTop from "@/components/AllTop";
 import RecentWatching from "@/components/RecentWatching";
@@ -29,7 +29,7 @@ export default function Page() {
     <div>
       <ResponsiveCarousal />
       <RecentWatching/>
-      <TopFavoriteCarousal />
+      <TopAiringCarousal />
       <RecommendationPanel />
       <AllTop />
       <ScheduleComponent/>

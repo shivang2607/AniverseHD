@@ -954,7 +954,7 @@ export default function Page({ params }) {
         <div className="md:hidden block my-12">
           <Metadata content={content} id={params?.id} />
         </div>
-      {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>}
+      {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
       </div>
       {params?.id && <Suggested id={params?.id} />}
     </div>
