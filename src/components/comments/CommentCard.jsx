@@ -309,7 +309,7 @@ export default function CommentCard({ animeId, comment, userId }) {
           {replyComments?.length > 0 ? (
             replyComments?.map((replyComment) => {
               return (
-                <ReplyCommentCard animeId={animeId} comment={replyComment} parentCommentId={comment.commentId} userId={userId}/>
+                <ReplyCommentCard key={replyComment?.commentId} animeId={animeId} comment={replyComment} parentCommentId={comment.commentId} userId={userId}/>
               )
             })
           ) : (

@@ -128,6 +128,7 @@ const Navbar = () => {
                 {navbarItems.map(item=>{
                   return (
                     <Link
+                    key={item.href}
                   href={item.href}
                   className={`px-3 py-2 flex gap-1 items-center rounded-md text-sm font-medium transition-colors ${currentPath === item.href ? "text-primary-200 bg-primary-100/10" : "text-gray-300 hover:text-primary-200 hover:bg-primary-100/5"}`}
                 >
@@ -237,7 +238,7 @@ const Navbar = () => {
             </div>
           {navbarItems.map(item => {
             return (
-              <Link href={item.href} className=" px-3 py-2 rounded-md text-base font-medium text-gray-300 flex items-center gap-1 hover:text-primary-200 hover:bg-primary-100/10">
+              <Link key={item.href} href={item.href} className=" px-3 py-2 rounded-md text-base font-medium text-gray-300 flex items-center gap-1 hover:text-primary-200 hover:bg-primary-100/10">
                 {item.icon}
                 {item.name}
             </Link>
