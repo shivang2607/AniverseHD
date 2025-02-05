@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { debounceGetComments, getComments, postComment } from './utilFunctions';
 import { Comment } from 'react-loader-spinner';
 import { orderBy } from 'lodash';
+import CommentCard from './CommentCard';
 
 const commentLength =500;
 
@@ -47,12 +48,19 @@ export default function CommentsContainer({animeId, loggedInUserId, loggedInUser
             
             //? For below code only loggedInUserId was needed as trigger but since we have implemented debounce function of 500ms delay this shouldn't cause any issue.
             if(!epNo)return;
-            setParams(prev => ({...prev, userId:loggedInUserId, epNo:epNo}))
-            const res = await debounceGetComments({...params, userId: loggedInUserId, epNo:epNo});
+            setParams(prev => ({...prev, userId:loggedInUserId, epNo:epNo}));
+        })();
+    }, [loggedInUserId, zoroEpId, gogoEpId, epNo])  //Adding zoro and gogo ids are not necessary, having said that its better to have this data as up to date as possible.
+
+
+    useEffect(()=>{
+        //This useEffect triggers whenever the params for comment sapi changes that means wehenever we want to get the comments data from the commetns api.
+        (async ()=>{
+            const res = await debounceGetComments(params);
             setCommentsData(res);
             console.log("fetched comments data => ", res);
         })();
-    }, [loggedInUserId, zoroEpId, gogoEpId, epNo])  //Adding zoro and gogo ids are not necessary, having said that its better to have this data as up to date as possible.
+    }, [params]);
 
 
 
@@ -145,8 +153,12 @@ export default function CommentsContainer({animeId, loggedInUserId, loggedInUser
             </div>  {/* div for adding the comment ended here  */}
             
             {/* //div for list of comments begins here */}
-            <div className="w-3/4 flex flex-col gap-4">
-
+            <div className="w-3/5 flex flex-col gap-6 mt-8">
+                {commentsData?.map(comment => {
+                    return (
+                        <CommentCard key={comment.commentId} animeId={animeId} comment={comment} userId={loggedInUserId}/>
+                    )
+                })}
             </div>
 
         </div>

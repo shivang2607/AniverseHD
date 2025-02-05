@@ -116,7 +116,7 @@ export default function Page({ params }) {
   const [recentTimestamp, setRecentTimestamp] = useState(0);
   const [downloadLink, setDownloadLink] = useState();
   const [duration, setDuration] = useState();
-  const [epNo, setEpNo] = useState(null);
+  const [epNo, setEpNo] = useState(1);
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
   const durationRef = useRef(duration);
@@ -954,7 +954,7 @@ export default function Page({ params }) {
         <div className="md:hidden block my-12">
           <Metadata content={content} id={params?.id} />
         </div>
-      {params?.id && epNo>0 && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>}
+      {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>}
       </div>
       {params?.id && <Suggested id={params?.id} />}
     </div>

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
     const payload = await req.json();
-    //values of reactionType can be ["like", "dislike", null/undefined], can be undefiend because it is handled in the worker code, so to remove like or dislike just dont send the reactionThpe variable
+    //values of reactionType can be ["like", "dislike", null/undefined], can be undefiend because it is handled in the worker code, so to remove like or dislike just dont send the reactionType variable
     const {commentId, userId, reactionType = null} = payload;
 
     // Validate required fields

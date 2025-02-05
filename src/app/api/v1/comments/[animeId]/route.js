@@ -49,7 +49,7 @@ export async function GET(req, { params }) {
 export async function POST(req, { params }) {
     const {animeId} = params;
     const payload = await req.json();
-    const {userId, userName, commentBody, epNo, isSpoiler, zoroEpId, gogoEpId, parentCommentId} = payload;
+    const {userId, userName, commentBody, epNo, isSpoiler, zoroEpId, gogoEpId, parentCommentId, repliedToUId} = payload;
 
     // Validate required fields
     console.log("Hello", animeId, userId, commentBody);
@@ -70,7 +70,8 @@ export async function POST(req, { params }) {
             isSpoiler: isSpoiler || false,
             zoroEpId: zoroEpId || null,
             gogoEpId: gogoEpId || null,
-            parentCommentId: parentCommentId || null
+            parentCommentId: parentCommentId || null,
+            repliedToUId
         };
 
         const res = await axios.post(

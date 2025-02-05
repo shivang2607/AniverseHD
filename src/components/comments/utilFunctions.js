@@ -91,7 +91,7 @@ export async function postComment(payload){
     
     try {
         const res = await axios.post(`/api/v1/comments/${animeId}`, payload);
-        console.log("this is res of postComment function => ",res);
+        // console.log("this is res of postComment function => ",res);
 
         if(res?.data?.result?.success===true){
             toast.success(res?.data?.message, {duration:3000});
@@ -103,3 +103,24 @@ export async function postComment(payload){
     }
 }
 
+
+export  async function ReactComment(payload){
+  // const {userId, commentId, reactionType} = payload;
+  if(!payload.userId){
+    toast.error("Please Login to React :)");
+    return;
+  }
+  try {
+    const res = await axios.post(`/api/v1/comments/react`, payload);
+
+    if(res?.data?.success===true){
+        // toast.success(res?.data?.message, {duration:3000});
+        return res;
+    }
+
+} catch (error) {
+    console.log(error);
+    toast.error("Error : Something went wrong! ", {duration:3000});
+    
+}
+}

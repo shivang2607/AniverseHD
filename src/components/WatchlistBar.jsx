@@ -58,7 +58,7 @@ export default function WatchlistBar() {
   return (
     <>
     {!hideWatchlistBar &&
-    <div className="w-full p-1 mx-2  bg-black/5. md:pr-10 pr-8 rounded-md overflow-clip flex md:gap-4 gap-2  items-center md:text-sm text-xs md:mt-2">
+    <div className="w-full p-1 mx-2  bg-black/5. md:pr-10 pr-8 rounded-md overflow-clip flex md:gap-4 gap-2  items-center md:text-sm text-xs md:mt-0">
       <BiSolidHide
         className="!text-2xl w-20 text-primary-300 ml-3 cursor-pointer"
         onClick={() => toggleHideWatchlistBar()}
