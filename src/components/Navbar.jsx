@@ -1,10 +1,16 @@
+//new code of navbar as recommended by deepseek
+
+
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { HiMenu, HiX } from "react-icons/hi";
+import { HiMenu, HiX, HiChevronDown, HiSparkles, HiHome } from "react-icons/hi";
+import { FaSearch, FaComments, FaPoll, FaLightbulb, FaRegStar } from "react-icons/fa";
+import { GrCatalog } from "react-icons/gr";
+import { VscFeedback } from "react-icons/vsc";
+import { FiMoreHorizontal } from "react-icons/fi";
 import SearchComponent from "./recommendationPanel/SearchComponent";
-import { FaSearch } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import DropDownNavbarUserAvatar from "./DropDownNavbarUserAvatar";
@@ -14,7 +20,7 @@ import useGlobalLoader from "./ZustandStores/useGlobalLoader";
 import { Constant_Var_localstorage_version } from "@/utils/constants";
 
 const Navbar = () => {
-  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists,RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar} = useUserStore();
+  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists, RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar } = useUserStore();
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -23,32 +29,40 @@ const Navbar = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
-  // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  // const [loggedInUserData, setLoggedInUserData] = useState(null);
-  const { setLoaderText, setIsLoaderVisible,setImageUrl } = useGlobalLoader();
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const { setLoaderText, setIsLoaderVisible, setImageUrl } = useGlobalLoader();
+
+
+  const navbarItems = [
+    { href: "/", name: "Home", icon: <HiHome className="text-base" /> },
+    { href: "/catalog", name: "Catalog", icon: <GrCatalog className="text-base" /> },
+    { href: "/recommendations", name: "Recommendations", icon: <HiSparkles className="text-base" /> },
+  ]
+
+  // Additional navigation items for the "More" dropdown
+  const moreItems = [
+    { href: "/discussions", name: "Discussions", icon: <FaComments className="mr-2" /> },
+    { href: "/polls", name: "Polls", icon: <FaPoll className="mr-2" /> },
+    { href: "/upcoming", name: "Upcoming Features", icon: <FaLightbulb className="mr-2" /> },
+    { href: "/feature-request", name: "Feature Request", icon: <FaRegStar className="mr-2" /> },
+  ];
+
   const handleSignIn = async () => {
     setIsLoaderVisible(true);
-    setImageUrl(" /userProfileImage7.jpg")
-    await login((status)=>{
-      setLoaderText(status)
-    });
-
-    setIsLoaderVisible(false)
-    setLoaderText(null)
-    setImageUrl(null)
+    setImageUrl("/userProfileImage7.jpg");
+    await login((status) => setLoaderText(status));
+    setIsLoaderVisible(false);
+    setLoaderText(null);
+    setImageUrl(null);
   };
-
-
 
   const handleScroll = () => {
     if (["/recommendations"].some((path) => path === currentPath)) return;
     const currentScrollY = window.scrollY;
 
     if (currentScrollY > lastScrollY && !isScrollingUp) {
-      // Scrolling down
       setShowNavbar(false);
     } else if (currentScrollY < lastScrollY && isScrollingUp) {
-      // Scrolling up
       setShowNavbar(true);
     }
 
@@ -65,10 +79,7 @@ const Navbar = () => {
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     router.prefetch("/profile");
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY, isScrollingUp]);
 
   useEffect(() => {
@@ -76,185 +87,185 @@ const Navbar = () => {
     setIsOpen(false);
   }, [currentPath]);
 
-
   useEffect(() => {
-    // loadUserData();
     loadLoggedInUserDataAndWatchLists();
   }, []);
 
- 
-  useEffect(()=>{
-    if(RecentWatchListId)
-    loadLoggedInUserRecentWatchList();
-  },[RecentWatchListId]);
+  useEffect(() => {
+    if (RecentWatchListId) loadLoggedInUserRecentWatchList();
+  }, [RecentWatchListId]);
 
-  useEffect(()=>{
-    const localstorage_version= localStorage.getItem("version");
-    if(!localstorage_version || localstorage_version !== Constant_Var_localstorage_version){
+  useEffect(() => {
+    const localstorage_version = localStorage.getItem("version");
+    if (!localstorage_version || localstorage_version !== Constant_Var_localstorage_version) {
       localStorage.clear();
-      localStorage.setItem("version",Constant_Var_localstorage_version);
+      localStorage.setItem("version", Constant_Var_localstorage_version);
       sessionStorage.clear();
     }
-  },[]);
+  }, []);
 
   return (
     <>
-    <nav
-        className={`fixed my-2 md:my-0  py-1 md:py-0 border-[1.5px] md:border-none border-primary-100  w-[97%] md:w-full self-center items-center md:m-none mx-1 md:mx-0 block justify-center ${isOpen || searchOpen ? "rounded-none" : "rounded-full md:rounded-none"}     z-50 transition-transform duration-300 backdrop-blur-sm ${
-          showNavbar ? "translate-y-0" : "-translate-y-[120%]"
-        } ${isBackgroundVisible ? "bg-cbg-100/80" : "bg-cbg-100/50"}`}
-    >
-      <div className="w-full mx-auto px-4 sm:px-6 ">
-        <div className="flex items-center justify-between h-fit py-1">
-          <div className="flex w-full items-center">
-            <div className="flex-shrink-0">
-              <Link href="/">
-                <div className="logo relative md:w-48 w-40 h-7 md:h-8">
-                  <Image
-                    src="/logo-primary.png"
-                    quality={100}
-                    priority
-                    fill
-                    alt="AniverseHD"
-                    className="text-xl font-bold "
-                  />
-                </div>
-              </Link>
-              {/* <h1 className="text-xl font-bold ">AniverseHD</h1> */}
-            </div>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-2">
-                <Link
-                  href="/"
-                  className=" hover:text-white px-2  rounded-md text-md font-light"
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/catalog"
-                  className=" hover:text-white px-2  rounded-md text-md font-light"
-                >
-                  Catalog
-                </Link>
-                <Link
-                  href="/recommendations"
-                  className=" hover:text-white px-2  rounded-md text-md font-light"
-                >
-                  Recommendations
-                </Link>
+      <nav className={`fixed w-full top-0 z-50 transition-transform duration-300 backdrop-blur-lg border-b border-primary-100/20 ${showNavbar ? "translate-y-0" : "-translate-y-full"} ${isBackgroundVisible ? "bg-cbg-100/95" : "bg-cbg-100/80"}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6">
+          <div className="flex items-center  h-16">
+            {/* Logo Section */}
+            <Link href="/" className="flex mx-2 items-center space-x-2 group flex-shrink-0">
+              <div className="relative w-36 h-12">
+                <Image
+                  src="/logo-primary.png"
+                  alt="AniverseHD"
+                  fill
+                  className="object-contain transition-transform duration-200 hover:scale-105"
+                  priority
+                />
+              </div>
+            </Link>
 
-                <Link
-                  href="/feedback-bug"
-                  className=" hover:text-white px-2 text-nowrap flex rounded-md text-md font-light"
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center flex-1 max-w-2xl mx-4">
+              <div className="flex space-x-3">
+                {navbarItems.map(item=>{
+                  return (
+                    <Link
+                  href={item.href}
+                  className={`px-3 py-2 flex gap-1 items-center rounded-md text-sm font-medium transition-colors ${currentPath === item.href ? "text-primary-200 bg-primary-100/10" : "text-gray-300 hover:text-primary-200 hover:bg-primary-100/5"}`}
                 >
-                  Feedback/Report Bug
+                  {item.icon}
+                  {item.name}
                 </Link>
+                  )
+                })}
+                
+		{/* More Dropdown */}
+    {/* //TODO: Below section will be uncommented when more features will be added */}
+                {/* <div className="relative">
+                  <button
+                    onClick={() => setIsMoreOpen(!isMoreOpen)}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isMoreOpen ? "text-primary-200 bg-primary-100/10" : "text-gray-300 hover:text-primary-200 hover:bg-primary-100/5"
+                    }`}
+                  >
+                    <FiMoreHorizontal className="mr-1" />
+                    More
+                    <HiChevronDown className={`ml-1 transition-transform ${isMoreOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {isMoreOpen && (
+                    <div className="absolute top-full left-0 mt-1 w-56 rounded-lg shadow-lg bg-cbg-200 border border-primary-100/20">
+                      <div className="py-1">
+                        {moreItems.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className="flex items-center px-4 py-2 text-sm text-gray-300 hover:text-primary-200 hover:bg-primary-100/10 transition-colors"
+                            onClick={() => setIsMoreOpen(false)}
+                          >
+                            {item.icon}
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div> */}
+
               </div>
             </div>
-          </div>
-          <div className="flex items-center  flex-row-reverse md:flex-row md:gap-8">
-            
 
-            <div className="searchpanel flex gap-2 items-center">
-              {/* <div
-                className={`w-80 transition-all duration-200 transform ${
-                  searchOpen
-                    ? "translate-x-0 opacity-100 visible"
-                    : "-translate-x-full opacity-0 invisible"
-                } md:block hidden`}
+            {/* Right Section */}
+            <div className="flex items-center gap-2 ml-auto">
+              {/* Search */}
+              <div className="relative hidden md:flex items-center">
+                <button
+                  onClick={() => setSearchOpen(!searchOpen)}
+                  className={`p-2 rounded-lg transition-colors z-10 ${
+                    searchOpen ? "text-primary-200 bg-primary-100/10" : "text-gray-300 hover:bg-primary-100/5"
+                  }`}
+                >
+                  <FaSearch className="w-5 h-5" />
+                </button>
+                
+                <div className={`absolute right-10 flex items-center transition-all duration-300 origin-right ${
+                  searchOpen ? "opacity-100 scale-100 translate-x-0" : "opacity-0 scale-95 translate-x-4"
+                }`}>
+                  <div className="mx-2 w-80 rounded-lg  bg-cbg-200 shadow-lg">
+                    <SearchComponent />
+                  </div>
+                </div>
+              </div>
+
+              {/* Feedback */}
+              <Link
+                href="/feedback-bug"
+                className="hidden md:inline-flex gap-1 items-center px-4 py-2 text-sm font-medium text-primary-200 rounded-lg hover:bg-primary-100/10 transition-colors"
               >
-                <SearchComponent />
-              </div> */}
-              <button onClick={() => setSearchOpen(!searchOpen)}>
-                <FaSearch
-                  className={`${
-                    searchOpen ? "text-sky-500" : "text-[whitesmoke]"
-                  } md:block hidden`}
-                  size={20}
-                />
-              </button>
-            </div>
+                <VscFeedback className="text-base"/>
+                Feedback
+              </Link>
 
-            
-            {!isUserLoggedIn ? (
-              <button
-                className=" bg-primary-200 md:block  text-gray-800 md:font-semibold hover:bg-primary-100 md:px-5 md:py-1.5 p-1 mx-3 px-2 text-sm md:text-base rounded-lg text-md "
-                onClick={handleSignIn}
-              >
-                Login
-              </button>
-            ) : (
-              <DropDownNavbarUserAvatar />
-            )}
-          </div>
+              {/* Auth Section */}
+              {!isUserLoggedIn ? (
+                <button
+                  onClick={handleSignIn}
+                  className="px-5 py-2 bg-primary-200 text-cbg-100 rounded-lg font-medium hover:bg-primary-300 transition-colors shadow-sm"
+                >
+                  Login
+                </button>
+              ) : (
+                <DropDownNavbarUserAvatar />
+              )}
 
-          <div className="ml-auto flex md:hidden">
+              {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className=" hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
+                className="md:hidden p-2 rounded-lg text-gray-300 hover:text-primary-200 hover:bg-primary-100/10 transition-colors"
               >
-                {isOpen ? (
-                  <HiX className="h-6 w-6" />
-                ) : (
-                  <HiMenu className="h-6 w-6" />
-                )}
+                {isOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
               </button>
             </div>
-
-        </div>
-      </div>
-
-      {/* //? MOBILE VIEW IS FROM BELOW */}
-      <div className={`${isOpen ? "flex" : "hidden"} md:hidden w-full overflow-hidden`}>
-        <div className="px-2 pt-5 pb-3 space-y-1 w-full flex flex-col gap-4  sm:px-1">
-        <div className="relative w-[80%] m-2">
-            <SearchComponent />
           </div>
-          <Link
-            href="/"
-            className=" hover:text-white block px-3  rounded-md text-base font-medium"
-          >
-            Home
-          </Link>
-          <Link
-            href="/catalog"
-            className=" hover:text-white block px-3 rounded-md text-base font-medium"
-          >
-            Catalog
-          </Link>
-          <Link
-            href="/recommendations"
-            className=" hover:text-white block px-3 rounded-md text-base font-medium"
-          >
-            Recommendations
-          </Link>
-
-          <Link
-            href="/feedback-bug"
-            className=" hover:text-white block px-3 rounded-md text-base font-medium"
-          >
-            Feedback/Report Bug
-          </Link>
-          
-          {!isUserLoggedIn && <button
-            className="md:w-full block bg-primary-200 !my-3  mx-2 rounded-lg text-gray-800 w-1/6 justify-center hover:bg-primary-100 px-3 py-2  text-sm font-medium"
-            onClick={handleSignIn}
-          >
-            Login
-          </button>}
         </div>
-      </div>
 
-      <div className={`searchpanel px-4 ${searchOpen ? "md:flex hidden  transition-all duration-200 transform  translate-x-0":"hidden"} w-full mx-auto  justify-center gap-2 items-center`}>
-              <div
-                className={`w-full my-2   md:block hidden`}
-              >
+        {/* Mobile Menu (keep existing mobile code) */}
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isOpen ? "max-h-screen" : "max-h-0"}`}>
+          <div className="px-4 pt-2 pb-4 space-y-1 border-t border-primary-100/10">
+          <div className=" pt-4 w-full">
+              <div className="rounded-lg border border-primary-100/20 bg-cbg-100 p-2">
                 <SearchComponent />
               </div>
-              
             </div>
-    {isUserLoggedIn  && <WatchlistBar  />}
-    </nav>
+          {navbarItems.map(item => {
+            return (
+              <Link href={item.href} className=" px-3 py-2 rounded-md text-base font-medium text-gray-300 flex items-center gap-1 hover:text-primary-200 hover:bg-primary-100/10">
+                {item.icon}
+                {item.name}
+            </Link>
+            )
+          })}
+           
+            <Link href="/feedback-bug" className="flex items-center gap-1 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-primary-200 hover:bg-primary-100/10">
+            <VscFeedback className="text-base"/>
+              Feedback
+            </Link>
+
+            {/* //TODO: Below section will be uncommented when more features will be added */}
+		{/* {moreItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-primary-200 hover:bg-primary-100/10"
+                onClick={() => setIsOpen(false)}
+              >
+                {item.icon}
+                {item.name}
+              </Link>
+            ))} */}
+            
+          </div>
+        </div>
+      {isUserLoggedIn && <WatchlistBar />}
+      </nav>
 
     </>
   );
