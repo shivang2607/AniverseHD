@@ -12,7 +12,7 @@ module.exports = {
     
     extend: {
       colors:{
-        primary: {  //manual color in suggested.jsx, in toaster components, in Skeleton component, in Swiper (carousal)
+        primary: {  //manual color in suggested.jsx, in toaster components, in Skeleton component, in Swiper (carousal), in Comment Loader spinner
           100 : '#57a6a1',
           200 : '#6bb0ab',
           300 : '#7fbab5',

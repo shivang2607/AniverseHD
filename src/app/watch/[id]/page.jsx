@@ -49,6 +49,7 @@ import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
 import { FaDownload, FaStepBackward, FaStepForward } from "react-icons/fa";
 import Link from "next/link";
+import CommentsContainer from "@/components/comments/CommentsContainer";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -96,11 +97,13 @@ export default function Page({ params }) {
 
   const {
     loggedInUserData,
+    loggedInUserId,
     isUserLoggedIn,
     RecentWatchListId,
     loadLoggedInUserRecentWatchList,
     loadLoggedInUserWatchLists
   } = useUserStore();
+
 
   const [showSkipButton, setShowSkipButton] = useState("");
   const [mediaPlayerState, setMediaPlayerState] = useState({
@@ -113,6 +116,7 @@ export default function Page({ params }) {
   const [recentTimestamp, setRecentTimestamp] = useState(0);
   const [downloadLink, setDownloadLink] = useState();
   const [duration, setDuration] = useState();
+  const [epNo, setEpNo] = useState(1);
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
   const durationRef = useRef(duration);
@@ -298,6 +302,8 @@ export default function Page({ params }) {
           (ep?.gogoDubId === gogoDubEpisodeId && gogoDubEpisodeId) ||
           (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
       );
+
+      setEpNo(currentIndex + 1);    //this will set the current episode number which will be used for commenting the comment for this episode number.
 
       
       if (!provider) router.replace("/not-found");
@@ -948,6 +954,7 @@ export default function Page({ params }) {
         <div className="md:hidden block my-12">
           <Metadata content={content} id={params?.id} />
         </div>
+      {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>}
       </div>
       {params?.id && <Suggested id={params?.id} />}
     </div>

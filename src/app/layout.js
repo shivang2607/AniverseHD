@@ -4,9 +4,16 @@ import Navbar from '@/components/Navbar'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { SkeletonTheme } from 'react-loading-skeleton'
 import Footer from '@/components/Footer'
-import WatchlistBar from '@/components/WatchlistBar'
-import GlobalError from 'next/dist/client/components/error-boundary'
+// import WatchlistBar from '@/components/WatchlistBar'
+// import GlobalError from 'next/dist/client/components/error-boundary'
 import GlobalLoader from '@/components/utils/GlobalLoader'
+import TimeAgo from 'javascript-time-ago'
+
+import en from 'javascript-time-ago/locale/en'
+import ru from 'javascript-time-ago/locale/ru'
+
+TimeAgo.addDefaultLocale(en)
+TimeAgo.addLocale(ru)
 
 const inter = Inter({ subsets: ['latin'] })
 
