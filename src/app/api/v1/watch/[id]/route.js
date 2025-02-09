@@ -70,8 +70,6 @@ export async function GET(req, { params }) {
           const res = await axios.get(
             `${aniwatchScrapeUrl}/api/v2/hianime/anime/${id}/episodes`
           );
-          console.log("aniwatch scraper url =>", aniwatchScrapeUrl);
-          console.log("response of scraper url", res.data);
           const totalEpisodes = res.data?.data?.totalEpisodes || 0;
           if (totalEpisodes > maxEpisode) {
             maxEpisode = totalEpisodes;

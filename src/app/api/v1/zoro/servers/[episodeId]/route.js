@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 const options = {
     max: 500,
-    ttl: 1000*60* 10 //10 min
+    ttl: 1000*60* 60 * 1 //1 hour
 }
 
 const serverCache = new LRUCache(options);

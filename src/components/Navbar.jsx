@@ -9,6 +9,7 @@ import { HiMenu, HiX, HiChevronDown, HiSparkles, HiHome } from "react-icons/hi";
 import { FaSearch, FaComments, FaPoll, FaLightbulb, FaRegStar } from "react-icons/fa";
 import { GrCatalog } from "react-icons/gr";
 import { VscFeedback } from "react-icons/vsc";
+import { SiDiscord } from "react-icons/si";
 import { FiMoreHorizontal } from "react-icons/fi";
 import SearchComponent from "./recommendationPanel/SearchComponent";
 import { usePathname } from "next/navigation";
@@ -107,7 +108,7 @@ const Navbar = () => {
   return (
     <>
       <nav className={`fixed w-full top-0 z-50 transition-transform duration-300 backdrop-blur-lg border-b border-primary-100/20 ${showNavbar ? "translate-y-0" : "-translate-y-full"} ${isBackgroundVisible ? "bg-cbg-100/95" : "bg-cbg-100/80"}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
           <div className="flex items-center  h-16">
             {/* Logo Section */}
             <Link href="/" className="flex mx-2 items-center space-x-2 group flex-shrink-0">
@@ -186,6 +187,7 @@ const Navbar = () => {
                 >
                   <FaSearch className="w-5 h-5" />
                 </button>
+
                 
                 <div className={`absolute right-10 flex items-center transition-all duration-300 origin-right ${
                   searchOpen ? "opacity-100 scale-100 translate-x-0" : "opacity-0 scale-95 translate-x-4"
@@ -196,10 +198,25 @@ const Navbar = () => {
                 </div>
               </div>
 
+               {/* Discord invite link */}
+               <Link
+                  href="https://discord.gg/AkmasG4xGa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative group text-xl bg-[#5865F2] rounded-full items-center flex p-2 mx-1"
+                >
+                  <SiDiscord className="text-white" />
+                  <span className="absolute left-1/2 w-36 -translate-x-1/2 -bottom-8 z-30 opacity-0 group-hover:opacity-100 bg-gray-900 text-white text-[0.65rem] leading-tight px-2 py-1 rounded-md transition-opacity">
+                    Join our Discord server now!
+                  </span>
+                </Link>
+
+
+
               {/* Feedback */}
               <Link
                 href="/feedback-bug"
-                className="hidden md:inline-flex gap-1 items-center px-4 py-2 text-sm font-medium text-primary-200 rounded-lg hover:bg-primary-100/10 transition-colors"
+                className="hidden md:inline-flex gap-1 items-center px-2 py-2 text-sm font-medium text-primary-200 rounded-lg hover:bg-primary-100/10 transition-colors"
               >
                 <VscFeedback className="text-base"/>
                 Feedback
