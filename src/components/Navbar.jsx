@@ -203,10 +203,10 @@ const Navbar = () => {
                   href="https://discord.gg/AkmasG4xGa"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative group text-xl bg-[#5865F2] rounded-full items-center flex p-2 mx-1"
+                  className="relative cursor-pointer group text-xl bg-[#5865F2] rounded-full items-center flex p-2 mx-1"
                 >
                   <SiDiscord className="text-white" />
-                  <span className="absolute left-1/2 w-36 -translate-x-1/2 -bottom-8 z-30 opacity-0 group-hover:opacity-100 bg-gray-900 text-white text-[0.65rem] leading-tight px-2 py-1 rounded-md transition-opacity">
+                  <span className="absolute left-1/2 w-36 -translate-x-1/2 -bottom-6 z-30 opacity-0 group-hover:opacity-100 bg-gray-900 text-white text-[0.65rem] leading-tight px-2 py-1 rounded-md transition-opacity">
                     Join our Discord server now!
                   </span>
                 </Link>
