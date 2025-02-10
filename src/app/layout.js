@@ -90,13 +90,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
-        {/* Cloudflare Web Analytics for Abhay */}
-        <Script 
-          defer 
-          src='https://static.cloudflareinsights.com/beacon.min.js' 
-          data-cf-beacon='{"token": "170d25d6bd5647b0b0211213bf548407"}'
-          strategy="afterInteractive"
-        />
+       
       </head>
       
       <body 
