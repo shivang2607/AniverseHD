@@ -4,17 +4,18 @@ import Navbar from '@/components/Navbar'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { SkeletonTheme } from 'react-loading-skeleton'
 import Footer from '@/components/Footer'
-// import WatchlistBar from '@/components/WatchlistBar'
-// import GlobalError from 'next/dist/client/components/error-boundary'
 import GlobalLoader from '@/components/utils/GlobalLoader'
 import TimeAgo from 'javascript-time-ago'
+import Script from 'next/script'
 
 import en from 'javascript-time-ago/locale/en'
 import ru from 'javascript-time-ago/locale/ru'
 
+// Initialize Time Ago
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
+// Initialize the Inter font
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
@@ -22,9 +23,7 @@ export const metadata = {
     template: 'AniverseHD | %s',
     default: 'AniverseHD : Stream Anime, Create & Share Watchlists - AniverseHD',
   },
-
-  icons:'logo-teal-stretched.png'
-  ,
+  icons: '/logo-teal-stretched.png',
   description: 'Stream your favorite anime in HD, create and share personalized watchlists, and get smart recommendations. Explore a world of anime with AniverseHD.',
   keywords: [
     'anime streaming',
@@ -58,32 +57,73 @@ export const metadata = {
   },
 };
 
-
-//* SKELETON THEME COLORS HAS TO BE CHANGED MANUALLY EVERYTIME WHENEVER THE THEME IS CHANGED ACCORDINGLY IF NEEDED */
-
-
-
-export default function RootLayout({ children }) {
+export default function RootLayout({ 
+  children 
+}) {
   return (
-    <html lang="en" className='scrollbar-thumb-primary-200 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-track-cbg-200'>
-      <link rel="icon" href="favicon.ico" sizes="any" />
-      <body className={`${inter.className} bg-cbg-100 text-[#EEEEEE] tracking-wide`}>
-      <SkeletonTheme baseColor="#39475b" highlightColor="#535f70" duration={1}>
-          <Navbar/>
-          {children}
-          <GlobalLoader/>
-          </SkeletonTheme>
-          <Footer/>
+    <html 
+      lang="en" 
+      className='
+        scrollbar-thumb-primary-200 
+        scrollbar-thumb-rounded-full 
+        scrollbar-track-rounded-full 
+        scrollbar-track-cbg-200
+      '
+    >
+      <head>
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
 
-          {/* <!-- Cloudflare Web Analytics --> */}
-          <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "fc05a7dc03db45c2aafe3bb385a757fb"}'></script>
-          {/* <!-- End Cloudflare Web Analytics --> */}
-          
-          {/* <!-- Cloudflare Web Analytics --> for abhay */}
-          <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "170d25d6bd5647b0b0211213bf548407"}'></script>
-          {/* <!-- End Cloudflare Web Analytics --> */}
+        {/* Umami Analytics */}
+        <Script 
+          defer 
+          src="https://umami.aniversehd.com/script.js" 
+          data-website-id="f2376715-c5ae-4187-9b7f-2c5177603eeb"
+          strategy="afterInteractive"
+        />
+
+        {/* Cloudflare Web Analytics */}
+        <Script 
+          defer 
+          src='https://static.cloudflareinsights.com/beacon.min.js' 
+          data-cf-beacon='{"token": "fc05a7dc03db45c2aafe3bb385a757fb"}'
+          strategy="afterInteractive"
+        />
+
+        {/* Cloudflare Web Analytics for Abhay */}
+        <Script 
+          defer 
+          src='https://static.cloudflareinsights.com/beacon.min.js' 
+          data-cf-beacon='{"token": "170d25d6bd5647b0b0211213bf548407"}'
+          strategy="afterInteractive"
+        />
+      </head>
+      
+      <body 
+        className={`
+          ${inter.className} 
+          bg-cbg-100 
+          text-[#EEEEEE] 
+          tracking-wide
+        `}
+      >
+        <SkeletonTheme 
+          baseColor="#39475b" 
+          highlightColor="#535f70" 
+          duration={1}
+        >
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            
+            <main className="flex-grow">
+              {children}
+            </main>
+            
+            <GlobalLoader />
+            <Footer />
+          </div>
+        </SkeletonTheme>
       </body>
-      {/* <GoogleTagManager gtmId='GTM-PBQJWMRT'/> */}
     </html>
   )
 }
