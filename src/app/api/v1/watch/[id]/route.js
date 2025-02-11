@@ -6,7 +6,7 @@ import redisClient from "@/lib/redis"; // Use the singleton instance directly
 
 const watchOptions = {
   max: 500,
-  ttl: 1000 * 60 * 10, // 10 min
+  ttl: 1000 * 60 * 15, // 15 min
 };
 const watchCache = new LRUCache(watchOptions);
 
@@ -139,12 +139,14 @@ export async function GET(req, { params }) {
 
     if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to)) {
       console.log("Caching finished anime for 5 days in Redis");
-      id && finalResponse?.zoro?.episodes?.length>0 && finalResponse?.gogoSub?.episodes?.length>0 &&
+      id && finalResponse?.zoro?.episodes?.length>0
+      //  && finalResponse?.gogoSub?.episodes?.length>0 --commented because gogo is not working as of now.
+       &&
         (await redisClient.set(
           `watch-${id}`,
           JSON.stringify(finalResponse),
           "EX",
-          60 * 60 * 24 * 5 //cache for 5 day, this is only 5 day because its possible that corrupt or incorrect or incomplete data is present in gogo or zoro providers data 
+          60 * 60 * 24 * 7 //cache for 7 days, this is only 7 day because its possible that corrupt or incorrect or incomplete data is present in gogo or zoro providers data 
         ));
     }
 
