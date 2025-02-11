@@ -10,6 +10,7 @@ import Script from 'next/script'
 
 import en from 'javascript-time-ago/locale/en'
 import ru from 'javascript-time-ago/locale/ru'
+import Notice from '@/components/Notice'
 
 // Initialize Time Ago
 TimeAgo.addDefaultLocale(en)
@@ -113,6 +114,7 @@ export default function RootLayout({
           duration={1}
         >
           <div className="flex flex-col min-h-screen">
+            <Notice />
             <Navbar />
             
             <main className="flex-grow">
