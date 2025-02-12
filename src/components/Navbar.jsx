@@ -19,6 +19,7 @@ import useUserStore from "./ZustandStores/userStore";
 import WatchlistBar from "./WatchlistBar";
 import useGlobalLoader from "./ZustandStores/useGlobalLoader";
 import { Constant_Var_localstorage_version } from "@/utils/constants";
+import Notice from "./Notice";
 
 const Navbar = () => {
   const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists, RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar } = useUserStore();
@@ -108,6 +109,7 @@ const Navbar = () => {
   return (
     <>
       <nav className={`fixed w-full top-0 z-50 transition-transform duration-300 backdrop-blur-lg border-b border-primary-100/20 ${showNavbar ? "translate-y-0" : "-translate-y-full"} ${isBackgroundVisible ? "bg-cbg-100/95" : "bg-cbg-100/80"}`}>
+        <Notice />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
           <div className="flex items-center  h-16">
             {/* Logo Section */}

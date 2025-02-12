@@ -114,7 +114,7 @@ export default function RootLayout({
           duration={1}
         >
           <div className="flex flex-col min-h-screen">
-            <Notice />
+            {/* <Notice /> */}
             <Navbar />
             
             <main className="flex-grow">
