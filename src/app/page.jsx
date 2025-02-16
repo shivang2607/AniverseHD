@@ -18,11 +18,12 @@ export default function Page() {
   useEffect(() => {
     async function f() {
       
-      await getTorrentData();console.log("function executed")
+      await getTorrentData("berserk");
+      console.log("function executed")
     
       }
 
-    f()
+    // f()
   }, []);
 
   return (
