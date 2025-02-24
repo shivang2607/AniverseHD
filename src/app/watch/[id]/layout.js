@@ -6,7 +6,6 @@ export default function WatchAnimeLayout({
 }) {
   return (
     <>
-      <Head>
       <Script
         id="monetag-script"
         strategy="lazyOnload"
@@ -18,7 +17,6 @@ export default function WatchAnimeLayout({
           })('gizokraijaw.net', 8974908, document.createElement('script'));`,
         }}
       />
-      </Head>
 
 
 
