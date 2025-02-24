@@ -50,6 +50,7 @@ import Metadata from "./Metadata";
 import { FaDownload, FaStepBackward, FaStepForward } from "react-icons/fa";
 import Link from "next/link";
 import CommentsContainer from "@/components/comments/CommentsContainer";
+import Script from "next/script";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
