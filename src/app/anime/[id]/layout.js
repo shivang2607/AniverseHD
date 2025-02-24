@@ -18,7 +18,7 @@ export const metadata = {
       card: 'summary_large_image',
       title: 'Anime Details | AniverseHD',
       description: 'Dive into the details of your favorite anime series on AniverseHD.',
-      images: ['https://www.aniversehd.com/assets/default-twitter-image.jpg'], // Replace with a default Twitter card image
+       
     },
   };
   

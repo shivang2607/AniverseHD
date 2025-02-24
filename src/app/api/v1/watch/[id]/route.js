@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import getAnime from "../../anime/[id]/mainFunction";
 import redisClient from "@/lib/redis"; // Use the singleton instance directly
 
+//? The commented code in the file is mostly of the gogo provider, since gogo has went down we can't do much about it and its not working as of writing this on 24/02/2025, the commented code for gogo is now deprecated.
+
 const watchOptions = {
   max: 500,
   ttl: 1000 * 60 * 15, // 15 min
@@ -49,13 +51,13 @@ export async function GET(req, { params }) {
       );
     }
 
-    const gogoanimeSites = animeData.Sites?.Gogoanime || {};
-    const gogoanimeKeys = Object.keys(gogoanimeSites);
-    const gogoIdSub = gogoanimeSites[gogoanimeKeys[0]]?.identifier || null;
-    const gogoIdDub =
-      gogoanimeKeys.length > 1
-        ? gogoanimeSites[gogoanimeKeys[1]]?.identifier || null
-        : null;
+    // const gogoanimeSites = animeData.Sites?.Gogoanime || {};
+    // const gogoanimeKeys = Object.keys(gogoanimeSites);
+    // const gogoIdSub = gogoanimeSites[gogoanimeKeys[0]]?.identifier || null;
+    // const gogoIdDub =
+    //   gogoanimeKeys.length > 1
+    //     ? gogoanimeSites[gogoanimeKeys[1]]?.identifier || null
+    //     : null;
 
     let maxEpisode = 0;
     let zoroEps = null;
@@ -81,25 +83,25 @@ export async function GET(req, { params }) {
       })
     );
 
-    const gogoEpsSubPromise = async () => {
-      try {
-        return gogoIdSub ? await axios.get(`${scrapeUrl}/anime/gogoanime/info/${gogoIdSub}`) : null;
-      } catch (error) {
-        console.error("Error fetching Gogoanime Sub:", error);
-        return null;
-      }
-    };
+    // const gogoEpsSubPromise = async () => {
+    //   try {
+    //     return gogoIdSub ? await axios.get(`${scrapeUrl}/anime/gogoanime/info/${gogoIdSub}`) : null;
+    //   } catch (error) {
+    //     console.error("Error fetching Gogoanime Sub:", error);
+    //     return null;
+    //   }
+    // };
     
-    const gogoEpsDubPromise = async () => {
-      try {
-        return gogoIdDub ? await axios.get(`${scrapeUrl}/anime/gogoanime/info/${gogoIdDub}`) : null;
-      } catch (error) {
-        console.error("Error fetching Gogoanime Dub:", error);
-        return null;
-      }
-    };
+    // const gogoEpsDubPromise = async () => {
+    //   try {
+    //     return gogoIdDub ? await axios.get(`${scrapeUrl}/anime/gogoanime/info/${gogoIdDub}`) : null;
+    //   } catch (error) {
+    //     console.error("Error fetching Gogoanime Dub:", error);
+    //     return null;
+    //   }
+    // };
     
-    const [gogoEpsSub, gogoEpsDub] = await Promise.all([gogoEpsSubPromise(), gogoEpsDubPromise()]);
+    // const [gogoEpsSub, gogoEpsDub] = await Promise.all([gogoEpsSubPromise(), gogoEpsDubPromise()]);
     
 
     const finalResponse = {
@@ -108,16 +110,32 @@ export async function GET(req, { params }) {
         totalEpisodes: zoroEps?.totalEpisodes || 0,
       },
       gogoSub: {
-        episodes: gogoEpsSub?.data?.episodes || [],
-        status: gogoEpsSub?.data?.status || null,
-        subOrDub: gogoEpsSub?.data?.subOrDub || null,
-        totalEpisodes: gogoEpsSub?.data?.totalEpisodes || 0,
+        episodes: 
+        // gogoEpsSub?.data?.episodes ||
+         [],
+        status: 
+        // gogoEpsSub?.data?.status ||
+         null,
+        subOrDub: 
+        // gogoEpsSub?.data?.subOrDub || 
+        null,
+        totalEpisodes:
+        //  gogoEpsSub?.data?.totalEpisodes || 
+        0,
       },
       gogoDub: {
-        episodes: gogoEpsDub?.data?.episodes || [],
-        status: gogoEpsDub?.data?.status || null,
-        subOrDub: gogoEpsDub?.data?.subOrDub || null,
-        totalEpisodes: gogoEpsDub?.data?.totalEpisodes || 0,
+        episodes: 
+        // gogoEpsDub?.data?.episodes ||
+         [],
+        status: 
+        // gogoEpsDub?.data?.status ||
+         null,
+        subOrDub: 
+        // gogoEpsDub?.data?.subOrDub ||
+         null,
+        totalEpisodes: 
+        // gogoEpsDub?.data?.totalEpisodes ||
+         0,
       },
       title: animeData.title || "",
       title_english: animeData.title_english || "",
@@ -138,7 +156,7 @@ export async function GET(req, { params }) {
     };
 
     if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to)) {
-      console.log("Caching finished anime for 5 days in Redis");
+      console.log("Caching finished anime for 7 days in Redis");
       id && finalResponse?.zoro?.episodes?.length>0
       //  && finalResponse?.gogoSub?.episodes?.length>0 --commented because gogo is not working as of now.
        &&

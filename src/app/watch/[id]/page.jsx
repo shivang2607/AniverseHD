@@ -749,7 +749,7 @@ export default function Page({ params }) {
 
                   currentTime={startTime}
                   onError={(e) =>
-                    toast.error(`${e.message}, Try Another Server or Different Provider.`)
+                    toast.error(`${e.message}, Try Another Server.`)
                   }
                   onEnded={() =>
                     mediaPlayerState?.isAutoNext && getNextEpisode()

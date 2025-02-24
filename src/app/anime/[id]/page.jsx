@@ -224,7 +224,7 @@ export default function Anime({ params }) {
 
                 {anime ? (
                   <div className="flex mt-4 gap-4 justify-center md:justify-start">
-                    {anime?.Sites && (
+                    {anime?.Sites?.Zoro && (
                       <Link
                         href={
                           recentData
