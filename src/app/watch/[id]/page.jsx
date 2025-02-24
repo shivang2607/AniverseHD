@@ -673,7 +673,7 @@ export default function Page({ params }) {
   return (
     <>
      <Script
-        id="monetag-script"
+        id="monetag-script"   
         strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `(function(d,z,s){
