@@ -674,7 +674,6 @@ export default function Page({ params }) {
      <Script
         id="monetag-script"
         strategy="lazyOnload"
-        async defer
         dangerouslySetInnerHTML={{
           __html: `(function(d,z,s){
               s.src = 'https://' + d + '/401/' + z;
