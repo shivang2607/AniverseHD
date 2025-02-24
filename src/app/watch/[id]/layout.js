@@ -1,4 +1,3 @@
-import Head from "next/head";
 import Script from "next/script";
 
 export default function WatchAnimeLayout({
@@ -7,7 +6,17 @@ export default function WatchAnimeLayout({
   return (
     <>
      
-
+     <Script
+        id="monetag-script"
+        strategy="lazyOnload"
+        async defer
+        dangerouslySetInnerHTML={{
+          __html: `(function(d,z,s){
+              s.src = 'https://' + d + '/401/' + z;
+              try { (document.body || document.documentElement).appendChild(s); } catch(e) { }
+          })('gizokraijaw.net', 8974908, document.createElement('script'));`,
+        }}
+      />
 
 
       <div>
