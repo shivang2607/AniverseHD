@@ -1,5 +1,4 @@
 import Script from "next/script";
-import { monetagAntiAddBlock } from "../../../../public/monetagAntiAddblockScript";
 
 export default function WatchAnimeLayout({
   children, // will be a page or nested layout
