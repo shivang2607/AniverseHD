@@ -1,5 +1,5 @@
 import Script from "next/script";
-import { monetagAntiAddBlock } from "./dangerousInnerHTMLContent";
+import { monetagAntiAddBlock } from "../../../../public/monetagAntiAddblockScript";
 
 export default function WatchAnimeLayout({
   children, // will be a page or nested layout
@@ -9,10 +9,9 @@ export default function WatchAnimeLayout({
 
 <Script
         id="monetag-inline-script"
+        src="/monetagAntiAddblockScript.js"
         strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: monetagAntiAddBlock,
-        }}
+        onError={(e) => console.error('Monetag script failed to load, please disable add blocker to support Us.', e)}
       />
      
      <Script
