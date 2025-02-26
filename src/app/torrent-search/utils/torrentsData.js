@@ -1,6 +1,6 @@
 import axios from "axios";
 import convert from "xml-js";
-import { getSessionWithExpiry, setSessionWithExpiry } from "./storage";
+import { getSessionWithExpiry, setSessionWithExpiry } from "../../../components/utils/storage";
 
 // Recursive function to remove a prefix from keys, extract _text values,
 // and convert numeric strings to numbers.

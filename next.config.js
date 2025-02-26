@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
-  reactStrictMode: true, // Set this to true for better error handling and optimization.
+  // reactStrictMode: true, // Set this to true for better error handling and optimization.
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
