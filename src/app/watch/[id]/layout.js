@@ -1,9 +1,10 @@
 // app/watch/[id]/layout.js
-import Script from 'next/script';
+'use client'
+import Script from "next/script";
 
-// Generate a timestamp that changes every 5 minutes 
+// Generate a timestamp that changes every 5 minutes
 const getCacheBuster = () => {
-  const time = 5 * 60 * 1000; 
+  const time = 5 * 60 * 1000;
   return Math.floor(Date.now() / time) * time;
 };
 
@@ -21,6 +22,24 @@ export default function WatchLayout({ children }) {
       <Script
         src={`/scripts/monetag-script.js?${cacheBuster}`}
         strategy="afterInteractive"
+      />
+
+      <Script
+        strategy="afterInteractive"
+        src="https://eechicha.com/act/files/tag.min.js?z=9015028"
+        data-cfasync="false"
+        async
+      />
+
+      <Script
+        id="push-notification"
+        strategy="afterInteractive"
+        onLoad={() => {
+          const script = document.createElement("script");
+          script.src = "https://vemtoutcheeg.com/400/9015075";
+          script.async = true;
+          document.body.appendChild(script);
+        }}
       />
 
       <div>{children}</div>
