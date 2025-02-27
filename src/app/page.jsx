@@ -8,7 +8,7 @@ import AllTop from "@/components/AllTop";
 import RecentWatching from "@/components/RecentWatching";
 import jikanjs from "@mateoaranda/jikanjs";
 import ScheduleComponent from "@/components/ScheduleComponent/ScheduleComponent";
-import { getTorrentData } from "@/app/torrent-search/utils/torrentsData";
+import { getTorrentData } from "@/app/torrent/utils/torrentsData";
 
 
 export default function Page() {

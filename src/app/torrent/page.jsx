@@ -1,22 +1,77 @@
-'use client'
-import React from 'react'
-import '@vidstack/react/player/styles/default/theme.css';
-import '@vidstack/react/player/styles/default/layouts/video.css';
-import MagnetPlayer from './MagnetPlayer';
-import TorrentStreamer from './MagnetPlayer';
+"use client";
+import { getTorrentData } from "@/app/torrent/utils/torrentsData";
+import React, { useState } from "react";
+import RowItem from "./rowItem";
 
+const Page = () => {
+  const [query, setQuery] = useState("");
+  const [torrents, setTorrents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  const searchTorrents = async () => {
+    setLoading(true);
+    setError(null);
 
+    const torrentList = await getTorrentData(query);
+    if (torrentList && torrentList.length > 0) {
+        console.log(torrentList)
+      setTorrents(torrentList);
+    } else {
+      setError("No torrents found.");
+    }
 
+    setLoading(false);
+  };
 
-export default function Page() {
-    const magnetUrl = "magnet:?xt=urn:btih:c8afd9c575c1754f0dcac6391dfd35716c1fb5cd&dn=%5BSubsPlease%5D%20Solo%20Leveling%20-%2018%20%281080p%29%20%5B28C7D1C2%5D.mkv&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce";
-    //"magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel"
-    //  "magnet:?xt=urn:btih:c8afd9c575c1754f0dcac6391dfd35716c1fb5cd&dn=%5BSubsPlease%5D%20Solo%20Leveling%20-%2018%20%281080p%29%20%5B28C7D1C2%5D.mkv&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce";
-  
-    return (
-      <div className="container mx-auto p-4 w-screen flex min-h-screen justify-center items-center">
-        <TorrentStreamer magnetURI={magnetUrl}/>
+  return (
+    <div className="pt-40 w-2/3 mx-auto">
+      <div className="flex gap-2 mb-4">
+        <input
+          type="text"
+          placeholder="Search Torrents"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="flex-grow p-2 border rounded text-black"
+        />
+        <button
+          onClick={searchTorrents}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Search
+        </button>
       </div>
-    );
-}
+
+      {loading && <p className="text-center text-gray-500">Loading...</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
+
+      <div className="overflow-x-auto">
+        <table className="w-full border">
+          <thead>
+            <tr className="bg-gray-800">
+              <th className="p-3 text-left">Title</th>
+              <th className="p-3 text-left">Size</th>
+              <th className="p-3 text-center">Copy</th>
+              <th className="p-3 text-center">Download</th>
+            </tr>
+          </thead>
+          <tbody>
+            {torrents.length > 0 ? (
+              torrents.map((torrent, index) => <RowItem key={index} torrent={torrent} />)
+            ) : (
+              !loading && (
+                <tr>
+                  <td colSpan={4} className="p-3 text-center text-gray-500">
+                    No results found.
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default Page;
