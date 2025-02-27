@@ -1,42 +1,29 @@
-'use client'
-import Script from "next/script";
+// app/watch/[id]/layout.js
+import Script from 'next/script';
 
-export default function WatchAnimeLayout({
-  children, // will be a page or nested layout
-}) {
+// Generate a timestamp that changes every 5 minutes 
+const getCacheBuster = () => {
+  const time = 5 * 60 * 1000; 
+  return Math.floor(Date.now() / time) * time;
+};
+
+export default function WatchLayout({ children }) {
+  const cacheBuster = getCacheBuster();
+
   return (
     <>
-
-<Script
-        id="monetag-inline-script"
-        src="/monetagAntiAddblockScript.js"
+      <Script
+        src={`/scripts/adblocker-detection.js?${cacheBuster}`}
         strategy="afterInteractive"
-        onError={(e) => console.error('Monetag script failed to load, please disable add blocker to support Us.', e)}
-      />
-     
-     <Script
-        id="monetag-external-script"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function(d, z, s, c){
-              s.src = '//' + d + '/400/' + z;
-              s.onerror = s.onload = E;
-              function E(){ c && c(); c = null }
-              try {
-                (document.body || document.documentElement).appendChild(s)
-              } catch(e) {
-                E()
-              }
-            })('shaiwourtijogno.net', 8974908, document.createElement('script'), _ytcwhw);
-          `,
-        }}
+        data-cfasync="false"
       />
 
+      <Script
+        src={`/scripts/monetag-script.js?${cacheBuster}`}
+        strategy="afterInteractive"
+      />
 
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </>
-  )
+  );
 }

@@ -51,6 +51,7 @@ import { FaDownload, FaStepBackward, FaStepForward } from "react-icons/fa";
 import Link from "next/link";
 import CommentsContainer from "@/components/comments/CommentsContainer";
 import Script from "next/script";
+import { GlobalScripts } from "@/components/GlobalScripts";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -672,17 +673,11 @@ export default function Page({ params }) {
 
   return (
     <>
-     <Script
-        id="monetag-script"
-        strategy="lazyOnload"
-        async defer
-        dangerouslySetInnerHTML={{
-          __html: `(function(d,z,s){
-              s.src = 'https://' + d + '/401/' + z;
-              try { (document.body || document.documentElement).appendChild(s); } catch(e) { }
-          })('gizokraijaw.net', 8974908, document.createElement('script'));`,
-        }}
-      />
+
+    {/* this component is for loading ads script  */}
+  {/* <GlobalScripts/> */}  
+   
+     
     <div className="py-16">
       <div className="content py-2 md:px-4 flex flex-col gap-4">
         {!animeNotAvailable && (
