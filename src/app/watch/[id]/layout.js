@@ -2,9 +2,9 @@
 'use client'
 import Script from "next/script";
 
-// Generate a timestamp that changes every 5 minutes
+// Generate a timestamp that changes every 20 minutes
 const getCacheBuster = () => {
-  const time = 5 * 60 * 1000;
+  const time = 20 * 60 * 1000;
   return Math.floor(Date.now() / time) * time;
 };
 
