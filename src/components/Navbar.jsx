@@ -20,6 +20,7 @@ import WatchlistBar from "./WatchlistBar";
 import useGlobalLoader from "./ZustandStores/useGlobalLoader";
 import { Constant_Var_localstorage_version } from "@/utils/constants";
 import Notice from "./Notice";
+import { SiUtorrent } from "react-icons/si";
 
 const Navbar = () => {
   const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists, RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar } = useUserStore();
@@ -39,6 +40,7 @@ const Navbar = () => {
     { href: "/", name: "Home", icon: <HiHome className="text-base" /> },
     { href: "/catalog", name: "Catalog", icon: <GrCatalog className="text-base" /> },
     { href: "/recommendations", name: "Recommendations", icon: <HiSparkles className="text-base" /> },
+    { href: "/torrent", name: "Torrent", icon: <SiUtorrent className="text-base" /> },
   ]
 
   // Additional navigation items for the "More" dropdown

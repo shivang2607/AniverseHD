@@ -3,8 +3,16 @@
 import { getTorrentData } from "@/app/torrent/utils/torrentsData";
 import React, { useState, useEffect } from "react";
 import TorrentRow from "./TorrentRow";
-import { FaSearch, FaExclamationTriangle, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import {
+  FaSearch,
+  FaExclamationTriangle,
+  FaSort,
+  FaSortUp,
+  FaSortDown,
+  FaInfoCircle,
+} from "react-icons/fa";
 import { BiReset } from "react-icons/bi";
+import CustomLoader from "@/components/CustomLoader";
 
 const Page = () => {
   const [query, setQuery] = useState("");
@@ -16,6 +24,7 @@ const Page = () => {
     direction: "desc",
   });
   const [noResults, setNoResults] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false); // New state for instructions visibility
 
   const searchTorrents = async () => {
     if (!query.trim()) {
@@ -79,23 +88,23 @@ const Page = () => {
     if (!sizeStr) return 0;
 
     const units = {
-      'KIB': 1,
-      'MIB': 1024,
-      'GIB': 1024 * 1024,
-      'TIB': 1024 * 1024 * 1024,
-      'KB': 1,
-      'MB': 1000,
-      'GB': 1000 * 1000,
-      'TB': 1000 * 1000 * 1000
+      KIB: 1,
+      MIB: 1024,
+      GIB: 1024 * 1024,
+      TIB: 1024 * 1024 * 1024,
+      KB: 1,
+      MB: 1000,
+      GB: 1000 * 1000,
+      TB: 1000 * 1000 * 1000,
     };
-    
+
     // Match digits and unit (case insensitive)
     const matches = sizeStr.match(/^([\d.]+)\s*([KMGT]i?B)$/i);
     if (!matches) return 0;
 
     const size = parseFloat(matches[1]);
     const unit = matches[2].toUpperCase();
-   
+
     return size * (units[unit] || 0);
   };
 
@@ -133,7 +142,7 @@ const Page = () => {
           return seedersB - seedersA;
         }
       }
-      
+
       // Default to seeders desc if no valid sort key
       return parseSeeders(b.seeders) - parseSeeders(a.seeders);
     });
@@ -151,6 +160,31 @@ const Page = () => {
           <p className="text-cbg-600">
             Search and find torrents from multiple sources
           </p>
+        </div>
+
+        {/* Instructions Section */}
+        <div className="mb-8">
+          <button
+            onClick={() => setShowInstructions(!showInstructions)}
+            className="flex items-center gap-2 text-primary-300 hover:text-primary-200 transition-colors"
+          >
+            <FaInfoCircle size={20} />
+            <span>How to use magnet URLs</span>
+          </button>
+
+          {showInstructions && (
+            <div className="mt-4 p-4 bg-cbg-200 rounded-lg border border-cbg-300">
+              <p className="mb-2">To download a anime using a magnet link:</p>
+              <ol className="list-decimal list-inside text-cbg-600">
+                <li>Copy the magnet link from the torrent listing.</li>
+                <li>Open your torrent client (e.g., uTorrent, BitTorrent).</li>
+                <li>
+                Paste the magnet link into the client&apos;s &quot;Add Torrent&quot; or &quot;Add URL&quot; option.
+                </li>
+                <li>Start the download.</li>
+              </ol>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col md:flex-row gap-2 mb-6">
@@ -194,10 +228,13 @@ const Page = () => {
           </div>
         )}
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <div className="w-12 h-12 border-4 border-primary-300 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-cbg-500">Searching for torrents...</p>
+        { loading? (
+          // <div className="flex flex-col items-center justify-center py-12">
+          //   <div className="w-12 h-12 border-4 border-primary-300 border-t-transparent rounded-full animate-spin mb-4"></div>
+          //   <p className="text-cbg-500">Searching for torrents...</p>
+          // </div>
+          <div className="h-[50vh]">
+            <CustomLoader  imageUrl={"/userProfileImage5.jpg"} loaderText={"Searching for torrents..."} />
           </div>
         ) : (
           <>
@@ -212,9 +249,7 @@ const Page = () => {
                   <table className="w-full">
                     <thead>
                       <tr className="bg-cbg-300 text-primary-300">
-                        <th className="p-4 text-left">
-                          Title
-                        </th>
+                        <th className="p-4 text-left">Title</th>
                         <th
                           onClick={() => requestSort("size")}
                           className="p-4 text-left cursor-pointer hover:bg-cbg-400 transition-colors whitespace-nowrap"
@@ -224,7 +259,7 @@ const Page = () => {
                             {getSortIcon("size")}
                           </div>
                         </th>
-                        <th 
+                        <th
                           onClick={() => requestSort("seeders")}
                           className="p-4 text-center cursor-pointer hover:bg-cbg-400 transition-colors whitespace-nowrap"
                         >
