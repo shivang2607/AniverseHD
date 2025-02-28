@@ -676,7 +676,14 @@ export default function Page({ params }) {
 
     {/* this component is for loading ads script  */}
   {/* <GlobalScripts/> */}  
-   
+  {/* <div className="banner flex w-2/3 h-2/3">
+  <ins id="pm_union"
+         data-partner_id="8789547"
+         data-add_types="banners"
+         data-source_url=""
+         data-pm-b="680x250"
+         ></ins>
+         </div> */}
      
     <div className="py-16">
       <div className="content py-2 md:px-4 flex flex-col gap-4">
