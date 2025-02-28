@@ -1,6 +1,5 @@
 // app/watch/[id]/layout.js
 "use client";
-import { useEffect } from "react";
 import Script from "next/script";
 
 // Generate a timestamp that changes every 10 minutes
@@ -29,24 +28,12 @@ export default function WatchLayout({ children }) {
         strategy="afterInteractive"
         data-cfasync="false"
       />
-      
+
       <Script
         src={`/scripts/monetag-script.js?${cacheBuster}`}
         strategy="afterInteractive"
       />
-      <div>
-      
-      <div className="banner flex w-2/3 h-2/3">
-  <ins id="pm_union"
-         data-partner_id="8789547"
-         data-add_types="banners"
-         data-referrer="aniversehd.com"
-         data-source_url=""
-         data-pm-b="680x250"
-         ></ins>
-         </div>
-         
-         {children}</div>
+      <div>{children}</div>
     </>
   );
 }
