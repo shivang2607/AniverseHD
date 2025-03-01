@@ -58,15 +58,21 @@ export async function getTorrentData(qText = "") {
   const rootUrl2 = process.env.NEXT_PUBLIC_NYAA_URL_2;
 
   // Build URL list with proper encoding for DEV mode
-  const urls = process.env.NEXT_PUBLIC_ENV === "DEV" 
-    ? [
-        encodeForAllOrigins(rootUrl1, queryParams),
-        ...(rootUrl2 ? [encodeForAllOrigins(rootUrl2, queryParams)] : [])
-      ]
-    : [
-        `${rootUrl1}/?${new URLSearchParams(queryParams)}`,
-        ...(rootUrl2 ? [`${rootUrl2}/?${new URLSearchParams(queryParams)}`] : [])
-      ];
+  //*below urls were throwing CORS issue in prod
+  // const urls = process.env.NEXT_PUBLIC_ENV === "DEV" 
+  //   ? [
+  //       encodeForAllOrigins(rootUrl1, queryParams),
+  //       ...(rootUrl2 ? [encodeForAllOrigins(rootUrl2, queryParams)] : [])
+  //     ]
+  //   : [
+  //       `${rootUrl1}/?${new URLSearchParams(queryParams)}`,
+  //       ...(rootUrl2 ? [`${rootUrl2}/?${new URLSearchParams(queryParams)}`] : [])
+  //     ];
+
+      const urls = [
+          encodeForAllOrigins(rootUrl1, queryParams),
+          ...(rootUrl2 ? [encodeForAllOrigins(rootUrl2, queryParams)] : [])
+        ];
 
   // Create a function to fetch data from a URL and validate the response
   const fetchFromUrl = async (url) => {
