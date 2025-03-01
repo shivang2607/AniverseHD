@@ -36,6 +36,9 @@ const TorrentRow = ({ torrent, index }) => {
           index % 2 === 0 ? "bg-cbg-200" : "bg-cbg-200/70"
         }`}
       >
+         <td className="p-4 text-sm ">
+          <span className="flex items-center justify-center text-cbg-600">{index+1}</span>
+        </td>
         <td className="p-4">
           <div className="flex items-start">
             <button
