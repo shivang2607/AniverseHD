@@ -6,9 +6,12 @@ const TorrentRow = ({ torrent, index }) => {
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-  const magnetLink = `magnet:?xt=urn:btih:${torrent.infoHash}`;
+  // 1. Add display name (torrent title) to the magnet link
+  // 2. Add well-known trackers for faster speeds
+  const magnetLink = `magnet:?xt=urn:btih:${torrent.infoHash}&dn=${encodeURIComponent(torrent.title)}&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2F9.rarbg.to%3A2710%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce`;
 
-  const copyMagnet = () => {
+  const copyMagnet = (e) => {
+    e.stopPropagation(); // Prevent link opening when clicking copy button
     navigator.clipboard.writeText(magnetLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -49,8 +52,13 @@ const TorrentRow = ({ torrent, index }) => {
               >
                 {displayTitle}
               </div>
-              {expanded && (
-                <div className="mt-2 text-sm text-cbg-500">
+              {/* 4. Add transition animation for expanded content */}
+              <div 
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  expanded ? "max-h-40 opacity-100 mt-2" : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="text-sm text-cbg-500">
                   <p className="mb-1">Original filename: {torrent.title}</p>
                   {torrent.category && (
                     <p className="mb-1">Category: {torrent.category}</p>
@@ -60,7 +68,7 @@ const TorrentRow = ({ torrent, index }) => {
                   )}
                   {torrent.leechers && <p>Leechers: {torrent.leechers}</p>}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </td>
@@ -82,16 +90,25 @@ const TorrentRow = ({ torrent, index }) => {
         </td>
         <td className="p-4 text-center">
           <div className="flex items-center justify-center space-x-3">
+            {/* 3. Modified: Magnet icon opens URL in new tab, added separate copy button */}
+            <Link
+              href={magnetLink}
+              className="p-2 rounded-full bg-cbg-300 hover:bg-cbg-400 text-primary-300 transition-all duration-200 hover:scale-110"
+              title="Open magnet link"
+            >
+              <FaMagnet size={16} />
+            </Link>
+            
             <button
               onClick={copyMagnet}
               className={`p-2 rounded-full ${
                 copied
                   ? "bg-green-700/30 text-green-500"
                   : "bg-cbg-300 hover:bg-cbg-400 text-primary-300"
-              } transition-all`}
+              } transition-all duration-200 hover:scale-110`}
               title="Copy magnet link"
             >
-              {copied ? <FaCheck size={16} /> : <FaMagnet size={16} />}
+              {copied ? <FaCheck size={16} /> : <FaCopy size={16} />}
             </button>
 
             {/* <Link

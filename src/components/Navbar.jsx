@@ -40,7 +40,7 @@ const Navbar = () => {
     { href: "/", name: "Home", icon: <HiHome className="text-base" /> },
     { href: "/catalog", name: "Catalog", icon: <GrCatalog className="text-base" /> },
     { href: "/recommendations", name: "Recommendations", icon: <HiSparkles className="text-base" /> },
-    { href: "/torrent", name: "Torrent", icon: <SiUtorrent className="text-base" /> },
+    { href: "/torrent", name: "Torrent", icon: <SiUtorrent className="text-base" />, new: true },
   ]
 
   // Additional navigation items for the "More" dropdown
@@ -133,13 +133,24 @@ const Navbar = () => {
                 {navbarItems.map(item=>{
                   return (
                     <Link
-                    key={item.href}
-                  href={item.href}
-                  className={`px-3 py-2 flex gap-1 items-center rounded-md text-sm font-medium transition-colors ${currentPath === item.href ? "text-primary-200 bg-primary-100/10" : "text-gray-300 hover:text-primary-200 hover:bg-primary-100/5"}`}
-                >
-                  {item.icon}
-                  {item.name}
-                </Link>
+  key={item.href}
+  href={item.href}
+  className={`px-3 py-2 flex gap-1 items-center rounded-md text-sm font-medium transition-colors ${
+    currentPath === item.href
+      ? "text-primary-200 bg-primary-100/10"
+      : "text-gray-300 hover:text-primary-200 hover:bg-primary-100/5"
+  }`}
+>
+  {item.icon}
+  <span className="relative">
+    {item.name}
+    {item.new && (
+      <span className="absolute -top-4 animate-pulse -right-6 bg-sky-500 text-white text-[0.65rem] px-1 rounded-lg font-bold  transform scale-75">
+        NEW
+      </span>
+    )}
+  </span>
+</Link>
                   )
                 })}
                 
@@ -262,6 +273,11 @@ const Navbar = () => {
               <Link key={item.href} href={item.href} className=" px-3 py-2 rounded-md text-base font-medium text-gray-300 flex items-center gap-1 hover:text-primary-200 hover:bg-primary-100/10">
                 {item.icon}
                 {item.name}
+                {item.new && (
+      <span className=" flex animate-pulse  bg-sky-500 text-white text-[0.65rem] px-1 rounded-lg font-bold  transform scale-75">
+        NEW
+      </span>
+    )}
             </Link>
             )
           })}

@@ -1,3 +1,4 @@
+// if name of file is pag.jsx then its intentional because we probably wont want this route to get shown on the website
 "use client";
 import React, { useEffect, useState } from "react";
 
