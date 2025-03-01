@@ -1,6 +1,5 @@
 import GetWatchListDataById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
 import CustomLoader from "@/components/CustomLoader";
-import FailCaseLoader from "@/components/FailCaseLoader";
 import Pagination from "@/components/Pagination";
 import WatchListCard from "@/components/watchListCard";
 import { Constant_Var_success } from "@/utils/constants";
@@ -74,14 +73,14 @@ const WatchListPagination = ({ selectedWatchList }) => {
             ))}
           </div>
         ) : (
-          <div className="w-full h-[60vh]"> <FailCaseLoader imageUrl={"/NoData.gif"} loaderText={"Empty List"}/></div>
+          <div className="w-full h-[60vh]"> <CustomLoader imageUrl={"/NoData.gif"} loaderText={"Empty List"}/></div>
         )
       ) : !error ? (
         <div className="h-[70vh] -my-10 -mx-4">
-          <CustomLoader imageUrl={"/userProfileImage5.jpg"} loaderText={"Loading WatchList"}/>
+          <CustomLoader imageUrl={"/userProfileImage5.jpg"} loaderText={"Loading WatchList..."}/>
         </div>
       ) : (
-        <div className="w-full h-[60vh]"> <FailCaseLoader imageUrl={"/NoData.gif"} loaderText={"Error Loading WatchList"}/></div>
+        <div className="w-full h-[60vh]"> <CustomLoader imageUrl={"/NoData.gif"} loaderText={"Error Loading WatchList"}/></div>
       )}
 
       {selectedWatchList && selectedWatchList.animeList.length > 0 && (

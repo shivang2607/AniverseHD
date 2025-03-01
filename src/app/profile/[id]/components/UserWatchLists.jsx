@@ -11,8 +11,8 @@ import React, { use, useEffect, useState } from "react";
 import WatchListsTabs from "./WatchListsTabs";
 import WatchListPagination from "./WatchListPagination";
 import useGlobalLoader from "@/components/ZustandStores/useGlobalLoader";
-import FailCaseLoader from "@/components/FailCaseLoader";
 import toast from "react-hot-toast";
+import CustomLoader from "@/components/CustomLoader";
 
 const UserWatchLists = ({ id }) => {
   const { isUserLoggedIn, loggedInUserId, loggedInUserWatchListsInfo } =
@@ -164,7 +164,7 @@ const UserWatchLists = ({ id }) => {
           userCustomWatchLists.length === 0 && (
             <div className="w-full h-[60vh]">
               {" "}
-              <FailCaseLoader
+              <CustomLoader
                 imageUrl={"/NoData.gif"}
                 loaderText={
                   isUserLoggedIn && loggedInUserId === id
