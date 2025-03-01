@@ -250,6 +250,9 @@ const Page = () => {
                   <table className="w-full">
                     <thead>
                       <tr className="bg-cbg-300 text-primary-300">
+                      <th className="p-4 text-center ">
+                          S.No.
+                        </th>
                         <th className="p-4 text-left">Title</th>
                         <th
                           onClick={() => requestSort("size")}
@@ -270,7 +273,7 @@ const Page = () => {
                           </div>
                         </th>
                         <th className="p-4 text-center whitespace-nowrap">
-                          Copy link
+                          Magnet URL
                         </th>
                       </tr>
                     </thead>
