@@ -102,7 +102,7 @@ export async function getTorrentData(qText = "") {
       return response.data;
     } catch (error) {
       console.error("Failed to fetch from URL:", url, error.message);
-      throw error;
+      // throw error;
     }
   };
 

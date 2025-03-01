@@ -23,6 +23,18 @@ export default function WatchLayout({ children }) {
 
   return (
     <>
+        <Script
+          id="native banner"
+          dangerouslySetInnerHTML={{
+            __html: `(function(d, z, s) {
+              s.src = 'https://' + d + '/401/' + z;
+              try {
+                (document.body || document.documentElement).appendChild(s);
+              } catch (e) {}
+            })('groleegni.net', 8974905, document.createElement('script'));`,
+          }}
+        />
+        
       <Script
         src={`/scripts/adblocker-detection.js?${cacheBuster}`}
         strategy="afterInteractive"
@@ -33,17 +45,6 @@ export default function WatchLayout({ children }) {
           strategy="afterInteractive"
         />
 
-      <script
-        id="native banner"
-        dangerouslySetInnerHTML={{
-          __html: `(function(d, z, s) {
-            s.src = 'https://' + d + '/401/' + z;
-            try {
-              (document.body || document.documentElement).appendChild(s);
-            } catch (e) {}
-          })('groleegni.net', 8974905, document.createElement('script'));`,
-        }}
-      />
       <div>{children}</div>
     </>
   );
