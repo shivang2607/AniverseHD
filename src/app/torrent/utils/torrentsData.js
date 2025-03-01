@@ -29,9 +29,9 @@ function removePrefixFromKeys(obj, prefix = "nyaa:") {
 }
 
 export async function getTorrentData(qText = "") {
-  const ttl = 1000* 60* 20; //ttl of 20 min
+  const ttl = 1000 * 60 * 20; //ttl of 20 min
   const cachedData = getSessionWithExpiry(`torrent-of-${qText}`);
-  if(cachedData) 
+  if (cachedData) 
     return cachedData;
 
   // Function to properly encode URL for allOrigins
@@ -68,50 +68,57 @@ export async function getTorrentData(qText = "") {
         ...(rootUrl2 ? [`${rootUrl2}/?${new URLSearchParams(queryParams)}`] : [])
       ];
 
-  let res;
-  let lastError;
-  for (const url of urls) {
+  // Create a function to fetch data from a URL and validate the response
+  const fetchFromUrl = async (url) => {
     try {
-      // console.log("Fetching URL:", url);
-      res = await axios.get(url, {
+      const response = await axios.get(url, {
         headers: {
           'Accept': 'application/xml, text/xml, */*',
-          // 'User-Agent': 'Mozilla/5.0 (compatible; RSS-Reader/1.0)'
         }
       });
 
       // Check for various error conditions
-      if (typeof res.data === "string") {
-        if (res.data.includes("429 Too Many Requests")) {
+      if (typeof response.data === "string") {
+        if (response.data.includes("429 Too Many Requests")) {
           console.error("Received 429 error from URL:", url);
-          lastError = new Error("429 Too Many Requests");
-          continue;
+          throw new Error("429 Too Many Requests");
         }
-        if (res.data.includes("404 Not Found")) {
+        if (response.data.includes("404 Not Found")) {
           console.error("Received 404 error from URL:", url);
-          lastError = new Error("404 Not Found");
-          continue;
+          throw new Error("404 Not Found");
         }
       }
 
-      if (res?.data) {
-        break;
+      if (!response?.data) {
+        throw new Error("No data in response");
       }
+      
+      return response.data;
     } catch (error) {
       console.error("Failed to fetch from URL:", url, error.message);
-      lastError = error;
-      continue;
+      throw error;
     }
-  }
+  };
 
-  if (!res || !res.data) {
-    throw new Error("All URL requests failed: " + (lastError ? lastError.message : "Unknown error"));
+  // Create an array of fetch promises
+  const fetchPromises = urls.map(url => fetchFromUrl(url)); //since there is no await in front of fetchFromUrl therefore both request will return simultaneously or kyunki fir aage Prmoise.any lagaya h mtlb jaise hi koi bhi ek success hogi usko return kr dega
+
+  let xmlData;
+  try {
+    // Use Promise.any to get the first successful response
+    xmlData = await Promise.any(fetchPromises);
+  } catch (error) {
+    // AggregateError is thrown when all promises reject
+    const errorMessage = error.errors ? 
+      error.errors.map(e => e.message).join(", ") : 
+      "Unknown error";
+    throw new Error("All URL requests failed: " + errorMessage);
   }
 
   try {
     // Convert XML to JSON using compact mode
     const options = { compact: true, spaces: 2 };
-    const jsonString = convert.xml2json(res.data, options);
+    const jsonString = convert.xml2json(xmlData, options);
     let jsonData = JSON.parse(jsonString);
 
     // Process the channel items
@@ -126,10 +133,8 @@ export async function getTorrentData(qText = "") {
     const dataArray = Array.isArray(jsonData) ? jsonData : [jsonData];
     const sortedJsonData = dataArray.sort((a, b) => Number(b.seeders) - Number(a.seeders));
 
-    console.log("Processed items count:", sortedJsonData.length, 
-      // "\n data => ", sortedJsonData
-    );
-    if(sortedJsonData.length > 0) {
+    console.log("Processed items count:", sortedJsonData.length);
+    if (sortedJsonData.length > 0) {
       setSessionWithExpiry(`torrent-of-${qText}`, sortedJsonData, ttl);  //cache data for 20 min
     }
     return sortedJsonData;

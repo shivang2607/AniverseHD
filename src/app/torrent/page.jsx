@@ -204,6 +204,7 @@ const Page = () => {
             <button
               onClick={searchTorrents}
               disabled={loading}
+              data-umami-event="onClick Torrent Search"
               className="px-6 py-3 bg-primary-300 text-cbg-100 font-medium rounded-lg hover:bg-primary-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 whitespace-nowrap"
             >
               {loading ? "Searching..." : "Search"}

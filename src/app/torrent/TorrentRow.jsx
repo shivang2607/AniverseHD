@@ -93,6 +93,7 @@ const TorrentRow = ({ torrent, index }) => {
             {/* 3. Modified: Magnet icon opens URL in new tab, added separate copy button */}
             <Link
               href={magnetLink}
+              data-umami-event="onClick Magnetic URL"
               className="p-2 rounded-full bg-cbg-300 hover:bg-cbg-400 text-primary-300 transition-all duration-200 hover:scale-110"
               title="Open magnet link"
             >
@@ -107,6 +108,7 @@ const TorrentRow = ({ torrent, index }) => {
                   : "bg-cbg-300 hover:bg-cbg-400 text-primary-300"
               } transition-all duration-200 hover:scale-110`}
               title="Copy magnet link"
+              data-umami-event="onClick copy Magnetic URL"
             >
               {copied ? <FaCheck size={16} /> : <FaCopy size={16} />}
             </button>
