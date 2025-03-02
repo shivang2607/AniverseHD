@@ -23,11 +23,11 @@ export default function WatchLayout({ children }) {
 
   return (
     <>
-      <Script
+     {/* <Script
         src={`/scripts/adblocker-detection.js?${cacheBuster}`}
         strategy="afterInteractive"
         data-cfasync="false"
-      />
+      /> */}
         <Script
           src={`/scripts/monetag-script.js?${cacheBuster}`}
           strategy="afterInteractive"
