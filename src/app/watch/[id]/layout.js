@@ -23,28 +23,27 @@ export default function WatchLayout({ children }) {
 
   return (
     <>
-        <Script
-          id="native banner"
-          dangerouslySetInnerHTML={{
-            __html: `(function(d, z, s) {
-              s.src = 'https://' + d + '/401/' + z;
-              try {
-                (document.body || document.documentElement).appendChild(s);
-              } catch (e) {}
-            })('groleegni.net', 8974905, document.createElement('script'));`,
-          }}
-        />
-        
-      <Script
+        {/* <Script
         src={`/scripts/adblocker-detection.js?${cacheBuster}`}
         strategy="afterInteractive"
         data-cfasync="false"
-      />
+      /> */}
         <Script
           src={`/scripts/monetag-script.js?${cacheBuster}`}
           strategy="afterInteractive"
         />
 
+      <script
+        id="native banner"
+        dangerouslySetInnerHTML={{
+          __html: `(function(d, z, s) {
+            s.src = 'https://' + d + '/401/' + z;
+            try {
+              (document.body || document.documentElement).appendChild(s);
+            } catch (e) {}
+          })('groleegni.net', 8974905, document.createElement('script'));`,
+        }}
+      />
       <div>{children}</div>
     </>
   );
