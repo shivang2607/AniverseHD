@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Comment } from 'react-loader-spinner';
-import { postComment } from './utilFunctions';
+import { postComment, putComment } from './utilFunctions';
 
-export default function InputCommentDiv({commentPayload, setCommentPayload, isEdit=false, isReply=false}) {
+export default function InputCommentDiv({commentPayload, setCommentPayload, isEdit=false, isReply=false, setIsEdit}) {
 
     const [loadingStates, setLoadingStates] = useState({
         addComment: false,
@@ -15,7 +15,25 @@ export default function InputCommentDiv({commentPayload, setCommentPayload, isEd
             toast.error(`Comment length cannot exceed ${commentLength} characters!`);
             return;
         }
+        
+        if(isEdit){
+            setCommentPayload(prev => ({...prev, editableBody: body}))
+            return;
+        }
         setCommentPayload(prev => ({...prev, commentBody: body}));
+    }
+
+
+    const handleEditComment = async () =>{
+
+        //set the add comment loader to true 
+        setLoadingStates(({...loadingStates, addComment: true}));
+
+        await putComment(commentPayload);
+        //set the add comment loader to false and reset the comment body and spoiler flag
+        setLoadingStates(({...loadingStates, addComment: false}));
+        setIsEdit(false)
+        // setCommentPayload(prev => ({...prev, commentBody: "", isSpoiler: false}));
     }
 
     const handleAddComment = async () =>{
@@ -29,20 +47,20 @@ export default function InputCommentDiv({commentPayload, setCommentPayload, isEd
     }
 
 
-
-  return (
-    <>
+    
+    return (
+        <>
     {/* //below is the div of adding the commment */}
                 <div className={`addcomment flex  flex-col w-3/4 ${isReply?"ml-12":""}  gap-2`}>
-                <div className="textarea">
-                    <textarea name="add-comment" id="" 
-                    value={commentPayload.commentBody} 
-                    disabled={loadingStates.addComment}
-                    onChange={handleOnChangeComment}
-                    placeholder={`Type your ${isReply?"Reply":"Comment"} here..`}
-                    className='w-full resize-none rounded-xl p-2 bg-cbg-100/40 focus:outline-none focus:border-2 border-primary-100 text-gray-300' 
-                    />
-                </div>
+                    <div className="textarea">
+                        <textarea name="add-comment" id="" 
+                        value={isEdit ? commentPayload?.editableBody :commentPayload?.commentBody} 
+                        disabled={loadingStates.addComment}
+                        onChange={handleOnChangeComment}
+                        placeholder={`Type your ${isReply?"Reply":"Comment"} here..`}
+                        className='w-full resize-none rounded-xl p-2 bg-cbg-100/40 focus:outline-none focus:border-2 border-primary-100 text-gray-300' 
+                        />
+                    </div>
                 <div className="buttons flex gap-4 text-gray-400 items-center ml-auto">
                 <label className="flex cursor-pointer items-center gap-1 text-gray-400">
                     <input
@@ -73,9 +91,9 @@ export default function InputCommentDiv({commentPayload, setCommentPayload, isEd
                 <button
                     type="button"
                     className=" text-cbg-200 font-semibold bg-primary-100 px-2 py-1 rounded-md hover:bg-primary-200 transition"
-                    onClick={handleAddComment}
+                    onClick={isEdit ? handleEditComment : handleAddComment}
                 >
-                    {isReply ? "Post Reply" : "Add Comment"}
+                    {isReply ? "Post Reply" : "Post Comment"}
                  </button>
     
                 }

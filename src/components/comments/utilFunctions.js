@@ -104,6 +104,44 @@ export async function postComment(payload){
 }
 
 
+export async function putComment(payload){
+  const {
+      animeId,  
+      isSpoiler,
+      commentId,
+      editableBody,
+  } = payload;
+  
+  if(editableBody.trim()===""){
+      toast.error("Please type some text");
+      return;
+  }
+  if(editableBody?.length > commentLength){
+      toast.error(`Cannot contain more than ${commentLength} characters!`);
+      return;
+  }
+
+  if(!commentId){
+    toast.error("Comment Id not in the payload.")
+  }
+  // console.log(payload);
+  // return;
+  
+  try {
+      const res = await axios.put(`/api/v1/comments/${animeId}`, { commentId, isSpoiler, commentBody: editableBody});
+      console.log("this is res of postComment function => ",res);
+
+      if(res?.data?.success===true){
+          toast.success("Comment Updated successfully", {duration:3000});
+      }
+
+  } catch (error) {
+      console.log(error);
+      toast.error("Error : Couldn't Edit your comment :(", {duration:3000});
+  }
+}
+
+
 export  async function ReactComment(payload){
   // const {userId, commentId, reactionType} = payload;
   if(!payload.userId){

@@ -13,12 +13,14 @@ import toast from "react-hot-toast";
 import { Comment } from "react-loader-spinner";
 import ReplyCommentCard from "./ReplyCommentCard";
 import InputCommentDiv from "./InputCommentDIv";
+import { MdEdit } from "react-icons/md";
 
 export default function CommentCard({ animeId, comment, userId }) {
   const [loadingStates, setLoadingStates] = useState({
     addComment: false,
   });
   const [showPostReply, setShowPostReply] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [showSpoiler, setShowSpoiler] = useState(!comment?.isSpoiler);
   const [reactionStates, setReactionStates] = useState({
     loading: false,
@@ -34,18 +36,22 @@ export default function CommentCard({ animeId, comment, userId }) {
     repliedToUId: comment?.userId,
     parentCommentId: comment?.commentId,
     commentBody: "",
+    editableBody: comment?.body,
     epNo: comment?.epNo,
     isSpoiler: false,
     gogoEpId: comment?.gogoEpId,
     zoroEpId: comment?.zoroEpId,
   });
+  const [editCommentPayload, setEditCommentPayload] = useState({
+    ...comment, animeId: animeId, editableBody: comment.body
+  })
   const [showReplies, setShowReplies] = useState(false);
   const [params, setParams] = useState({
     animeId: animeId,
     parentCommentId: comment?.commentId,
     userId: userId,
     epNo: comment?.epNo,
-    orderBy: 'createdAt ASC', // for replies we would want that older replies should be shown first and newer replies below them because they can be the replies of replies as well
+    orderBy: "createdAt ASC", // for replies we would want that older replies should be shown first and newer replies below them because they can be the replies of replies as well
     limit: 100,
     offset: 0,
   });
@@ -107,8 +113,6 @@ export default function CommentCard({ animeId, comment, userId }) {
     setReactionStates((prev) => ({ ...prev, loading: false }));
   };
 
-
-
   //this function handles the on click trigger of show replies button
   const handleShowReply = async () => {
     setShowReplies(!showReplies);
@@ -139,20 +143,31 @@ export default function CommentCard({ animeId, comment, userId }) {
             <div className="name text-sky-400 font-semibold tracking-wide">
               {comment?.userName}
             </div>
-            <div className="name text-gray-400 text-xs">
+            <div className="name-edited flex gap-1 text-gray-400 text-xs">
               {/* {console.log(new Date(comment?.createdAt))} */}
               <CustomTimeAgo date={new Date(comment?.createdAt + "Z")} />
+            <div className="isEdited text-gray-400 text-xs">{comment?.isEdited>0 && "(edited)"}</div>
             </div>
           </div>
 
-          <div
-            className={`body ${
-              comment?.isSpoiler && !showSpoiler ? "blur-sm" : ""
-            } text-gray-300 w-full text-wrap`}
-          >
-            {comment?.body}
-          </div>
-          {comment?.isSpoiler > 0 && (
+          {isEdit ? (
+            <InputCommentDiv
+              commentPayload={editCommentPayload}
+              setCommentPayload={setEditCommentPayload}
+              isEdit={true}
+              setIsEdit={setIsEdit}
+            />
+          ) : (
+            <div
+              className={`body ${
+                (editCommentPayload?.isSpoiler) && !showSpoiler ? "blur-sm" : ""
+              } text-gray-300 w-full text-wrap`}
+            >
+              {editCommentPayload?.editableBody}
+              {/* in the abve expression since default value of editableBody is that of comment body initially so it workes even before editing, and after editing it changes anyways so no need to reload the comment data */}
+            </div>
+          )}
+          {editCommentPayload?.isSpoiler > 0 && (
             <div className="flex">
               <button
                 className="spoiler px-1 py-1 my-1 rounded-md !text-xs bg-white text-gray-800"
@@ -164,13 +179,21 @@ export default function CommentCard({ animeId, comment, userId }) {
           )}
 
           <div className="reply-reaction flex my-1 text-gray-400 text-xs gap-6 items-center">
+            {userId === comment?.userId && (
+              <button
+                className="edit flex items-center gap-1"
+                onClick={() => setIsEdit((prev) => !prev)}
+              >
+                <MdEdit /> Edit
+              </button>
+            )}
+
             <button
               className="reply flex gap-1  items-center"
               onClick={() => setShowPostReply((prev) => !prev)}
             >
               <FaReply /> Reply
             </button>
-
 
             <button
               className="like flex items-center disabled:cursor-progress gap-1 text-xs"
@@ -184,8 +207,6 @@ export default function CommentCard({ animeId, comment, userId }) {
               )}
               {reactionStates?.likesCount > 0 ? reactionStates?.likesCount : ""}
             </button>
-
-
 
             <button
               className="dislike flex items-center disabled:cursor-progress gap-1 text-xs"
@@ -202,8 +223,6 @@ export default function CommentCard({ animeId, comment, userId }) {
                 : ""}
             </button>
 
-
-
             {comment?.replyCount > 0 && (
               <button
                 className="view-replies text-primary-500 font-light"
@@ -214,25 +233,22 @@ export default function CommentCard({ animeId, comment, userId }) {
                   : `Show ${comment.replyCount} Replies`}
               </button>
             )}
-
-
           </div>
         </div>
       </div>
-
-
-
-
 
       {/* //below code is for the posting the reply to the comment  */}
       {
         showPostReply && (
           /* //below is the div of adding the commment */
-          
-          <InputCommentDiv commentPayload={commentPayload} setCommentPayload={setCommentPayload} isReply={true}/>
+
+          <InputCommentDiv
+            commentPayload={commentPayload}
+            setCommentPayload={setCommentPayload}
+            isReply={true}
+          />
         ) /* div for adding the reply comment ended here  */
       }
-
 
       {/* //below component renders all the replies of the current comment component */}
       {showReplies && (
@@ -240,8 +256,13 @@ export default function CommentCard({ animeId, comment, userId }) {
           {replyComments?.length > 0 ? (
             replyComments?.map((replyComment) => {
               return (
-                <ReplyCommentCard animeId={animeId} comment={replyComment} parentCommentId={comment.commentId} userId={userId}/>
-              )
+                <ReplyCommentCard
+                  animeId={animeId}
+                  comment={replyComment}
+                  parentCommentId={comment.commentId}
+                  userId={userId}
+                />
+              );
             })
           ) : (
             <div className="text-sm text-red-400">No Replies</div>
