@@ -34,7 +34,7 @@ export async function getComments(params){
         // orderBy,
         // userId,
      } = params;
-     console.log(params);
+    //  console.log(params);
      if(!animeId || !epNo){
         toast.error("AnimeId or episode Number not found");
         return;
@@ -129,7 +129,7 @@ export async function putComment(payload){
   
   try {
       const res = await axios.put(`/api/v1/comments/${animeId}`, { commentId, isSpoiler, commentBody: editableBody});
-      console.log("this is res of postComment function => ",res);
+      // console.log("this is res of postComment function => ",res);
 
       if(res?.data?.success===true){
           toast.success("Comment Updated successfully", {duration:3000});

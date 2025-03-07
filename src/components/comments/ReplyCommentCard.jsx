@@ -121,14 +121,15 @@ export default function ReplyCommentCard({
 
         <div className="contentContainer w-full flex flex-col gap-1 text-sm">
           <div className="first flex items-center gap-5">
-            <div className="name text-sky-400  font-semibold tracking-wide">
-              {comment?.userName}
-            </div>
-            <div className="name text-gray-400 text-xs">
-              {/* {console.log(new Date(comment?.createdAt))} */}
-              <CustomTimeAgo date={new Date(comment?.createdAt + "Z")} />
-            </div>
-          </div>
+                      <div className="name text-sky-400 font-semibold tracking-wide">
+                        {comment?.userName}
+                      </div>
+                      <div className="name-edited flex gap-1 text-gray-400 text-xs">
+                        {/* {console.log(new Date(comment?.createdAt))} */}
+                        <CustomTimeAgo date={new Date(comment?.createdAt + "Z")} />
+                      <div className="isEdited text-gray-400 text-xs">{comment?.isEdited>0 && "(edited)"}</div>
+                      </div>
+                    </div>
 
           {isEdit ? (
             <InputCommentDiv

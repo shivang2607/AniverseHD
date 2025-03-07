@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { Comment } from 'react-loader-spinner';
 import { postComment, putComment } from './utilFunctions';
 
+const commentLength =500;
+
 export default function InputCommentDiv({commentPayload, setCommentPayload, isEdit=false, isReply=false, setIsEdit}) {
 
     const [loadingStates, setLoadingStates] = useState({
