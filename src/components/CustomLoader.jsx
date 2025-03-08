@@ -19,7 +19,7 @@ const CustomLoader = ({imageUrl,loaderText}) => {
           />
         )}
         {loaderText  && (
-          <p className="text-xl font-semibold text-white">{loaderText + ".."}</p>
+          <p className="text-xl font-semibold text-white">{loaderText}</p>
         )}
         {/* <div className="max-w-40 w-[50%] h-1 mx-auto bg-blue-500 rounded-full animate-pulse"></div> */}
       </div>

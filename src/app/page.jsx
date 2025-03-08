@@ -8,6 +8,7 @@ import AllTop from "@/components/AllTop";
 import RecentWatching from "@/components/RecentWatching";
 import jikanjs from "@mateoaranda/jikanjs";
 import ScheduleComponent from "@/components/ScheduleComponent/ScheduleComponent";
+import { getTorrentData } from "@/app/torrent/utils/torrentsData";
 
 
 export default function Page() {
@@ -17,8 +18,8 @@ export default function Page() {
   useEffect(() => {
     async function f() {
       
-      const apiUrl = "https://api.jikan.moe/v4/";
-      const res = await axios.get(`${apiUrl}schedules?filter=friday&sfw=true`);
+      await getTorrentData("berserk");
+      console.log("function executed")
     
       }
 

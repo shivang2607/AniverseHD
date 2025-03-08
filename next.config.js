@@ -2,7 +2,22 @@
 const nextConfig = {
   output: "standalone",
   reactStrictMode: true, // Set this to true for better error handling and optimization.
-  
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        'node:crypto': false,
+        'node:stream': false,
+        'node:buffer': false,
+        crypto: false,
+      };
+    }
+    return config;
+  },
   experimental: {
     serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
     missingSuspenseWithCSRBailout: false,

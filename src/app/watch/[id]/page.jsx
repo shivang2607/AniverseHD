@@ -50,6 +50,8 @@ import Metadata from "./Metadata";
 import { FaDownload, FaStepBackward, FaStepForward } from "react-icons/fa";
 import Link from "next/link";
 import CommentsContainer from "@/components/comments/CommentsContainer";
+import Script from "next/script";
+import { GlobalScripts } from "@/components/GlobalScripts";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -101,9 +103,8 @@ export default function Page({ params }) {
     isUserLoggedIn,
     RecentWatchListId,
     loadLoggedInUserRecentWatchList,
-    loadLoggedInUserWatchLists
+    loadLoggedInUserWatchLists,
   } = useUserStore();
-
 
   const [showSkipButton, setShowSkipButton] = useState("");
   const [mediaPlayerState, setMediaPlayerState] = useState({
@@ -122,7 +123,6 @@ export default function Page({ params }) {
   const durationRef = useRef(duration);
   const contentRef = useRef(content);
   // const [isAutoSkip, setIsAutoSkip] = useState(true);
-
 
   //cleanup function saves the timestamp and url to the user Recent watchlist thereby adding the current episode with current timestamp in the Recent watchlist of the user
   useEffect(() => {
@@ -222,8 +222,7 @@ export default function Page({ params }) {
     return () => {};
   }, [provider, zoroId, gogoSubId, gogoDubId, serverV, dubV]);
 
-
-  //below functions gets the necessary data from both provider like episodes content at the page load, mergeProviderData is used in this useEffect  
+  //below functions gets the necessary data from both provider like episodes content at the page load, mergeProviderData is used in this useEffect
   useEffect(() => {
     if (!params?.id) return;
 
@@ -291,7 +290,6 @@ export default function Page({ params }) {
     })();
   }, [params]);
 
-
   //below useEffect updates the server data whenever any of the dependency changes
   useEffect(() => {
     (async () => {
@@ -303,15 +301,15 @@ export default function Page({ params }) {
           (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
       );
 
-      setEpNo(currentIndex + 1);    //this will set the current episode number which will be used for commenting the comment for this episode number.
+      setEpNo(currentIndex + 1); //this will set the current episode number which will be used for commenting the comment for this episode number.
 
-      
       if (!provider) router.replace("/not-found");
-      
+
       setIsNextEpisodeAvailable(true);
       setIsPrevEpisodeAvailable(true);
-      if(currentIndex === 0) setIsPrevEpisodeAvailable(false);
-      if(currentIndex === episodesData?.length - 1) setIsNextEpisodeAvailable(false);
+      if (currentIndex === 0) setIsPrevEpisodeAvailable(false);
+      if (currentIndex === episodesData?.length - 1)
+        setIsNextEpisodeAvailable(false);
 
       if (provider === "zoro" && zoroEpisodeId) {
         const cachedServerData = getSessionWithExpiry(
@@ -333,14 +331,20 @@ export default function Page({ params }) {
                 cachedServerData?.raw?.[0]?.serverName
             );
           // return;
-        } else{
-          console.log("entered zoro server fetch block with data => ", provider, zoroEpisodeId);
+        } else {
+          console.log(
+            "entered zoro server fetch block with data => ",
+            provider,
+            zoroEpisodeId
+          );
           if (zoroEpisodeId) {
             try {
               // Make the API call to get the server data
-              const serverData = await axios.get(`/api/v1/${provider}/servers/${zoroEpisodeId}`);
+              const serverData = await axios.get(
+                `/api/v1/${provider}/servers/${zoroEpisodeId}`
+              );
               // console.log("This is Zoro server data: ", serverData);
-          
+
               // Ensure the server data exists and has the expected structure
               if (serverData?.data?.data) {
                 // Update the router URL parameters (e.g., dub value)
@@ -350,23 +354,23 @@ export default function Page({ params }) {
                     false
                   )
                 );
-          
+
                 // Set the server data and server name
                 setServerData(serverData?.data?.data);
                 setServer(
                   serverData?.data?.data?.sub?.[0]?.serverName ||
-                  serverData?.data?.data?.raw?.[0]?.serverName
+                    serverData?.data?.data?.raw?.[0]?.serverName
                 );
-          
+
                 // Cache the server data with an expiry of 2 hours
                 setSessionWithExpiry(
                   `serverData-${provider}-${zoroEpisodeId}`,
                   serverData?.data?.data,
-                  1000 * 60 * 60 * 2  // 2 hours expiry
+                  1000 * 60 * 60 * 2 // 2 hours expiry
                 );
               } else {
                 // Handle the case where serverData doesn't have the expected structure
-                
+
                 toast.error("Failed to fetch server data. Please try again.");
               }
             } catch (error) {
@@ -375,13 +379,11 @@ export default function Page({ params }) {
               // toast.error(" Error occurred while fetching server data. Please try again.");
             }
           }
-          
         }
       }
 
-
       //for gogo server data
-      else if(provider === "gogo" && (gogoSubEpisodeId || gogoDubEpisodeId)){
+      else if (provider === "gogo" && (gogoSubEpisodeId || gogoDubEpisodeId)) {
         try {
           const cachekey = `serverData-${provider}-${gogoSubEpisodeId}-${gogoDubEpisodeId}`;
           const cachedServerData = getSessionWithExpiry(cachekey);
@@ -393,61 +395,61 @@ export default function Page({ params }) {
               )
             );
             setServerData(cachedServerData);
-            if (!serverV)
-              setServer(cachedServerData?.sub?.[0]?.name);
+            if (!serverV) setServer(cachedServerData?.sub?.[0]?.name);
             // return;
-          } 
-          else if(gogoDubEpisodeId || gogoSubEpisodeId){
-            console.log("entered gogo server fetch block with data => ", provider, gogoDubEpisodeId, gogoSubEpisodeId);
+          } else if (gogoDubEpisodeId || gogoSubEpisodeId) {
+            console.log(
+              "entered gogo server fetch block with data => ",
+              provider,
+              gogoDubEpisodeId,
+              gogoSubEpisodeId
+            );
             let serverDataSub, serverDataDub;
-            if(gogoSubEpisodeId && gogoSubEpisodeId!=="null"){
-              serverDataSub = await axios.get(`/api/v1/${provider}/servers/${gogoSubEpisodeId}`);
-
+            if (gogoSubEpisodeId && gogoSubEpisodeId !== "null") {
+              serverDataSub = await axios.get(
+                `/api/v1/${provider}/servers/${gogoSubEpisodeId}`
+              );
             }
-            if(gogoDubEpisodeId && gogoDubEpisodeId!=="null"){
-              serverDataDub = await axios.get(`/api/v1/${provider}/servers/${gogoDubEpisodeId}`);
-
+            if (gogoDubEpisodeId && gogoDubEpisodeId !== "null") {
+              serverDataDub = await axios.get(
+                `/api/v1/${provider}/servers/${gogoDubEpisodeId}`
+              );
             }
 
+            const formatedResponse = {
+              sub: serverDataSub?.data,
+              dub: serverDataDub?.data,
+            };
+            const subServerName = formatedResponse?.sub?.[0]?.name;
+            const dubServerName = formatedResponse?.dub?.[0]?.name;
+            // console.log(subServerName, dubServerName);
+            router.replace(
+              updateParams(
+                [{ key: "dub", val: updateDubVal(formatedResponse) }],
+                false
+              )
+            );
 
-          const formatedResponse = {sub: serverDataSub?.data,dub: serverDataDub?.data}
-          const subServerName = formatedResponse?.sub?.[0]?.name;
-          const dubServerName = formatedResponse?.dub?.[0]?.name;
-          // console.log(subServerName, dubServerName);
-          router.replace(
-            updateParams(
-              [{ key: "dub", val: updateDubVal(formatedResponse) }],
-              false
-            )
-          );
-
-          setServer(dub ? dubServerName : subServerName);
-          setServerData(formatedResponse); 
-          if(formatedResponse){ 
-            setSessionWithExpiry(
-            cachekey,
-            formatedResponse,
-            1000 * 60 * 60 * 2
-          ); //2 hrs
-        }
-
-        }
-
+            setServer(dub ? dubServerName : subServerName);
+            setServerData(formatedResponse);
+            if (formatedResponse) {
+              setSessionWithExpiry(
+                cachekey,
+                formatedResponse,
+                1000 * 60 * 60 * 2
+              ); //2 hrs
+            }
+          }
         } catch (error) {
           // toast.error(error.message);
           console.log("error while fetching server data => ", error);
         }
-      }
-
-      else  {
-        if(content?.title){
-        toast.error("Anime not available");
-        setAnimeNotAvailable(true);
+      } else {
+        if (content?.title) {
+          toast.error("Anime not available");
+          setAnimeNotAvailable(true);
         }
       }
-
-     
-
     })();
 
     return () => {
@@ -455,18 +457,16 @@ export default function Page({ params }) {
     };
   }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
 
-
   //this function update the url params, it has resetT as true which will remove timestamp t parameter by default
   const updateParams = (paramsList, resetT = true) => {
     const newParams = new URLSearchParams(searchParams);
     if (resetT) newParams.delete("t");
     paramsList.forEach((par) => {
-      newParams.set(par.key, par.val ? par.val : '');
+      newParams.set(par.key, par.val ? par.val : "");
     });
 
     return pathname + "?" + newParams.toString();
   };
-
 
   //self explainatory
   const getPrevEpisode = () => {
@@ -477,9 +477,7 @@ export default function Page({ params }) {
         (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
     );
 
-    
-
-    if (currentIndex !== -1 && currentIndex > 0 ) {
+    if (currentIndex !== -1 && currentIndex > 0) {
       const ep = episodesData[currentIndex - 1]; // Return the prev episode's ID
       const url = updateParams([
         { key: "z-id", val: ep?.episodeId },
@@ -493,9 +491,7 @@ export default function Page({ params }) {
       setIsPrevEpisodeAvailable(false);
       return null; // No prev episodes available
     }
-
-  }
-
+  };
 
   //self explainatory
   const getNextEpisode = () => {
@@ -520,7 +516,6 @@ export default function Page({ params }) {
       return null; // No more episodes available
     }
   };
-
 
   //this function updates player options in firebase and in local storage like skip intro, auto next and autoplay
   const updatePlayerOptions = (newOpt) => {
@@ -560,8 +555,6 @@ export default function Page({ params }) {
     } else setEpisodesData(null);
   };
 
-
-
   //self explainatory
   const handleOnClickWatchList = async () => {
     const result = await GetLoggedUserWatchListsInfo();
@@ -573,8 +566,7 @@ export default function Page({ params }) {
     } else if (
       result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
     ) {
-      const signInResp = await SignInGooglePopUp((status) => {
-      });
+      const signInResp = await SignInGooglePopUp((status) => {});
 
       if (signInResp.status === Constant_Var_success) return;
       else toast.error(signInResp?.response?.message, { duration: 3000 });
@@ -586,21 +578,21 @@ export default function Page({ params }) {
   const handleTimeUpdate = (v, event) => {
     const player = event.target;
     const currentTime = player?.currentTime;
-    
+
     const t = currentTime;
     if (
       Math.floor(t) % 5 == 0 &&
       Math.floor(t) !== Math.floor(recentTimestamp)
     ) {
       //save timestamp after every 5 seconds
-      
+
       setRecentTimestamp(t);
     }
-    
-    if (!streamingData?.intro){
+
+    if (!streamingData?.intro) {
       setShowSkipButton("");
       return;
-    } 
+    }
     // console.log(currentTime, v);
     // Define the intro and outro timestamps
     const introStart = streamingData?.intro?.start;
@@ -629,24 +621,25 @@ export default function Page({ params }) {
     }
   };
 
-
-
   //below function and usememo is to get src url of m3u8 file according to the provider
-  const getStreamingSource = ()=>{
-    if(provider === "zoro"){
+  const getStreamingSource = () => {
+    if (provider === "zoro") {
       setDownloadLink();
       return streamingData?.sources?.[0]?.url;
-    } 
-    else if(provider === "gogo"){
-      const defaultSrcData =  streamingData?.sources?.filter(src => src?.quality === 'default');
+    } else if (provider === "gogo") {
+      const defaultSrcData = streamingData?.sources?.filter(
+        (src) => src?.quality === "default"
+      );
       setDownloadLink(streamingData?.download);
       // console.log("gogo src data",defaultSrcData);
-      return `https://goodproxy.goodproxy.workers.dev/fetch?url=${defaultSrcData?.[0]?.url}`; 
+      return `https://goodproxy.goodproxy.workers.dev/fetch?url=${defaultSrcData?.[0]?.url}`;
     }
-    
-  }
+  };
   //* using use Memo to cache the streaming url result, because apparantly media player was calling this function after every few seconds
-  const streamingSrc = useMemo(() => getStreamingSource(), [provider, streamingData]);
+  const streamingSrc = useMemo(
+    () => getStreamingSource(),
+    [provider, streamingData]
+  );
 
   //In case if dub is not available for a episode the we will automatically change the router to the sub..this function utility handles the dub val (either 1, 0, -1)
   const updateDubVal = (serData) => {
@@ -670,188 +663,212 @@ export default function Page({ params }) {
   // console.log(streamingData);
 
   return (
-    <div className="py-16">
-      <div className="content py-2 md:px-4 flex flex-col gap-4">
-        {!animeNotAvailable && (
-          <h1 className="text-2xl mx-2 md:mx-0 tracking-wide my-3 font-semibold  self-center">
-            {" "}
-            Currently Watching : {content?.title_english || content?.title}
-          </h1>
-        )}
-        <div className="stream-container self-center md:w-[95%] w-full flex flex-col gap-12 ">
-          <div className="bg-cbg-200 md:p-4 ">
-            {animeNotAvailable ? (
-              <div className=" mx-auto flex flex-col gap-4 h-72 w-72 justify-center items-center">
-                <div className="relative overflow-hidden rounded h-full w-full flex flex-col gap-4 mx-auto object-cover object-center">
-                  <Image
-                    src="/anime-not-available.webp"
-                    unoptimized
-                    alt="Anime not Available for Streaming..."
-                    fill
-                    className=""
-                  />
-                </div>
-                <div className="text-lg text-center mx-aut z-20">
-                  Sorry! Not Available on this Provider !!
-                </div>
-              </div>
-            ) : !streamingData ? (
-              <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
-                <ThreeCircles
-                  visible={true}
-                  height="100"
-                  width="100"
-                  color="#0ea5e9"
-                  // className="text-sky-500"
-                  ariaLabel="three-circles-loading"
-                  wrapperStyle={{}}
-                  wrapperClass=""
-                />
-              </div>
-            ) : streamingData?.status === 500 ? (
-              <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
-                <ImCross color="red" /> {streamingData?.message}
-              </div>
-            ) : (
-              streamingSrc && <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
-                <MediaPlayer
-                  load="eager"
-                  autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
-                  ref={player}
-                  keyTarget="player"
-                  storage="media-player"
-                  buffer
-                  title={streamingData?.malId}
-                  src={streamingSrc}
-                  
-                  className="h-full"
-                  playsInline = {true}
-                  crossOrigin
-                  streamType="on-demand"
-                  onLoadedMetadata={(e) => {
-                   
-                    setDuration(e.target.duration);
-                  }}
-                  onProviderChange={(provider, event) => {
-                    if (isHLSProvider(provider)) {
-                      provider.config = {
-                        nudgeMaxRetry: 5,
-                        maxFragLookUpTolerance: 0.5,
-                        fragLoadingTimeOut: 30000,
-                        fragLoadingMaxRetry: 5,
-                        maxMaxBufferLength: 600,
-                        maxBufferLength: 20,
-                       
-                      };
-                    }
-                  }}
-                  // crossOrigin="anonymous"
+    <>
+      {/* this component is for loading ads script  */}
+      {/* <GlobalScripts/> */}
+      {/* <div className="banner flex w-2/3 h-2/3">
+  <ins id="pm_union"
+         data-partner_id="8789547"
+         data-add_types="banners"
+         data-source_url=""
+         data-pm-b="680x250"
+         ></ins>
+         </div> */}
 
-                  currentTime={startTime}
-                  onError={(e) =>
-                    toast.error(`${e.message}, Try Another Server or Different Provider.`)
-                  }
-                  onEnded={() =>
-                    mediaPlayerState?.isAutoNext && getNextEpisode()
-                  } //only fetch next episode if the auto next state is set to true.
-                  onTimeUpdate={(v, event) => {
-                    handleTimeUpdate(v, event);
-                  }}
-
-                  // onHlsError={()=>{
-                  //   toast.error("Error while loading the file, Try another Provider or try after some time.");
-                  //   console.log("Some error occured in playing the file.");
-                  // }}
-                >
-                  <MediaProvider>
-                    {streamingData?.tracks
-                      ?.filter((t) => t?.kind === "captions")
-                      ?.map((tr, index) => {
-                        return (
-                          // <Captions key={tr?.file} src={tr?.file}  label={tr?.label} default={tr?.default} className="vds-captions"/>
-                          <Track
-                            key={tr?.file}
-                            src={tr?.file}
-                            kind="subtitles"
-                            label={tr?.label}
-                            // lang="en-US"
-                            default={tr?.default}
-                          />
-                        );
-                      })}
-                  </MediaProvider>
-                  <DefaultVideoLayout
-                    thumbnails={
-                      process.env.NEXT_PUBLIC_GOOD_PROXY + (streamingData?.tracks?.filter(
-                        (t) => t.kind === "thumbnails"
-                      )?.[0]?.file)
-                    }
-                    slots={{
-                      beforeCaptionButton: (
-                        <div className="change episodes flex gap-4 mx-4 text-xl">
-                          <button
-                            disabled={!isPrevEpisodeAvailable}
-                            className="hover:scale-110 duration-150 ease-in disabled:text-gray-400"
-                            onClick={getPrevEpisode}
-                          >
-                            <FaStepBackward />
-                          </button>
-                          <button
-                            disabled={!isNextEpisodeAvailable}
-                            className="hover:scale-110 duration-150 ease-in disabled:text-gray-400"
-                            onClick={getNextEpisode}
-                          >
-                            <FaStepForward />
-                          </button>
-                        </div>
-                      ),
-                      afterCaptions: showSkipButton && (
-                        <button
-                          className="md:text-lg w-fit h-fit absolute right-4 bottom-8 md:right-12 md:bottom-24 px-2 py-1 border-white border-2 rounded-md font-semibold backdrop-blur-lg bg-black/10 flex"
-                          onClick={() => {
-                           
-                            player.current.currentTime =
-                              showSkipButton === "Intro"
-                                ? streamingData?.intro?.end
-                                : streamingData?.outro?.end; // Skip to the end of the intro
-                            setShowSkipButton(""); // Hide the button after skipping
-                          }}
-                        >
-                          Skip {showSkipButton}
-                        </button>
-                      ),
-                      downloadButton: downloadLink && (
-                        <Link href={downloadLink} target="_blank" rel="noopener noreferrer" className="text-xl items-center flex mx-3" ><FaDownload/></Link>
-                      )
-                    }}
-                    icons={defaultLayoutIcons}
-                  />
-                </MediaPlayer>
-              </div>
-            )}
-            <div className="flex mt-4 mx-1 md:mx-4 md:text-sm my-2  text-[10px] md:gap-1 gap-[0.20rem]">
-              <button
-                className="favorites flex items-center text-lg  md:mr-5 justify-center gap-1"
-                onClick={handleOnClickWatchList}
-              >
-                {" "}
-                <PiBookmarkSimpleBold className="font-bold text-2xl md:text-base" />
-                <div className="flex flex-col">
-                  <span className="text-sm hidden md:flex gap-2 items-center">
-                    {" "}
-                    Edit Watch List{" "}
-                  </span>
-
-                  {isWatchListOpen && (
-                    <ListDropDown
-                      anime={content}
-                      isOpen={isWatchListOpen}
-                      watchListData={watchListData}
-                      setIsOpen={setIsWatchListOpen}
+      <div className="py-16">
+        <div className="content py-2 md:px-4 flex flex-col gap-4">
+          {!animeNotAvailable && (
+            <h1 className="text-2xl mx-2 md:mx-0 tracking-wide my-3 font-semibold  self-center">
+              {" "}
+              Currently Watching : {content?.title_english || content?.title}
+            </h1>
+          )}
+          <div className="stream-container self-center md:w-[95%] w-full flex flex-col gap-12 ">
+            <div className="bg-cbg-200 md:p-4 ">
+              {animeNotAvailable ? (
+                <div className=" mx-auto flex flex-col gap-4 h-72 w-72 justify-center items-center">
+                  <div className="relative overflow-hidden rounded h-full w-full flex flex-col gap-4 mx-auto object-cover object-center">
+                    <Image
+                      src="/anime-not-available.webp"
+                      unoptimized
+                      alt="Anime not Available for Streaming..."
+                      fill
+                      className=""
                     />
-                  )}
+                  </div>
+                  <div className="text-lg text-center mx-aut z-20">
+                    Sorry! Not Available on this Provider !!
+                  </div>
                 </div>
-                {/* <Toaster
+              ) : !streamingData ? (
+                <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
+                  <ThreeCircles
+                    visible={true}
+                    height="100"
+                    width="100"
+                    color="#0ea5e9"
+                    // className="text-sky-500"
+                    ariaLabel="three-circles-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                  />
+                </div>
+              ) : streamingData?.status === 500 ? (
+                <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
+                  <ImCross color="red" /> {streamingData?.message}
+                </div>
+              ) : (
+                streamingSrc && (
+                  <>
+                    
+
+                    <div class="pm_video" className="pm_video flex h-fit">
+                      <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
+                        <MediaPlayer
+                          load="eager"
+                          autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
+                          ref={player}
+                          keyTarget="player"
+                          storage="media-player"
+                          buffer
+                          title={streamingData?.malId}
+                          src={streamingSrc}
+                          className="h-full"
+                          playsInline={true}
+                          crossOrigin
+                          streamType="on-demand"
+                          onLoadedMetadata={(e) => {
+                            setDuration(e.target.duration);
+                          }}
+                          onProviderChange={(provider, event) => {
+                            if (isHLSProvider(provider)) {
+                              provider.config = {
+                                nudgeMaxRetry: 5,
+                                maxFragLookUpTolerance: 0.5,
+                                fragLoadingTimeOut: 30000,
+                                fragLoadingMaxRetry: 5,
+                                maxMaxBufferLength: 600,
+                                maxBufferLength: 20,
+                              };
+                            }
+                          }}
+                          // crossOrigin="anonymous"
+
+                          currentTime={startTime}
+                          onError={(e) =>
+                            toast.error(`${e.message}, Try Another Server.`)
+                          }
+                          onEnded={() =>
+                            mediaPlayerState?.isAutoNext && getNextEpisode()
+                          } //only fetch next episode if the auto next state is set to true.
+                          onTimeUpdate={(v, event) => {
+                            handleTimeUpdate(v, event);
+                          }}
+
+                          // onHlsError={()=>{
+                          //   toast.error("Error while loading the file, Try another Provider or try after some time.");
+                          //   console.log("Some error occured in playing the file.");
+                          // }}
+                        >
+                          <MediaProvider>
+                            {streamingData?.tracks
+                              ?.filter((t) => t?.kind === "captions")
+                              ?.map((tr, index) => {
+                                return (
+                                  // <Captions key={tr?.file} src={tr?.file}  label={tr?.label} default={tr?.default} className="vds-captions"/>
+                                  <Track
+                                    key={tr?.file}
+                                    src={tr?.file}
+                                    kind="subtitles"
+                                    label={tr?.label}
+                                    // lang="en-US"
+                                    default={tr?.default}
+                                  />
+                                );
+                              })}
+                          </MediaProvider>
+                          <DefaultVideoLayout
+                            thumbnails={
+                              process.env.NEXT_PUBLIC_GOOD_PROXY +
+                              streamingData?.tracks?.filter(
+                                (t) => t.kind === "thumbnails"
+                              )?.[0]?.file
+                            }
+                            slots={{
+                              beforeCaptionButton: (
+                                <div className="change episodes flex gap-4 mx-4 text-xl">
+                                  <button
+                                    disabled={!isPrevEpisodeAvailable}
+                                    className="hover:scale-110 duration-150 ease-in disabled:text-gray-400"
+                                    onClick={getPrevEpisode}
+                                  >
+                                    <FaStepBackward />
+                                  </button>
+                                  <button
+                                    disabled={!isNextEpisodeAvailable}
+                                    className="hover:scale-110 duration-150 ease-in disabled:text-gray-400"
+                                    onClick={getNextEpisode}
+                                  >
+                                    <FaStepForward />
+                                  </button>
+                                </div>
+                              ),
+                              afterCaptions: showSkipButton && (
+                                <button
+                                  className="md:text-lg w-fit h-fit absolute right-4 bottom-8 md:right-12 md:bottom-24 px-2 py-1 border-white border-2 rounded-md font-semibold backdrop-blur-lg bg-black/10 flex"
+                                  onClick={() => {
+                                    player.current.currentTime =
+                                      showSkipButton === "Intro"
+                                        ? streamingData?.intro?.end
+                                        : streamingData?.outro?.end; // Skip to the end of the intro
+                                    setShowSkipButton(""); // Hide the button after skipping
+                                  }}
+                                >
+                                  Skip {showSkipButton}
+                                </button>
+                              ),
+                              downloadButton: downloadLink && (
+                                <Link
+                                  href={downloadLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xl items-center flex mx-3"
+                                >
+                                  <FaDownload />
+                                </Link>
+                              ),
+                            }}
+                            icons={defaultLayoutIcons}
+                          />
+                        </MediaPlayer>
+                      </div>
+                    </div>
+                  </>
+                )
+              )}
+              <div className="flex mt-4 mx-1 md:mx-4 md:text-sm my-2  text-[10px] md:gap-1 gap-[0.20rem]">
+                <button
+                  className="favorites flex items-center text-lg  md:mr-5 justify-center gap-1"
+                  onClick={handleOnClickWatchList}
+                >
+                  {" "}
+                  <PiBookmarkSimpleBold className="font-bold text-2xl md:text-base" />
+                  <div className="flex flex-col">
+                    <span className="text-sm hidden md:flex gap-2 items-center">
+                      {" "}
+                      Edit Watch List{" "}
+                    </span>
+
+                    {isWatchListOpen && (
+                      <ListDropDown
+                        anime={content}
+                        isOpen={isWatchListOpen}
+                        watchListData={watchListData}
+                        setIsOpen={setIsWatchListOpen}
+                      />
+                    )}
+                  </div>
+                  {/* <Toaster
                   toastOptions={{
                     style: {
                       borderRadius: "10px",
@@ -862,101 +879,106 @@ export default function Page({ params }) {
                     },
                   }}
                 /> */}
-              </button>
+                </button>
 
-              {provider === "zoro" && (
+                {provider === "zoro" && (
+                  <button
+                    className={`md:mx-1 ${
+                      mediaPlayerState?.isAutoSkip
+                        ? "text-sky-400 font-semibold"
+                        : "font-[300]"
+                    } `}
+                    onClick={() =>
+                      updatePlayerOptions({
+                        ...mediaPlayerState,
+                        isAutoSkip: !mediaPlayerState?.isAutoSkip,
+                      })
+                    }
+                  >
+                    Auto Skip Intro (
+                    {mediaPlayerState?.isAutoSkip ? "on" : "off"})
+                  </button>
+                )}
+
                 <button
                   className={`md:mx-1 ${
-                    mediaPlayerState?.isAutoSkip
+                    mediaPlayerState?.isAutoNext
                       ? "text-sky-400 font-semibold"
                       : "font-[300]"
                   } `}
                   onClick={() =>
                     updatePlayerOptions({
                       ...mediaPlayerState,
-                      isAutoSkip: !mediaPlayerState?.isAutoSkip,
+                      isAutoNext: !mediaPlayerState?.isAutoNext,
                     })
                   }
                 >
-                  Auto Skip Intro ({mediaPlayerState?.isAutoSkip ? "on" : "off"}
-                  )
+                  Auto Next ({mediaPlayerState?.isAutoNext ? "on" : "off"})
                 </button>
-              )}
 
-              <button
-                className={`md:mx-1 ${
-                  mediaPlayerState?.isAutoNext
-                    ? "text-sky-400 font-semibold"
-                    : "font-[300]"
-                } `}
-                onClick={() =>
-                  updatePlayerOptions({
-                    ...mediaPlayerState,
-                    isAutoNext: !mediaPlayerState?.isAutoNext,
-                  })
-                }
-              >
-                Auto Next ({mediaPlayerState?.isAutoNext ? "on" : "off"})
-              </button>
+                <button
+                  className={`md:mx-1 ${
+                    mediaPlayerState?.isAutoPlay
+                      ? "text-sky-400 font-semibold"
+                      : "font-[300]"
+                  } `}
+                  onClick={() =>
+                    updatePlayerOptions({
+                      ...mediaPlayerState,
+                      isAutoPlay: !mediaPlayerState?.isAutoPlay,
+                    })
+                  }
+                >
+                  Auto Play ({mediaPlayerState?.isAutoPlay ? "on" : "off"})
+                </button>
 
-              <button
-                className={`md:mx-1 ${
-                  mediaPlayerState?.isAutoPlay
-                    ? "text-sky-400 font-semibold"
-                    : "font-[300]"
-                } `}
-                onClick={() =>
-                  updatePlayerOptions({
-                    ...mediaPlayerState,
-                    isAutoPlay: !mediaPlayerState?.isAutoPlay,
-                  })
-                }
-              >
-                Auto Play ({mediaPlayerState?.isAutoPlay ? "on" : "off"})
-              </button>
-
-              <div className="md:ml-auto flex md:gap-2 ml-2 items-center">
-                {/* {episodesData?.length > 1 && isNextEpisodeAvailable && <button className="nextEpisode flex gap-1 items-center" onClick={getNextEpisode}>
+                <div className="md:ml-auto flex md:gap-2 ml-2 items-center">
+                  {/* {episodesData?.length > 1 && isNextEpisodeAvailable && <button className="nextEpisode flex gap-1 items-center" onClick={getNextEpisode}>
                   <TbPlayerTrackNextFilled /> Next Episode
                 </button>} */}
 
-                {recentTimestamp > 0 && (
+                  {recentTimestamp > 0 && (
+                    <ShareModal
+                      t={recentTimestamp}
+                      buttonText="Share this Scene"
+                      modalTitle="Share this anime scene"
+                      title={`Checkout this Amazing Scene from ${
+                        content?.title_english || content?.title
+                      }`}
+                    />
+                  )}
                   <ShareModal
-                    t={recentTimestamp}
-                    buttonText="Share this Scene"
-                    modalTitle="Share this anime scene"
-                    title={`Checkout this Amazing Scene from ${
+                    buttonText="Share this episode"
+                    title={`Checkout this Amazing Episode from ${
                       content?.title_english || content?.title
                     }`}
                   />
-                )}
-                <ShareModal
-                  buttonText="Share this episode"
-                  title={`Checkout this Amazing Episode from ${
-                    content?.title_english || content?.title
-                  }`}
-                />
+                </div>
               </div>
+            </div>
+
+            {episodesData && (
+              <ProviderContainer
+                content={content}
+                id={params?.id}
+                setAnimeNotAvailable={setAnimeNotAvailable}
+              />
+            )}
+
+            <div className="note text-sm flex text-nowrp items-center  self-center text-gray-400">
+              *Note: Episode boxes with{" "}
+              <div className="rounded w-5 h-3 bg-sky-400 mx-2"></div> color are
+              filler episodes!
             </div>
           </div>
 
-          {episodesData && (
-            <ProviderContainer content={content} id={params?.id} setAnimeNotAvailable = {setAnimeNotAvailable} />
-          )}
-
-          <div className="note text-sm flex text-nowrp items-center  self-center text-gray-400">
-            *Note: Episode boxes with{" "}
-            <div className="rounded w-5 h-3 bg-sky-400 mx-2"></div> color are
-            filler episodes!
+          <div className="md:hidden block my-12">
+            <Metadata content={content} id={params?.id} />
           </div>
+          {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
         </div>
-
-        <div className="md:hidden block my-12">
-          <Metadata content={content} id={params?.id} />
-        </div>
-      {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
+        {params?.id && <Suggested id={params?.id} />}
       </div>
-      {params?.id && <Suggested id={params?.id} />}
-    </div>
+    </>
   );
 }
