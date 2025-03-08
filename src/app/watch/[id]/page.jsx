@@ -720,16 +720,7 @@ export default function Page({ params }) {
               ) : (
                 streamingSrc && (
                   <>
-                    <script
-                      type="text/javascript"
-                      src="https://cdnwidget.simplejsmenu.com/public/lib.en.min.js"
-                    ></script>
-                    <ins
-                      id="pm_union"
-                      data-partner_id="8789547"
-                      data-add_types="preroll"
-                      data-source_url=""
-                    ></ins>
+                    
 
                     <div class="pm_video" className="pm_video flex h-fit">
                       <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
