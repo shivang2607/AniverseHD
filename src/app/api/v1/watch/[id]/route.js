@@ -17,9 +17,10 @@ export async function GET(req, { params }) {
     return NextResponse.json({ error: "ID is required" }, { status: 400 });
   }
 
+  console.log("Fetching watch anime data for id:", id);
   const cachedData = watchCache.get(`watch-${id}`);
   if (cachedData) {
-    console.log("LRU watch anime cache hit");
+    console.log("LRU watch anime cache hit",id,cachedData);
     return NextResponse.json(cachedData);
   }
 
@@ -70,6 +71,7 @@ export async function GET(req, { params }) {
           const res = await axios.get(
             `${aniwatchScrapeUrl}/api/v2/hianime/anime/${id}/episodes`
           );
+          console.log("Zoro episodes fetched:", res.data?.data?.totalEpisodes);
           const totalEpisodes = res.data?.data?.totalEpisodes || 0;
           if (totalEpisodes > maxEpisode) {
             maxEpisode = totalEpisodes;
