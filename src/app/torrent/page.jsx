@@ -175,16 +175,21 @@ const Page = () => {
 
           {showInstructions && (
             <div className="mt-4 p-4 bg-cbg-200 rounded-lg border border-cbg-300">
-              <p className="mb-2">To download a anime using a magnet link:</p>
-              <ol className="list-decimal list-inside text-cbg-600">
-                <li>Copy the magnet link from the torrent listing.</li>
-                <li>Open your torrent client (e.g., uTorrent, BitTorrent).</li>
-                <li>
+            <p className="mb-2">To download an anime using a magnet link:</p>
+            <ol className="list-decimal list-inside text-cbg-600">
+              <li>Copy the magnet link from the torrent listing.</li>
+              <li>
+                If using Brave, simply click on the magnet link icon to start the download directly in the browser.
+              </li>
+              <li>
+                Otherwise, open your torrent client (e.g., BitTorrent, Transmission, or Deluge).
+              </li>
+              <li>
                 Paste the magnet link into the client&apos;s &quot;Add Torrent&quot; or &quot;Add URL&quot; option.
-                </li>
-                <li>Start the download.</li>
-              </ol>
-            </div>
+              </li>
+              <li>Start the download.</li>
+            </ol>
+          </div>          
           )}
         </div>
 
