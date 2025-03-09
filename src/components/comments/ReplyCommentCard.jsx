@@ -12,6 +12,7 @@ import { postComment, ReactComment } from "./utilFunctions";
 import { Comment } from "react-loader-spinner";
 import InputCommentDiv from "./InputCommentDIv";
 import { MdEdit } from "react-icons/md";
+import Link from "next/link";
 
 export default function ReplyCommentCard({
   parentCommentId,
@@ -119,7 +120,7 @@ export default function ReplyCommentCard({
           </div>
         </div>
 
-        <div className="contentContainer w-full flex flex-col gap-1 text-sm">
+        <div className="contentContainer w-full flex flex-col gap-1 md:text-sm">
           <div className="first flex items-center gap-5">
                       <div className="name text-sky-400 font-semibold tracking-wide">
                         {comment?.userName}
@@ -140,16 +141,18 @@ export default function ReplyCommentCard({
             />
           ) : (
             <div
-              className={`body text-sm ${
-                editCommentPayload?.isSpoiler && !showSpoiler ? "blur-sm" : ""
-              } text-gray-300 w-full text-wrap flex gap-1 items-center`}
-            >
-              <span className="text-fuchsia-400 text-xs flex  ">
-                @{comment?.repliedToUserName}
-              </span>{" "}
-              <div> {editCommentPayload?.editableBody} </div> 
-              {/* in the abve expression since default value of editableBody is that of comment body initially so it workes even before editing, and after editing it changes so no need to reload the comment data */}
-            </div>
+  className={`body text-sm ${
+    editCommentPayload?.isSpoiler && !showSpoiler ? "blur-sm" : ""
+  } text-gray-300 w-full text-wrap`}
+>
+  <div className="flex">
+    <span className="text-fuchsia-400 items-center  text-sm mr-1">
+      <Link href={`/profile/${userId}`}> @{comment?.repliedToUserName}</Link>
+    </span>
+    <div className="flex-1">{editCommentPayload?.editableBody}</div>
+  </div>
+</div>
+              // {/* in the abve expression since default value of editableBody is that of comment body initially so it workes even before editing, and after editing it changes so no need to reload the comment data */}
           )}
           {editCommentPayload?.isSpoiler > 0 && (
             <div className="flex">

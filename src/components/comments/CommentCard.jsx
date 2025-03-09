@@ -6,11 +6,9 @@ import { AiFillDislike, AiFillLike, AiOutlineDislike } from "react-icons/ai";
 import { AiOutlineLike } from "react-icons/ai";
 import {
   debounceGetComments,
-  postComment,
   ReactComment,
 } from "./utilFunctions";
-import toast from "react-hot-toast";
-import { Comment } from "react-loader-spinner";
+import { Comment, TailSpin } from "react-loader-spinner";
 import ReplyCommentCard from "./ReplyCommentCard";
 import InputCommentDiv from "./InputCommentDIv";
 import { MdEdit } from "react-icons/md";
@@ -138,7 +136,7 @@ export default function CommentCard({ animeId, comment, userId }) {
           </div>
         </div>
 
-        <div className="contentContainer w-full flex flex-col gap-1 text-sm">
+        <div className="contentContainer w-full flex flex-col gap-1 md:text-sm">
           <div className="first flex items-center gap-5">
             <div className="name text-sky-400 font-semibold tracking-wide">
               {comment?.userName}
@@ -178,7 +176,7 @@ export default function CommentCard({ animeId, comment, userId }) {
             </div>
           )}
 
-          <div className="reply-reaction flex my-1 text-gray-400 text-xs gap-6 items-center">
+          <div className="reply-reaction flex my-1 text-gray-400 md:text-xs text-sm gap-6 items-center">
             {userId === comment?.userId && (
               <button
                 className="edit flex items-center gap-1"
@@ -196,7 +194,7 @@ export default function CommentCard({ animeId, comment, userId }) {
             </button>
 
             <button
-              className="like flex items-center disabled:cursor-progress gap-1 text-xs"
+              className="like flex items-center disabled:cursor-progress gap-1 "
               disabled={reactionStates.loading}
               onClick={handleLike}
             >
@@ -209,7 +207,7 @@ export default function CommentCard({ animeId, comment, userId }) {
             </button>
 
             <button
-              className="dislike flex items-center disabled:cursor-progress gap-1 text-xs"
+              className="dislike flex items-center disabled:cursor-progress gap-1 "
               disabled={reactionStates.loading}
               onClick={handleDislike}
             >
@@ -252,7 +250,7 @@ export default function CommentCard({ animeId, comment, userId }) {
 
       {/* //below component renders all the replies of the current comment component */}
       {showReplies && (
-        <div className="ml-24 my-4 border-l-[1.5px] border-gray-600 pl-4 flex flex-col gap-6">
+        <div className="md:ml-24 ml-8 my-4 border-l-[1.5px] border-gray-600 pl-4 flex flex-col md:gap-6 gap-2">
           {replyComments?.length > 0 ? (
             replyComments?.map((replyComment) => {
               return (
@@ -265,7 +263,18 @@ export default function CommentCard({ animeId, comment, userId }) {
               );
             })
           ) : (
-            <div className="text-sm text-red-400">No Replies</div>
+            <div className="text-sm text-red-400"> <div className="flex m-8 mx-12">
+                          <TailSpin
+                            visible={loadingStates.loadMore}
+                            height="32"
+                            width="32"
+                            color=" #0ea5e9"
+                            ariaLabel="tail-spin-loading"
+                            radius="2"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                          />
+                        </div></div>
           )}
         </div>
       )}

@@ -81,11 +81,11 @@ export default function CommentsContainer({
   };
 
   return (
-    <div className="comments-container flex flex-col gap-4 mx-8 ">
+    <div className="comments-container justify-center flex flex-col gap-4 md:mx-8 mx-2">
       <h1 className="text-primary-300 text-2xl px-2 font-semibold tracking-wide">
         Comments
       </h1>
-      <div className="comments flex text-sm  rounded-xl px-6 py-4 bg-cbg-300/60 flex-col gap-4  min-h-48">
+      <div className="comments flex md:text-sm  rounded-xl px-2 justify-center md:justify-normal md:px-6 py-4 bg-cbg-300/60 flex-col gap-4  min-h-48">
         {loggedInUserId && (
           <div className="post-comment flex flex-col gap-2">
             <div className="user-id flex gap-2 items-center">
@@ -107,7 +107,7 @@ export default function CommentsContainer({
         )}
 
         {/* //below is the div of adding the commment */}
-
+        
         <InputCommentDiv
           commentPayload={commentPayload}
           setCommentPayload={setCommentPayload}
@@ -115,7 +115,7 @@ export default function CommentsContainer({
         {/* </div>  div for adding the comment ended here  */}
 
         {/* //div for list of comments begins here */}
-        <div className="w-3/5 flex flex-col gap-6 mt-8">
+        <div className="md:w-3/5 w-full flex flex-col gap-6 mt-8">
           {/* {console.log('comments --------', commentsData)} */}
           {loadingStates.hasOnceLoaded ? (commentsData && commentsData?.length > 0 ? (
             commentsData?.map((comment) => {
@@ -129,9 +129,18 @@ export default function CommentsContainer({
               );
             })
           ) : (
-            <>no Comments available</>
+            <div className="no comments flex-col gap-8 mx-auto items-center justify-center">
+                <div className="img relative flex self-center h-32 w-36 mx-auto rounded-md my-4 overflow-hidden ">
+                    <Image src = "/waku-waku-anya.gif" alt="No Comments Here"  fill/>
+                </div>
+                <h2 className="text-base text-sky-200">Be the first to comment – Anya is waiting!</h2>
+            </div>
           )):
-          <div>Loading...</div> }
+          <div>
+            <div className="img relative flex self-center h-36 w-48 mx-auto rounded-md my-4 overflow-hidden ">
+          <Image src = "/comments loading.gif" alt="Comments Loading"  fill/>
+          </div>
+      </div> }
         </div>
 
         {loadingStates.hasOnceLoaded && !loadingStates.noMoreComments &&

@@ -53,7 +53,7 @@ export default function InputCommentDiv({commentPayload, setCommentPayload, isEd
     return (
         <>
     {/* //below is the div of adding the commment */}
-                <div className={`addcomment flex  flex-col w-3/4 ${isReply?"ml-12":""}  gap-2`}>
+                <div className={`addcomment flex  flex-col    ${isReply?"ml-12 w-auto":"w-full md:w-3/4"}  gap-2`}>
                     <div className="textarea">
                         <textarea name="add-comment" id="" 
                         value={isEdit ? commentPayload?.editableBody :commentPayload?.commentBody} 
