@@ -170,7 +170,7 @@ export async function GET(req, { params }) {
         ));
     }
 
-    watchCache.set(`watch-${id}`, finalResponse);
+    id && finalResponse?.zoro?.episodes?.length>0 && watchCache.set(`watch-${id}`, finalResponse);
     return NextResponse.json(finalResponse);
   } catch (error) {
     console.error("Error fetching anime data:", error);
