@@ -159,7 +159,7 @@ const Page = () => {
             Torrent Search
           </h1>
           <p className="text-cbg-600">
-            Search and find torrents from multiple sources
+            Search and find torrents from multiple sources (Click on Search again in case of failed torrent search!)
           </p>
         </div>
 
