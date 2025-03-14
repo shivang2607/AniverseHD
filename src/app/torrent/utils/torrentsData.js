@@ -82,29 +82,30 @@ export async function getTorrentData(qText = "") {
           'Accept': 'application/xml, text/xml, */*',
         }
       });
-
+  
       // Check for various error conditions
       if (typeof response.data === "string") {
         if (response.data.includes("429 Too Many Requests")) {
           console.error("Received 429 error from URL:", url);
-          throw new Error("429 Too Many Requests");
+          return Promise.reject(new Error("429 Too Many Requests"));
         }
         if (response.data.includes("404 Not Found")) {
           console.error("Received 404 error from URL:", url);
-          throw new Error("404 Not Found");
+          return Promise.reject(new Error("404 Not Found"));
         }
       }
-
+  
       if (!response?.data) {
-        throw new Error("No data in response");
+        return Promise.reject(new Error("No data in response"));
       }
       
       return response.data;
     } catch (error) {
       console.error("Failed to fetch from URL:", url, error.message);
-      // throw error;
+      return Promise.reject(error); // Instead of throwing, return a rejected promise
     }
   };
+  
 
   // Create an array of fetch promises
   const fetchPromises = urls.map(url => fetchFromUrl(url)); //since there is no await in front of fetchFromUrl therefore both request will return simultaneously or kyunki fir aage Prmoise.any lagaya h mtlb jaise hi koi bhi ek success hogi usko return kr dega
