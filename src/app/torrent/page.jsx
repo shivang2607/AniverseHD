@@ -46,7 +46,7 @@ const Page = () => {
         setTorrents([]);
       }
     } catch (error) {
-      console.log(error);
+      console.log( "torrent error :", error);
       setError("Failed to fetch torrents. Please try again later.");
     } finally {
       setLoading(false);
