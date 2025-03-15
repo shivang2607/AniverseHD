@@ -53,6 +53,7 @@ import CommentsContainer from "@/components/comments/CommentsContainer";
 import Script from "next/script";
 import { GlobalScripts } from "@/components/GlobalScripts";
 
+
 export default function Page({ params }) {
   const searchParams = useSearchParams();
   const zoroId = searchParams.get("z-id") || null;
@@ -626,10 +627,9 @@ export default function Page({ params }) {
     if (provider === "zoro") {
       setDownloadLink();
       return streamingData?.sources?.[0]?.url;
-    } else if (provider === "gogo") {
-      const defaultSrcData = streamingData?.sources?.filter(
-        (src) => src?.quality === "default"
-      );
+    } 
+    else if(provider === "gogo"){
+      const defaultSrcData =  streamingData?.sources?.filter(src => src?.quality === 'default');
       setDownloadLink(streamingData?.download);
       // console.log("gogo src data",defaultSrcData);
       return `https://goodproxy.goodproxy.workers.dev/fetch?url=${defaultSrcData?.[0]?.url}`;
@@ -749,6 +749,18 @@ export default function Page({ params }) {
                                 fragLoadingMaxRetry: 5,
                                 maxMaxBufferLength: 600,
                                 maxBufferLength: 20,
+                                enableWorker: true,
+                               
+                                xhrSetup: (xhr, url) => {
+                                  if (url.endsWith('.m3u8')) {
+                                    // Direct load for playlists
+                                    xhr.open('GET', url, true);
+                                  } else {
+                                    // Add proxy for all requests
+                                    const proxyUrl = `/api/v1/streamingProxy?url=${encodeURIComponent(url)}`;;
+                                    xhr.open('GET', proxyUrl, true);
+                                  }
+                                }
                               };
                             }
                           }}
