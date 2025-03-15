@@ -5,7 +5,7 @@ async function fetchWithCustomReferer(url) {
 
   const response = await fetch(url, {
     headers: {
-      Referer: "https://megacloud.club/", // Modify as needed
+      "referer": "https://megacloud.club/", // Modify as needed
       "User-Agent": "Mozilla/5.0", // Optional: Customize or forward User-Agent
     },
   });
@@ -13,6 +13,7 @@ async function fetchWithCustomReferer(url) {
   return response;
 }
 
+// In your Next.js API route
 export async function GET(request, { params }) {
   const url = request.nextUrl.searchParams.get("url");
   if (!url) {
@@ -21,11 +22,14 @@ export async function GET(request, { params }) {
 
   try {
     const response = await fetchWithCustomReferer(url);
-    const data = await response.text(); // Use response.json() if the API returns JSON
+    const contentType = response.headers.get("Content-Type");
 
-    return new NextResponse(data, {
+    return new NextResponse(await response.arrayBuffer(), {
       status: response.status,
-      headers: { "Content-Type": response.headers.get("Content-Type") || "text/plain" },
+      headers: {
+        "Content-Type": contentType || "video/mp2t",
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
     });
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
