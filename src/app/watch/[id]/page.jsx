@@ -626,7 +626,8 @@ export default function Page({ params }) {
   const getStreamingSource = () => {
     if (provider === "zoro") {
       setDownloadLink();
-      return streamingData?.sources?.[0]?.url;
+      
+      return `/api/v1/streamingProxy?url=${encodeURIComponent(streamingData?.sources?.[0]?.url)}`;
     } 
     else if(provider === "gogo"){
       const defaultSrcData =  streamingData?.sources?.filter(src => src?.quality === 'default');
@@ -751,16 +752,6 @@ export default function Page({ params }) {
                                 maxBufferLength: 20,
                                 enableWorker: true,
                                
-                                xhrSetup: (xhr, url) => {
-                                  if (url.endsWith('.m3u8')) {
-                                    // Direct load for playlists
-                                    xhr.open('GET', url, true);
-                                  } else {
-                                    // Add proxy for all requests
-                                    const proxyUrl = `/api/v1/streamingProxy?url=${encodeURIComponent(url)}`;;
-                                    xhr.open('GET', proxyUrl, true);
-                                  }
-                                }
                               };
                             }
                           }}
