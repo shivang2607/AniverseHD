@@ -4,7 +4,7 @@ async function fetchWithCustomReferer(url) {
   if (!url) throw new Error("URL is required");
   return fetch(url, {
     headers: {
-      referer: "https://megacloud.club/",
+      "referer": "https://megacloud.club/",
       "User-Agent": "Mozilla/5.0",
     },
   });
@@ -40,6 +40,13 @@ export async function GET(request) {
     const response = await fetchWithCustomReferer(url);
     const contentType = response.headers.get("Content-Type");
     const isM3U8 = url.endsWith(".m3u8");
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: response.statusText },
+        { status: response.status }
+      );
+    }
 
     if (isM3U8) {
       // Rewrite URLs in the playlist
