@@ -328,7 +328,7 @@ export default function Page({ params }) {
           setServerData(cachedServerData);
           if (!serverV)
             setServer(
-              cachedServerData?.sub?.[0]?.serverName ||
+              cachedServerData?.sub?.[1]?.serverName ||
                 cachedServerData?.raw?.[0]?.serverName
             );
           // return;
@@ -359,7 +359,7 @@ export default function Page({ params }) {
                 // Set the server data and server name
                 setServerData(serverData?.data?.data);
                 setServer(
-                  serverData?.data?.data?.sub?.[0]?.serverName ||
+                  serverData?.data?.data?.sub?.[1]?.serverName ||
                     serverData?.data?.data?.raw?.[0]?.serverName
                 );
 
