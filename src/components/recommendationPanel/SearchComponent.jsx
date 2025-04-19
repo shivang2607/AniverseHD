@@ -24,7 +24,7 @@ const useDebouncedValue = (inputValue, delay) => {
   return debouncedValue;
 };
 
-const SearchComponent = ({viewAll=true}) => {
+const SearchComponent = ({viewAll=true, isOpen}) => {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchRes, setSearchRes] = useState();
@@ -72,7 +72,7 @@ const SearchComponent = ({viewAll=true}) => {
 
   return (
     <>
-      <div className="h-full w-full relative flex gap-1 z-40 flex-col">
+      <div className={`h-full w-full relative flex gap-1 ${isOpen?"z-40":"-z-10"} flex-col`}>
         <input
           type="text"
           placeholder="Search..."

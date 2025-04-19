@@ -101,7 +101,7 @@ const ResponsiveCarousal = () => {
                     <div className="duration gap-1 text-base flex justify-between items-center">
                       <FaCakeCandles/> {formatDate(anime?.aired?.from?.split('T')[0]) || 'NA'}
                     </div>
-                    <div className="ratings gap-1   rounded-md bg-primary-100  text-sm px-2  flex justify-between items-center">
+                    <div className="ratings gap-1   rounded-md bg-primary-100 text-cbg-100  text-sm px-2  flex justify-between items-center">
                        {anime?.rating?.split(" ")[0] || 'NA'}
                     </div>
                   </div>
@@ -110,7 +110,7 @@ const ResponsiveCarousal = () => {
                   
 
                   <div className="reroute flex md:gap-6 gap-3 items-center mt-5">
-                    <Link href={`/watch/${anime?.mal_id}?provider=${process.env.NEXT_PUBLIC_PROVIDER || "zoro"}`} className="rounded-lg p-2 text-nowrap  md:text-base text-sm gap-1 bg-primary-600 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
+                    <Link href={`/watch/${anime?.mal_id}?provider=${process.env.NEXT_PUBLIC_PROVIDER || "zoro"}`} className="rounded-lg p-2 text-nowrap  md:text-base text-sm gap-1 bg-primary-500 md:gap-2 items-center flex text-cbg-100 "><FaPlayCircle/>Watch Now</Link>
                     <Link href={`/anime/${anime?.mal_id}`} className="rounded-lg  p-2 md:text-base text-sm  md:gap-2 items-center flex text-primary-600 bg-cbg-300 tracking-wide">Details <FaChevronRight/></Link>
                   </div>
                 

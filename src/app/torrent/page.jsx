@@ -158,7 +158,7 @@ const Page = () => {
           <h1 className="text-3xl font-bold mb-2 text-primary-300">
             Torrent Search
           </h1>
-          <p className="text-cbg-600">
+          <p className="text-gray-500">
             Search and find torrents from multiple sources (Click on Search again in case of failed torrent search!)
           </p>
         </div>
@@ -176,7 +176,7 @@ const Page = () => {
           {showInstructions && (
             <div className="mt-4 p-4 bg-cbg-200 rounded-lg border border-cbg-300">
             <p className="mb-2">To download an anime using a magnet link:</p>
-            <ol className="list-decimal list-inside text-cbg-600">
+            <ol className="list-decimal list-inside text-gray-400 text-sm">
               <li>Copy the magnet link from the torrent listing.</li>
               <li>
                 If using Brave, simply click on the magnet link icon to start the download directly in the browser.
@@ -238,7 +238,7 @@ const Page = () => {
         { loading? (
           // <div className="flex flex-col items-center justify-center py-12">
           //   <div className="w-12 h-12 border-4 border-primary-300 border-t-transparent rounded-full animate-spin mb-4"></div>
-          //   <p className="text-cbg-500">Searching for torrents...</p>
+          //   <p className="text-gray-400">Searching for torrents...</p>
           // </div>
           <div className="h-[50vh]">
             <CustomLoader  imageUrl={"/userProfileImage5.jpg"} loaderText={"Searching for torrents..."} />
@@ -248,7 +248,7 @@ const Page = () => {
             {noResults ? (
               <div className="text-center py-12 bg-cbg-200 rounded-lg border border-cbg-300">
                 <p className="text-xl font-medium mb-2">No torrents found</p>
-                <p className="text-cbg-500">Try a different search term</p>
+                <p className="text-gray-400">Try a different search term</p>
               </div>
             ) : (
               sortedTorrents.length > 0 && (

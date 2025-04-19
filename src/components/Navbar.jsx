@@ -21,6 +21,7 @@ import useGlobalLoader from "./ZustandStores/useGlobalLoader";
 import { Constant_Var_localstorage_version } from "@/utils/constants";
 import Notice from "./Notice";
 import { SiUtorrent } from "react-icons/si";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const Navbar = () => {
   const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists, RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar } = useUserStore();
@@ -40,15 +41,18 @@ const Navbar = () => {
     { href: "/", name: "Home", icon: <HiHome className="text-base" /> },
     { href: "/catalog", name: "Catalog", icon: <GrCatalog className="text-base" /> },
     { href: "/recommendations", name: "Recommendations", icon: <HiSparkles className="text-base" /> },
-    { href: "/torrent", name: "Torrent", icon: <SiUtorrent className="text-base" />, new: true },
+    // { href: "/torrent", name: "Torrent", icon: <SiUtorrent className="text-base" />, new: true },
   ]
 
   // Additional navigation items for the "More" dropdown
   const moreItems = [
-    { href: "/discussions", name: "Discussions", icon: <FaComments className="mr-2" /> },
-    { href: "/polls", name: "Polls", icon: <FaPoll className="mr-2" /> },
-    { href: "/upcoming", name: "Upcoming Features", icon: <FaLightbulb className="mr-2" /> },
-    { href: "/feature-request", name: "Feature Request", icon: <FaRegStar className="mr-2" /> },
+    // { href: "", name: "Theme", icon: <></>, new: true },
+    // { href: "/discussions", name: "Discussions", icon: <FaComments className="mr-2" /> },
+    // { href: "/polls", name: "Polls", icon: <FaPoll className="mr-2" /> },
+    // { href: "/upcoming", name: "Upcoming Features", icon: <FaLightbulb className="mr-2" /> },
+    { href: "/torrent", name: "Torrent", icon: <SiUtorrent className="text-base mr-2" />, new: true },
+    // { href: "/feature-request", name: "Feature Request", icon: <FaRegStar className="mr-2" /> },
+
   ];
 
   const handleSignIn = async () => {
@@ -135,7 +139,7 @@ const Navbar = () => {
                     <Link
   key={item.href}
   href={item.href}
-  className={`px-3 py-2 flex gap-1 items-center rounded-md text-sm font-medium transition-colors ${
+  className={`px-3 py-2 flex gap-1 items-center rounded-md z-30 text-sm font-medium transition-colors ${
     currentPath === item.href
       ? "text-primary-200 bg-primary-100/10"
       : "text-gray-300 hover:text-primary-200 hover:bg-primary-100/5"
@@ -156,10 +160,10 @@ const Navbar = () => {
                 
 		{/* More Dropdown */}
     {/* //TODO: Below section will be uncommented when more features will be added */}
-                {/* <div className="relative">
+                <div className="relative">
                   <button
                     onClick={() => setIsMoreOpen(!isMoreOpen)}
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex z-30 items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isMoreOpen ? "text-primary-200 bg-primary-100/10" : "text-gray-300 hover:text-primary-200 hover:bg-primary-100/5"
                     }`}
                   >
@@ -171,6 +175,7 @@ const Navbar = () => {
                   {isMoreOpen && (
                     <div className="absolute top-full left-0 mt-1 w-56 rounded-lg shadow-lg bg-cbg-200 border border-primary-100/20">
                       <div className="py-1">
+                      <ThemeSwitcher/>
                         {moreItems.map((item) => (
                           <Link
                             key={item.href}
@@ -185,7 +190,7 @@ const Navbar = () => {
                       </div>
                     </div>
                   )}
-                </div> */}
+                </div>
 
               </div>
             </div>
@@ -193,7 +198,7 @@ const Navbar = () => {
             {/* Right Section */}
             <div className="flex items-center gap-2 ml-auto">
               {/* Search */}
-              <div className="relative hidden md:flex items-center">
+              <div className="relative hidden md:flex  items-center">
                 <button
                   onClick={() => setSearchOpen(!searchOpen)}
                   className={`p-2 rounded-lg transition-colors z-10 ${
@@ -205,10 +210,10 @@ const Navbar = () => {
 
                 
                 <div className={`absolute right-10 flex items-center transition-all duration-300 origin-right ${
-                  searchOpen ? "opacity-100 scale-100 translate-x-0" : "opacity-0 scale-95 translate-x-4"
+                  searchOpen ? "opacity-100 scale-100 z-30 translate-x-0" : "opacity-0 scale-95 -z-10 translate-x-4"
                 }`}>
                   <div className="mx-2 w-80 rounded-lg  bg-cbg-200 shadow-lg">
-                    <SearchComponent />
+                    <SearchComponent isOpen={searchOpen}/>
                   </div>
                 </div>
               </div>
@@ -261,7 +266,7 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu (keep existing mobile code) */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isOpen ? "max-h-screen" : "max-h-0"}`}>
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isOpen ? "h-[60vh]" : "max-h-0"}`}>
           <div className="px-4 pt-2 pb-4 space-y-1 border-t border-primary-100/10">
           <div className=" pt-4 w-full">
               <div className="rounded-lg border border-primary-100/20 bg-cbg-100 p-2">
@@ -288,7 +293,8 @@ const Navbar = () => {
             </Link>
 
             {/* //TODO: Below section will be uncommented when more features will be added */}
-		{/* {moreItems.map((item) => (
+            <ThemeSwitcher/>
+		{moreItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -298,7 +304,7 @@ const Navbar = () => {
                 {item.icon}
                 {item.name}
               </Link>
-            ))} */}
+            ))}
             
           </div>
         </div>

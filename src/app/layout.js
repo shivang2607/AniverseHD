@@ -69,6 +69,7 @@ export default function RootLayout({
         scrollbar-thumb-rounded-full 
         scrollbar-track-rounded-full 
         scrollbar-track-cbg-200
+        default
       '
     >
       <head>
@@ -102,23 +103,24 @@ export default function RootLayout({
           tracking-wide
         `}
       >
-        <SkeletonTheme 
-          baseColor="#39475b" 
-          highlightColor="#535f70" 
-          duration={1}
-        >
-          <div className="flex flex-col min-h-screen">
-            {/* <Notice /> */}
-            <Navbar />
-            
-            <main className="flex-grow">
-              {children}
-            </main>
-            
-            <GlobalLoader />
-            <Footer />
-          </div>
-        </SkeletonTheme>
+        {/* <ThemeProvider> */}
+          <SkeletonTheme 
+            baseColor="#39475b" 
+            highlightColor="#535f70" 
+            duration={1}
+          >
+            <div className="flex flex-col min-h-screen" id="theme-container">
+              <Navbar />
+              
+              <main className="flex-grow">
+                {children}
+              </main>
+              
+              <GlobalLoader />
+              <Footer />
+            </div>
+          </SkeletonTheme>
+        {/* </ThemeProvider> */}
       </body>
     </html>
   )

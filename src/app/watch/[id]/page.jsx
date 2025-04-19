@@ -752,12 +752,9 @@ export default function Page({ params }) {
                                 enableWorker: true,
                                
                                 xhrSetup: (xhr, url) => {
-                                  if (url.endsWith('.m3u8')) {
-                                    // Direct load for playlists
-                                    xhr.open('GET', url, true);
-                                  } else {
+                                  {
                                     // Add proxy for all requests
-                                    const proxyUrl = `/api/v1/streamingProxy?url=${encodeURIComponent(url)}`;;
+                                    const proxyUrl = `/api/v1/streamingProxy?url=${encodeURIComponent(url)}`;
                                     xhr.open('GET', proxyUrl, true);
                                   }
                                 }
