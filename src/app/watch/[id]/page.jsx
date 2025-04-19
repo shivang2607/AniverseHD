@@ -328,7 +328,7 @@ export default function Page({ params }) {
           setServerData(cachedServerData);
           if (!serverV)
             setServer(
-              cachedServerData?.sub?.[0]?.serverName ||
+              cachedServerData?.sub?.[1]?.serverName ||
                 cachedServerData?.raw?.[0]?.serverName
             );
           // return;
@@ -359,7 +359,7 @@ export default function Page({ params }) {
                 // Set the server data and server name
                 setServerData(serverData?.data?.data);
                 setServer(
-                  serverData?.data?.data?.sub?.[0]?.serverName ||
+                  serverData?.data?.data?.sub?.[1]?.serverName ||
                     serverData?.data?.data?.raw?.[0]?.serverName
                 );
 
@@ -626,7 +626,8 @@ export default function Page({ params }) {
   const getStreamingSource = () => {
     if (provider === "zoro") {
       setDownloadLink();
-      return streamingData?.sources?.[0]?.url;
+      
+      return `/api/v1/streamingProxy?url=${encodeURIComponent(streamingData?.sources?.[0]?.url)}`;
     } 
     else if(provider === "gogo"){
       const defaultSrcData =  streamingData?.sources?.filter(src => src?.quality === 'default');
@@ -751,13 +752,6 @@ export default function Page({ params }) {
                                 maxBufferLength: 20,
                                 enableWorker: true,
                                
-                                xhrSetup: (xhr, url) => {
-                                  {
-                                    // Add proxy for all requests
-                                    const proxyUrl = `/api/v1/streamingProxy?url=${encodeURIComponent(url)}`;
-                                    xhr.open('GET', proxyUrl, true);
-                                  }
-                                }
                               };
                             }
                           }}
