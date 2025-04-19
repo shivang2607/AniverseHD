@@ -5,7 +5,7 @@ export default function WatchLayout({ children }) {
     <>
       
     <meta name="referer" content="no-referer-when-downgrade" />
-      <div className="flex w-full gap-4 md:pt-28 pt-20 z-0">
+      <div className="flex w-full gap-4 md:pt-16 pt-20 z-0">
         {children}
       </div>
     </>

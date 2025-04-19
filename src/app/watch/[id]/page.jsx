@@ -676,7 +676,7 @@ export default function Page({ params }) {
          ></ins>
          </div> */}
 
-      <div className="py-16">
+      <div className="py-12">
         <div className="content py-2 md:px-4 flex flex-col gap-4">
           {!animeNotAvailable && (
             <h1 className="text-2xl mx-2 md:mx-0 tracking-wide my-3 font-semibold  self-center">
