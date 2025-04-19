@@ -37,13 +37,13 @@ const TorrentRow = ({ torrent, index }) => {
         }`}
       >
          <td className="p-4 text-sm ">
-          <span className="flex items-center justify-center text-cbg-600">{index+1}</span>
+          <span className="flex items-center justify-center text-gray-400">{index+1}</span>
         </td>
         <td className="p-4">
           <div className="flex items-start">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="mr-2 mt-1 text-cbg-500 hover:text-primary-300 transition-colors"
+              className="mr-2 mt-1 text-gray-400 hover:text-primary-300 transition-colors"
               title={expanded ? "Show less" : "Show more"}
             >
               <FaInfoCircle size={16} />
@@ -61,7 +61,7 @@ const TorrentRow = ({ torrent, index }) => {
                   expanded ? "max-h-40 opacity-100 mt-2" : "max-h-0 opacity-0"
                 }`}
               >
-                <div className="text-sm text-cbg-500">
+                <div className="text-sm text-gray-400">
                   <p className="mb-1">Original filename: {torrent.title}</p>
                   {torrent.category && (
                     <p className="mb-1">Category: {torrent.category}</p>
@@ -75,7 +75,7 @@ const TorrentRow = ({ torrent, index }) => {
             </div>
           </div>
         </td>
-        <td className="p-4 whitespace-nowrap text-cbg-500">
+        <td className="p-4 whitespace-nowrap text-gray-400">
           {torrent.size || "Unknown size"}
         </td>
         <td className="p-4 text-center">
