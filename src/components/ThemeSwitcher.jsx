@@ -96,7 +96,7 @@ export default function ThemeSwitcher() {
     { id: 'DarkPurple', name: 'DarkPurple', primary: '#6f6dc6', cbg: '#1a1b22' },
     { id: 'DarkYellow', name: 'DarkYellow', primary: '#f8d299', cbg: '#1a1b22' },
     { id: 'CalmGreen', name: 'CalmGreen', primary: '#5c8c68', cbg: '#1a1b22' },
-    { id: 'Blue', name: 'Blue', primary: '#2a6f97', cbg: '#2a6f97' },
+    { id: 'TurquoiseDark', name: 'TurquoiseDark', primary: '#50e6c1', cbg: '#1a1b22' },
     { id: 'Purple', name: 'Purple', primary: '#7b5ea6', cbg: '#7b5ea6' }
   ];
   
