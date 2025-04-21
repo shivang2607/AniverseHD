@@ -72,7 +72,7 @@ const SearchComponent = ({viewAll=true, isOpen}) => {
 
   return (
     <>
-      <div className={`h-full w-full relative flex gap-1 ${isOpen?"z-40":"-z-10"} flex-col`}>
+      <div className={`h-full w-full relative flex gap-1 ${isOpen?"z-40":"md:-z-10"} flex-col`}>
         <input
           type="text"
           placeholder="Search..."

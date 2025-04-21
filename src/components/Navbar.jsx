@@ -266,10 +266,10 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu (keep existing mobile code) */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isOpen ? "h-[60vh]" : "max-h-0"}`}>
-          <div className="px-4 pt-2 pb-4 space-y-1 border-t border-primary-100/10">
+        <div className={`md:hidden z-40 overflow-hidden transition-all duration-300 ${isOpen ? "h-[60vh]" : "max-h-0"}`}>
+          <div className="px-4 pt-2 pb-4 space-y-1 z-30 border-t border-primary-100/10">
           <div className=" pt-4 w-full">
-              <div className="rounded-lg border border-primary-100/20 bg-cbg-100 p-2">
+              <div className=" rounded-lg border border-primary-100/20 bg-cbg-100 p-2">
                 <SearchComponent />
               </div>
             </div>
