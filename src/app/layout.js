@@ -77,6 +77,22 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
 
         {/* Umami Analytics */}
+        <Script data-cfasync="false" async type="text/javascript" src="https://cluckedzion.com/gHBwiL5kU0DqfIaYF/121367"></Script>
+
+        
+
+        <Script 
+          src="/scripts/anti-adblock-1.js" 
+          strategy="afterInteractive" 
+          id="anti-adblock-1" 
+        />
+        <Script 
+          src="/scripts/anti-adblock-2.js" 
+          strategy="afterInteractive" 
+          id="anti-adblock-2" 
+        />
+
+
         <Script 
           defer 
           src="https://umami.aniversehd.com/script.js" 
