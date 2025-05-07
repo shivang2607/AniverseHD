@@ -70,7 +70,7 @@ const ResponsiveCarousal = () => {
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
-        navigation={true}
+        navigation={false}  //earlier it was true, this renders the arrow in the main carousal on the home page, but after suggestion of few users I have removed sliding arrows from this carousal.
         
       >
         {topAiring?.map((anime, index) => {
