@@ -129,7 +129,7 @@ export default function ProviderContainer({
         const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
           params: {
             category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
-            server: server || 'hd-1'
+            server: server || 'hd-2'
           }
         });
         
