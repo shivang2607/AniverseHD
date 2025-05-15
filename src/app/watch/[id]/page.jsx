@@ -746,9 +746,9 @@ export default function Page({ params }) {
                               provider.config = {
                                 nudgeMaxRetry: 5,
                                 maxFragLookUpTolerance: 0.5,
-                                fragLoadingTimeOut: 30000,
+                                fragLoadingTimeOut: 3000,
                                 fragLoadingMaxRetry: 5,
-                                maxMaxBufferLength: 600,
+                                maxMaxBufferLength: 200,
                                 maxBufferLength: 20,
                                 enableWorker: true,
                                
