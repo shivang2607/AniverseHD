@@ -256,6 +256,7 @@ export default function CommentCard({ animeId, comment, userId }) {
               return (
                 <ReplyCommentCard
                   animeId={animeId}
+                  key={replyComment.commentId}
                   comment={replyComment}
                   parentCommentId={comment.commentId}
                   userId={userId}
