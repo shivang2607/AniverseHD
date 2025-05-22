@@ -63,25 +63,70 @@ export default function CommentsContainer({
   useEffect(() => {
     //This useEffect triggers whenever the params for comments api changes that means whenever we want to get the comments data from the comments api.
     (async () => {
+      setLoadingStates((prev) => ({ ...prev, loadMore: true })); 
       const res = await debounceGetComments(params);
       if (Array.isArray(res) && res?.length < (params.limit || 10)) {
         //make sure that res is an array
-        console.log("insisde if statement");
+
+        console.log("inside if statement");
         setLoadingStates((pr) => ({ ...pr, noMoreComments: true }));
       } //means that there are no more comments left to fetch in the database so hide the load more button
-      setCommentsData((prev) => [...prev, ...res]);
+      setCommentsData((prev) => [...prev, ...res]);  
       setLoadingStates((prev) => ({ ...prev, loadMore: false, hasOnceLoaded:true })); //disable load more loader
       
     })();
-  }, [params]);
 
-  const loadMore = () => {
+    // return () => {
+    //   setLoadingStates(({loadMore:false, noMoreComments:false, hasOnceLoaded:false})); //reset the loading states})); 
+    // }
+  }, [params.offset, params.limit]);
+
+
+  //below will fetch the comments when new episode, anime, user or different ordering is selected
+  useEffect(() => {
+    (async ()=>{
+    setParams((prev) => ({
+      ...prev,
+      offset: 0
+    }));
+    const res = await debounceGetComments({...params, offset:0});
+    setCommentsData(res);
+    setLoadingStates((prev) => ({ ...prev,hasOnceLoaded: true }));
+    if (Array.isArray(res) && res?.length < (params.limit || 10)) {
+    setLoadingStates((prev) => ({ ...prev,noMoreComments:true }));
+    }
+    setLoadingStates((prev) => ({ ...prev, loadMore: false })); //disable load more loader
+    })();
+    
+    return () => {
+      setCommentsData([]); //clear the comments data when the params change
+      setLoadingStates(({loadMore:false, noMoreComments:false,  hasOnceLoaded:false})); //reset the loading states})); 
+    }
+  
+  }, [params.epNo, params.animeId, params.userId, params.orderBy]);
+
+//? INFO ABOUT HOW THE COMMENTS API WORKS
+
+  // basically uper 2 useEffects h comments load krne k liye, vo isiliye kyunki ek jiski dependency offset and limit h vo current comments k array m aur comments append krta hai, but jb hmko episode change krna ho ya filter lagana ho, ya fir user change krna ho tb hm append nahi krenge blki shru se fetch krenge comments data.
+
+  //In useEffects m cleanup function bhi jaruri h kyunki uske bina jab bhi koi params change hoga to wo purane comments ko nahi hataega and naye comments ko append karega, so purane comments bhi dikhte rahenge jo ki nahi hona chahiye. So cleanup function m hum commentsData ko clear krte h and loading states ko reset krte h.
+
+  //Ab isme ek loadingStates krke ek state h jo ki 3 cheeze store krta h, loadMore, noMoreComments and hasOnceLoaded.
+
+  // ---> sbse pehle hasOnceLoaded ki agar baat kre to iska sirf itna kaam h ki ye batayega ki comments ek baar bhi fetch hue h ki nahi...agar hue h and comments data m kuch nahi h to fir first comment abhi tk nahi kiya h is episode pr so show anya, agar nahi hue yaani is state ki value false h yaani loading state dikhana h.
+
+  //----> loadMore ki baat  kre to ye sirf ye cheez batata h ki kya load more button click krne k baad aur comments load ho rahe h ya nahi, agar ye true h yaani load ho rahe h vrna false. agar ye true h to blue chakka dikhega pr sirf tb jb hasOnceLoaded true hoga aur noMoreComments flag false hoga (yaani ab bhi comments exist krte h db m is anime episode k liye) warna nahi dikhega.
+
+  //----> noMoreComments ki baat kre to ye sirf ye cheez batata h ki kya load more button click krne k baad aur koi comments nahi aaye yaani abhi tk jitne comments the wo sab aa gaye h, so isse hum load more button ko hide kar sakte h.
+
+
+  const handleLoadMore = () => {
     setLoadingStates((prev) => ({ ...prev, loadMore: true })); //enable load more loader
     setParams((prev) => ({ ...prev, offset: prev.offset + prev.limit }));
   };
 
   return (
-    <div className="comments-container justify-center flex flex-col gap-4 md:mx-8 mx-2">
+    <div className="comments-container flex flex-col gap-4 md:mx-8 mx-2">
       <h1 className="text-primary-300 text-2xl px-2 font-semibold tracking-wide">
         Comments
       </h1>
@@ -131,14 +176,14 @@ export default function CommentsContainer({
           ) : (
             <div className="no comments flex-col gap-8 mx-auto items-center justify-center">
                 <div className="img relative flex self-center h-32 w-36 mx-auto rounded-md my-4 overflow-hidden ">
-                    <Image src = "/waku-waku-anya.gif" alt="No Comments Here"  fill/>
+                    <Image src = "/waku-waku-anya.gif" alt="No Comments Here" unoptimized  fill/>
                 </div>
                 <h2 className="text-base text-sky-200">Be the first to comment – Anya is waiting!</h2>
             </div>
           )):
           <div>
             <div className="img relative flex self-center h-36 w-48 mx-auto rounded-md my-4 overflow-hidden ">
-          <Image src = "/comments loading.gif" alt="Comments Loading"  fill/>
+          <Image src = "/comments loading.gif" alt="Comments Loading" unoptimized  fill/>
           </div>
       </div> }
         </div>
@@ -147,7 +192,7 @@ export default function CommentsContainer({
           (!loadingStates?.loadMore ? (
             <button
               className="text-base text-primary-200 font-semibold tracking-wide flex w-fit mx-4"
-              onClick={() => loadMore()}
+              onClick={() => handleLoadMore()}
             >
               Load more
             </button>
