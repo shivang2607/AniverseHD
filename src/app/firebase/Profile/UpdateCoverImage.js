@@ -51,6 +51,17 @@ export default async function UpdateCoverImage({blob = false, imageUrl = false})
       }
     );
 
+    // Update user document in cloudflare with new cover image URL
+    await fetch(`/api/v1/users-cloudflare/${userData.details.uid}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userBannerUrl: resp.response,
+      })
+    });
+    
     const oldData = getUserInfoCached();
     changeCoverUrlCached({coverUrl:resp.response});
     const respDelete = await DeleteImageFromFirebaseStorage(oldData.coverUrl);

@@ -1,4 +1,5 @@
 import FilterPanel from "@/components/utils/FilterPanel";
+import Script from "next/script";
 
 
 export const metadata = {
@@ -39,6 +40,7 @@ export default function RecommendationLayout({
   }) {
     return (
       <div className=" flex w-full gap-4 md:pt-28 pt-20 z-0">
+        <Script data-cfasync="false" async type="text/javascript" src="https://cluckedzion.com/gHBwiL5kU0DqfIaYF/121367"></Script>
         {children}
         <FilterPanel/>
       </div>

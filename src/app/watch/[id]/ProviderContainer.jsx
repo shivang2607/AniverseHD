@@ -129,7 +129,7 @@ export default function ProviderContainer({
         const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
           params: {
             category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
-            server: server || 'hd-1'
+            server: server || 'hd-2'
           }
         });
         
@@ -147,7 +147,7 @@ export default function ProviderContainer({
             }
           });
           if(data?.data?.status){
-            toast.error("Anime not available, Try Another Server or Provider")
+            toast.error("Anime not available, Try Another Server")
             return;
           }
           setStreamingData(data?.data);
@@ -204,7 +204,8 @@ export default function ProviderContainer({
           >
             Provider-Z
           </Link>
-          <Link
+          {/* //* The below Link component is of the Provider-G , Since GOGO has went down its not working as of now and the below Link component is now deprecated */}
+          {/* <Link
             href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:''}], false)}
             scroll={false}
             className={` text-lg font-semibold p-1 px-2 rounded-md  ${
@@ -216,7 +217,7 @@ export default function ProviderContainer({
             }}
           >
             Provider-G
-          </Link>
+          </Link> */}
         </div>
 
         <div className="availableServers mx self-center flex flex-col">
