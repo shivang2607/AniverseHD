@@ -12,6 +12,7 @@ import { Comment, TailSpin } from "react-loader-spinner";
 import ReplyCommentCard from "./ReplyCommentCard";
 import InputCommentDiv from "./InputCommentDIv";
 import { MdEdit } from "react-icons/md";
+import Link from "next/link";
 
 export default function CommentCard({ animeId, comment, userId }) {
   const [loadingStates, setLoadingStates] = useState({
@@ -126,14 +127,19 @@ export default function CommentCard({ animeId, comment, userId }) {
     <div>
       <div className="w-full flex gap-2 items-center my-3">
         <div className="profile p-1 justify-center h-full flex">
-          <div className="img relative w-9 h-9 rounded-full overflow-hidden object-cover ">
+          <Link
+            href={`/profile/${comment.userId}`}
+            className="img relative w-9 h-9 rounded-full overflow-hidden object-cover "
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Image
               src={comment?.userProfileUrl || "/logo-teal-stretched.png"}
               alt="Profile Image"
               fill
               className="object-cover "
             />
-          </div>
+          </Link>
         </div>
 
         <div className="contentContainer w-full flex flex-col gap-1 md:text-sm">
@@ -142,9 +148,10 @@ export default function CommentCard({ animeId, comment, userId }) {
               {comment?.userName}
             </div>
             <div className="name-edited flex gap-1 text-gray-400 text-xs">
-              {/* {console.log(new Date(comment?.createdAt))} */}
               <CustomTimeAgo date={new Date(comment?.createdAt + "Z")} />
-            <div className="isEdited text-gray-400 text-xs">{comment?.isEdited>0 && "(edited)"}</div>
+              <div className="isEdited text-gray-400 text-xs">
+                {comment?.isEdited > 0 && "(edited)"}
+              </div>
             </div>
           </div>
 
@@ -158,11 +165,10 @@ export default function CommentCard({ animeId, comment, userId }) {
           ) : (
             <div
               className={`body ${
-                (editCommentPayload?.isSpoiler) && !showSpoiler ? "blur-sm" : ""
+                editCommentPayload?.isSpoiler && !showSpoiler ? "blur-sm" : ""
               } text-gray-300 w-full text-wrap`}
             >
               {editCommentPayload?.editableBody}
-              {/* in the abve expression since default value of editableBody is that of comment body initially so it workes even before editing, and after editing it changes anyways so no need to reload the comment data */}
             </div>
           )}
           {editCommentPayload?.isSpoiler > 0 && (
@@ -235,20 +241,14 @@ export default function CommentCard({ animeId, comment, userId }) {
         </div>
       </div>
 
-      {/* //below code is for the posting the reply to the comment  */}
-      {
-        showPostReply && (
-          /* //below is the div of adding the commment */
+      {showPostReply && (
+        <InputCommentDiv
+          commentPayload={commentPayload}
+          setCommentPayload={setCommentPayload}
+          isReply={true}
+        />
+      )}
 
-          <InputCommentDiv
-            commentPayload={commentPayload}
-            setCommentPayload={setCommentPayload}
-            isReply={true}
-          />
-        ) /* div for adding the reply comment ended here  */
-      }
-
-      {/* //below component renders all the replies of the current comment component */}
       {showReplies && (
         <div className="md:ml-24 ml-8 my-4 border-l-[1.5px] border-gray-600 pl-4 flex flex-col md:gap-6 gap-2">
           {replyComments?.length > 0 ? (
@@ -264,18 +264,20 @@ export default function CommentCard({ animeId, comment, userId }) {
               );
             })
           ) : (
-            <div className="text-sm text-red-400"> <div className="flex m-8 mx-12">
-                          <TailSpin
-                            visible={loadingStates.loadMore}
-                            height="32"
-                            width="32"
-                            color=" #0ea5e9"
-                            ariaLabel="tail-spin-loading"
-                            radius="2"
-                            wrapperStyle={{}}
-                            wrapperClass=""
-                          />
-                        </div></div>
+            <div className="text-sm text-red-400">
+              <div className="flex m-8 mx-12">
+                <TailSpin
+                  visible={loadingStates.loadMore}
+                  height="32"
+                  width="32"
+                  color=" #0ea5e9"
+                  ariaLabel="tail-spin-loading"
+                  radius="2"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              </div>
+            </div>
           )}
         </div>
       )}
