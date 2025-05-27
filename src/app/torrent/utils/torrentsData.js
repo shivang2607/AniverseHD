@@ -84,6 +84,11 @@ export async function getTorrentData(qText = "") {
       });
   
       // Check for various error conditions
+      if (response.headers['content-type']?.includes("text/html")) {
+        console.error("Received HTML content from URL:", url);
+        return Promise.reject(new Error("Unexpected HTML content in response"));
+      }
+      
       if (typeof response.data === "string") {
         if (response.data.includes("429 Too Many Requests")) {
           console.error("Received 429 error from URL:", url);
@@ -93,6 +98,8 @@ export async function getTorrentData(qText = "") {
           console.error("Received 404 error from URL:", url);
           return Promise.reject(new Error("404 Not Found"));
         }
+        // Check if the response content type is HTML
+        
       }
   
       if (!response?.data) {
