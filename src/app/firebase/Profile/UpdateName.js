@@ -36,6 +36,16 @@ export default async function UpdateName({ userName }) {
         userName: userName,
       }
     );
+
+    await fetch(`/api/v1/users-cloudflare/${userData.details.uid}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userName: userName,
+      })
+    });
     changeUserNameCached({ userName: userName });
 
     return { status: Constant_Var_success, response: null };

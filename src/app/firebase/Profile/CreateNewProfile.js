@@ -117,6 +117,20 @@ export default async function CreateNewProfile() {
 
     await batch.commit();
 
+    await fetch('/api/v1/users-cloudflare', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userData.details.uid,
+          userName: userData.details.name,
+          userProfileUrl: photoURL,
+          userBannerUrl: coverURL,
+          email: userData.details.email
+        }),
+    });
+
     isProfileBeingCreated = false;
     return { status: Constant_Var_success, response: null };
     //do not save watchLists in users collection, only save them in public collection

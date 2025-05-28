@@ -50,6 +50,7 @@ import Metadata from "./Metadata";
 import { FaDownload, FaStepBackward, FaStepForward } from "react-icons/fa";
 import Link from "next/link";
 import CommentsContainer from "@/components/comments/CommentsContainer";
+import { uniqueId } from "lodash";
 import Script from "next/script";
 import { GlobalScripts } from "@/components/GlobalScripts";
 
@@ -980,7 +981,11 @@ export default function Page({ params }) {
           </div>
           {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
         </div>
-        {params?.id && <Suggested id={params?.id} />}
+
+        <div className="md:hidden block my-12">
+          <Metadata content={content} id={params?.id} />
+        </div>
+      {params?.id  && <CommentsContainer key={uniqueId} animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>}
       </div>
     </>
   );
