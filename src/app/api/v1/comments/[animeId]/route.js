@@ -33,7 +33,6 @@ export async function GET(req, { params }) {
         }
       }
     );
-
     return NextResponse.json(response.data);
 
   } catch (error) {
@@ -112,7 +111,6 @@ export async function PUT(req) {
             `${process.env.WORKER_URL}/api/${process.env.WORKER_VERSION}/comments`,
             data
         );
-        console.log("response => ", res.data);
         return NextResponse.json(res.data);
     } catch (error) {
         // console.error('Error updating comment:', error);
