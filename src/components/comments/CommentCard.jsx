@@ -10,7 +10,7 @@ import {
 } from "./utilFunctions";
 import { Comment, TailSpin } from "react-loader-spinner";
 import ReplyCommentCard from "./ReplyCommentCard";
-import InputCommentDiv from "./InputCommentDIv";
+import InputCommentDiv from "./InputCommentDiv";
 import { MdEdit } from "react-icons/md";
 import Link from "next/link";
 

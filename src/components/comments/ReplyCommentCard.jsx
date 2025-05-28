@@ -10,7 +10,7 @@ import {
 import { CustomTimeAgo } from "../utils/timeago";
 import { postComment, ReactComment } from "./utilFunctions";
 import { Comment } from "react-loader-spinner";
-import InputCommentDiv from "./InputCommentDIv";
+import InputCommentDiv from "./InputCommentDiv";
 import { MdEdit } from "react-icons/md";
 import Link from "next/link";
 

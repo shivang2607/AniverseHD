@@ -2,7 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { debounceGetComments } from "./utilFunctions";
 import CommentCard from "./CommentCard";
-import InputCommentDiv from "./InputCommentDIv";
+import InputCommentDiv from "./InputCommentDiv";
 import { RotatingLines, TailSpin } from "react-loader-spinner";
 import { Toaster } from "react-hot-toast";
 
