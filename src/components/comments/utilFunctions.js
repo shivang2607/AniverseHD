@@ -94,6 +94,8 @@ export async function postComment(payload){
         // console.log("this is res of postComment function => ",res);
 
         if(res?.data?.result?.success===true){
+          // console.log("Comment posted successfully");
+          // console.log("this is res of postComment function => ",res);  
             toast.success(res?.data?.message, {duration:3000});
         }
 
