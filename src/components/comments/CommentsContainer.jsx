@@ -4,6 +4,7 @@ import { debounceGetComments } from "./utilFunctions";
 import CommentCard from "./CommentCard";
 import InputCommentDiv from "./InputCommentDIv";
 import { RotatingLines, TailSpin } from "react-loader-spinner";
+import { Toaster } from "react-hot-toast";
 
 export default function CommentsContainer({
   animeId,
@@ -142,11 +143,14 @@ export default function CommentsContainer({
                 />
               </div>
               <div className="label">
-                Comment as{" "}
+                Post your Comment here{" "}
                 <b className="text-primary-400 font-normal">
-                  {loggedInUserData?.userName}
+                  {/* {loggedInUserData?.userName}     */}
+                  {/* //? when abhay will bring the dat aof users from SQL to loggedInUserData tb isko uncomment krna!! */
+                  }
                 </b>
               </div>
+              
             </div>
           </div>
         )}
@@ -211,6 +215,17 @@ export default function CommentsContainer({
             </div>
           ))}
       </div>
+      <Toaster
+                  toastOptions={{
+                    style: {
+                      borderRadius: "10px",
+                      background: "#b6d7d4",
+                      border: "1px solid ",
+                      color: "#041C32",
+              
+                    },
+                  }}
+                />
     </div>
   );
 }
