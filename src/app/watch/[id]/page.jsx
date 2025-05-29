@@ -294,7 +294,6 @@ export default function Page({ params }) {
   useEffect(() => {
     (async () => {
       setAnimeNotAvailable(false);
-      console.log("setting the episode Numberfrom the use Effect");
       const currentIndex = episodesData?.findIndex(
         (ep) =>
           (ep?.episodeId === zoroEpisodeId && zoroEpisodeId) ||
@@ -303,12 +302,12 @@ export default function Page({ params }) {
       );
 
       setEpNo(currentIndex ? currentIndex + 1 : 1); //this will set the current episode number which will be used for commenting the comment for this episode number.
-      console.log(
-        "setted thee episode number from usEffect",
-        currentIndex,
-        zoroEpisodeId,
-        episodesData
-      );
+      // console.log(
+      //   "setted thee episode number from usEffect",
+      //   currentIndex,
+      //   zoroEpisodeId,
+      //   episodesData
+      // );
 
       if (!provider) router.replace("/not-found");
 
