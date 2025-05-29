@@ -10,7 +10,7 @@ import {
 } from "./utilFunctions";
 import { Comment, TailSpin } from "react-loader-spinner";
 import ReplyCommentCard from "./ReplyCommentCard";
-import InputCommentDiv from "./InputCommentDIv";
+import InputCommentDiv from "./InputCommentDiv";
 import { MdEdit } from "react-icons/md";
 import Link from "next/link";
 
@@ -41,6 +41,9 @@ export default function CommentCard({ animeId, comment, userId }) {
     gogoEpId: comment?.gogoEpId,
     zoroEpId: comment?.zoroEpId,
   });
+  const [editCommentPayload, setEditCommentPayload] = useState({
+    ...comment, animeId: animeId, editableBody: comment.body
+  })
   const [editCommentPayload, setEditCommentPayload] = useState({
     ...comment, animeId: animeId, editableBody: comment.body
   })
