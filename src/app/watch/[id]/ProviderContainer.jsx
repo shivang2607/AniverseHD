@@ -13,7 +13,7 @@ import { MdOutlineSportsScore } from "react-icons/md";
 import { PiVideoFill } from "react-icons/pi";
 import { IoMdTimer } from "react-icons/io";
 import { RxDotFilled } from "react-icons/rx";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
 
@@ -186,7 +186,7 @@ export default function ProviderContainer({
       <div className="md:w-[90%] w-full mx-auto justify-between md:gap-0 gap-12 flex mb-8  flex-col md:flex-row">
         
       <div className="hidden md:block"><Metadata content={content} id={id}/></div>
-
+      
 
       <div className="provider-server-select self-center flex flex-col gap-8">
         <div className="button self-center flex gap-2 text-gray-200 ">
@@ -312,6 +312,8 @@ export default function ProviderContainer({
           })}
         </select>
       </div>
+
+      
 
       <div className="episode-list grid md:grid-cols-4 grid-cols-2 gap-2 m-3 md:max-h-screen max-h-[40vh]  overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
         {episodes

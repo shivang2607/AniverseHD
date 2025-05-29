@@ -6,7 +6,6 @@ import {
   getSessionWithExpiry,
   setSessionWithExpiry,
 } from "@/components/utils/storage";
-import { IoMdAdd } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -53,7 +52,6 @@ import CommentsContainer from "@/components/comments/CommentsContainer";
 import { uniqueId } from "lodash";
 import Script from "next/script";
 import { GlobalScripts } from "@/components/GlobalScripts";
-
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -119,7 +117,7 @@ export default function Page({ params }) {
   const [recentTimestamp, setRecentTimestamp] = useState(0);
   const [downloadLink, setDownloadLink] = useState();
   const [duration, setDuration] = useState();
-  const [epNo, setEpNo] = useState(1);
+  const [epNo, setEpNo] = useState(null);
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
   const durationRef = useRef(duration);
@@ -296,6 +294,7 @@ export default function Page({ params }) {
   useEffect(() => {
     (async () => {
       setAnimeNotAvailable(false);
+      console.log("setting the episode Numberfrom the use Effect");
       const currentIndex = episodesData?.findIndex(
         (ep) =>
           (ep?.episodeId === zoroEpisodeId && zoroEpisodeId) ||
@@ -303,7 +302,13 @@ export default function Page({ params }) {
           (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
       );
 
-      setEpNo(currentIndex + 1); //this will set the current episode number which will be used for commenting the comment for this episode number.
+      setEpNo(currentIndex ? currentIndex + 1 : 1); //this will set the current episode number which will be used for commenting the comment for this episode number.
+      console.log(
+        "setted thee episode number from usEffect",
+        currentIndex,
+        zoroEpisodeId,
+        episodesData
+      );
 
       if (!provider) router.replace("/not-found");
 
@@ -457,7 +462,13 @@ export default function Page({ params }) {
     return () => {
       // setServerData(null);
     };
-  }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
+  }, [
+    zoroEpisodeId,
+    gogoDubEpisodeId,
+    provider,
+    gogoSubEpisodeId,
+    episodesData,
+  ]);
 
   //this function update the url params, it has resetT as true which will remove timestamp t parameter by default
   const updateParams = (paramsList, resetT = true) => {
@@ -627,11 +638,14 @@ export default function Page({ params }) {
   const getStreamingSource = () => {
     if (provider === "zoro") {
       setDownloadLink();
-      
-      return `/api/v1/streamingProxy?url=${encodeURIComponent(streamingData?.sources?.[0]?.url)}`;
-    } 
-    else if(provider === "gogo"){
-      const defaultSrcData =  streamingData?.sources?.filter(src => src?.quality === 'default');
+
+      return `/api/v1/streamingProxy?url=${encodeURIComponent(
+        streamingData?.sources?.[0]?.url
+      )}`;
+    } else if (provider === "gogo") {
+      const defaultSrcData = streamingData?.sources?.filter(
+        (src) => src?.quality === "default"
+      );
       setDownloadLink(streamingData?.download);
       // console.log("gogo src data",defaultSrcData);
       return `https://goodproxy.goodproxy.workers.dev/fetch?url=${defaultSrcData?.[0]?.url}`;
@@ -677,7 +691,7 @@ export default function Page({ params }) {
          ></ins>
          </div> */}
 
-      <div className="py-12">
+      <div className="py-12 w-full">
         <div className="content py-2 md:px-4 flex flex-col gap-4">
           {!animeNotAvailable && (
             <h1 className="text-2xl mx-2 md:mx-0 tracking-wide my-3 font-semibold  self-center">
@@ -685,6 +699,7 @@ export default function Page({ params }) {
               Currently Watching : {content?.title_english || content?.title}
             </h1>
           )}
+          
           <div className="stream-container self-center md:w-[95%] w-full flex flex-col gap-12 ">
             <div className="bg-cbg-200 md:p-4 ">
               {animeNotAvailable ? (
@@ -722,8 +737,6 @@ export default function Page({ params }) {
               ) : (
                 streamingSrc && (
                   <>
-                    
-
                     <div class="pm_video" className="pm_video flex h-fit">
                       <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
                         <MediaPlayer
@@ -752,7 +765,6 @@ export default function Page({ params }) {
                                 maxMaxBufferLength: 200,
                                 maxBufferLength: 20,
                                 enableWorker: true,
-                               
                               };
                             }
                           }}
@@ -872,18 +884,9 @@ export default function Page({ params }) {
                       />
                     )}
                   </div>
-                  {/* <Toaster
-                  toastOptions={{
-                    style: {
-                      borderRadius: "10px",
-                      background: "#b6d7d4",
-                      border: "1px solid ",
-                      color: "#041C32",
-              
-                    },
-                  }}
-                /> */}
                 </button>
+
+                
 
                 {provider === "zoro" && (
                   <button
@@ -985,7 +988,20 @@ export default function Page({ params }) {
         <div className="md:hidden block my-12">
           <Metadata content={content} id={params?.id} />
         </div>
-      {params?.id  && <CommentsContainer key={uniqueId} animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>}
+
+        {params?.id && (
+          <CommentsContainer
+            key={uniqueId}
+            animeId={params?.id}
+            loggedInUserId={loggedInUserId}
+            loggedInUserData={loggedInUserData}
+            epNo={epNo}
+            zoroEpId={zoroEpisodeId}
+            gogoEpId={`${gogoSubId ? gogoSubId : ""}|${
+              gogoDubId ? gogoDubId : ""
+            }`}
+          />
+        )}
       </div>
     </>
   );

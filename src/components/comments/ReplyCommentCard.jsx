@@ -20,9 +20,7 @@ export default function ReplyCommentCard({
   animeId,
   userId,
 }) {
-  const [loadingStates, setLoadingStates] = useState({
-    addComment: false,
-  });
+  
   const [showPostReply, setShowPostReply] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [showSpoiler, setShowSpoiler] = useState(!comment?.isSpoiler);

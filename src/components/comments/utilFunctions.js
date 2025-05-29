@@ -96,12 +96,12 @@ export async function postComment(payload){
         if(res?.data?.result?.success===true){
           // console.log("Comment posted successfully");
           // console.log("this is res of postComment function => ",res);  
-            toast.success(res?.data?.message, {duration:3000});
+            toast.success(res?.data?.message, {id:1, duration:3000});
         }
 
     } catch (error) {
         console.log(error);
-        toast.error("Error : Couldn't Post your comment :(", {duration:3000});
+        toast.error("Error : Couldn't Post your comment :(", {id:2, duration:3000});
     }
 }
 
@@ -115,16 +115,16 @@ export async function putComment(payload){
   } = payload;
   
   if(editableBody.trim()===""){
-      toast.error("Please type some text");
+      toast.error("Please type some text", {id:3, duration:3000});
       return;
   }
   if(editableBody?.length > commentLength){
-      toast.error(`Cannot contain more than ${commentLength} characters!`);
+      toast.error(`Cannot contain more than ${commentLength} characters!`, {id:4, duration:3000});
       return;
   }
 
   if(!commentId){
-    toast.error("Comment Id not in the payload.")
+    toast.error("Comment Id not in the payload.", {id:5, duration:3000});
   }
   // console.log(payload);
   // return;
@@ -134,12 +134,12 @@ export async function putComment(payload){
       // console.log("this is res of postComment function => ",res);
 
       if(res?.data?.success===true){
-          toast.success("Comment Updated successfully", {duration:3000});
+          toast.success("Comment Updated successfully", {id:6, duration:3000});
       }
 
   } catch (error) {
       console.log(error);
-      toast.error("Error : Couldn't Edit your comment :(", {duration:3000});
+      toast.error("Error : Couldn't Edit your comment :(", {id:7, duration:3000});
   }
 }
 
@@ -147,7 +147,7 @@ export async function putComment(payload){
 export  async function ReactComment(payload){
   // const {userId, commentId, reactionType} = payload;
   if(!payload.userId){
-    toast.error("Please Login to React :)");
+    toast.error("Please Login to React :)", {id:8, duration:3000});
     return;
   }
   try {
@@ -160,7 +160,7 @@ export  async function ReactComment(payload){
 
 } catch (error) {
     console.log(error);
-    toast.error("Error : Something went wrong! ", {duration:3000});
+    toast.error("Error : Something went wrong! ", {id:9, duration:3000});
     
 }
 }
