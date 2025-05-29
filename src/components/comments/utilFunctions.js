@@ -36,7 +36,7 @@ export async function getComments(params){
      } = params;
     //  console.log(params);
      if(!animeId || !epNo){
-        toast.error("AnimeId or episode Number not found");
+        console.log("AnimeId or episode Number not found");
         return;
      }
 
