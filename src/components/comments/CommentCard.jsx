@@ -44,9 +44,6 @@ export default function CommentCard({ animeId, comment, userId }) {
   const [editCommentPayload, setEditCommentPayload] = useState({
     ...comment, animeId: animeId, editableBody: comment.body
   })
-  const [editCommentPayload, setEditCommentPayload] = useState({
-    ...comment, animeId: animeId, editableBody: comment.body
-  })
   const [showReplies, setShowReplies] = useState(false);
   const [params, setParams] = useState({
     animeId: animeId,
