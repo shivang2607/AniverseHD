@@ -698,7 +698,7 @@ export default function Page({ params }) {
               Currently Watching : {content?.title_english || content?.title}
             </h1>
           )}
-          
+
           <div className="stream-container self-center md:w-[95%] w-full flex flex-col gap-12 ">
             <div className="bg-cbg-200 md:p-4 ">
               {animeNotAvailable ? (
@@ -885,8 +885,6 @@ export default function Page({ params }) {
                   </div>
                 </button>
 
-                
-
                 {provider === "zoro" && (
                   <button
                     className={`md:mx-1 ${
@@ -978,9 +976,7 @@ export default function Page({ params }) {
             </div>
           </div>
 
-          <div className="md:hidden block my-12">
-            <Metadata content={content} id={params?.id} />
-          </div>
+          
           {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
         </div>
 
