@@ -978,9 +978,7 @@ export default function Page({ params }) {
             </div>
           </div>
 
-          <div className="md:hidden block my-12">
-            <Metadata content={content} id={params?.id} />
-          </div>
+          
           {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
         </div>
 
