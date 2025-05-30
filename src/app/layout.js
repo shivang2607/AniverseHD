@@ -78,12 +78,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" sizes="any" />
 
         {/* Umami Analytics */}
-        <Script
-          data-cfasync="false"
-          async
-          type="text/javascript"
-          src="https://cluckedzion.com/gHBwiL5kU0DqfIaYF/121367"
-        ></Script>
+        
 
         <Script
           defer
