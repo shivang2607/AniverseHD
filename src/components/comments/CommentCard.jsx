@@ -10,11 +10,11 @@ import {
 } from "./utilFunctions";
 import { Comment, TailSpin } from "react-loader-spinner";
 import ReplyCommentCard from "./ReplyCommentCard";
-import InputCommentDiv from "./InputCommentDiv";
+import InputCommentDiv from "./InputCommentDIv";
 import { MdEdit } from "react-icons/md";
 import Link from "next/link";
 
-export default function CommentCard({ animeId, comment, userId }) {
+export default function CommentCard({ animeId, comment, userId, loggedInUserData }) {
   const [loadingStates, setLoadingStates] = useState({
     addComment: false,
   });
@@ -36,6 +36,7 @@ export default function CommentCard({ animeId, comment, userId }) {
     parentCommentId: comment?.commentId,
     commentBody: "",
     editableBody: comment?.body,
+    userName: loggedInUserData?.userName || "",
     epNo: comment?.epNo,
     isSpoiler: false,
     gogoEpId: comment?.gogoEpId,
@@ -257,7 +258,9 @@ export default function CommentCard({ animeId, comment, userId }) {
                 <ReplyCommentCard
                   animeId={animeId}
                   key={replyComment.commentId}
+                  id={replyComment.commentId}
                   comment={replyComment}
+                  loggedInUserData={loggedInUserData}
                   parentCommentId={comment.commentId}
                   userId={userId}
                 />
