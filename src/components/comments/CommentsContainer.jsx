@@ -35,30 +35,32 @@ export default function CommentsContainer({
     userId: null,
     commentBody: "",
     epNo: epNo,
+    userName: loggedInUserData?.userName || "",
     isSpoiler: false,
     gogoEpId: gogoEpId,
     zoroEpId: zoroEpId,
   });
 
-  useEffect(() => {
-    (async () => {})();
-  }, [loggedInUserId]);
+
 
   useEffect(() => {
     (async () => {
       setCommentPayload((prev) => ({
         ...prev,
         userId: loggedInUserId,
+        userName: loggedInUserData?.userName || "",
         zoroEpId,
         gogoEpId,
         epNo,
       }));
 
+      console.log("speaking from comments container useEffect", loggedInUserData);
+
       //? For below code only loggedInUserId was needed as trigger but since we have implemented debounce function of 500ms delay this shouldn't cause any issue.
       if (!epNo) return;
       setParams((prev) => ({ ...prev, userId: loggedInUserId, epNo: epNo }));
     })();
-  }, [loggedInUserId, zoroEpId, gogoEpId, epNo]); //Adding zoro and gogo ids are not necessary, having said that its better to have this data as up to date as possible.
+  }, [loggedInUserData, loggedInUserId, zoroEpId, gogoEpId, epNo]); //Adding zoro and gogo ids are not necessary, having said that its better to have this data as up to date as possible.
 
   useEffect(() => {
     //This useEffect triggers whenever the params for comments api changes that means whenever we want to get the comments data from the comments api.
@@ -167,7 +169,9 @@ export default function CommentsContainer({
               return (
                 <CommentCard
                   key={comment.commentId}
+                  id={comment.commentId}
                   animeId={animeId}
+                  loggedInUserData={loggedInUserData}
                   comment={comment}
                   userId={loggedInUserId}
                 />
