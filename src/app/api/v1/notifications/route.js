@@ -54,8 +54,9 @@ return NextResponse.json(res?.data);
   }
 }
 
+//* IMP INFO : In the caching we using, we are only considering the userId as the key, this is because at the time of read notifcation we wont have the other params except the userid, so we wouldn't be able to invalidate the cache based on other params like isRead, getAll, limit, offset etc. So we are only caching the response based on userId and invalidating it when the user marks notifications as read.
 
-// below method will only be used for marking notifications as read
+// !below method will only be used for marking notifications
 export async function PUT(req) {
   const userId = req.headers.get("user-id");
   const payload = await req.json(); //payload has only one thing which is notificationId, if not provided then all the notifications will be marked as read

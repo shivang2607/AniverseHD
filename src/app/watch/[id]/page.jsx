@@ -6,7 +6,7 @@ import {
   getSessionWithExpiry,
   setSessionWithExpiry,
 } from "@/components/utils/storage";
-import { IoMdAdd } from "react-icons/io";
+import { MEDIA_KEY_SHORTCUTS } from "@vidstack/react";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -53,7 +53,6 @@ import CommentsContainer from "@/components/comments/CommentsContainer";
 import { uniqueId } from "lodash";
 import Script from "next/script";
 import { GlobalScripts } from "@/components/GlobalScripts";
-
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -627,11 +626,14 @@ export default function Page({ params }) {
   const getStreamingSource = () => {
     if (provider === "zoro") {
       setDownloadLink();
-      
-      return `/api/v1/streamingProxy?url=${encodeURIComponent(streamingData?.sources?.[0]?.url)}`;
-    } 
-    else if(provider === "gogo"){
-      const defaultSrcData =  streamingData?.sources?.filter(src => src?.quality === 'default');
+
+      return `/api/v1/streamingProxy?url=${encodeURIComponent(
+        streamingData?.sources?.[0]?.url
+      )}`;
+    } else if (provider === "gogo") {
+      const defaultSrcData = streamingData?.sources?.filter(
+        (src) => src?.quality === "default"
+      );
       setDownloadLink(streamingData?.download);
       // console.log("gogo src data",defaultSrcData);
       return `https://goodproxy.goodproxy.workers.dev/fetch?url=${defaultSrcData?.[0]?.url}`;
@@ -722,12 +724,40 @@ export default function Page({ params }) {
               ) : (
                 streamingSrc && (
                   <>
-                    
-
                     <div class="pm_video" className="pm_video flex h-fit">
                       <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
                         <MediaPlayer
                           load="eager"
+                          keyShortcuts={{
+                            ...MEDIA_KEY_SHORTCUTS,
+                            nextEpisode: {
+                              keys: ["n", "N"],
+                              onKeyDown: ({ event }) => {
+                                event.preventDefault();
+                                getNextEpisode();
+                              },
+                            },
+                            prevEpisode: {
+                              keys: ["p", "P"],
+                              onKeyDown: ({ event }) => {
+                                event.preventDefault();
+                                getPrevEpisode();
+                              },
+                            },
+                            skip: {
+                              keys: ["s", "S"],
+                              onKeyDown: ({ event }) => {
+                                event.preventDefault();
+                                if (showSkipButton) {
+                                  player.current.currentTime =
+                                    showSkipButton === "Intro"
+                                      ? streamingData?.intro?.end
+                                      : streamingData?.outro?.end; // Skip to the end of the intro or outro
+                                  setShowSkipButton(""); // Hide the button after skipping
+                                }
+                              },
+                            }
+                          }}
                           autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
                           ref={player}
                           keyTarget="player"
@@ -752,7 +782,6 @@ export default function Page({ params }) {
                                 maxMaxBufferLength: 200,
                                 maxBufferLength: 20,
                                 enableWorker: true,
-                               
                               };
                             }
                           }}
@@ -985,7 +1014,19 @@ export default function Page({ params }) {
         <div className="md:hidden block my-12">
           <Metadata content={content} id={params?.id} />
         </div>
-      {params?.id  && <CommentsContainer key={uniqueId} animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>}
+        {params?.id && (
+          <CommentsContainer
+            key={uniqueId}
+            animeId={params?.id}
+            loggedInUserId={loggedInUserId}
+            loggedInUserData={loggedInUserData}
+            epNo={epNo}
+            zoroEpId={zoroEpisodeId}
+            gogoEpId={`${gogoSubId ? gogoSubId : ""}|${
+              gogoDubId ? gogoDubId : ""
+            }`}
+          />
+        )}
       </div>
     </>
   );
