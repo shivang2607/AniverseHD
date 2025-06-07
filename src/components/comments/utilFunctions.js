@@ -1,5 +1,8 @@
+import { getAbsoluteURLPath } from "@/app/watch/[id]/utilFunctions";
 import axios from "axios";
 import toast from "react-hot-toast";
+
+
 
 const commentLength = 500;
 const delay = 500;
@@ -88,9 +91,12 @@ export async function postComment(payload){
     }
     // console.log(payload);
     // return;
+
     
     try {
-        const res = await axios.post(`/api/v1/comments/${animeId}`, payload);
+        const searchParams = new URLSearchParams(window.location.search);
+        const pathname = window.location.pathname;
+        const res = await axios.post(`/api/v1/comments/${animeId}`, {url: getAbsoluteURLPath(pathname, searchParams), ...payload});
         // console.log("this is res of postComment function => ",res);
 
         if(res?.data?.result?.success===true){

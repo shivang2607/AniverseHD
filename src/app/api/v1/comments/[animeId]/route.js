@@ -33,7 +33,7 @@ export async function GET(req, { params }) {
         }
       }
     );
-    return NextResponse.json(response.data);
+    return NextResponse.json(response?.data);
 
   } catch (error) {
     console.error('Error fetching comments:', error);
@@ -48,7 +48,7 @@ export async function GET(req, { params }) {
 export async function POST(req, { params }) {
     const {animeId} = params;
     const payload = await req.json();
-    const {userId, userName, commentBody, epNo, isSpoiler, zoroEpId, gogoEpId, parentCommentId, repliedToUId} = payload;
+    const {userId, url, userName, commentBody, epNo, isSpoiler, zoroEpId, gogoEpId, parentCommentId, repliedToUId} = payload;
 
     // Validate required fields
     console.log("Hello", animeId, userId, commentBody);
@@ -64,6 +64,7 @@ export async function POST(req, { params }) {
         const data = {
             userId,
             userName,
+            url: url || null, //added for the notification purpose
             commentBody,
             epNo,
             isSpoiler: isSpoiler || false,
