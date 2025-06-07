@@ -6,6 +6,7 @@ import {
   getSessionWithExpiry,
   setSessionWithExpiry,
 } from "@/components/utils/storage";
+import { MEDIA_KEY_SHORTCUTS } from "@vidstack/react";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -49,7 +50,6 @@ import Metadata from "./Metadata";
 import { FaDownload, FaStepBackward, FaStepForward } from "react-icons/fa";
 import Link from "next/link";
 import CommentsContainer from "@/components/comments/CommentsContainer";
-import { uniqueId } from "lodash";
 import { uniqueId } from "lodash";
 import Script from "next/script";
 import { GlobalScripts } from "@/components/GlobalScripts";
@@ -118,7 +118,7 @@ export default function Page({ params }) {
   const [recentTimestamp, setRecentTimestamp] = useState(0);
   const [downloadLink, setDownloadLink] = useState();
   const [duration, setDuration] = useState();
-  const [epNo, setEpNo] = useState(null);
+  const [epNo, setEpNo] = useState(1);
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
   const durationRef = useRef(duration);
@@ -302,13 +302,7 @@ export default function Page({ params }) {
           (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
       );
 
-      setEpNo(currentIndex ? currentIndex + 1 : 1); //this will set the current episode number which will be used for commenting the comment for this episode number.
-      // console.log(
-      //   "setted thee episode number from usEffect",
-      //   currentIndex,
-      //   zoroEpisodeId,
-      //   episodesData
-      // );
+      setEpNo(currentIndex + 1); //this will set the current episode number which will be used for commenting the comment for this episode number.
 
       if (!provider) router.replace("/not-found");
 
@@ -462,13 +456,7 @@ export default function Page({ params }) {
     return () => {
       // setServerData(null);
     };
-  }, [
-    zoroEpisodeId,
-    gogoDubEpisodeId,
-    provider,
-    gogoSubEpisodeId,
-    episodesData,
-  ]);
+  }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
 
   //this function update the url params, it has resetT as true which will remove timestamp t parameter by default
   const updateParams = (paramsList, resetT = true) => {
@@ -691,7 +679,7 @@ export default function Page({ params }) {
          ></ins>
          </div> */}
 
-      <div className="py-12 w-full">
+      <div className="py-12">
         <div className="content py-2 md:px-4 flex flex-col gap-4">
           {!animeNotAvailable && (
             <h1 className="text-2xl mx-2 md:mx-0 tracking-wide my-3 font-semibold  self-center">
@@ -699,7 +687,6 @@ export default function Page({ params }) {
               Currently Watching : {content?.title_english || content?.title}
             </h1>
           )}
-
           <div className="stream-container self-center md:w-[95%] w-full flex flex-col gap-12 ">
             <div className="bg-cbg-200 md:p-4 ">
               {animeNotAvailable ? (
@@ -741,6 +728,36 @@ export default function Page({ params }) {
                       <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
                         <MediaPlayer
                           load="eager"
+                          keyShortcuts={{
+                            ...MEDIA_KEY_SHORTCUTS,
+                            nextEpisode: {
+                              keys: ["n", "N"],
+                              onKeyDown: ({ event }) => {
+                                event.preventDefault();
+                                getNextEpisode();
+                              },
+                            },
+                            prevEpisode: {
+                              keys: ["p", "P"],
+                              onKeyDown: ({ event }) => {
+                                event.preventDefault();
+                                getPrevEpisode();
+                              },
+                            },
+                            skip: {
+                              keys: ["s", "S"],
+                              onKeyDown: ({ event }) => {
+                                event.preventDefault();
+                                if (showSkipButton) {
+                                  player.current.currentTime =
+                                    showSkipButton === "Intro"
+                                      ? streamingData?.intro?.end
+                                      : streamingData?.outro?.end; // Skip to the end of the intro or outro
+                                  setShowSkipButton(""); // Hide the button after skipping
+                                }
+                              },
+                            }
+                          }}
                           autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
                           ref={player}
                           keyTarget="player"
@@ -884,6 +901,17 @@ export default function Page({ params }) {
                       />
                     )}
                   </div>
+                  {/* <Toaster
+                  toastOptions={{
+                    style: {
+                      borderRadius: "10px",
+                      background: "#b6d7d4",
+                      border: "1px solid ",
+                      color: "#041C32",
+              
+                    },
+                  }}
+                /> */}
                 </button>
 
                 {provider === "zoro" && (
@@ -977,14 +1005,15 @@ export default function Page({ params }) {
             </div>
           </div>
 
-          
+          <div className="md:hidden block my-12">
+            <Metadata content={content} id={params?.id} />
+          </div>
           {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
         </div>
 
         <div className="md:hidden block my-12">
           <Metadata content={content} id={params?.id} />
         </div>
-
         {params?.id && (
           <CommentsContainer
             key={uniqueId}
