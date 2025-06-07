@@ -19,8 +19,11 @@ export default function ReplyCommentCard({
   comment,
   animeId,
   userId,
+  loggedInUserData,
 }) {
-  
+  const [loadingStates, setLoadingStates] = useState({
+    addComment: false,
+  });
   const [showPostReply, setShowPostReply] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [showSpoiler, setShowSpoiler] = useState(!comment?.isSpoiler);
@@ -38,6 +41,7 @@ export default function ReplyCommentCard({
     repliedToUId: comment?.userId,
     parentCommentId: parentCommentId,
     commentBody: "",
+    userName:loggedInUserData?.userName || "",
     epNo: comment?.epNo,
     isSpoiler: false,
     gogoEpId: comment?.gogoEpId,
