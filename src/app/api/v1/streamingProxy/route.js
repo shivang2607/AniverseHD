@@ -1,4 +1,12 @@
+import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
+
+const options = {
+    max:2000,  // Maximum 2000 segments
+    ttl: 1000*60*30, // 30 minutes
+}
+const cache = new LRUCache(options)
+
 
 async function fetchWithCustomReferer(url) {
   if (!url) throw new Error("URL is required");
@@ -37,6 +45,12 @@ export async function GET(request) {
   }
 
   try {
+
+    if(cache.get(url)){
+        console.log("Streming proxy cache hit");
+        return NextResponse.json(cache.get(url));
+    }
+
     const response = await fetchWithCustomReferer(url);
     const contentType = response.headers.get("Content-Type");
     const isM3U8 = url.endsWith(".m3u8");
@@ -63,7 +77,10 @@ export async function GET(request) {
       });
     } else {
       // Handle segments (TS files)
-      return new NextResponse(await response.arrayBuffer(), {
+      segment_file = await response.arrayBuffer()
+
+      cache.set(url, segment_file);
+      return new NextResponse(segment_file, {
         status: 200,
         headers: {
           "Content-Type": "video/mp2t",
