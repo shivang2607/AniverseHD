@@ -3,6 +3,7 @@ import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 import getAnime from "../../anime/[id]/mainFunction";
 import redisClient from "@/lib/redis"; // Use the singleton instance directly
+import { fetchAnimepaheInfoByMalId } from "./fetchAnimeInfoByMalId";
 
 //? The commented code in the file is mostly of the gogo provider, since gogo has went down we can't do much about it and its not working as of writing this on 24/02/2025, the commented code for gogo is now deprecated.
 
@@ -72,6 +73,8 @@ export async function GET(req, { params }) {
       );
     }
 
+
+
     let maxEpisode = 0;
     let zoroEps = null;
 
@@ -97,10 +100,23 @@ export async function GET(req, { params }) {
       })
     );
 
+    //below code is for getting the episodes from the animepahe provider!
+
+    let animepaheEps = null;
+    const animepaheData = await fetchAnimepaheInfoByMalId(id, animeData?.Sites); // Fetch animepahe data (first it will check for the id in Sites, if not found which is super rare, it will fetch from mapper)
+    
+    if (animepaheData?.episodes) {
+      animepaheEps = animepaheData.episodes;
+    }
+
     const finalResponse = {
       zoro: {
         episodes: zoroEps?.episodes || [],
         totalEpisodes: zoroEps?.totalEpisodes || 0,
+      },
+      animepahe: {
+        episodes: animepaheEps || [],
+        totalEpisodes: animepaheData?.totalEpisodes || animepaheData?.episodes?.length || 0,
       },
       gogoSub: {
         episodes: [],
