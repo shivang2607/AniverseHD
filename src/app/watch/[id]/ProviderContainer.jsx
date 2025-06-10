@@ -16,6 +16,7 @@ import { RxDotFilled } from "react-icons/rx";
 import toast, { Toaster } from "react-hot-toast";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
+import ProviderSelect from "./ProviderSelect";
 
 
 
@@ -70,6 +71,7 @@ export default function ProviderContainer({
   serverData,
   // prov = "gogo",
   setSelectedProvider,
+  episodeIds,
   zoroEpisodeId, setZoroEpisodeId,
   gogoSubEpisodeId, setGogoSubEpisodeId,
   gogoDubEpisodeId, setGogoDubEpisodeId,
@@ -110,23 +112,22 @@ export default function ProviderContainer({
   // console.log("This is server data",serverData);
 
   useDebouncedEffect(() => {
-    if (!zoroEpisodeId && !gogoDubEpisodeId && !gogoSubEpisodeId) return;
+    if (!zoroEpisodeId && !episodeIds.zoro && !gogoDubEpisodeId && !gogoSubEpisodeId) return;
     
     fetchStreamingData({
-      episodeId: zoroEpisodeId,
-      gogoSubId: gogoSubEpisodeId,
-      gogoDubId: gogoDubEpisodeId,
+      episodeId: episodeIds.zoro,
+      animepahe_id: episodeIds.animepahe,
     });
-  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], 100, setStreamingData); // 50ms delay
+  }, [episodeIds, provider, dub, server], 100, setStreamingData); // 50ms delay
   
   
   const fetchStreamingData = async(ep)=>{
 
     setStreamLoading(true);
     try {
-      if(provider==="zoro" && ep?.episodeId){
+      if(provider==="zoro" && ep?.zoro_episodeId){
         setAnimeNotAvailable(false);
-        const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
+        const data = await axios.get(`/api/v1/${provider}/stream/${ep?.zoro_episodeId}`, {
           params: {
             category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
             server: server || 'hd-2'
@@ -138,25 +139,7 @@ export default function ProviderContainer({
         }
         setStreamingData(data?.data);
       }
-      else if(provider==="gogo" && (ep?.gogoDubId || ep?.gogoSubId)){
-        setAnimeNotAvailable(false);
-        try {
-          const data = await axios.get(`/api/v1/${provider}/stream/${dub ? ep?.gogoDubId : ep?.gogoSubId}`, {
-            params: {
-              server: server || ''
-            }
-          });
-          if(data?.data?.status){
-            toast.error("Anime not available, Try Another Server")
-            return;
-          }
-          setStreamingData(data?.data);
-          console.log("gogo ki streaming api vaala data", data);
-          
-        } catch (error) {
-          // toast.error(error.message);
-        }
-      }
+      
       
     } catch (error) {
       console.log("couldn't fetch streaming data, ",error);
@@ -189,36 +172,7 @@ export default function ProviderContainer({
       
 
       <div className="provider-server-select self-center flex flex-col gap-8">
-        <div className="button self-center flex gap-2 text-gray-200 ">
-          <Link
-            href = {updateParams([{key:"provider", val: "zoro"},{ key:"server", val:''}], false)}
-            scroll={false}
-            className={` text-lg font-semibold p-1 px-2 rounded-md ${
-              provider === "zoro" ? "bg-primary-100" : ""
-            }  `} 
-            onClick={() => {
-              setSelectedProvider("zoro");
-              
-              // setServerLoading(true);
-            }}
-          >
-            Provider-Z
-          </Link>
-          {/* //* The below Link component is of the Provider-G , Since GOGO has went down its not working as of now and the below Link component is now deprecated */}
-          {/* <Link
-            href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:''}], false)}
-            scroll={false}
-            className={` text-lg font-semibold p-1 px-2 rounded-md  ${
-              provider === "gogo" ? "bg-primary-100" : ""
-            } `}
-            onClick={() => {
-              setSelectedProvider("gogo");
-              // setServerLoading(true);
-            }}
-          >
-            Provider-G
-          </Link> */}
-        </div>
+        <ProviderSelect/>
 
         <div className="availableServers mx self-center flex flex-col">
         {(serverData?.sub) &&<div className="sub flex font-semibold text-sm items-center p-2 gap-4">
@@ -301,7 +255,7 @@ export default function ProviderContainer({
           className="rounded-md p-2 bg-cbg-300 mx-5 text-sm scrollbar-thin"
           value={episodeRangeIndex}
           onChange={(e) => setEpisodeRangeIndex(parseInt(e.target.value))}
-        >
+        >{console.log("episodes. are. =>", episodes)}
           {[...Array(Math.ceil(episodes?.length / episodesPerWindow))].map((e, i) => {
             // console.log(i);
             return (
@@ -326,16 +280,17 @@ export default function ProviderContainer({
               <Link
                 scroll={false}
                 href={updateParams([
-                  {key: "z-id", val: ep?.episodeId},
+                  {key: "z-id", val: ep?.zoro_episodeId},
+                  {key: "apahe-id", val: ep?.animepahe_id},
                   {key: "g-sub-id", val: ep?.gogoSubId},
                   {key: "g-dub-id", val: ep?.gogoDubId},
                   {key: "server", val:server},
                 ])}
-                key={ep?.episodeId}
+                key={ep?.zoro_episodeId}
                 className={`w-full   text-xs p-4 cursor-pointer my-1 rounded-md  tracking-wider  flex gap-2 ${
-                  (zoroEpisodeId === ep?.episodeId  && zoroEpisodeId) ||
-                  (gogoSubEpisodeId === ep?.gogoSubId && gogoSubEpisodeId) ||
-                  (gogoDubEpisodeId === ep?.gogoDubId && gogoDubEpisodeId)
+                  (episodeIds.zoro === ep?.zoro_episodeId  && episodeIds.zoro) ||
+                  (episodeIds.animepahe === ep?.animepahe_id && episodeIds.animepahe)
+                  
                     ? ep?.isFiller ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
                     : "font-[350] bg-black/30"
                 }
@@ -350,7 +305,7 @@ export default function ProviderContainer({
                   {" "}
                   Ep {ep?.number} :{" "}
                 </div>{" "}
-                {ep?.title}
+                {ep?.zoro_title || ep?.animepahe_title}
               </Link>
             );
           })}
