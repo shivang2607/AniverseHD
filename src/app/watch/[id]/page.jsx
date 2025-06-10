@@ -359,7 +359,7 @@ export default function Page({ params }) {
           console.log(
             `entered ${provider} server fetch block with data => `,
             provider,
-            episodeIds[provider]
+            episodeIds
           );
           if (episodeIds[provider]) {
             try {

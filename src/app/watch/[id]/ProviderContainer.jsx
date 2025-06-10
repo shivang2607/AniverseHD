@@ -255,7 +255,7 @@ export default function ProviderContainer({
           className="rounded-md p-2 bg-cbg-300 mx-5 text-sm scrollbar-thin"
           value={episodeRangeIndex}
           onChange={(e) => setEpisodeRangeIndex(parseInt(e.target.value))}
-        >{console.log("episodes. are. =>", episodes)}
+        >
           {[...Array(Math.ceil(episodes?.length / episodesPerWindow))].map((e, i) => {
             // console.log(i);
             return (
