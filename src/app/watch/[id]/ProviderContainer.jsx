@@ -17,6 +17,7 @@ import toast, { Toaster } from "react-hot-toast";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
 import ProviderSelect from "./ProviderSelect";
+import { providersConfig } from "./providersConfig";
 
 
 
@@ -125,6 +126,18 @@ export default function ProviderContainer({
 
     setStreamLoading(true);
     try {
+
+        if(episodeIds[provider]){
+          setAnimeNotAvailable(false);
+          const data = await providersConfig[provider].streamingData(
+            episodeIds[provider], 
+            { dub: dub || '', server: providersConfig[provider].hasServersApi ? server || 'hd-2' : undefined }
+          );
+          console.log("Streaming data fetched for provider using provider Config ===>:", provider, data);
+        }
+
+
+
       if(provider==="zoro" && ep?.zoro_episodeId){
         setAnimeNotAvailable(false);
         const data = await axios.get(`/api/v1/${provider}/stream/${ep?.zoro_episodeId}`, {
