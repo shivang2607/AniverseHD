@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const providersConfig = {
   'zoro' : {
     id: 'zoro',
@@ -5,6 +7,7 @@ export const providersConfig = {
     displayName: 'Zoro Provider',
     hasServersApi: true,
     hasMultipleIdsPerEpisode: false,
+    needsServerSideStreaming: true, // Zoro requires server-side streaming
     serverApiUrl: (episodeId) =>   `/api/v1/zoro/servers/${episodeId}`,
     streamingData : async (episodeId, { dub = '', server = 'hd-2' } = {}) => {
       try {
@@ -21,7 +24,7 @@ export const providersConfig = {
             tracks: data?.tracks || [],
             intro: data?.intro || null,
             outro: data?.outro || null,
-            headers: data?.headers || {},
+            headers: data?.headers || null,
           };
         }
 
@@ -40,6 +43,32 @@ export const providersConfig = {
     hasServersApi: false,
     hasMultipleIdsPerEpisode: false,
     serverApiUrl: null, // Animepahe does not have a servers API, it uses episode IDs directly,
+    needsServerSideStreaming: true,
+    streamingData: async (episodeId, {dub = false} = {}) => {
+      try {
+        const response = await axios.get(`/api/v2/animepahe/watch/${encodeURIComponent(episodeId)}`, {
+          
+        });
+
+        const data = response?.data;
+        console.log("value of dub as recieved in stremaing function :", dub);
+        console.log("AnimePahe Streaming Data in the obj of provider Config:", data);
+        if (data) {
+          return {
+            sources: data?.sources?.filter(src=>  src.isDub === (dub ==='1')) || [],
+            tracks: data?.tracks || [],
+            intro: data?.intro || null,
+            outro: data?.outro || null,
+            headers: data?.headers || null,
+          };
+        }
+
+        return null; // anime not available
+      } catch (err) {
+        console.error("AnimePahe Streaming Error:", err);
+        return null;
+      }
+    }
 
   },
 };
