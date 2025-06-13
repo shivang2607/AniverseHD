@@ -356,7 +356,7 @@ export default function ProviderContainer({
               >
                 <div className="font-medium text-nowrap ">
                   {" "}
-                  Ep {ep?.number} :{" "}
+                  Ep {ep?.number || ep?.episodeIndex || i} :{" "}
                 </div>{" "}
                 {ep?.zoro_title || ep?.animepahe_title}
               </Link>

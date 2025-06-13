@@ -4,7 +4,7 @@ async function fetchWithCustomReferer(url) {
   if (!url) throw new Error("URL is required");
   return fetch(url, {
     headers: {
-      "referer": "https://kwik.cx/",
+      "referer": "https://megacloud.club/",
       "User-Agent": "Mozilla/5.0",
     },
   });

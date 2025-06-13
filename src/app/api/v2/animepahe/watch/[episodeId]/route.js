@@ -7,8 +7,8 @@ import { NextResponse } from "next/server";
 export async function GET(req, { params }) {
   const episodeId = params.episodeId;
   try {
-    // console.log("Episode URL -> ", `${process.env.SCRAPER_URL}/anime/animepahe/watch?episodeId=${episodeId}`);
-    const data = await axios.get(`${process.env.SCRAPER_URL}/anime/animepahe/watch?episodeId=${episodeId}`);
+    console.log("Episode URL -> ", `${process.env.SCRAPER_URL}/anime/animepahe/watch?episodeId=${encodeURIComponent(episodeId)}`);
+    const data = await axios.get(`${process.env.SCRAPER_URL}/anime/animepahe/watch?episodeId=${encodeURIComponent(episodeId)}`);
     if(data?.data){
         return NextResponse.json(data?.data);
     }

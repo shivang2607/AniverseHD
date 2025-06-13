@@ -104,7 +104,7 @@ export async function GET(req, { params }) {
 
     let animepaheEps = null;
     const animepaheData = await fetchAnimepaheInfoByMalId(id, animeData?.Sites); // Fetch animepahe data (first it will check for the id in Sites, if not found which is super rare, it will fetch from mapper)
-    
+    console.log("animepahe data in the watch api is => ", animepaheData);
     if (animepaheData?.episodes) {
       animepaheEps = animepaheData.episodes;
     }
@@ -151,6 +151,7 @@ export async function GET(req, { params }) {
     if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to)) {
       console.log("Caching finished anime for 7 days in Redis");
       id && finalResponse?.zoro?.episodes?.length>0 &&
+      finalResponse?.animepahe?.episodes?.length>0 &&
         (await redisClient.set(
           `watch-${id}`,
           JSON.stringify(finalResponse),
@@ -159,7 +160,9 @@ export async function GET(req, { params }) {
         ));
     }
 
-    id && finalResponse?.zoro?.episodes?.length>0 && watchCache.set(`watch-${id}`, finalResponse);
+    console.log('final response from watch api route.', finalResponse)
+
+    id && finalResponse?.zoro?.episodes?.length>0 && finalResponse?.animepahe?.episodes?.length>0  && watchCache.set(`watch-${id}`, finalResponse);
     
     // Add cache control headers for 30 min server-side caching
     return new NextResponse(JSON.stringify(finalResponse), {

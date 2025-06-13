@@ -54,6 +54,7 @@ import { uniqueId } from "lodash";
 import Script from "next/script";
 import { GlobalScripts } from "@/components/GlobalScripts";
 import { providersConfig } from "./providersConfig";
+import ArtVideoPlayer from "./ArtVideoPlayer";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
@@ -244,7 +245,7 @@ export default function Page({ params }) {
         console.log("Using cached data for watch page:", cachedData);
         setEpisodesData(cachedData?.episodesData || []);
 
-        if (!zoroId && !animepaheId && !gogoSubId && !gogoDubId) {
+        if (!zoroId && !animepaheId) {
           //!new
           setEpisodeIds({
             zoro: cachedData?.episodesData?.[0]?.zoro_episodeId,
@@ -269,7 +270,7 @@ export default function Page({ params }) {
           return;
         }
 
-        const refinedData =  await mergeAnimeEpisodesData(data);
+        const refinedData = await mergeAnimeEpisodesData(data);
         setContent(refinedData);
         setEpisodesData(refinedData?.episodesData || []);
         console.log("This is refiend data -->", refinedData);
@@ -585,17 +586,22 @@ export default function Page({ params }) {
     if (config.needsServerSideStreaming) {
       setDownloadLink();
       console.log("Streaming data here here here  is ===", streamingData);
+
+      
       return `/api/v1/streamingProxy?url=${encodeURIComponent(
         streamingData?.sources?.[0]?.url
       )}`;
+    
+    
+
     } else {
       const qualityOrder = ["1080p", "720p", "480p", "360p"];
       for (const quality of qualityOrder) {
         const match = streamingData?.sources?.find((src) =>
           src?.quality?.includes(quality)
         );
-        console.log("src streaming data is ===", streamingData)
-        console.log("Match Url is => ",match);
+        console.log("src streaming data is ===", streamingData);
+        console.log("Match Url is => ", match);
         if (match?.url) return match.url;
       }
 
@@ -676,9 +682,28 @@ export default function Page({ params }) {
               ) : (
                 streamingSrc && (
                   <>
-                    <div class="pm_video" className="pm_video flex h-fit">
+                    <div  className="pm_video flex h-fit">
                       <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
-                        <MediaPlayer
+                        <ArtVideoPlayer
+                        key={uniqueId("art-video-")}
+                        getNextEpisode={getNextEpisode}
+                        getPrevEpisode={getPrevEpisode}
+                          src={streamingSrc}
+                          sources = {streamingData?.sources}
+                          title={"Monster Ep3" || content?.episodesData?.[epNo-1]?.zoro_title}
+                          thumbnails={
+                              streamingData?.tracks?.filter(
+                                (t) => t.kind === "thumbnails"
+                              )?.[0]?.file
+                            }
+                            subtitles={streamingData?.tracks}
+                            startTime={startTime}
+                            recentTimestampRef={recentTimestampRef}
+                            setAnimeNotAvailable = {setAnimeNotAvailable}
+                          
+                        />
+
+                        {/* <MediaPlayer
                           load="eager"
                           keyShortcuts={{
                             ...MEDIA_KEY_SHORTCUTS,
@@ -716,7 +741,10 @@ export default function Page({ params }) {
                           storage="media-player"
                           buffer
                           title={streamingData?.malId}
-                          src={streamingSrc}
+                          src={
+                            "https://aniversehd.com/api/v1/streamingProxy?url=https://vault-11.padorupado.ru/hls/11/06/cda74eaebce25a12f5e548f7c220bb5dc245700b0280bdb45ff98b2fe4803d2b/owo.m3u8" ||
+                            streamingSrc
+                          }
                           className="h-full"
                           playsInline={true}
                           crossOrigin
@@ -825,7 +853,7 @@ export default function Page({ params }) {
                             }}
                             icons={defaultLayoutIcons}
                           />
-                        </MediaPlayer>
+                        </MediaPlayer> */}
                       </div>
                     </div>
                   </>
@@ -922,7 +950,7 @@ export default function Page({ params }) {
                   <TbPlayerTrackNextFilled /> Next Episode
                 </button>} */}
 
-                  {recentTimestamp > 0 && (
+                  {/* { (
                     <ShareModal
                       t={recentTimestamp}
                       buttonText="Share this Scene"
@@ -930,8 +958,9 @@ export default function Page({ params }) {
                       title={`Checkout this Amazing Scene from ${
                         content?.title_english || content?.title
                       }`}
+                      onClick={()=>setRecentTimestamp(recentTimestampRef.current)}
                     />
-                  )}
+                  )} */}
                   <ShareModal
                     buttonText="Share this episode"
                     title={`Checkout this Amazing Episode from ${
@@ -980,6 +1009,8 @@ export default function Page({ params }) {
             }`}
           />
         )}
+
+        <Suggested id={params?.id} />
       </div>
     </>
   );
