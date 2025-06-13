@@ -134,7 +134,7 @@ export default function ArtVideoPlayer({
             Math.floor(t) % 5 === 0 &&
             Math.floor(t) !== Math.floor(recentTimestampRef.current)
           ) {
-            console.log("saving recent timestamp", recentTimestampRef.current);
+            // console.log("saving recent timestamp", recentTimestampRef.current);
             recentTimestampRef.current = t;
           }
         });

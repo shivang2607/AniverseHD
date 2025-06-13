@@ -261,7 +261,7 @@ export default function Page({ params }) {
         const response = await axios.get(`/api/v1/watch/${params?.id}`);
         const data = response?.data;
 
-        console.log("Response data for watch api:", data);
+        console.log("Response data for watch api:", data);  
         // Check if the data object has an 'error' key
         if (data?.error) {
           console.error(`Error in response data for ${provider}:`, data.error);
