@@ -191,7 +191,7 @@ export default function ArtVideoPlayer({
   return (
     <div
       ref={artRef}
-      className="w-full h-full rounded-2xl overflow-hidden shadow-lg"
+      className="w-full h-full flex rounded-2xl overflow-hidden shadow-lg min-h-[300px]"
     />
   );
 }

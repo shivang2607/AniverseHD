@@ -142,6 +142,26 @@ export default function Page({ params }) {
     return () => {
       const f = async () => {
         const content = contentRef.current;
+        console.log({
+          watchListId: RecentWatchListId,
+          url: currentAbsoluteURL.current,
+          episodeTimestamp: recentTimestampRef.current,
+          duration: durationRef.current,
+          animeId: `${params?.id}`,
+          animeName: content?.title_english || content?.title,
+          animePhoto: content?.main_picture || content?.images || {},
+          animeGenre: content?.genres || [],
+          animeType: content?.type || "NA",
+          animeScore: content?.score || "NA",
+          animeAgeRating: content?.rating || "NA",
+          animeStartYear:
+            Math.floor(
+              content?.aired?.prop?.from?.year ||
+                content?.start_year ||
+                content?.year
+            ) || "NA",
+          animeLength: content?.episodes || content?.episode || null,
+        })
         const result = await AddAnimeToWatchList({
           watchListId: RecentWatchListId,
           url: currentAbsoluteURL.current,
@@ -683,7 +703,7 @@ export default function Page({ params }) {
                 streamingSrc && (
                   <>
                     <div  className="pm_video flex h-fit">
-                      <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
+                      <div className="stream block bg-black md:h-[85vh] h-[40vh] w-full justify-center items-center rounded my-4">
                         <ArtVideoPlayer
                         key={uniqueId("art-video-")}
                         getNextEpisode={getNextEpisode}
@@ -986,9 +1006,7 @@ export default function Page({ params }) {
             </div>
           </div>
 
-          <div className="md:hidden block my-12">
-            <Metadata content={content} id={params?.id} />
-          </div>
+          
           {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
         </div>
 

@@ -103,7 +103,7 @@ export async function GET(req, { params }) {
     //below code is for getting the episodes from the animepahe provider!
 
     let animepaheEps = null;
-    console.log("Entering the fetchAnimepaheInfoByMalId");  
+    console.log("Entering the fetchAnimepaheInfoByMalId");   
     const animepaheData = await fetchAnimepaheInfoByMalId(id, animeData?.Sites); // Fetch animepahe data (first it will check for the id in Sites, if not found which is super rare, it will fetch from mapper)
     console.log("animepahe data in the watch api is => ", animepaheData);
     if (animepaheData?.episodes) {
