@@ -142,26 +142,7 @@ export default function Page({ params }) {
     return () => {
       const f = async () => {
         const content = contentRef.current;
-        console.log({
-          watchListId: RecentWatchListId,
-          url: currentAbsoluteURL.current,
-          episodeTimestamp: recentTimestampRef.current,
-          duration: durationRef.current,
-          animeId: `${params?.id}`,
-          animeName: content?.title_english || content?.title,
-          animePhoto: content?.main_picture || content?.images || {},
-          animeGenre: content?.genres || [],
-          animeType: content?.type || "NA",
-          animeScore: content?.score || "NA",
-          animeAgeRating: content?.rating || "NA",
-          animeStartYear:
-            Math.floor(
-              content?.aired?.prop?.from?.year ||
-                content?.start_year ||
-                content?.year
-            ) || "NA",
-          animeLength: content?.episodes || content?.episode || null,
-        })
+        
         const result = await AddAnimeToWatchList({
           watchListId: RecentWatchListId,
           url: currentAbsoluteURL.current,
@@ -281,7 +262,7 @@ export default function Page({ params }) {
         const response = await axios.get(`/api/v1/watch/${params?.id}`);
         const data = response?.data;
 
-        console.log("Response data for watch api:", data);  
+          
         // Check if the data object has an 'error' key
         if (data?.error) {
           console.error(`Error in response data for ${provider}:`, data.error);
@@ -293,7 +274,7 @@ export default function Page({ params }) {
         const refinedData = await mergeAnimeEpisodesData(data);
         setContent(refinedData);
         setEpisodesData(refinedData?.episodesData || []);
-        console.log("This is refiend data -->", refinedData);
+        
 
         // Set session with 30-minute expiry
         setSessionWithExpiry(`watch-${params.id}`, refinedData, 1000 * 60 * 30);
@@ -355,7 +336,7 @@ export default function Page({ params }) {
           `serverData-${provider}-${episodeIds[provider]}` // episodeIds[provider] yaani ki episode id us provider ki for example agar provider zoro h to zoro ki episode id
         );
         if (cachedServerData) {
-          console.log("cached servers data : ", cachedServerData);
+          // console.log("cached servers data : ", cachedServerData);
           // if sub is not available then cahnge the default server and dub flag to the raw
           router.replace(
             updateParams(
@@ -605,7 +586,7 @@ export default function Page({ params }) {
     const config = providersConfig[provider];
     if (config.needsServerSideStreaming) {
       setDownloadLink();
-      console.log("Streaming data here here here  is ===", streamingData);
+      
 
       
       return `/api/v1/streamingProxy?url=${encodeURIComponent(
@@ -620,8 +601,7 @@ export default function Page({ params }) {
         const match = streamingData?.sources?.find((src) =>
           src?.quality?.includes(quality)
         );
-        console.log("src streaming data is ===", streamingData);
-        console.log("Match Url is => ", match);
+        
         if (match?.url) return match.url;
       }
 
@@ -709,6 +689,7 @@ export default function Page({ params }) {
                         getNextEpisode={getNextEpisode}
                         getPrevEpisode={getPrevEpisode}
                           src={streamingSrc}
+                          setDuration={setDuration}
                           sources = {streamingData?.sources}
                           title={"Monster Ep3" || content?.episodesData?.[epNo-1]?.zoro_title}
                           thumbnails={

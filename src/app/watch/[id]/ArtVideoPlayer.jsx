@@ -12,6 +12,7 @@ export default function ArtVideoPlayer({
   getNextEpisode,
   getPrevEpisode,
   defaultQuality = "1080p",
+  setDuration,
   sources,
   title,
   poster,
@@ -127,6 +128,10 @@ export default function ArtVideoPlayer({
 
       try {
         const art = new Artplayer(option);
+
+        art.on('ready', ()=>{
+          setDuration(art.duration);
+        })
 
         art.on("video:timeupdate", () => {
           const t = art.currentTime;

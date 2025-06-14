@@ -1,36 +1,51 @@
 // lib/fetchAnimepaheInfoByMalId.js
 
 import axios from "axios";
+import { LRUCache } from "lru-cache";
+
+// LRU cache config
+const animepaheInfoCache = new LRUCache({
+  max: 300,
+  ttl: 1000 * 60 * 15, // 15 minutes
+});
 
 export async function fetchAnimepaheInfoByMalId(malId, Sites) {
-
   if (!malId) throw new Error("No MAL ID provided.");
 
-  try {
-    // Step 1: Fetch animepahe ID from Sites, otherwise from mapper
-    let animepaheId = null;
-    if(Sites?.animepahe?.sub) {
-        animepaheId = Sites.animepahe.sub;
-        console.log("AnimePahe ID found in Sites:", animepaheId);
-    }
-    else{
-    const mapRes = await axios.get(
-      `${process.env.MAPPER_URL}/anime/mappings/mal_id/${malId}`
-    );
+  const cacheKey = `animepahe-info-${malId}`;
+  const cached = animepaheInfoCache.get(cacheKey);
+  if (cached) {
+    console.log("✅ LRU Cache hit for Animepahe info:", malId);
+    return cached;
+  }
 
-    animepaheId = mapRes?.data?.animepahe?.sub || null;
+  try {
+    // Step 1: Get AnimePahe ID
+    let animepaheId = null;
+
+    if (Sites?.animepahe?.sub) {
+      animepaheId = Sites.animepahe.sub;
+    } else {
+      const mapRes = await axios.get(
+        `${process.env.MAPPER_URL}/anime/mappings/mal_id/${malId}`
+      );
+      animepaheId = mapRes?.data?.animepahe?.sub || null;
     }
 
     if (!animepaheId) {
       throw new Error("Animepahe ID not found for this MAL ID.");
     }
 
-    // Step 2: Fetch full animepahe info
+    // Step 2: Fetch AnimePahe info
     const infoUrl = `${process.env.SCRAPER_URL}/anime/animepahe/info/${animepaheId}`;
-    console.log(`🔍 Fetching AnimePahe Info: ${infoUrl}`);
-
     const infoRes = await axios.get(infoUrl);
-    return infoRes?.data;
+
+    if (infoRes?.data) {
+      animepaheInfoCache.set(cacheKey, infoRes.data);
+      return infoRes.data;
+    } else {
+      throw new Error("Animepahe info not found.");
+    }
   } catch (error) {
     console.error("❌ Failed to fetch AnimePahe info:", error?.message);
     throw new Error(

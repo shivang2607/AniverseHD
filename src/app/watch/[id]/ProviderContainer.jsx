@@ -135,7 +135,7 @@ export default function ProviderContainer({
             episodeIds[provider], 
             { dub: dub || '', server: providersConfig[provider].hasServersApi ? server || 'hd-2' : undefined }
           );
-          console.log("Streaming data fetched for provider using provider Config ===>:", provider, data);
+          
           setStreamingData(data);
         }
         else { //for block providers like animepahe which don't have servers api
@@ -143,7 +143,7 @@ export default function ProviderContainer({
             episodeIds[provider], 
             { dub: dub === "-1" ? false : dub } //if dub is false means its raw means dub will be false, if dub is null then means its false also if dub is non empty or non null value then atutomatically means its true
           );
-          console.log("Streaming data fetched for provider like animepahe without server api using provider Config ===>:", provider, data);
+          
           setStreamingData(data);
         }
           setStreamLoading(false);
@@ -189,7 +189,7 @@ export default function ProviderContainer({
   }
   
 
-  // console.log("this is content  :", content);
+  // console.log("this is console.logcontent  :", content);
 
   return (
     <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">

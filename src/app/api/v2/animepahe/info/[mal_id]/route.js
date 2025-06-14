@@ -16,7 +16,6 @@ export async function GET(req, { params }) {
     }
 
     // get the info of the anime from animepahe api
-    console.log(`url -> ${process.env.SCRAPER_URL}/anime/animepahe/info/${animepaheId}`);
     const resp = await axios.get(`${process.env.SCRAPER_URL}/anime/animepahe/info/${animepaheId}`);
     return NextResponse.json(resp?.data);
 

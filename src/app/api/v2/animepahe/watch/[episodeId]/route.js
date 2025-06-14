@@ -23,7 +23,7 @@ export async function GET(req, { params }) {
 
   try {
     const url = `${process.env.SCRAPER_URL}/anime/animepahe/watch?episodeId=${encodeURIComponent(episodeId)}`;
-    console.log("Episode URL ->", url);
+    
     
     const { data } = await axios.get(url);
 

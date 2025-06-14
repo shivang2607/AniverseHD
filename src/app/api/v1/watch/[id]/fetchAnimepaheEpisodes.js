@@ -1,10 +1,24 @@
 // lib/fetchAnimepaheEpisode.ts
 
 import axios from "axios";
+import { LRUCache } from "lru-cache";
+
+// LRU cache config
+const episodeCache = new LRUCache({
+  max: 500,
+  ttl: 1000 * 60 * 15, // 15 minutes
+});
 
 export async function fetchAnimepaheEpisode(episodeId) {
   if (!episodeId) {
     throw new Error("No episodeId provided.");
+  }
+
+  const cacheKey = `animepahe-ep-${episodeId}`;
+  const cached = episodeCache.get(cacheKey);
+  if (cached) {
+    console.log("✅ LRU Cache hit for Animepahe episode:", episodeId);
+    return cached;
   }
 
   try {
@@ -13,6 +27,7 @@ export async function fetchAnimepaheEpisode(episodeId) {
     );
 
     if (response?.data) {
+      episodeCache.set(cacheKey, response.data);
       return response.data;
     } else {
       throw new Error("Episode not found.");

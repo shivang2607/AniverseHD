@@ -17,7 +17,7 @@ export const providersConfig = {
         });
 
         const data = response?.data;
-        console.log("Zoro Streaming Data in the obj of provider Config:", data);
+        
         if (!data?.status) {
           return {
             sources: data?.sources || [],
@@ -51,8 +51,6 @@ export const providersConfig = {
         });
 
         const data = response?.data;
-        console.log("value of dub as recieved in stremaing function :", dub);
-        console.log("AnimePahe Streaming Data in the obj of provider Config:", data);
         if (data) {
           return {
             sources: data?.sources?.filter(src=>  src.isDub === (dub ==='1')) || [],
