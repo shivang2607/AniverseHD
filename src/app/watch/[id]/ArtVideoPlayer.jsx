@@ -6,6 +6,9 @@ import Hls from "hls.js";
 import { toast } from "react-hot-toast";
 
 Artplayer.USE_RAF = true;
+Artplayer.MOBILE_CLICK_PLAY = true;
+Artplayer.ASPECT_RATIO = ['default', '4:3', '16:9', '18:9', '21:9'];
+
 
 export default function ArtVideoPlayer({
   src,
@@ -20,6 +23,7 @@ export default function ArtVideoPlayer({
   thumbnails,
   startTime,
   recentTimestampRef,
+  mediaPlayerState
 }) {
   const artRef = useRef(null);
   const playerRef = useRef(null);
@@ -49,9 +53,18 @@ export default function ArtVideoPlayer({
     const timer = setTimeout(() => {
       if (!artRef.current) return;
 
+      const qualities = sources?.map((source) => ({
+        html: source?.quality,
+        url: `/api/v1/streamingProxy?url=${source?.url}`,
+        default: source?.quality.includes(defaultQuality),
+        width: '10px'
+      }));
+
+      const defaultSource = qualities?.find(q => q.default);
+
       const option = {
         container: artRef.current,
-        url: src,
+        url: defaultSource?.url || src,
         type: "m3u8",
         title: title || "TITLE",
         poster: poster || "",
@@ -69,10 +82,7 @@ export default function ArtVideoPlayer({
         autoOrientation: true,
         airplay: true,
         theme: "#7289da",
-        quality: sources?.map((source) => ({
-          html: source?.quality,
-          url: `/api/v1/streamingProxy?url=${source?.url}`,
-        })),
+        quality: qualities,
         moreVideoAttr: {
           crossOrigin: "anonymous",
         },
@@ -108,10 +118,8 @@ export default function ArtVideoPlayer({
 
             video.onerror = () => {
               console.error("Video playback failed");
-              // toast.error("Streaming Source not available. Try another Server or Provider!");
             };
 
-            // ⏩ Seek once video metadata is available
             video.onloadedmetadata = () => {
               try {
                 if (startTime && !isNaN(startTime)) {
@@ -126,12 +134,16 @@ export default function ArtVideoPlayer({
         },
       };
 
+
+
       try {
         const art = new Artplayer(option);
 
-        art.on('ready', ()=>{
+        art.on("ready", () => {
           setDuration(art.duration);
-        })
+
+          
+        });
 
         art.on("video:timeupdate", () => {
           const t = art.currentTime;
@@ -139,7 +151,6 @@ export default function ArtVideoPlayer({
             Math.floor(t) % 5 === 0 &&
             Math.floor(t) !== Math.floor(recentTimestampRef.current)
           ) {
-            // console.log("saving recent timestamp", recentTimestampRef.current);
             recentTimestampRef.current = t;
           }
         });
@@ -151,8 +162,9 @@ export default function ArtVideoPlayer({
             tag === "textarea" ||
             document.activeElement.isContentEditable;
           if (isTyping) return;
-
+          
           const key = event.key.toLowerCase();
+          if (key === " ") return;
 
           switch (key) {
             case "f":
@@ -179,6 +191,10 @@ export default function ArtVideoPlayer({
               break;
           }
         });
+
+        art.on("video:ended", ()=>{
+          mediaPlayerState?.isAutoNext && getNextEpisode();
+        })
 
         playerRef.current = art;
       } catch (error) {

@@ -701,6 +701,7 @@ export default function Page({ params }) {
                             startTime={startTime}
                             recentTimestampRef={recentTimestampRef}
                             setAnimeNotAvailable = {setAnimeNotAvailable}
+                            mediaPlayerState={mediaPlayerState}
                           
                         />
 
