@@ -46,18 +46,18 @@ export async function GET(request) {
 
   try {
 
-    if (cache.get(url)) {
-        console.log("Streaming proxy cache hit");
-        const segment_file = cache.get(url);
-        return new NextResponse(segment_file, {
-            status: 200,
-            headers: {
-                "Content-Type": "video/mp2t",
-                "Cache-Control": "public, max-age=31536000, immutable",
-                "Access-Control-Allow-Origin": "*",
-            },
-        });
-    }
+    // if (cache.get(url)) {
+    //     console.log("Streaming proxy cache hit");
+    //     const segment_file = cache.get(url);
+    //     return new NextResponse(segment_file, {
+    //         status: 200,
+    //         headers: {
+    //             "Content-Type": "video/mp2t",
+    //             "Cache-Control": "public, max-age=31536000, immutable",
+    //             "Access-Control-Allow-Origin": "*",
+    //         },
+    //     });
+    // }
 
     const response = await fetchWithCustomReferer(url);
     const contentType = response.headers.get("Content-Type");
@@ -85,11 +85,11 @@ export async function GET(request) {
       });
     } else {
       // Handle segments (TS files)
-      let segment_file = cache.get(url);
-      if (!segment_file) {
-        segment_file = Buffer.from(await response.arrayBuffer());
-        cache.set(url, segment_file);
-      }
+      // let segment_file = cache.get(url);
+      // if (!segment_file) {
+      //   segment_file = Buffer.from(await response.arrayBuffer());
+      //   cache.set(url, segment_file);
+      // }
       return new NextResponse(segment_file, {
         status: 200,
         headers: {
