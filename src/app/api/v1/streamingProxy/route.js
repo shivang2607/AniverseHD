@@ -90,7 +90,7 @@ export async function GET(request) {
       //   segment_file = Buffer.from(await response.arrayBuffer());
       //   cache.set(url, segment_file);
       // }
-      return new NextResponse(segment_file, {
+      return new NextResponse(Buffer.from(await response.arrayBuffer()), {
         status: 200,
         headers: {
           "Content-Type": "video/mp2t",
