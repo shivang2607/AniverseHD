@@ -133,9 +133,8 @@ export default function ProviderContainer({
           if(providersConfig[provider]?.hasServersApi){
           const data = await providersConfig[provider].streamingData(
             episodeIds[provider], 
-            { dub: dub || '', server: providersConfig[provider].hasServersApi ? server || 'hd-2' : undefined }
+            { dub: dub || '', server: providersConfig[provider].hasServersApi ? server || providersConfig[provider].defaultServer : undefined }
           );
-          
           setStreamingData(data);
         }
         else { //for block providers like animepahe which don't have servers api
@@ -205,6 +204,7 @@ export default function ProviderContainer({
         <div className="availableServers mx self-center flex flex-col">
   {
     providersConfig[provider]?.hasServersApi ? (
+      // console.log("This is server data just above the rendering component => ",serverData),
       <>
         {/* SUB or RAW */}
         {(serverData?.sub || serverData?.raw) && (
