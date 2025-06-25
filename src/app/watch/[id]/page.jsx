@@ -352,40 +352,41 @@ export default function Page({ params }) {
             );
           // return;
         } else {
-          console.log(
-            `entered ${provider} server fetch block with data => `,
-            provider,
-            episodeIds
-          );
+          // console.log(
+          //   `entered ${provider} server fetch block with data => `,
+          //   provider,
+          //   episodeIds
+          // );
           if (episodeIds[provider]) {
             try {
               // Make the API call to get the server data
               const serverData = await axios.get(
                 providersConfig[provider]?.serverApiUrl(episodeIds[provider])
               );
-              console.log(`This is ${provider} server data: `, serverData);
+              // console.log(`This is ${provider} server data: `, serverData);
 
               // Ensure the server data exists and has the expected structure
-              if (serverData?.data?.data) {
+              // ! the new api returns the data in a different format
+              if (serverData?.data) {
                 // Update the router URL parameters (e.g., dub value)
                 router.replace(
                   updateParams(
-                    [{ key: "dub", val: updateDubVal(serverData?.data?.data) }],
+                    [{ key: "dub", val: updateDubVal(serverData?.data) }],
                     false
                   )
                 );
 
                 // Set the server data and server name
-                setServerData(serverData?.data?.data);
+                setServerData(serverData?.data);
                 setServer(
-                  serverData?.data?.data?.sub?.[2]?.serverName ||
-                    serverData?.data?.data?.raw?.[0]?.serverName
+                  serverData?.data?.sub?.[2]?.serverName ||
+                    serverData?.data?.raw?.[0]?.serverName
                 );
 
                 // Cache the server data with an expiry of 2 hours
                 setSessionWithExpiry(
                   `serverData-${provider}-${episodeIds[provider]}`,
-                  serverData?.data?.data,
+                  serverData?.data,
                   1000 * 60 * 60 * 2 // 2 hours expiry
                 );
               } else {
@@ -587,11 +588,9 @@ export default function Page({ params }) {
     if (config.needsServerSideStreaming) {
       setDownloadLink();
       
-
-      
-      return `/api/v1/streamingProxy?url=${encodeURIComponent(
+      return `/api/v1/streamingProxy?url=${
         streamingData?.sources?.[0]?.url
-      )}`;
+      }`;
     
     
 
@@ -613,6 +612,7 @@ export default function Page({ params }) {
     () => getStreamingSource(),
     [provider, streamingData]
   );
+
 
   //In case if dub is not available for a episode the we will automatically change the router to the sub..this function utility handles the dub val (either 1, 0, -1)
   const updateDubVal = (serData) => {
@@ -691,13 +691,17 @@ export default function Page({ params }) {
                           src={streamingSrc}
                           setDuration={setDuration}
                           sources = {streamingData?.sources}
+                          intro={streamingData?.intro}
+                          outro={streamingData?.outro}
+                          isAutoSkip={mediaPlayerState?.isAutoSkip}
                           title={"Monster Ep3" || content?.episodesData?.[epNo-1]?.zoro_title}
-                          thumbnails={
+                          thumbnail={
+                            process.env.NEXT_PUBLIC_GOOD_PROXY +
                               streamingData?.tracks?.filter(
                                 (t) => t.kind === "thumbnails"
                               )?.[0]?.file
                             }
-                            subtitles={streamingData?.tracks}
+                            subtitles={streamingData?.tracks?.filter(tr => tr?.kind === 'captions')}
                             startTime={startTime}
                             recentTimestampRef={recentTimestampRef}
                             setAnimeNotAvailable = {setAnimeNotAvailable}
