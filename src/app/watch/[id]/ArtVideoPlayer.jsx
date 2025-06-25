@@ -72,7 +72,7 @@ export default function ArtVideoPlayer({
       const qualities = sources?.map((source) => ({
         html: source?.quality || "Auto",
         url: `/api/v1/streamingProxy?url=${source?.url}`,
-        default: source?.quality?.includes(defaultQuality) || true,
+        default: source?.quality?.includes(defaultQuality) || false,
         width: "10px",
       }));
 
