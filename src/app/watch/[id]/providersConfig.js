@@ -1,24 +1,66 @@
 import axios from "axios";
 
+
+/**
+ * Transforms an array of server entries into an object grouped by type.
+ *
+ * Server api Output format:
+ * {
+ *     sub: [ // All 'sub' type entries
+ *       {
+ *         type: "sub",           // original type
+ *         serverName: "HD-1"     // human-readable server name
+ *        ...other data 
+ *       },
+ *       ...
+ *     ],
+ *     dub: [ // All 'dub' type entries
+ *       {
+ *         type: "dub",           // original type
+ *         serverName: "HD-1"     // human-readable server name
+ *        ...other data 
+ *       },
+ *       ...
+ *     ],
+ *     raw: [ // All 'raw' type entries if available 
+ *       {
+ *         type: "raw",           // original type
+ *         serverName: "HD-1"     // human-readable server name
+ *        ...other data 
+ *       ...
+ *      }], 
+ *  }
+ *   
+ * 
+ */
+
+
 export const providersConfig = {
   'zoro' : {
     id: 'zoro',
     name: 'Provider-Z',
     displayName: 'Zoro Provider',
     hasServersApi: true,
+    defaultServer: 'HD-2',
     hasMultipleIdsPerEpisode: false,
     needsServerSideStreaming: true, // Zoro requires server-side streaming
-    serverApiUrl: (episodeId) =>   `/api/v1/zoro/servers/${episodeId}`,
+    serverApiUrl: (episodeId) =>   `/api/v2/zoro/servers/${episodeId}`,
     streamingData : async (episodeId, { dub = '', server = 'hd-2' } = {}) => {
       try {
-        const category = dub === "-1" ? "raw" : "dub" || "sub";
-        const response = await axios.get(`/api/v1/zoro/stream/${episodeId}`, {
-          params: { category, server }
+        const category = dub === "-1" ? "raw" : dub ? "dub" : "sub";
+        const response = await axios.get(`/api/v2/zoro/watch/${episodeId}`, {
+          params: { type: category, server }
         });
 
+        //below is the response from the api of v1 version which was aniwatch-api scraper by Ritesh
+        // const response = await axios.get(`/api/v1/zoro/stream/${episodeId}`, {
+        //   params: { category, server }
+        // });
+        // console.log("Zoro Streaming Response from providers config:", response?.data);
         const data = response?.data;
         
-        if (!data?.status) {
+        
+        if (data?.sources?.length>0) {
           return {
             sources: data?.sources || [],
             tracks: data?.tracks || [],
@@ -41,6 +83,7 @@ export const providersConfig = {
     name: 'Provider-A',
     displayName: 'Animepahe Provider',
     hasServersApi: false,
+    defaultServer: null, 
     hasMultipleIdsPerEpisode: false,
     serverApiUrl: null, // Animepahe does not have a servers API, it uses episode IDs directly,
     needsServerSideStreaming: true,
