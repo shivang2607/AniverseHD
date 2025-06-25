@@ -59,7 +59,7 @@ export const providersConfig = {
         // console.log("Zoro Streaming Response from providers config:", response?.data);
         const data = response?.data;
         
-        //!below format is  incomplete as the new api returns the response in a different format
+        
         if (data?.sources?.length>0) {
           return {
             sources: data?.sources || [],
