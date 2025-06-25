@@ -81,7 +81,7 @@ export default function ArtVideoPlayer({
       const playerSettings = [];
       const playerControls = [];
 
-      console.log("subtitles lenght => ", subtitles)
+      
       if (subtitles?.length > 0) {
         playerSettings.push({
           html: "Captions",
