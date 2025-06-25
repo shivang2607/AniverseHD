@@ -463,8 +463,8 @@ export default function Page({ params }) {
         (episodeIds.animepahe && ep.animepahe_id === episodeIds.animepahe)
     );
 
-    if (currentIndex !== -1 && currentIndex < episodesData.length - 1) {
-      const ep = episodesData[currentIndex + 1]; // Return the next episode's ID
+    if (currentIndex !== -1 && currentIndex < episodesData?.length - 1) {
+      const ep = episodesData?.[currentIndex + 1]; // Return the next episode's ID
       const url = updateParams([
         { key: "z-id", val: ep?.zoro_episodeId },
         { key: "apahe-id", val: ep?.animepahe_id },
