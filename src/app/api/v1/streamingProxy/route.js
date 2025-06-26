@@ -1,4 +1,12 @@
+import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
+
+const options = {
+    max:2000,  // Maximum 2000 segments
+    ttl: 1000*60*30, // 30 minutes
+}
+const cache = new LRUCache(options)
+
 
 async function fetchWithCustomReferer(url) {
   if (!url) throw new Error("URL is required");
@@ -37,6 +45,20 @@ export async function GET(request) {
   }
 
   try {
+
+    // if (cache.get(url)) {
+    //     console.log("Streaming proxy cache hit");
+    //     const segment_file = cache.get(url);
+    //     return new NextResponse(segment_file, {
+    //         status: 200,
+    //         headers: {
+    //             "Content-Type": "video/mp2t",
+    //             "Cache-Control": "public, max-age=31536000, immutable",
+    //             "Access-Control-Allow-Origin": "*",
+    //         },
+    //     });
+    // }
+
     const response = await fetchWithCustomReferer(url);
     const contentType = response.headers.get("Content-Type");
     const isM3U8 = url.endsWith(".m3u8");
@@ -63,7 +85,12 @@ export async function GET(request) {
       });
     } else {
       // Handle segments (TS files)
-      return new NextResponse(await response.arrayBuffer(), {
+      // let segment_file = cache.get(url);
+      // if (!segment_file) {
+      //   segment_file = Buffer.from(await response.arrayBuffer());
+      //   cache.set(url, segment_file);
+      // }
+      return new NextResponse(Buffer.from(await response.arrayBuffer()), {
         status: 200,
         headers: {
           "Content-Type": "video/mp2t",

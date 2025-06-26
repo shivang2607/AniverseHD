@@ -246,6 +246,8 @@ export default function ArtVideoPlayer({
         },
       };
 
+
+
       try {
         const art = new Artplayer(option);
 
@@ -303,7 +305,7 @@ export default function ArtVideoPlayer({
             tag === "textarea" ||
             document.activeElement.isContentEditable;
           if (isTyping) return;
-
+          
           const key = event.key.toLowerCase();
           if (key === " ") return;
 
