@@ -43,7 +43,7 @@ import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import HandleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
 import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
-import { getAbsoluteURLPath } from "./utilFunctions";
+import { getAbsoluteURLPath, mergeAnimeEpisodesData } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
@@ -53,10 +53,13 @@ import CommentsContainer from "@/components/comments/CommentsContainer";
 import { uniqueId } from "lodash";
 import Script from "next/script";
 import { GlobalScripts } from "@/components/GlobalScripts";
+import { providersConfig } from "./providersConfig";
+import ArtVideoPlayer from "./ArtVideoPlayer";
 
 export default function Page({ params }) {
   const searchParams = useSearchParams();
   const zoroId = searchParams.get("z-id") || null;
+  const animepaheId = searchParams.get("apahe-id") || null;
   const gogoSubId = searchParams.get("g-sub-id") || null;
   const gogoDubId = searchParams.get("g-dub-id") || null;
   const provider = searchParams.get("provider") || "zoro";
@@ -78,6 +81,8 @@ export default function Page({ params }) {
   const {
     episodesData,
     setEpisodesData,
+    episodeIds,
+    setEpisodeIds,
     streamingData,
     setStreamingData,
     selectedProvider,
@@ -137,6 +142,7 @@ export default function Page({ params }) {
     return () => {
       const f = async () => {
         const content = contentRef.current;
+        
         const result = await AddAnimeToWatchList({
           watchListId: RecentWatchListId,
           url: currentAbsoluteURL.current,
@@ -211,6 +217,10 @@ export default function Page({ params }) {
       return;
     }
     setServer(serverV);
+    setEpisodeIds({
+      zoro: zoroId,
+      animepahe: animepaheId,
+    });
     setZoroEpisodeId(zoroId);
     setGogoDubEpisodeId(gogoDubId);
     setSelectedProvider(provider);
@@ -221,7 +231,7 @@ export default function Page({ params }) {
     // console.log("Hello world!!",provider, episodeId, selectedEpisodeId);
 
     return () => {};
-  }, [provider, zoroId, gogoSubId, gogoDubId, serverV, dubV]);
+  }, [provider, zoroId, animepaheId, gogoSubId, gogoDubId, serverV, dubV]);
 
   //below functions gets the necessary data from both provider like episodes content at the page load, mergeProviderData is used in this useEffect
   useEffect(() => {
@@ -233,17 +243,15 @@ export default function Page({ params }) {
       const cachedData = getSessionWithExpiry(`watch-${params.id}`);
       if (cachedData) {
         setContent(cachedData);
+        console.log("Using cached data for watch page:", cachedData);
+        setEpisodesData(cachedData?.episodesData || []);
 
-        mergeProviderData(
-          cachedData?.zoro,
-          cachedData?.gogoDub,
-          cachedData?.gogoSub
-        );
-
-        if (!zoroId && !gogoSubId && !gogoDubId) {
-          setZoroEpisodeId(cachedData?.zoro?.episodes?.[0]?.episodeId);
-          setGogoSubEpisodeId(cachedData?.gogoSub?.episodes?.[0]?.id);
-          setGogoDubEpisodeId(cachedData?.gogoDub?.episodes?.[0]?.id);
+        if (!zoroId && !animepaheId) {
+          //!new
+          setEpisodeIds({
+            zoro: cachedData?.episodesData?.[0]?.zoro_episodeId,
+            animepahe: cachedData?.episodesData?.[0]?.animepahe_id,
+          });
         }
         // console.log(cachedData);
 
@@ -254,6 +262,7 @@ export default function Page({ params }) {
         const response = await axios.get(`/api/v1/watch/${params?.id}`);
         const data = response?.data;
 
+          
         // Check if the data object has an 'error' key
         if (data?.error) {
           console.error(`Error in response data for ${provider}:`, data.error);
@@ -262,18 +271,27 @@ export default function Page({ params }) {
           return;
         }
 
-        setContent(data);
-        // console.log("This is content data", response, data);
+        const refinedData = await mergeAnimeEpisodesData(data);
+        setContent(refinedData);
+        setEpisodesData(refinedData?.episodesData || []);
+        
 
         // Set session with 30-minute expiry
-        setSessionWithExpiry(`watch-${params.id}`, data, 1000 * 60 * 30);
+        setSessionWithExpiry(`watch-${params.id}`, refinedData, 1000 * 60 * 30);
 
         // Merge provider data only if keys are available in data
-        mergeProviderData(data?.zoro, data?.gogoDub, data?.gogoSub);
-        if (!zoroId && !gogoSubId && !gogoDubId) {
-          setZoroEpisodeId(data?.zoro?.episodes?.[0]?.episodeId);
-          setGogoSubEpisodeId(data?.gogoSub?.episodes?.[0]?.id);
-          setGogoDubEpisodeId(data?.gogoDub?.episodes?.[0]?.id);
+        // mergeProviderData(data?.zoro, data?.gogoDub, data?.gogoSub);
+
+        if (!zoroId && !animepaheId) {
+          //!new
+          setEpisodeIds({
+            zoro: refinedData?.episodesData?.[0]?.zoro_episodeId,
+            animepahe: refinedData?.episodesData?.[0]?.animepahe_id,
+          });
+          console.log("new episode ids --> ", {
+            zoro: refinedData?.episodesData?.[0]?.zoro_episodeId,
+            animepahe: refinedData?.episodesData?.[0]?.animepahe_id,
+          });
         }
         setAnimeNotAvailable(false);
       } catch (error) {
@@ -295,11 +313,12 @@ export default function Page({ params }) {
   useEffect(() => {
     (async () => {
       setAnimeNotAvailable(false);
-      const currentIndex = episodesData?.findIndex(
+      const currentIndex = content?.episodesData?.findIndex(
         (ep) =>
-          (ep?.episodeId === zoroEpisodeId && zoroEpisodeId) ||
-          (ep?.gogoDubId === gogoDubEpisodeId && gogoDubEpisodeId) ||
-          (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
+          //!new
+          (episodeIds.zoro && ep.zoro_episodeId === episodeIds.zoro) ||
+          (episodeIds.animepahe && ep.animepahe_id === episodeIds.animepahe)
+        //!new
       );
 
       setEpNo(currentIndex + 1); //this will set the current episode number which will be used for commenting the comment for this episode number.
@@ -312,9 +331,9 @@ export default function Page({ params }) {
       if (currentIndex === episodesData?.length - 1)
         setIsNextEpisodeAvailable(false);
 
-      if (provider === "zoro" && zoroEpisodeId) {
+      if (providersConfig[provider]?.hasServersApi) {
         const cachedServerData = getSessionWithExpiry(
-          `serverData-${provider}-${zoroEpisodeId}`
+          `serverData-${provider}-${episodeIds[provider]}` // episodeIds[provider] yaani ki episode id us provider ki for example agar provider zoro h to zoro ki episode id
         );
         if (cachedServerData) {
           // console.log("cached servers data : ", cachedServerData);
@@ -333,40 +352,41 @@ export default function Page({ params }) {
             );
           // return;
         } else {
-          console.log(
-            "entered zoro server fetch block with data => ",
-            provider,
-            zoroEpisodeId
-          );
-          if (zoroEpisodeId) {
+          // console.log(
+          //   `entered ${provider} server fetch block with data => `,
+          //   provider,
+          //   episodeIds
+          // );
+          if (episodeIds[provider]) {
             try {
               // Make the API call to get the server data
               const serverData = await axios.get(
-                `/api/v1/${provider}/servers/${zoroEpisodeId}`
+                providersConfig[provider]?.serverApiUrl(episodeIds[provider])
               );
-              // console.log("This is Zoro server data: ", serverData);
+              // console.log(`This is ${provider} server data: `, serverData);
 
               // Ensure the server data exists and has the expected structure
-              if (serverData?.data?.data) {
+              // ! the new api returns the data in a different format
+              if (serverData?.data) {
                 // Update the router URL parameters (e.g., dub value)
                 router.replace(
                   updateParams(
-                    [{ key: "dub", val: updateDubVal(serverData?.data?.data) }],
+                    [{ key: "dub", val: updateDubVal(serverData?.data) }],
                     false
                   )
                 );
 
                 // Set the server data and server name
-                setServerData(serverData?.data?.data);
+                setServerData(serverData?.data);
                 setServer(
-                  serverData?.data?.data?.sub?.[2]?.serverName ||
-                    serverData?.data?.data?.raw?.[0]?.serverName
+                  serverData?.data?.sub?.[2]?.serverName ||
+                    serverData?.data?.raw?.[0]?.serverName
                 );
 
                 // Cache the server data with an expiry of 2 hours
                 setSessionWithExpiry(
-                  `serverData-${provider}-${zoroEpisodeId}`,
-                  serverData?.data?.data,
+                  `serverData-${provider}-${episodeIds[provider]}`,
+                  serverData?.data,
                   1000 * 60 * 60 * 2 // 2 hours expiry
                 );
               } else {
@@ -381,70 +401,9 @@ export default function Page({ params }) {
             }
           }
         }
-      }
-
-      //for gogo server data
-      else if (provider === "gogo" && (gogoSubEpisodeId || gogoDubEpisodeId)) {
-        try {
-          const cachekey = `serverData-${provider}-${gogoSubEpisodeId}-${gogoDubEpisodeId}`;
-          const cachedServerData = getSessionWithExpiry(cachekey);
-          if (cachedServerData) {
-            router.replace(
-              updateParams(
-                [{ key: "dub", val: updateDubVal(cachedServerData) }],
-                false
-              )
-            );
-            setServerData(cachedServerData);
-            if (!serverV) setServer(cachedServerData?.sub?.[0]?.name);
-            // return;
-          } else if (gogoDubEpisodeId || gogoSubEpisodeId) {
-            console.log(
-              "entered gogo server fetch block with data => ",
-              provider,
-              gogoDubEpisodeId,
-              gogoSubEpisodeId
-            );
-            let serverDataSub, serverDataDub;
-            if (gogoSubEpisodeId && gogoSubEpisodeId !== "null") {
-              serverDataSub = await axios.get(
-                `/api/v1/${provider}/servers/${gogoSubEpisodeId}`
-              );
-            }
-            if (gogoDubEpisodeId && gogoDubEpisodeId !== "null") {
-              serverDataDub = await axios.get(
-                `/api/v1/${provider}/servers/${gogoDubEpisodeId}`
-              );
-            }
-
-            const formatedResponse = {
-              sub: serverDataSub?.data,
-              dub: serverDataDub?.data,
-            };
-            const subServerName = formatedResponse?.sub?.[0]?.name;
-            const dubServerName = formatedResponse?.dub?.[0]?.name;
-            // console.log(subServerName, dubServerName);
-            router.replace(
-              updateParams(
-                [{ key: "dub", val: updateDubVal(formatedResponse) }],
-                false
-              )
-            );
-
-            setServer(dub ? dubServerName : subServerName);
-            setServerData(formatedResponse);
-            if (formatedResponse) {
-              setSessionWithExpiry(
-                cachekey,
-                formatedResponse,
-                1000 * 60 * 60 * 2
-              ); //2 hrs
-            }
-          }
-        } catch (error) {
-          // toast.error(error.message);
-          console.log("error while fetching server data => ", error);
-        }
+      } else if (providersConfig[provider]?.hasServersApi === false) {
+        setServer(null);
+        setServerData(null);
       } else {
         if (content?.title) {
           toast.error("Anime not available");
@@ -456,7 +415,7 @@ export default function Page({ params }) {
     return () => {
       // setServerData(null);
     };
-  }, [zoroEpisodeId, gogoDubEpisodeId, provider, gogoSubEpisodeId]);
+  }, [episodeIds, provider]);
 
   //this function update the url params, it has resetT as true which will remove timestamp t parameter by default
   const updateParams = (paramsList, resetT = true) => {
@@ -471,19 +430,20 @@ export default function Page({ params }) {
 
   //self explainatory
   const getPrevEpisode = () => {
+    const { episodesData } = content;
     const currentIndex = episodesData?.findIndex(
       (ep) =>
-        (ep?.episodeId === zoroEpisodeId && zoroEpisodeId) ||
-        (ep?.gogoDubId === gogoDubEpisodeId && gogoDubEpisodeId) ||
-        (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
+        //!new
+        (episodeIds.zoro && ep.zoro_episodeId === episodeIds.zoro) ||
+        (episodeIds.animepahe && ep.animepahe_id === episodeIds.animepahe)
+      //!new
     );
 
     if (currentIndex !== -1 && currentIndex > 0) {
       const ep = episodesData[currentIndex - 1]; // Return the prev episode's ID
       const url = updateParams([
-        { key: "z-id", val: ep?.episodeId },
-        { key: "g-sub-id", val: ep?.gogoSubId },
-        { key: "g-dub-id", val: ep?.gogoDubId },
+        { key: "z-id", val: ep?.zoro_episodeId },
+        { key: "apahe-id", val: ep?.animepahe_id },
         { key: "n", val: currentIndex - 1 },
       ]);
 
@@ -496,20 +456,19 @@ export default function Page({ params }) {
 
   //self explainatory
   const getNextEpisode = () => {
+    const { episodesData } = content;
     const currentIndex = episodesData?.findIndex(
       (ep) =>
-        (ep?.episodeId === zoroEpisodeId && zoroEpisodeId) ||
-        (ep?.gogoDubId === gogoDubEpisodeId && gogoDubEpisodeId) ||
-        (ep?.gogoSubId === gogoSubEpisodeId && gogoSubEpisodeId)
+        (episodeIds.zoro && ep?.zoro_episodeId === episodeIds.zoro) ||
+        (episodeIds.animepahe && ep.animepahe_id === episodeIds.animepahe)
     );
 
-    if (currentIndex !== -1 && currentIndex < episodesData.length - 1) {
-      const ep = episodesData[currentIndex + 1]; // Return the next episode's ID
+    if (currentIndex !== -1 && currentIndex < episodesData?.length - 1) {
+      const ep = episodesData?.[currentIndex + 1]; // Return the next episode's ID
       const url = updateParams([
-        { key: "z-id", val: ep?.episodeId },
-        { key: "g-sub-id", val: ep?.gogoSubId },
-        { key: "g-dub-id", val: ep?.gogoDubId },
-        { key: "n", val: currentIndex + 1 },
+        { key: "z-id", val: ep?.zoro_episodeId },
+        { key: "apahe-id", val: ep?.animepahe_id },
+        { key: "n", val: currentIndex - 1 },
       ]);
       router.push(url);
     } else {
@@ -531,30 +490,31 @@ export default function Page({ params }) {
   // console.log(episodesData);
 
   //since zoro data has few things like zoroId episodes data like title etc and gogo data has data like gogodub and gogo sub...this function merges both of the providers episodes data into one object
-  const mergeProviderData = (zoro, gogoDub, gogoSub) => {
-    const gds = gogoDub?.episodes?.length; //gogo dub size
-    const gss = gogoSub?.episodes?.length; //gogo sub size
-    if (zoro?.episodes?.length > 0) {
-      const newMergedData = zoro?.episodes?.map((ep, idx) => {
-        return {
-          ...ep,
-          gogoSubId: gss > idx ? gogoSub?.episodes[idx].id : null,
-          gogoDubId: gds > idx ? gogoDub?.episodes[idx].id : null,
-        };
-      });
-      setEpisodesData(newMergedData);
-      // console.log("this is merged data with zoro", newMergedData);
-    } else if (gogoSub?.episodes?.length > 0) {
-      const newMergedData = gogoSub?.episodes?.map((ep, idx) => {
-        return {
-          ...ep,
-          gogoDubId: gds > idx ? gogoDub?.episodes[idx].id : null,
-        };
-      });
-      setEpisodesData(newMergedData);
-      // console.log("this is merged data with zoro", newMergedData);
-    } else setEpisodesData(null);
-  };
+  //?not needed=>
+  //  const mergeProviderData = (zoro, gogoDub, gogoSub) => {
+  //   const gds = gogoDub?.episodes?.length; //gogo dub size
+  //   const gss = gogoSub?.episodes?.length; //gogo sub size
+  //   if (zoro?.episodes?.length > 0) {
+  //     const newMergedData = zoro?.episodes?.map((ep, idx) => {
+  //       return {
+  //         ...ep,
+  //         gogoSubId: gss > idx ? gogoSub?.episodes[idx].id : null,
+  //         gogoDubId: gds > idx ? gogoDub?.episodes[idx].id : null,
+  //       };
+  //     });
+  //     // setEpisodesData(newMergedData);
+  //     console.log("this is merged data with zoro", newMergedData);
+  //   } else if (gogoSub?.episodes?.length > 0) {
+  //     const newMergedData = gogoSub?.episodes?.map((ep, idx) => {
+  //       return {
+  //         ...ep,
+  //         gogoDubId: gds > idx ? gogoDub?.episodes[idx].id : null,
+  //       };
+  //     });
+  //     // setEpisodesData(newMergedData);
+  //     // console.log("this is merged data with zoro", newMergedData);
+  //   } else setEpisodesData(null);
+  // };
 
   //self explainatory
   const handleOnClickWatchList = async () => {
@@ -624,19 +584,27 @@ export default function Page({ params }) {
 
   //below function and usememo is to get src url of m3u8 file according to the provider
   const getStreamingSource = () => {
-    if (provider === "zoro") {
+    const config = providersConfig[provider];
+    if (config.needsServerSideStreaming) {
       setDownloadLink();
-
-      return `/api/v1/streamingProxy?url=${encodeURIComponent(
+      
+      return `/api/v1/streamingProxy?url=${
         streamingData?.sources?.[0]?.url
-      )}`;
-    } else if (provider === "gogo") {
-      const defaultSrcData = streamingData?.sources?.filter(
-        (src) => src?.quality === "default"
-      );
-      setDownloadLink(streamingData?.download);
-      // console.log("gogo src data",defaultSrcData);
-      return `https://goodproxy.goodproxy.workers.dev/fetch?url=${defaultSrcData?.[0]?.url}`;
+      }`;
+    
+    
+
+    } else {
+      const qualityOrder = ["1080p", "720p", "480p", "360p"];
+      for (const quality of qualityOrder) {
+        const match = streamingData?.sources?.find((src) =>
+          src?.quality?.includes(quality)
+        );
+        
+        if (match?.url) return match.url;
+      }
+
+      return null;
     }
   };
   //* using use Memo to cache the streaming url result, because apparantly media player was calling this function after every few seconds
@@ -644,6 +612,7 @@ export default function Page({ params }) {
     () => getStreamingSource(),
     [provider, streamingData]
   );
+
 
   //In case if dub is not available for a episode the we will automatically change the router to the sub..this function utility handles the dub val (either 1, 0, -1)
   const updateDubVal = (serData) => {
@@ -668,17 +637,6 @@ export default function Page({ params }) {
 
   return (
     <>
-      {/* this component is for loading ads script  */}
-      {/* <GlobalScripts/> */}
-      {/* <div className="banner flex w-2/3 h-2/3">
-  <ins id="pm_union"
-         data-partner_id="8789547"
-         data-add_types="banners"
-         data-source_url=""
-         data-pm-b="680x250"
-         ></ins>
-         </div> */}
-
       <div className="py-12 w-full">
         <div className="content py-2 md:px-4 flex flex-col gap-4">
           {!animeNotAvailable && (
@@ -724,9 +682,34 @@ export default function Page({ params }) {
               ) : (
                 streamingSrc && (
                   <>
-                    <div class="pm_video" className="pm_video flex h-fit">
-                      <div className="stream block bg-black md:h-[85vh] h-fit w-full rounded my-4">
-                        <MediaPlayer
+                    <div  className="pm_video flex h-fit">
+                      <div className="stream block bg-black md:h-[85vh] h-[40vh] w-full justify-center items-center rounded my-4">
+                        <ArtVideoPlayer
+                        key={uniqueId("art-video-")}
+                        getNextEpisode={getNextEpisode}
+                        getPrevEpisode={getPrevEpisode}
+                          src={streamingSrc}
+                          setDuration={setDuration}
+                          sources = {streamingData?.sources}
+                          intro={streamingData?.intro}
+                          outro={streamingData?.outro}
+                          isAutoSkip={mediaPlayerState?.isAutoSkip}
+                          title={"Monster Ep3" || content?.episodesData?.[epNo-1]?.zoro_title}
+                          thumbnail={
+                            process.env.NEXT_PUBLIC_GOOD_PROXY +
+                              streamingData?.tracks?.filter(
+                                (t) => t.kind === "thumbnails"
+                              )?.[0]?.file
+                            }
+                            subtitles={streamingData?.tracks?.filter(tr => tr?.kind === 'captions')}
+                            startTime={startTime}
+                            recentTimestampRef={recentTimestampRef}
+                            setAnimeNotAvailable = {setAnimeNotAvailable}
+                            mediaPlayerState={mediaPlayerState}
+                          
+                        />
+
+                        {/* <MediaPlayer
                           load="eager"
                           keyShortcuts={{
                             ...MEDIA_KEY_SHORTCUTS,
@@ -756,7 +739,7 @@ export default function Page({ params }) {
                                   setShowSkipButton(""); // Hide the button after skipping
                                 }
                               },
-                            }
+                            },
                           }}
                           autoPlay={mediaPlayerState?.isAutoPlay ? true : false}
                           ref={player}
@@ -764,7 +747,10 @@ export default function Page({ params }) {
                           storage="media-player"
                           buffer
                           title={streamingData?.malId}
-                          src={streamingSrc}
+                          src={
+                            "https://aniversehd.com/api/v1/streamingProxy?url=https://vault-11.padorupado.ru/hls/11/06/cda74eaebce25a12f5e548f7c220bb5dc245700b0280bdb45ff98b2fe4803d2b/owo.m3u8" ||
+                            streamingSrc
+                          }
                           className="h-full"
                           playsInline={true}
                           crossOrigin
@@ -873,7 +859,7 @@ export default function Page({ params }) {
                             }}
                             icons={defaultLayoutIcons}
                           />
-                        </MediaPlayer>
+                        </MediaPlayer> */}
                       </div>
                     </div>
                   </>
@@ -970,7 +956,7 @@ export default function Page({ params }) {
                   <TbPlayerTrackNextFilled /> Next Episode
                 </button>} */}
 
-                  {recentTimestamp > 0 && (
+                  {/* { (
                     <ShareModal
                       t={recentTimestamp}
                       buttonText="Share this Scene"
@@ -978,8 +964,9 @@ export default function Page({ params }) {
                       title={`Checkout this Amazing Scene from ${
                         content?.title_english || content?.title
                       }`}
+                      onClick={()=>setRecentTimestamp(recentTimestampRef.current)}
                     />
-                  )}
+                  )} */}
                   <ShareModal
                     buttonText="Share this episode"
                     title={`Checkout this Amazing Episode from ${
@@ -1005,9 +992,7 @@ export default function Page({ params }) {
             </div>
           </div>
 
-          <div className="md:hidden block my-12">
-            <Metadata content={content} id={params?.id} />
-          </div>
+          
           {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
         </div>
 
@@ -1021,12 +1006,15 @@ export default function Page({ params }) {
             loggedInUserId={loggedInUserId}
             loggedInUserData={loggedInUserData}
             epNo={epNo}
-            zoroEpId={zoroEpisodeId}
+            zoroEpId={episodeIds.zoro}
+            animepaheEpId={episodeIds.animepahe} //!new
             gogoEpId={`${gogoSubId ? gogoSubId : ""}|${
               gogoDubId ? gogoDubId : ""
             }`}
           />
         )}
+
+        <Suggested id={params?.id} />
       </div>
     </>
   );
