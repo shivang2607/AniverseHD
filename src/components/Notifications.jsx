@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { IoMdNotifications, IoMdClose } from "react-icons/io";
 import {
   FaCheck,
@@ -7,49 +7,33 @@ import {
   FaInfoCircle,
 } from "react-icons/fa";
 import { CustomTimeAgo } from "./utils/timeago";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { getSessionWithExpiry, setSessionWithExpiry } from "./utils/storage";
+import { Oval, ThreeDots } from "react-loader-spinner";
 
-export default function Notifications() {
+export default function Notifications({loggedInUserId}) {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      notification_id: 8,
-      recipient_user_id: "JsnQAAJn2oeq8S5185iwQyu5cw12",
-      module: "COMMENT",
-      action: "REPLIED",
-      metadata: {
-        animeId: "58567",
-        epNo: 1,
-        zoroEpId:
-          "solo-leveling-season-2-arise-from-the-shadow-19413?ep=131394",
-        body: "Jai Shree Ram",
-        parentCommentId: 4,
-        repliedBy: "Gojo 2.0",
-      },
-      action_user: "JsnQAAJn2oeq8S5185iwQyu5cw12",
-      is_read: 0,
-      created_at: "2025-06-06 17:39:19",
-    },
-    {
-      notification_id: 4,
-      recipient_user_id: "JsnQAAJn2oeq8S5185iwQyu5cw12",
-      module: "COMMENT",
-      action: "REPLIED",
-      metadata: {
-        animeId: "58567",
-        epNo: 1,
-        zoroEpId:
-          "solo-leveling-season-2-arise-from-the-shadow-19413?ep=131394",
-        body: "Vande Matram",
-        parentCommentId: 1,
-        repliedBy: "",
-      },
-      action_user: "JsnQAAJn2oeq8S5185iwQyu5cw12",
-      is_read: 0,
-      created_at: "2025-06-06 17:20:02",
-    },
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [loadingStates, setLoadingStates] = useState({
+    markAllReadLoading: false,
+    notificationsLoading: false,
+  })
 
   const dropdownRef = useRef(null);
+
+  // Parse notification metadata with error handling
+  const parseMetadata = useCallback((metadata) => {
+    try {
+      if (typeof metadata === 'string') {
+        return JSON.parse(metadata);
+      }
+      return metadata || {};
+    } catch (error) {
+      console.warn('Failed to parse notification metadata:', error);
+      return {};
+    }
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -58,10 +42,84 @@ export default function Notifications() {
         setIsOpen(false);
       }
     };
-
+    
     document.addEventListener("mousedown", handleClickOutside);
+
+    //fetch the notifications when the component mounts
+    (async ()=>{
+      await fetchNotifications();
+    })();
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  //useEffect to fetch the notifications
+  useEffect(() => {
+    (async () => {
+      if(!isOpen) return;
+      await fetchNotifications();
+    })();
+  }, [isOpen]);
+
+
+  async function fetchNotifications(){
+    try {
+      setLoadingStates((prev) => ({ ...prev, notificationsLoading: true }));
+      if(getSessionWithExpiry(`notifications`)){
+        setNotifications(getSessionWithExpiry(`notifications`));
+        setLoadingStates((prev) => ({ ...prev, notificationsLoading: false }));
+        return;
+      }
+      const response = await axios.get('/api/v1/notifications', {
+        headers: {"user-id": loggedInUserId,},
+        params: {
+          getAll: true, // Fetch all notifications
+          limit: 20, // Limit to 100 notifications
+        },
+      });
+      if(response?.data?.success){
+        setNotifications(response?.data?.results || []);  
+        setSessionWithExpiry(`notifications`, response?.data?.results || [], 1000 * 60 * 10);
+      }
+      else{
+        toast.error("Failed to fetch Notifications", {id: "fetch-notifications-error",duration: 3000,});
+      }
+      setLoadingStates((prev) => ({ ...prev, notificationsLoading: false }));
+      
+    } catch (error) {
+      toast.error("Error fetching notifications", {id: "fetch-notifications-error",duration: 3000,});
+      setLoadingStates((prev) => ({ ...prev, notificationsLoading: false }));
+      
+    }
+   
+  }
+
+  async function markAllAsRead() {
+    try {
+      setLoadingStates((prev) => ({ ...prev, markAllReadLoading: true }));
+      const response = await axios.put('/api/v1/notifications', {}, {
+        headers: { "user-id": loggedInUserId },
+      });
+      if (response?.data?.success) {
+        setNotifications((prev) =>
+          prev.map((notification) => ({ ...notification, is_read: true }))
+        );
+        setSessionWithExpiry(`notifications`, response?.data?.results || [], 1000 * 60 * 10);
+      } else {  
+        toast.error("Failed to mark all notifications as read", {
+          id: "mark-all-read-error",
+          duration: 3000,
+        });
+      }
+      setLoadingStates((prev) => ({ ...prev, markAllReadLoading: false }));
+    } catch (error) {
+      toast.error("Error marking all notifications as read", {
+        id: "mark-all-read-error",
+        duration: 3000,
+      });
+      setLoadingStates((prev) => ({ ...prev, markAllReadLoading: false }));
+    }
+  }
+
 
   // Get unread notifications count
   const unreadCount = notifications.filter(
@@ -84,13 +142,6 @@ export default function Notifications() {
     );
   };
 
-  // Mark all notifications as read
-  const markAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((notification) => ({ ...notification, is_read: true }))
-    );
-  };
-
   // Get icon based on notification type
   const getNotificationIcon = (module) => {
     switch (module) {
@@ -107,23 +158,19 @@ export default function Notifications() {
     }
   };
 
-  const getNotificationTitle = (notification) => {
+  const getNotificationTitle = useCallback((notification) => {
+    const metadata = parseMetadata(notification.metadata);
+    console.log("metadata", metadata);
     switch (notification.module) {
       case "COMMENT":
         return (
           notification.action === "REPLIED" ??
-          `New reply from ${notification.metadata.repliedBy || "Unknown"}`
+          `New reply from ${metadata.repliedBy || "Unknown"}`
         );
-      // case 'warning':
-      //     return 'Warning'
-      // case 'success':
-      //     return 'Success'
-      // case 'info':
-      //     return 'Information'
       default:
         return "Notification";
     }
-  };
+  }, [parseMetadata]);
 
   return (
     <div className="relative flex" ref={dropdownRef}>
@@ -143,7 +190,7 @@ export default function Notifications() {
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-96 bg-cbg-100 rounded-lg shadow-xl border border-gray-600 z-50 max-h-96 overflow-hidden">
+        <div className="absolute top-full right-0 mt-2 w-96 bg-cbg-200 rounded-lg shadow-xl border border-gray-600 z-50 max-h-96 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-primary-200">
             <h3 className="text-lg font-semibold text-primary-300">
@@ -152,10 +199,24 @@ export default function Notifications() {
             <div className="flex items-center space-x-2">
               {unreadCount > 0 && (
                 <button
-                  onClick={markAllAsRead}
-                  className="text-sm text-sky-500 hover:text-sky-300 font-medium"
+                  onClick={async()=> await markAllAsRead()}
+                  disabled={loadingStates.markAllReadLoading}
+                  className="text-sm text-sky-500 hover:text-sky-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  Mark all read
+                  {loadingStates.markAllReadLoading ? (
+                    <>
+                      <ThreeDots
+                        height="16"
+                        width="16"
+                        radius="9"
+                        color="#0ea5e9"
+                        ariaLabel="three-dots-loading"
+                      />
+                      <span>Marking...</span>
+                    </>
+                  ) : (
+                    "Mark all read"
+                  )}
                 </button>
               )}
               <button
@@ -169,84 +230,103 @@ export default function Notifications() {
 
           {/* Notifications List */}
           <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-track-transparent">
-            {notifications.length === 0 ? (
+            {loadingStates.notificationsLoading ? (
+              // Loading state for notifications
+              <div className="flex flex-col items-center justify-center p-8">
+                <Oval
+                  height={40}
+                  width={40}
+                  color="#0ea5e9"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                  visible={true}
+                  ariaLabel='oval-loading'
+                  secondaryColor="#0ea5e9"
+                  strokeWidth={2}
+                  strokeWidthSecondary={2}
+                />
+                <p className="text-gray-400 mt-3">Loading notifications...</p>
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <IoMdNotifications className="text-4xl mx-auto mb-2 opacity-50" />
                 <p>No notifications yet</p>
               </div>
             ) : (
-              notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`p-4 border-b border-gray-400  transition-colors ${
-                    !notification.is_read
-                      ? "bg-cbg-200 border-l-4 border-l-cbg-500"
-                      : ""
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    {/* Notification Icon */}
-                    <div className="flex-shrink-0 mt-1">
-                      {getNotificationIcon(notification.module)}
-                    </div>
+              notifications.map((notification) => {
+                const metadata = parseMetadata(notification.metadata);
+                return (
+                  <div
+                    key={notification.id}
+                    className={`p-4 border-b border-gray-400  transition-colors ${
+                      !notification.is_read
+                        ? "bg-cbg-100 border-l-4 border-l-cbg-500"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex items-start space-x-3">
+                      {/* Notification Icon */}
+                      <div className="flex-shrink-0 mt-1">
+                        {getNotificationIcon(notification.module)}
+                      </div>
 
-                    {/* Notification Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4
-                            className={`text-sm title font-semibold ${
-                              !notification.is_read
-                                ? "text-gray-300"
-                                : "text-gray-400"
-                            }`}
-                          >
-                            {getNotificationTitle(notification)}
-                            {notification.module === "COMMENT"
-                              ? `New reply from ${
-                                  notification.metadata.repliedBy || "Unknown"
-                                }`
-                              : `Notification from ${notification.module}`}
-                          </h4>
-                          <p
-                            className={`body text-sm line-clamp-1 mt-1 ${
-                              !notification.is_read
-                                ? "text-gray-300"
-                                : "text-gray-400"
-                            }`}
-                          >
-                            {notification.metadata.body ||
-                              "No details available"}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            <CustomTimeAgo
-                              date={new Date(notification?.created_at + "Z")}
-                            />
-                          </p>
+                      {/* Notification Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4
+                              className={`text-sm title font-semibold ${
+                                !notification.is_read
+                                  ? "text-gray-300"
+                                  : "text-gray-400"
+                              }`}
+                            >
+                              {getNotificationTitle(notification)}
+                              {notification.module === "COMMENT"
+                                ? `New reply from ${
+                                    metadata.repliedBy || "Unknown"
+                                  }`
+                                : `Notification from ${notification.module}`}
+                            </h4>
+                            <p
+                              className={`body text-sm line-clamp-1 mt-1 ${
+                                !notification.is_read
+                                  ? "text-gray-300"
+                                  : "text-gray-400"
+                              }`}
+                            >
+                              {metadata.body || "No details available"}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              <CustomTimeAgo
+                                date={new Date(notification?.created_at + "Z")}
+                              />
+                            </p>
+                          </div>
+
+                          {/* Mark as Read Button */}
+                          {!notification.is_read && (
+                            <button
+                              onClick={() =>
+                                markAsRead(notification.notification_id)
+                              }
+                              className="flex-shrink-0 ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                              title="Mark as read"
+                            >
+                              <FaCheck className="text-xs" />
+                            </button>
+                          )}
                         </div>
-
-                        {/* Mark as Read Button */}
-                        {!notification.is_read && (
-                          <button
-                            onClick={() =>
-                              markAsRead(notification.notification_id)
-                            }
-                            className="flex-shrink-0 ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            title="Mark as read"
-                          >
-                            <FaCheck className="text-xs" />
-                          </button>
-                        )}
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 
           {/* Footer */}
-          {notifications.length > 0 && (
+          {notifications.length > 0 && !loadingStates.notificationsLoading && (
             <div className="p-3 border-t border-gray-800 bg-gray-800">
               <button className="w-full text-center text-sm text-gray-300 hover:text-gray-200 font-medium">
                 View all notifications

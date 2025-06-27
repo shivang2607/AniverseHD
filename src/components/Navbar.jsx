@@ -25,7 +25,7 @@ import ThemeSwitcher from "./ThemeSwitcher";
 import Notifications from "./Notifications";
 
 const Navbar = () => {
-  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists, RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar } = useUserStore();
+  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists, RecentWatchListId, loadLoggedInUserRecentWatchList, loggedInUserId, hideWatchlistBar } = useUserStore();
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -234,7 +234,7 @@ const Navbar = () => {
                 </Link>
 
 
-                {isUserLoggedIn && <Notifications/>}
+                {isUserLoggedIn && <Notifications loggedInUserId = {loggedInUserId}/>}
 
 
 
