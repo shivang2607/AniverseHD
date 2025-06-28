@@ -359,13 +359,15 @@ export default function Notifications({loggedInUserId}) {
           </div>
 
           {/* Footer */}
-          {notifications.length > 0 && !loadingStates.notificationsLoading && (
+
+          {/* //commenting view all notifications because we dont have notifications page yet */}
+          {/* {notifications.length > 0 && !loadingStates.notificationsLoading && (
             <div className="p-3 border-t border-gray-800 bg-gray-800">
               <button className="w-full text-center text-sm text-gray-300 hover:text-gray-200 font-medium">
                 View all notifications
               </button>
             </div>
-          )}
+          )} */}
         </div>
       )}
     </div>
