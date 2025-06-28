@@ -11,6 +11,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { getSessionWithExpiry, setSessionWithExpiry } from "./utils/storage";
 import { Oval, ThreeDots } from "react-loader-spinner";
+import Link from "next/link";
 
 export default function Notifications({loggedInUserId}) {
   const [isOpen, setIsOpen] = useState(false);
@@ -132,14 +133,28 @@ export default function Notifications({loggedInUserId}) {
   };
 
   // Mark individual notification as read
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
+  const markAsRead = async (id) => {
+    
+    const res = await axios.put('/api/v1/notifications', { notificationId: id }, {
+      headers: { "user-id": loggedInUserId },
+    });
+    if (res?.data?.success) {
+      setSessionWithExpiry(`notifications`, res?.data?.results || [], 1000 * 60 * 10);
+      setNotifications((prev) =>
       prev.map((notification) =>
         notification.notification_id === id
           ? { ...notification, is_read: true }
           : notification
       )
     );
+    }
+    else {
+      toast.error("Failed to mark notification as read", {
+        id: "mark-read-error",
+        duration: 3000,
+      });
+    }
+
   };
 
   // Get icon based on notification type
@@ -160,7 +175,6 @@ export default function Notifications({loggedInUserId}) {
 
   const getNotificationTitle = useCallback((notification) => {
     const metadata = parseMetadata(notification.metadata);
-    console.log("metadata", metadata);
     switch (notification.module) {
       case "COMMENT":
         return (
@@ -169,6 +183,23 @@ export default function Notifications({loggedInUserId}) {
         );
       default:
         return "Notification";
+    }
+  }, [parseMetadata]);
+
+
+  const generateUrl = useCallback((notification) => {
+    if (!notification || !notification.url) {
+      return "#";
+    }
+    const metadata = parseMetadata(notification.metadata);
+    switch (notification.module) {
+      case "COMMENT":
+        return `${notification.url}#comment-${metadata.parentCommentId}`;
+      case "LIKE":
+        return `/posts/${metadata.postId}`;
+      
+      default:
+        return "#";
     }
   }, [parseMetadata]);
 
@@ -255,6 +286,7 @@ export default function Notifications({loggedInUserId}) {
             ) : (
               notifications.map((notification) => {
                 const metadata = parseMetadata(notification.metadata);
+                const url = generateUrl(notification);
                 return (
                   <div
                     key={notification.id}
@@ -271,9 +303,10 @@ export default function Notifications({loggedInUserId}) {
                       </div>
 
                       {/* Notification Content */}
+                      
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
+                          <Link href={url} onClick={toggleDropdown} className="flex-1">
                             <h4
                               className={`text-sm title font-semibold ${
                                 !notification.is_read
@@ -302,7 +335,7 @@ export default function Notifications({loggedInUserId}) {
                                 date={new Date(notification?.created_at + "Z")}
                               />
                             </p>
-                          </div>
+                          </Link>
 
                           {/* Mark as Read Button */}
                           {!notification.is_read && (

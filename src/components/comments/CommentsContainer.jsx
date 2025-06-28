@@ -43,6 +43,17 @@ export default function CommentsContainer({
     zoroEpId: zoroEpId,
   });
 
+  // useEffect(() => {
+    
+  
+  //   return () => {
+  //     console.log("comment hash id=> ", window?.location?.hash);
+  //     setCommentHashId(window?.location?.hash?.split('-')?.pop());
+  //   }
+  // }, [])
+  
+
+
   useEffect(() => {
     (async () => {
       setCommentPayload((prev) => ({
@@ -53,8 +64,12 @@ export default function CommentsContainer({
         gogoEpId,
         epNo,
       }));
-
       setCommentHashId(window?.location?.hash?.split('-')?.pop()); //ye hash id us comment ki h jisko alag se fetch krke vaha tk scroll  krna h...so in case notifiation k through koi comment pr click krega to uski parent comment ki hash id h ye and we have to fetch that comment separately and scroll to it. Iska bhi khayaal rakha gaya h ki if the comment with this hash id already exists in the commentsData that is initially fetched by the flow then vo nahi dikhe...because ye comment sbse uper dikhana h hmko. ! the thing to be noted is that this comment id is not of the reply comment id but of the parent comment id.
+      if(commentHashId) {
+      const hashCommentData = await fetchCommentById();
+      setHashCommentData(hashCommentData);
+      
+    }
 
       // console.log("speaking from comments container useEffect", loggedInUserData);
 
@@ -94,7 +109,6 @@ export default function CommentsContainer({
         ...prev,
         offset: 0,
       }));
-      setHashCommentData(await fetchCommentById());
       const res = await debounceGetComments({ ...params, offset: 0 });
       setCommentsData(res);
       setLoadingStates((prev) => ({ ...prev, hasOnceLoaded: true }));
@@ -123,12 +137,13 @@ export default function CommentsContainer({
         behavior: 'smooth', 
         block: 'center' 
       });
-    }, 500);
+    }, 200);
   }
 }, [hashCommentData, commentHashId]);
 
   async function fetchCommentById() {
     if (loggedInUserId && commentHashId) {
+      
       const res = await getCommentById(commentHashId, loggedInUserId);
       return res;
     }
