@@ -25,6 +25,31 @@ export function debounce(func, delay) {
   }
   
   
+  export async function getCommentById(commentId, userId){
+    try {
+      if(!userId){
+        toast.error("Please Login to view comments");
+        return;
+      }
+      if(!commentId){
+        toast.error("Comment Id not found");
+        return;
+      }
+      const res = await axios.get(`/api/v1/comments/id/${commentId}`, {
+        headers: {
+          'user-id': userId || null
+        },
+      });
+      if(res?.data?.success===true){
+            return res?.data?.results?.[0]; //since the output array will always have one element we will return the first element of the array itself
+        }
+      
+    } catch (error) {
+      console.log("Error faced while fetching comments => ", error);
+        return null;
+    }
+
+  }
 
 export async function getComments(params){
 
