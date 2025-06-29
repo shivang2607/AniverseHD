@@ -14,7 +14,7 @@ import InputCommentDiv from "./InputCommentDiv";
 import { MdEdit } from "react-icons/md";
 import Link from "next/link";
 
-export default function CommentCard({ animeId, comment, userId, highlighted = false, id, loggedInUserData }) {
+export default function CommentCard({ animeId, comment, userId, loggedInUserData }) {
   const [loadingStates, setLoadingStates] = useState({
     addComment: false,
   });
@@ -121,10 +121,11 @@ export default function CommentCard({ animeId, comment, userId, highlighted = fa
     }
     const res = await debounceGetComments(params);
     setReplyComments(res);
+    console.log("fetched comment reply data => ", res);
   };
 
   return (
-    <div id={`comment-${id}`} className= {`${highlighted ? "bg-sky-500/20 rounded-md" : ""}`}>
+    <div>
       <div className="w-full flex gap-2 items-center my-3">
         <div className="profile p-1 justify-center h-full flex">
           <Link
