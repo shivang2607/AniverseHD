@@ -22,10 +22,9 @@ import { Constant_Var_localstorage_version } from "@/utils/constants";
 import Notice from "./Notice";
 import { SiUtorrent } from "react-icons/si";
 import ThemeSwitcher from "./ThemeSwitcher";
-import Notifications from "./Notifications";
 
 const Navbar = () => {
-  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists, RecentWatchListId, loadLoggedInUserRecentWatchList, loggedInUserId, hideWatchlistBar } = useUserStore();
+  const { isUserLoggedIn, login, loadLoggedInUserDataAndWatchLists, RecentWatchListId, loadLoggedInUserRecentWatchList, hideWatchlistBar } = useUserStore();
   const router = useRouter();
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -52,7 +51,6 @@ const Navbar = () => {
     // { href: "/polls", name: "Polls", icon: <FaPoll className="mr-2" /> },
     // { href: "/upcoming", name: "Upcoming Features", icon: <FaLightbulb className="mr-2" /> },
     { href: "/torrent", name: "Torrent", icon: <SiUtorrent className="text-base mr-2" />, new: true },
-    { href: "/feedback-bug", name: "Feedback", icon: <VscFeedback className="text-base mr-2" />, new: false },
     // { href: "/feature-request", name: "Feature Request", icon: <FaRegStar className="mr-2" /> },
 
   ];
@@ -118,7 +116,7 @@ const Navbar = () => {
     <>
       <nav className={`fixed w-full top-0 z-50 transition-transform duration-300 backdrop-blur-lg border-b border-primary-100/20 ${showNavbar ? "translate-y-0" : "-translate-y-full"} ${isBackgroundVisible ? "bg-cbg-100/95" : "bg-cbg-100/80"}`}>
         <Notice />
-        <div className="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
           <div className="flex items-center  h-16">
             {/* Logo Section */}
             <Link href="/" className="flex mx-2 items-center space-x-2 group flex-shrink-0">
@@ -234,18 +232,15 @@ const Navbar = () => {
                 </Link>
 
 
-                {isUserLoggedIn && <Notifications loggedInUserId = {loggedInUserId}/>}
-
-
 
               {/* Feedback */}
-              {/* <Link
+              <Link
                 href="/feedback-bug"
                 className="hidden md:inline-flex gap-1 items-center px-2 py-2 text-sm font-medium text-primary-200 rounded-lg hover:bg-primary-100/10 transition-colors"
               >
                 <VscFeedback className="text-base"/>
                 Feedback
-              </Link> */}
+              </Link>
 
               {/* Auth Section */}
               {!isUserLoggedIn ? (
