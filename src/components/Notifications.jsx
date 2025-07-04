@@ -221,7 +221,7 @@ export default function Notifications({loggedInUserId}) {
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-96 bg-cbg-200 rounded-lg shadow-xl border border-gray-600 z-50 max-h-96 overflow-hidden">
+        <div className="absolute top-full md:right-0 -right-12 mt-2 md:w-96 w-80 bg-cbg-200 rounded-lg shadow-xl border border-gray-600 z-50 max-h-96 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-primary-200">
             <h3 className="text-lg font-semibold text-primary-300">
