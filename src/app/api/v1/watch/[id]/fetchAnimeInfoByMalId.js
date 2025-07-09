@@ -23,7 +23,7 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
     // Step 1: Get AnimePahe ID
     let animepaheId = null;
 
-    if (Sites?.animepahe?.sub) {
+    if (Sites?.animepahe?.sub !== null) {
       animepaheId = Sites.animepahe.sub;
     } else {
       const mapRes = await axios.get(
