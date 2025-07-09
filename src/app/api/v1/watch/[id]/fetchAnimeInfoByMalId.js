@@ -23,7 +23,7 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
     // Step 1: Get AnimePahe ID
     let animepaheId = null;
 
-    if (Sites?.animepahe?.sub) {
+    if (Sites?.animepahe?.sub !== null) {
       animepaheId = Sites.animepahe.sub;
     } else {
       const mapRes = await axios.get(
@@ -33,7 +33,7 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
     }
 
     if (!animepaheId) {
-      throw new Error("Animepahe ID not found for this MAL ID.");
+      console.log("Animepahe ID not found for MAL ID => ", malId);
     }
 
     // Step 2: Fetch AnimePahe info
