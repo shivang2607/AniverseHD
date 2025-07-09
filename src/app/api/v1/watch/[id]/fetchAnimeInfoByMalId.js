@@ -16,6 +16,7 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
   const cached = animepaheInfoCache.get(cacheKey);
   if (cached) {
     console.log("✅ LRU Cache hit for Animepahe info:", malId);
+    console.log("Cached data:", cached);
     return cached;
   }
 
