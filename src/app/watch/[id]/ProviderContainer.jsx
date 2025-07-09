@@ -113,7 +113,9 @@ export default function ProviderContainer({
   // console.log("This is server data",serverData);
 
   useDebouncedEffect(() => {
-    if (!zoroEpisodeId && !episodeIds.zoro && !gogoDubEpisodeId && !gogoSubEpisodeId) return;
+    if (Object.values(episodeIds).every(val => val == null)) return; //this will check if all of the episodeIds are null
+
+    // console.log("entering fetchingStreamingData with provider:", provider, "and episodeIds:", episodeIds);
     
     fetchStreamingData({
       episodeId: episodeIds.zoro,
@@ -142,7 +144,8 @@ export default function ProviderContainer({
             episodeIds[provider], 
             { dub: dub === "-1" ? false : dub } //if dub is false means its raw means dub will be false, if dub is null then means its false also if dub is non empty or non null value then atutomatically means its true
           );
-          
+          // console.log("Streaming data fetched for provider:", provider, "data:", data);
+          // console.log("This is the episode id for streaming data => ", episodeIds[provider]);
           setStreamingData(data);
         }
           setStreamLoading(false);

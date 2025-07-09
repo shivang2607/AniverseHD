@@ -16,6 +16,7 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
   const cached = animepaheInfoCache.get(cacheKey);
   if (cached) {
     console.log("✅ LRU Cache hit for Animepahe info:", malId);
+    console.log("Cached data:", cached);
     return cached;
   }
 
@@ -33,7 +34,7 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
     }
 
     if (!animepaheId) {
-      console.log("Animepahe ID not found for MAL ID => ", malId);
+      console.log("Animepahe ID not found for this MAL ID =>", malId);
     }
 
     // Step 2: Fetch AnimePahe info
