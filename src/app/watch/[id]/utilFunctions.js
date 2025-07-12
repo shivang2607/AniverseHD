@@ -1,6 +1,7 @@
 export async function mergeAnimeEpisodesData(animeData) {
   console.log("🚀 Starting mergeAnimeEpisodesData function (INDEX-BASED MERGING)");
   // console.log("📊 Input data keys:", Object.keys(animeData || {}));
+  // console.log(animeData);
   
   try {
     const providerKeys = ['zoro', 'animepahe'];

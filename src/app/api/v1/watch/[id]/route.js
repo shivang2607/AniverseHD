@@ -79,11 +79,11 @@ export async function GET(req, { params }) {
     let maxEpisode = 0;
     let zoroEps = null;
 
-    const zoroSites = animeData.Sites?.Zoro || {};
+    const zoroSites = animeData.Sites?.Zoro || animeData.Sites?.zoro ||  {};
     await Promise.all(
       Object.keys(zoroSites).map(async (key) => {
         try {
-          const id = zoroSites[key]?.url?.split("/").pop();
+          const id = key === 'sub' ? zoroSites[key] : zoroSites[key]?.url?.split("/").pop();
           if (!id) return;
 
           const res = await axios.get(

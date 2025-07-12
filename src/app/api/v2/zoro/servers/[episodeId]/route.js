@@ -41,7 +41,7 @@ export async function GET(req, {params}){
         return NextResponse.json(cachedData);
 
     try {
-        // console.log(`${process.env.ANIWATCH_SCRAPER_URL}/anime/servers?episodeId=${episodeId}?ep=${ep}`)
+        console.log(`${process.env.ANIWATCH_SCRAPER_URL}/anime/servers?episodeId=${episodeId}?ep=${ep}`)
         const res = await axios.get(`${process.env.ZORO_SCRAPER_URL}/api/servers/${episodeId}?ep=${ep}`);
         serverCache.set(`zoro-server-${episodeId}-${ep}`, transformResults(res?.data?.results || []));
         // console.log(res?.data);
