@@ -65,8 +65,8 @@ function convertApiV2ToSites(apiV2Data) {
 // Function to merge Sites data from both APIs (API v2 takes precedence)
 function mergeSitesData(malSyncSites, apiV2Data) {
   if (!malSyncSites && !apiV2Data) return null;
-  if (!malSyncSites) return convertApiV2ToSites(apiV2Data);
   if (!apiV2Data) return malSyncSites;
+  if (!malSyncSites) return convertApiV2ToSites(apiV2Data);
 
   const apiV2Sites = convertApiV2ToSites(apiV2Data);
 
@@ -138,9 +138,24 @@ export async function syncQdrant(id, resPayload) {
             console.log("⚠️ No Sites data found from either API");
         }
     } 
-    else if (resPayload.Sites.mal_id) {
+    else if (resPayload.Sites.animepahe?.sub) {
+
+      if(!resPayload.Sites.Zoro){
+        console.log(" Case 2 part a -> Sites data has mal_id(animepahe) but no Zoro(from malSync), fetching from MalSync...");
+        const malSyncSites = await fetchMalSyncData(id, limiter);
+       sitesData = mergeSitesData(resPayload.Sites, malSyncSites);
+       if (sitesData) {
+            updatePayload.Sites = sitesData;
+            console.log("✅ Successfully updated Sites data with Malsyc Zoro");
+        } else {
+            console.log("⚠️ Failed to fetch malsync api data, using existing Sites");
+            sitesData = resPayload.Sites;
+        }
+      }
+      else{
         console.log("✅ Case 2: Sites data is complete (has mal_id), using existing data");
         sitesData = resPayload.Sites;
+      }
     } 
     else {
         console.log("📡 Case 3: Sites data exists but incomplete, fetching API v2 data...");
