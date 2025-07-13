@@ -145,7 +145,7 @@ export default function ArtVideoPlayer({
         flip: true,
         aspectRatio: true,
         mutex: true,
-        miniProgressBar: true,
+        miniProgressBar: false, //was true earlier , this is the progress bar that will come even when the menu is not visible
         setting: true,
         fullscreen: true,
         playbackRate: true,
