@@ -41,8 +41,12 @@ export default function ArtVideoPlayer({
     cursor: "pointer",
   };
 
+  // const [hls]
   const artRef = useRef(null);
   const playerRef = useRef(null);
+  // The the purpose of this ref and hlsInstanceRef is to store the levels of the quality of the video that is being played, and to store the rref of hls itself so that the art.setting.add (<quality option>) can be used!. Since without the refs, we could not use the level or hls instance on art.on('ready') event, which is necessary if we want to add the quality change option.
+  const hlsLevelsRef = useRef([]);
+  const hlsInstanceRef = useRef(null);
 
   useEffect(() => {
     if (!artRef.current || !src) return;
@@ -70,7 +74,7 @@ export default function ArtVideoPlayer({
       if (!artRef.current) return;
 
       const qualities = sources?.map((source) => ({
-        html: source?.quality || "Auto",
+        html: source?.quality || " ",
         url: `/api/v1/streamingProxy?url=${source?.url}`,
         default: source?.quality?.includes(defaultQuality) || false,
         width: "10px",
@@ -81,7 +85,6 @@ export default function ArtVideoPlayer({
       const playerSettings = [];
       const playerControls = [];
 
-      
       if (subtitles?.length > 0) {
         playerSettings.push({
           html: "Captions",
@@ -117,21 +120,21 @@ export default function ArtVideoPlayer({
         });
 
         playerControls.push({
-            name: "Captions",
-            index: 10,
-            position: "right",
-            html: "📝",
-            tooltip: "Toggle Caption",
-            style: {
-              fontSize: "1.2rem",
-            },
-            click: function (...args) {
-              playerRef.current?.subtitle.toggle();
-            },
-            // mounted: function (...args) {
-            //     console.info('mounted', args);
-            // },
-          },);
+          name: "Captions",
+          index: 10,
+          position: "right",
+          html: "📝",
+          tooltip: "Toggle Caption",
+          style: {
+            fontSize: "1.2rem",
+          },
+          click: function (...args) {
+            playerRef.current?.subtitle.toggle();
+          },
+          // mounted: function (...args) {
+          //     console.info('mounted', args);
+          // },
+        });
       }
 
       const option = {
@@ -214,6 +217,26 @@ export default function ArtVideoPlayer({
               hls.loadSource(url);
               hls.attachMedia(video);
               video.hls = hls;
+              hlsInstanceRef.current = hls;
+
+              hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                const levels = hls.levels.map((level, i) => ({
+                  html: `${level.height}p`,
+                  value: i,
+                  default: level.height === parseInt(defaultQuality),
+                }));
+
+                // Add 'Auto' option at the top
+                hlsLevelsRef.current = [
+                  {
+                    html: "Auto",
+                    value: -1,
+                    default: !levels.some((lvl) => lvl.default),
+                  },
+                  ...levels,
+                ];
+                console.log("HLS levels:", hlsLevelsRef.current);
+              });
 
               hls.on(Hls.Events.ERROR, (event, data) => {
                 if (data.fatal) {
@@ -246,13 +269,22 @@ export default function ArtVideoPlayer({
         },
       };
 
-
-
       try {
         const art = new Artplayer(option);
 
         art.on("ready", () => {
           setDuration(art.duration);
+          if (hlsLevelsRef.current.length > 0 && sources?.length === 1) {
+            art.setting.add({
+              html: "Quality",
+              width: 200,
+              selector: hlsLevelsRef.current,
+              onSelect(item) {
+                hlsInstanceRef.current.currentLevel = item.value;
+                return item.html;
+              },
+            });
+          }
         });
 
         art.on("video:timeupdate", () => {
@@ -305,7 +337,7 @@ export default function ArtVideoPlayer({
             tag === "textarea" ||
             document.activeElement.isContentEditable;
           if (isTyping) return;
-          
+
           const key = event.key.toLowerCase();
           if (key === " ") return;
 
