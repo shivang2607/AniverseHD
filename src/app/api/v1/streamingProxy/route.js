@@ -12,7 +12,7 @@ async function fetchWithCustomReferer(url) {
   if (!url) throw new Error("URL is required");
   return fetch(url, {
     headers: {
-      "referer": "https://megacloud.club/",
+      "referer": "https://kwik.si/",
       "User-Agent": "Mozilla/5.0",
     },
   });
@@ -25,7 +25,20 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
     .split("\n")
     .map((line) => {
       const trimmed = line.trim();
-      if (trimmed.startsWith("#") || trimmed === "") return line;
+      if (trimmed.startsWith("#") || trimmed === ""){
+        // return line;
+         if (trimmed.startsWith("#EXT-X-KEY:METHOD=AES-128,URI=")) {
+            const uriMatch = trimmed.match(/URI="([^"]+)"/);
+            if (uriMatch) {
+                const originalUrl = uriMatch[1];
+                const proxiedUrl = `/api/v1/streamingProxy?url=${encodeURIComponent(originalUrl)}`;
+                return trimmed.replace(/URI="[^"]+"/, `URI="${proxiedUrl}"`);
+            }
+            return trimmed;
+        } else {
+            return line;
+        }
+      }
 
       // Resolve relative URLs to absolute
       const resolvedUrl = new URL(trimmed, base).href;
