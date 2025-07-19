@@ -41,6 +41,7 @@ export const providersConfig = {
     name: 'Provider-Z',
     displayName: 'Zoro Provider',
     hasServersApi: true,
+    isSubtitleNeedReferer: true, // Zoro requires referer for subtitles
     defaultServer: 'HD-2',
     hasMultipleIdsPerEpisode: false,
     needsServerSideStreaming: true, // Zoro requires server-side streaming
@@ -84,6 +85,7 @@ export const providersConfig = {
     displayName: 'Animepahe Provider',
     hasServersApi: false,
     defaultServer: null, 
+    isSubtitleNeedReferer: false, // Animepahe does not require subtitles let alone subtitles
     hasMultipleIdsPerEpisode: false,
     serverApiUrl: null, // Animepahe does not have a servers API, it uses episode IDs directly,
     needsServerSideStreaming: true,

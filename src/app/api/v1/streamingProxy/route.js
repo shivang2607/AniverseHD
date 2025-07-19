@@ -1,3 +1,4 @@
+import { ref } from "firebase/storage";
 import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 
@@ -7,19 +8,62 @@ const options = {
 }
 const cache = new LRUCache(options)
 
+const referer_map = {
+  "tubeplx.viddsn": "https://vidwish.live/",
+  "dotstream.buzz": "https://megaplay.buzz/",
+  "kwikie.com": "https://kwik.si/",
+}
 
-async function fetchWithCustomReferer(url) {
+async function fetchWithCustomReferer(url, referer=null) {
   if (!url) throw new Error("URL is required");
+
+  if(!referer){
+    referer = "https://kwik.si/";
+    for (const key in referer_map) {
+      if (url.includes(key)){
+        referer = referer_map[key];
+        break;
+      }
+    }
+  }
+
+  // console.log("Fetching URL:", url, "with referer:", referer);
+
   return fetch(url, {
     headers: {
-      "referer": "https://kwik.si/",
+      "referer": referer,
       "User-Agent": "Mozilla/5.0",
     },
   });
 }
 
+function guessContentTypeFromUrl(url) {
+  const ext = url.split("?")[0].split(".").pop()?.toLowerCase();
+  switch (ext) {
+    case "vtt": return "text/vtt";
+    case "srt": return "application/x-subrip";
+    case "m3u8": return "application/vnd.apple.mpegurl";
+    case "mpd": return "application/dash+xml";
+    case "ts": return "video/mp2t";
+    case "mp4": return "video/mp4";
+    case "json": return "application/json";
+    case "xml": return "application/xml";
+    case "webvtt": return "text/vtt";
+    default: return "application/octet-stream"; // safe fallback
+  }
+}
+
 // Helper to resolve URLs and rewrite them to use the proxy
 function rewritePlaylistUrls(playlistText, baseUrl) {
+  let referer = "https://kwik.si/";
+
+  for (const key in referer_map) {
+    if (baseUrl.includes(key)){
+      referer = referer_map[key];
+      break;
+    }
+  }
+
   const base = new URL(baseUrl);
   return playlistText
     .split("\n")
@@ -31,7 +75,7 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
             const uriMatch = trimmed.match(/URI="([^"]+)"/);
             if (uriMatch) {
                 const originalUrl = uriMatch[1];
-                const proxiedUrl = `/api/v1/streamingProxy?url=${encodeURIComponent(originalUrl)}`;
+                const proxiedUrl = `/api/v1/streamingProxy?url=${encodeURIComponent(originalUrl)}&referer=${referer}`;
                 return trimmed.replace(/URI="[^"]+"/, `URI="${proxiedUrl}"`);
             }
             return trimmed;
@@ -43,36 +87,23 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
       // Resolve relative URLs to absolute
       const resolvedUrl = new URL(trimmed, base).href;
       // Point to the proxy for subsequent requests
-      return `/api/v1/streamingProxy?url=${encodeURIComponent(resolvedUrl)}`;
+      return `/api/v1/streamingProxy?url=${encodeURIComponent(resolvedUrl)}&referer=${referer}`;
     })
     .join("\n");
 }
 
 export async function GET(request) {
-  const url = new URL(request.url).searchParams.get("url");
-  if (!url) {
-    return NextResponse.json(
-      { error: "URL parameter is required" },
-      { status: 400 }
-    );
-  }
-
   try {
+    const url = new URL(request.url).searchParams.get("url");
+    const referer = new URL(request.url).searchParams.get("referer") || null;
+    if (!url) {
+      return NextResponse.json(
+        { error: "URL parameter is required" },
+        { status: 400 }
+      );
+    }
 
-    // if (cache.get(url)) {
-    //     console.log("Streaming proxy cache hit");
-    //     const segment_file = cache.get(url);
-    //     return new NextResponse(segment_file, {
-    //         status: 200,
-    //         headers: {
-    //             "Content-Type": "video/mp2t",
-    //             "Cache-Control": "public, max-age=31536000, immutable",
-    //             "Access-Control-Allow-Origin": "*",
-    //         },
-    //     });
-    // }
-
-    const response = await fetchWithCustomReferer(url);
+    const response = await fetchWithCustomReferer(url, referer);
     const contentType = response.headers.get("Content-Type");
     const isM3U8 = url.endsWith(".m3u8");
 
@@ -97,22 +128,20 @@ export async function GET(request) {
         },
       });
     } else {
-      // Handle segments (TS files)
-      // let segment_file = cache.get(url);
-      // if (!segment_file) {
-      //   segment_file = Buffer.from(await response.arrayBuffer());
-      //   cache.set(url, segment_file);
-      // }
-      return new NextResponse(Buffer.from(await response.arrayBuffer()), {
+      const buffer = Buffer.from(await response.arrayBuffer());
+      const detectedContentType = contentType || guessContentTypeFromUrl(url);
+
+      return new NextResponse(buffer, {
         status: 200,
         headers: {
-          "Content-Type": "video/mp2t",
+          "Content-Type": detectedContentType,
           "Cache-Control": "public, max-age=31536000, immutable",
           "Access-Control-Allow-Origin": "*",
         },
       });
     }
   } catch (error) {
+    console.log("Error fetching data:", error);
     return NextResponse.json(
       { error: "Failed to fetch data" },
       { status: 500 }
