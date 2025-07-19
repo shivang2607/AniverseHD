@@ -37,6 +37,22 @@ async function fetchWithCustomReferer(url, referer=null) {
   });
 }
 
+function guessContentTypeFromUrl(url) {
+  const ext = url.split("?")[0].split(".").pop()?.toLowerCase();
+  switch (ext) {
+    case "vtt": return "text/vtt";
+    case "srt": return "application/x-subrip";
+    case "m3u8": return "application/vnd.apple.mpegurl";
+    case "mpd": return "application/dash+xml";
+    case "ts": return "video/mp2t";
+    case "mp4": return "video/mp4";
+    case "json": return "application/json";
+    case "xml": return "application/xml";
+    case "webvtt": return "text/vtt";
+    default: return "application/octet-stream"; // safe fallback
+  }
+}
+
 // Helper to resolve URLs and rewrite them to use the proxy
 function rewritePlaylistUrls(playlistText, baseUrl) {
   let referer = "https://kwik.si/";
@@ -112,10 +128,13 @@ export async function GET(request) {
         },
       });
     } else {
-      return new NextResponse(Buffer.from(await response.arrayBuffer()), {
+      const buffer = Buffer.from(await response.arrayBuffer());
+      const detectedContentType = contentType || guessContentTypeFromUrl(url);
+
+      return new NextResponse(buffer, {
         status: 200,
         headers: {
-          "Content-Type": "video/mp2t",
+          "Content-Type": detectedContentType,
           "Cache-Control": "public, max-age=31536000, immutable",
           "Access-Control-Allow-Origin": "*",
         },
