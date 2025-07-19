@@ -10,7 +10,7 @@ const cache = new LRUCache(options)
 
 const referer_map = {
   "tubeplx.viddsn": "https://vidwish.live/",
-  "dotstream.buzz": "https://megplay.buzz/",
+  "dotstream.buzz": "https://megaplay.buzz/",
   "kwikie.com": "https://kwik.si/",
 }
 
@@ -27,7 +27,7 @@ async function fetchWithCustomReferer(url, referer=null) {
     }
   }
 
-  console.log("Fetching URL:", url, "with referer:", referer);
+  // console.log("Fetching URL:", url, "with referer:", referer);
 
   return fetch(url, {
     headers: {

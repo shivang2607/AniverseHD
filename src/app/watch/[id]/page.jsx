@@ -701,7 +701,13 @@ export default function Page({ params }) {
                                 (t) => t.kind === "thumbnails"
                               )?.[0]?.file
                             }
-                            subtitles={streamingData?.tracks?.filter(tr => tr?.kind === 'captions')}
+                            subtitles={streamingData?.tracks?.filter(tr => tr?.kind === 'captions')?.map(tr => {
+                              return {
+                              ...tr,
+                              file:`/api/v1/streamingProxy?url=${tr?.file}`,        // zoro api subtitles require referes as well, by using straming proxy which automatically adds the referer based on the domain of the url, we are just adding the referer to the subtitles file.
+                            }
+                          }
+                        )}
                             startTime={startTime}
                             recentTimestampRef={recentTimestampRef}
                             setAnimeNotAvailable = {setAnimeNotAvailable}
