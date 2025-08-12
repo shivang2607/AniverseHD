@@ -22,7 +22,7 @@ const MALImporter = ({loggedInUserId}) => {
     
     // Call your actual import function here
     try {
-      setAnimationPhase(3);
+      setAnimationPhase(3, 3000);
         await MergeMALData(username, loggedInUserId);
         setAnimationPhase(4);
       // await importMALWatchlist(username);
@@ -39,13 +39,7 @@ const MALImporter = ({loggedInUserId}) => {
     }
   };
 
-  const importMALWatchlist = async (username) => {
-    // Replace this with your actual MAL API call
-    return new Promise((resolve) => {
-      setTimeout(resolve, 2000);
-    });
-  };
-
+ 
   const AnimatedFiles = () => {
     return (
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
