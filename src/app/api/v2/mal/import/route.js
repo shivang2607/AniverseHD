@@ -20,7 +20,7 @@ function convertUserWatchlist(watchlistData){
         const key = nameToKeyMap[item.name];
         if(key){
         item?.animeList?.forEach(entry => {
-            dataMap[entry?.a] = {name: key, source: ""};
+            dataMap[entry?.a] = {name: key, s: ""};
         });
     }
     })
@@ -40,14 +40,14 @@ function mergeBothWatchlists(MALWatchlist, userWatchlistMap) {
                 mergedWatchlistMap[animeId] = {
                     name: key,
                     t: new Date().toISOString(),
-                    source: 'MAL',
+                    s: 'MAL',
                 };
             }
             else if(!mergedWatchlistMap[animeId]) {
                 mergedWatchlistMap[animeId] = {
                     name: key,
                     t: new Date().toISOString(),
-                    source: 'MAL',
+                    s: 'MAL',
                 };
             }
         })
@@ -60,7 +60,7 @@ function mergeBothWatchlists(MALWatchlist, userWatchlistMap) {
          if (!mergedWatchlistData[name]) {
         mergedWatchlistData[name] = [];
     }
-        mergedWatchlistData[name].push({a: animeId, t: watchlistEntry.t, source: watchlistEntry.source});
+        mergedWatchlistData[name].push({a: animeId, t: watchlistEntry.t, s: watchlistEntry.s});
     });
 
     const finalMergedWatchlistData = {};
@@ -68,7 +68,7 @@ function mergeBothWatchlists(MALWatchlist, userWatchlistMap) {
         finalMergedWatchlistData[name] = animeList.map(entry => ({
             a: entry.a,
             t: entry.t,
-            source: entry.source
+            s: entry.s
         }));
     });
 
