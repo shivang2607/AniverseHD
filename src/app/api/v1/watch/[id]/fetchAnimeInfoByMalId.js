@@ -53,6 +53,6 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
     }
   } catch (error) {
     console.error("❌ Failed to fetch AnimePahe info:", error?.message);
-    return null
+    return null;
   }
 }
