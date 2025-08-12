@@ -60,7 +60,7 @@ function mergeBothWatchlists(MALWatchlist, userWatchlistMap) {
          if (!mergedWatchlistData[name]) {
         mergedWatchlistData[name] = [];
     }
-        mergedWatchlistData[name].push({a: animeId, t: watchlistEntry.t, s: watchlistEntry.s});
+        mergedWatchlistData[name].push({a: animeId, t: watchlistEntry.t, s: watchlistEntry?.s});
     });
 
     const finalMergedWatchlistData = {};
@@ -68,7 +68,7 @@ function mergeBothWatchlists(MALWatchlist, userWatchlistMap) {
         finalMergedWatchlistData[name] = animeList.map(entry => ({
             a: entry.a,
             t: entry.t,
-            s: entry.s
+            s: entry?.s
         }));
     });
 
