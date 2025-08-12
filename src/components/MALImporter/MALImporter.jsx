@@ -22,7 +22,7 @@ const MALImporter = ({loggedInUserId}) => {
     
     // Call your actual import function here
     try {
-      setAnimationPhase(3, 3000);
+      setAnimationPhase(3, 1000);
         await MergeMALData(username, loggedInUserId);
         setAnimationPhase(4);
       // await importMALWatchlist(username);
