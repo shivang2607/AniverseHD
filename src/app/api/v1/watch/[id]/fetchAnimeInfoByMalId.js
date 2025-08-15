@@ -10,7 +10,10 @@ const animepaheInfoCache = new LRUCache({
 });
 
 export async function fetchAnimepaheInfoByMalId(malId, Sites) {
-  if (!malId) throw new Error("No MAL ID provided.");
+  if (!malId){
+    console.warn("No MAL ID Provided in fetchAnimepaheInfoByMalId!");
+    return null;
+  }
 
   const cacheKey = `animepahe-info-${malId}`;
   const cached = animepaheInfoCache.get(cacheKey);
@@ -45,12 +48,11 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
       animepaheInfoCache.set(cacheKey, infoRes.data);
       return infoRes.data;
     } else {
-      throw new Error("Animepahe info not found.");
+      console.error("Animepahe info not found.");
+      return null;
     }
   } catch (error) {
     console.error("❌ Failed to fetch AnimePahe info:", error?.message);
-    throw new Error(
-      error?.response?.data?.error || error.message || "Unknown error"
-    );
+    return null
   }
 }
