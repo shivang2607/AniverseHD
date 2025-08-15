@@ -347,10 +347,10 @@ export default function ProviderContainer({
                   (episodeIds.zoro === ep?.zoro_episodeId  && episodeIds.zoro) ||
                   (episodeIds.animepahe === ep?.animepahe_id && episodeIds.animepahe)
                   
-                    ? ep?.isFiller ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
+                    ? (ep?.isFiller || ep?.zoro_isFiller) ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
                     : "font-[350] bg-black/30"
                 }
-                    ${ep?.isFiller ? "bg-sky-400/30 " : ""} `}
+                    ${(ep?.isFiller || ep?.zoro_isFiller) ? "bg-sky-400/30 " : ""} `}
                 onClick={() =>{
                   // fetchStreamingData(ep);
                 }
