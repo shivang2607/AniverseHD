@@ -23,25 +23,22 @@ function isAllowedHost(host) {
   );
 }
 
-function isAllowedOrigin(value) {
-  if (!value) return false;
-  return allowedDomains.some(domain =>
-    value.includes(domain)
-  ) || allowedExactHosts.some(local =>
-    value.includes(local)
-  );
-}
+// function isAllowedOrigin(value) {
+//   if (!value) return false;
+//   return allowedDomains.some(domain =>
+//     value.includes(domain)
+//   ) || allowedExactHosts.some(local =>
+//     value.includes(local)
+//   );
+// }
 
 export function middleware(req) {
   const host = req.headers.get('host') || '';
-  const origin = req.headers.get('origin') || '';
-  const referer = req.headers.get('referer') || '';
 
   const isValidHost = isAllowedHost(host);
-  const isValidOrigin = isAllowedOrigin(origin);
-  const isValidReferer = isAllowedOrigin(referer);
+  // const isValidOrigin = isAllowedOrigin(origin);
 
-  if (!isValidHost && !isValidOrigin && !isValidReferer) {
+  if (!isValidHost) {     //earlier here condition also included the referer and the origin, but actually the host is the sufficient condition will suffice.
     return new NextResponse('Forbidden', { status: 403 });
   }
 
