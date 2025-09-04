@@ -1,5 +1,8 @@
+import { getAbsoluteURLPath } from "@/app/watch/[id]/utilFunctions";
 import axios from "axios";
 import toast from "react-hot-toast";
+
+
 
 const commentLength = 500;
 const delay = 500;
@@ -22,6 +25,31 @@ export function debounce(func, delay) {
   }
   
   
+  export async function getCommentById(commentId, userId){
+    try {
+      if(!userId){
+        toast.error("Please Login to view comments");
+        return;
+      }
+      if(!commentId){
+        toast.error("Comment Id not found");
+        return;
+      }
+      const res = await axios.get(`/api/v1/comments/id/${commentId}`, {
+        headers: {
+          'user-id': userId || null
+        },
+      });
+      if(res?.data?.success===true){
+            return res?.data?.results?.[0]; //since the output array will always have one element we will return the first element of the array itself
+        }
+      
+    } catch (error) {
+      console.log("Error faced while fetching comments => ", error);
+        return null;
+    }
+
+  }
 
 export async function getComments(params){
 
@@ -34,7 +62,7 @@ export async function getComments(params){
         // orderBy,
         // userId,
      } = params;
-     console.log(params);
+    //  console.log(params);
      if(!animeId || !epNo){
         toast.error("AnimeId or episode Number not found");
         return;
@@ -88,9 +116,12 @@ export async function postComment(payload){
     }
     // console.log(payload);
     // return;
+
     
     try {
-        const res = await axios.post(`/api/v1/comments/${animeId}`, payload);
+        const searchParams = new URLSearchParams(window.location.search);
+        const pathname = window.location.pathname;
+        const res = await axios.post(`/api/v1/comments/${animeId}`, {url: getAbsoluteURLPath(pathname, searchParams), ...payload});
         // console.log("this is res of postComment function => ",res);
 
         if(res?.data?.result?.success===true){
@@ -101,6 +132,44 @@ export async function postComment(payload){
         console.log(error);
         toast.error("Error : Couldn't Post your comment :(", {duration:3000});
     }
+}
+
+
+export async function putComment(payload){
+  const {
+      animeId,  
+      isSpoiler,
+      commentId,
+      editableBody,
+  } = payload;
+  
+  if(editableBody.trim()===""){
+      toast.error("Please type some text");
+      return;
+  }
+  if(editableBody?.length > commentLength){
+      toast.error(`Cannot contain more than ${commentLength} characters!`);
+      return;
+  }
+
+  if(!commentId){
+    toast.error("Comment Id not in the payload.")
+  }
+  // console.log(payload);
+  // return;
+  
+  try {
+      const res = await axios.put(`/api/v1/comments/${animeId}`, { commentId, isSpoiler, commentBody: editableBody});
+      // console.log("this is res of postComment function => ",res);
+
+      if(res?.data?.success===true){
+          toast.success("Comment Updated successfully", {duration:3000});
+      }
+
+  } catch (error) {
+      console.log(error);
+      toast.error("Error : Couldn't Edit your comment :(", {duration:3000});
+  }
 }
 
 

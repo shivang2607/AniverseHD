@@ -17,7 +17,6 @@ export async function GET(req, { params }) {
     // Get userId from headers
     const userId = req.headers.get('user-id');
     
-
     const response = await axios.get(
       `${process.env.WORKER_URL}/api/${process.env.WORKER_VERSION}/${animeId}/comments`,
       {
@@ -33,8 +32,7 @@ export async function GET(req, { params }) {
         }
       }
     );
-
-    return NextResponse.json(response.data);
+    return NextResponse.json(response?.data);
 
   } catch (error) {
     console.error('Error fetching comments:', error);
@@ -49,7 +47,7 @@ export async function GET(req, { params }) {
 export async function POST(req, { params }) {
     const {animeId} = params;
     const payload = await req.json();
-    const {userId, userName, commentBody, epNo, isSpoiler, zoroEpId, gogoEpId, parentCommentId, repliedToUId} = payload;
+    const {userId, url, userName, commentBody, epNo, isSpoiler, zoroEpId, gogoEpId, parentCommentId, repliedToUId} = payload;
 
     // Validate required fields
     console.log("Hello", animeId, userId, commentBody);
@@ -65,6 +63,7 @@ export async function POST(req, { params }) {
         const data = {
             userId,
             userName,
+            url: url || null, //added for the notification purpose
             commentBody,
             epNo,
             isSpoiler: isSpoiler || false,
@@ -81,9 +80,9 @@ export async function POST(req, { params }) {
         
         return NextResponse.json(res.data);
     } catch (error) {
-        console.log(error.response);
+        console.log(error);
         return NextResponse.json(
-            { error: `Error -> ${error.response.data.error}` },
+            { error: `Error -> ${error?.response?.data?.error}` },
             { status: error.response?.status || 500 }
         );
     }
@@ -103,21 +102,20 @@ export async function PUT(req) {
 
     try {
         const data = {
-            commentId,
+            commentId:commentId,
             newBody: commentBody,
-            isSpoiler,
+            isSpoiler: isSpoiler,
         };
 
         const res = await axios.put(
             `${process.env.WORKER_URL}/api/${process.env.WORKER_VERSION}/comments`,
             data
         );
-        console.log("response => ", res.data);
         return NextResponse.json(res.data);
     } catch (error) {
-        // console.error('Error updating comment:', error);
+        console.error('Error updating comment:', error);
         return NextResponse.json(
-            { error: `Error => ${error.response.data.message}` },
+            { error: `Error => ${error.response?.data?.message}` },
             { status: error.response?.status || 500 }
         );
     }

@@ -13,9 +13,11 @@ import { MdOutlineSportsScore } from "react-icons/md";
 import { PiVideoFill } from "react-icons/pi";
 import { IoMdTimer } from "react-icons/io";
 import { RxDotFilled } from "react-icons/rx";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import ShareModal from "@/components/utils/ShareModal";
 import Metadata from "./Metadata";
+import ProviderSelect from "./ProviderSelect";
+import { providersConfig } from "./providersConfig";
 
 
 
@@ -70,6 +72,7 @@ export default function ProviderContainer({
   serverData,
   // prov = "gogo",
   setSelectedProvider,
+  episodeIds,
   zoroEpisodeId, setZoroEpisodeId,
   gogoSubEpisodeId, setGogoSubEpisodeId,
   gogoDubEpisodeId, setGogoDubEpisodeId,
@@ -110,53 +113,62 @@ export default function ProviderContainer({
   // console.log("This is server data",serverData);
 
   useDebouncedEffect(() => {
-    if (!zoroEpisodeId && !gogoDubEpisodeId && !gogoSubEpisodeId) return;
+    if (Object.values(episodeIds).every(val => val == null)) return; //this will check if all of the episodeIds are null
+
+    // console.log("entering fetchingStreamingData with provider:", provider, "and episodeIds:", episodeIds);
     
     fetchStreamingData({
-      episodeId: zoroEpisodeId,
-      gogoSubId: gogoSubEpisodeId,
-      gogoDubId: gogoDubEpisodeId,
+      episodeId: episodeIds.zoro,
+      animepahe_id: episodeIds.animepahe,
     });
-  }, [zoroEpisodeId, gogoSubEpisodeId, gogoDubEpisodeId, provider, dub, server], 100, setStreamingData); // 50ms delay
+  }, [episodeIds, provider, dub, server], 100, setStreamingData); // 50ms delay
   
   
   const fetchStreamingData = async(ep)=>{
 
     setStreamLoading(true);
     try {
-      if(provider==="zoro" && ep?.episodeId){
-        setAnimeNotAvailable(false);
-        const data = await axios.get(`/api/v1/${provider}/stream/${ep?.episodeId}`, {
-          params: {
-            category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
-            server: server || 'hd-2'
-          }
-        });
+
+        if(provider && episodeIds[provider]){
+          setAnimeNotAvailable(false);
+
+          if(providersConfig[provider]?.hasServersApi){
+          const data = await providersConfig[provider].streamingData(
+            episodeIds[provider], 
+            { dub: dub || '', server: providersConfig[provider].hasServersApi ? server || providersConfig[provider].defaultServer : undefined }
+          );
+          setStreamingData(data);
+        }
+        else { //for block providers like animepahe which don't have servers api
+          const data = await providersConfig[provider].streamingData(
+            episodeIds[provider], 
+            { dub: dub === "-1" ? false : dub } //if dub is false means its raw means dub will be false, if dub is null then means its false also if dub is non empty or non null value then atutomatically means its true
+          );
+          // console.log("Streaming data fetched for provider:", provider, "data:", data);
+          // console.log("This is the episode id for streaming data => ", episodeIds[provider]);
+          setStreamingData(data);
+        }
+          setStreamLoading(false);
+        }
+
+
+
+
+      // if(provider==="zoro" && ep?.zoro_episodeId){
+      //   setAnimeNotAvailable(false);
+      //   const data = await axios.get(`/api/v1/${provider}/stream/${ep?.zoro_episodeId}`, {
+      //     params: {
+      //       category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
+      //       server: server || 'hd-2'
+      //     }
+      //   });
         
-        if(data?.data?.status){
-          return;
-        }
-        setStreamingData(data?.data);
-      }
-      else if(provider==="gogo" && (ep?.gogoDubId || ep?.gogoSubId)){
-        setAnimeNotAvailable(false);
-        try {
-          const data = await axios.get(`/api/v1/${provider}/stream/${dub ? ep?.gogoDubId : ep?.gogoSubId}`, {
-            params: {
-              server: server || ''
-            }
-          });
-          if(data?.data?.status){
-            toast.error("Anime not available, Try Another Server")
-            return;
-          }
-          setStreamingData(data?.data);
-          console.log("gogo ki streaming api vaala data", data);
-          
-        } catch (error) {
-          // toast.error(error.message);
-        }
-      }
+      //   if(data?.data?.status){
+      //     return;
+      //   }
+      //   setStreamingData(data?.data);
+      // }
+      
       
     } catch (error) {
       console.log("couldn't fetch streaming data, ",error);
@@ -168,6 +180,7 @@ export default function ProviderContainer({
   
 
   const updateParams = (paramsList, resetT=true)=>{
+    // console.log("this is paramsList :", paramsList);
     const newParams = new URLSearchParams(searchParams); 
     if(resetT) newParams.delete("t");
     paramsList.forEach(par => {
@@ -178,7 +191,7 @@ export default function ProviderContainer({
   }
   
 
-  // console.log("this is content  :", content);
+  // console.log("this is console.logcontent  :", content);
 
   return (
     <div className="w-full rounded-lg bg-cbg-200/80 overflow-hidden  relative flex flex-col py-8 gap-2">
@@ -186,113 +199,109 @@ export default function ProviderContainer({
       <div className="md:w-[90%] w-full mx-auto justify-between md:gap-0 gap-12 flex mb-8  flex-col md:flex-row">
         
       <div className="hidden md:block"><Metadata content={content} id={id}/></div>
-
+      
 
       <div className="provider-server-select self-center flex flex-col gap-8">
-        <div className="button self-center flex gap-2 text-gray-200 ">
-          <Link
-            href = {updateParams([{key:"provider", val: "zoro"},{ key:"server", val:''}], false)}
-            scroll={false}
-            className={` text-lg font-semibold p-1 px-2 rounded-md ${
-              provider === "zoro" ? "bg-primary-100" : ""
-            }  `} 
-            onClick={() => {
-              setSelectedProvider("zoro");
-              
-              // setServerLoading(true);
-            }}
-          >
-            Provider-Z
-          </Link>
-          {/* //* The below Link component is of the Provider-G , Since GOGO has went down its not working as of now and the below Link component is now deprecated */}
-          {/* <Link
-            href = {updateParams([{key:"provider", val: "gogo"},{ key:"server", val:''}], false)}
-            scroll={false}
-            className={` text-lg font-semibold p-1 px-2 rounded-md  ${
-              provider === "gogo" ? "bg-primary-100" : ""
-            } `}
-            onClick={() => {
-              setSelectedProvider("gogo");
-              // setServerLoading(true);
-            }}
-          >
-            Provider-G
-          </Link> */}
-        </div>
+        <ProviderSelect/>
 
         <div className="availableServers mx self-center flex flex-col">
-        {(serverData?.sub) &&<div className="sub flex font-semibold text-sm items-center p-2 gap-4">
-               <h2 className="flex gap-2 items-center"><FaClosedCaptioning className="text-lg text-primary-300"/> {(serverData?.sub?.length > 0) ? "SUB:" : "RAW:"}</h2>
-              <div className="flex gap-3 flex-wrap">
-               
-                {
-                  (serverData?.sub?.length > 0) ? serverData?.sub?.map(ser=>{
-                    // console.log("ser first", ser);
-                    return (
-                      <Link 
-                      key={ser?.serverName || ser?.name}
-                      href={updateParams([{key: "dub", val:''}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
-                      scroll={false} 
-                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${!dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
-                      // onClick={()=>fetchStreamingData({
-                      //   episodeId : zoroEpisodeId,
-                      //   gogoSubId: gogoSubEpisodeId,
-                      //   gogoDubId: gogoDubEpisodeId
-                      // })}
-                      >{ser?.serverName || ser?.name}</Link>
-                    )
-                  }) :
-
-                  serverData?.raw && serverData?.raw?.map(ser=>{
-                    // console.log("ser first", ser);
-                    return (
-                      <Link 
-                      key={ser?.serverName || ser?.name}
-                      href={updateParams([{key: "dub", val:'-1'}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
-                      scroll={false} 
-                      className={`rounded px-2 py-1 items-center bg-cbg-400 ${dub==="-1" && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
-                      // onClick={()=>fetchStreamingData({
-                      //   episodeId : zoroEpisodeId,
-                      //   gogoSubId: gogoSubEpisodeId,
-                      //   gogoDubId: gogoDubEpisodeId
-                      // })}
-                      >{ser?.serverName || ser?.name}</Link>
-                    )
-                  })
-                  
-                }
-              </div>
+  {
+    providersConfig[provider]?.hasServersApi ? (
+      // console.log("This is server data just above the rendering component => ",serverData),
+      <>
+        {/* SUB or RAW */}
+        {(serverData?.sub || serverData?.raw) && (
+          <div className="sub flex font-semibold text-sm items-center p-2 gap-4">
+            <h2 className="flex gap-2 items-center">
+              <FaClosedCaptioning className="text-lg text-primary-300" />
+              {serverData?.sub?.length > 0 ? "SUB:" : "RAW:"}
+            </h2>
+            <div className="flex gap-3 flex-wrap">
+              {(serverData?.sub?.length > 0 ? serverData.sub : serverData.raw || []).map((ser) => (
+                <Link
+                  key={ser?.serverName || ser?.name}
+                  href={updateParams(
+                    [
+                      { key: "dub", val: serverData.sub ? "" : "-1" },
+                      { key: "server", val: ser?.serverName || ser?.name }
+                    ],
+                    false
+                  )}
+                  scroll={false}
+                  className={`rounded px-2 py-1 items-center bg-cbg-400 ${
+                    (!dub && serverData.sub && (server === ser?.serverName || server === ser?.name)) ||
+                    (dub === "-1" && !serverData.sub && (server === ser?.serverName || server === ser?.name))
+                      ? "bg-primary-100 text-gray-100"
+                      : ""
+                  }`}
+                >
+                  {ser?.serverName || ser?.name}
+                </Link>
+              ))}
             </div>
-        }
+          </div>
+        )}
 
-            {(serverData?.dub ) && <div className="sub flex font-semibold text-sm items-center p-2 gap-4">
-              <h2 className="flex gap-2 items-center"><FaMicrophoneAlt className="text-lg text-primary-300"/> DUB:</h2>
-              <div className="flex gap-3 flex-wrap ">
-
-             
-
-
-              {
-                   serverData?.dub?.map(ser=>{
-                    return (
-                      <Link key={ser?.serverName || ser?.name} 
-                      scroll={false} 
-                      href={updateParams([{key: "dub", val:'1'}, {key:"server", val: ser?.serverName || ser?.name}], false)} 
-                      className={`rounded whitespace-nowrap text-ellipsis px-2 py-1 items-center bg-cbg-400 ${dub && (server===ser?.serverName || server===ser?.name) ? "bg-primary-100 text-gray-100":""}`}
-                      // onClick={()=>fetchStreamingData({
-                      //   episodeId : zoroEpisodeId,
-                      //   gogoSubId: gogoSubEpisodeId,
-                      //   gogoDubId: gogoDubEpisodeId
-                      // })}
-                      >{ser?.serverName || ser?.name}</Link>
-                    )
-                  })
-              }
-              </div>
-
+        {/* DUB */}
+        {serverData?.dub && (
+          <div className="sub flex font-semibold text-sm items-center p-2 gap-4">
+            <h2 className="flex gap-2 items-center">
+              <FaMicrophoneAlt className="text-lg text-primary-300" /> DUB:
+            </h2>
+            <div className="flex gap-3 flex-wrap">
+              {serverData.dub.map((ser) => (
+                <Link
+                  key={ser?.serverName || ser?.name}
+                  href={updateParams(
+                    [{ key: "dub", val: "1" }, { key: "server", val: ser?.serverName || ser?.name }],
+                    false
+                  )}
+                  scroll={false}
+                  className={`rounded px-2 py-1 whitespace-nowrap bg-cbg-400 ${
+                    dub && (server === ser?.serverName || server === ser?.name)
+                      ? "bg-primary-100 text-gray-100"
+                      : ""
+                  }`}
+                >
+                  {ser?.serverName || ser?.name}
+                </Link>
+              ))}
             </div>
-                }
+          </div>
+        )}
+      </>
+    ) : (
+      // Providers like animepahe with direct stream links for sub/dub
+      <div className="sub flex font-semibold text-sm items-center p-2 gap-4">
+        <h2 className="flex gap-2 items-center">
+          <FaClosedCaptioning className="text-lg text-primary-300" />
+          Sub/Dub:
+        </h2>
+        <div className="flex gap-3 flex-wrap">
+          <Link
+            href={updateParams([{ key: "dub", val: "" }, { key: "server", val: "" }], false)}
+            scroll={false}
+            className={`rounded px-2 py-1 items-center bg-cbg-400 ${
+              !dub ? "bg-primary-100 text-gray-100" : ""
+            }`}
+          >
+            Sub
+          </Link>
+          <Link
+            href={updateParams([{ key: "dub", val: "1" }, { key: "server", val: "" }], false)}
+            scroll={false}
+            className={`rounded px-2 py-1 items-center bg-cbg-400 ${
+              dub ? "bg-primary-100 text-gray-100" : ""
+            }`}
+          >
+            Dub
+          </Link>
         </div>
+      </div>
+    )
+  }
+</div>
+
       </div>
       </div>
 
@@ -313,6 +322,8 @@ export default function ProviderContainer({
         </select>
       </div>
 
+      
+
       <div className="episode-list grid md:grid-cols-4 grid-cols-2 gap-2 m-3 md:max-h-screen max-h-[40vh]  overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
         {episodes
           ?.slice(
@@ -320,24 +331,26 @@ export default function ProviderContainer({
             Math.min(episodes?.length, episodesPerWindow * (episodeRangeIndex + 1))
           )
           ?.map((ep,i) => {
+            // console.log("Episode data:", ep);
             return (
               <Link
                 scroll={false}
                 href={updateParams([
-                  {key: "z-id", val: ep?.episodeId},
+                  {key: "z-id", val: ep?.zoro_episodeId},
+                  {key: "apahe-id", val: ep?.animepahe_id},
                   {key: "g-sub-id", val: ep?.gogoSubId},
                   {key: "g-dub-id", val: ep?.gogoDubId},
                   {key: "server", val:server},
                 ])}
-                key={ep?.episodeId}
+                key={ep?.zoro_episodeId}
                 className={`w-full   text-xs p-4 cursor-pointer my-1 rounded-md  tracking-wider  flex gap-2 ${
-                  (zoroEpisodeId === ep?.episodeId  && zoroEpisodeId) ||
-                  (gogoSubEpisodeId === ep?.gogoSubId && gogoSubEpisodeId) ||
-                  (gogoDubEpisodeId === ep?.gogoDubId && gogoDubEpisodeId)
-                    ? ep?.isFiller ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
+                  (episodeIds.zoro === ep?.zoro_episodeId  && episodeIds.zoro) ||
+                  (episodeIds.animepahe === ep?.animepahe_id && episodeIds.animepahe)
+                  
+                    ? (ep?.isFiller || ep?.zoro_isFiller) ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
                     : "font-[350] bg-black/30"
                 }
-                    ${ep?.isFiller ? "bg-sky-400/30 " : ""} `}
+                    ${(ep?.isFiller || ep?.zoro_isFiller) ? "bg-sky-400/30 " : ""} `}
                 onClick={() =>{
                   // fetchStreamingData(ep);
                 }
@@ -346,9 +359,9 @@ export default function ProviderContainer({
               >
                 <div className="font-medium text-nowrap ">
                   {" "}
-                  Ep {ep?.number} :{" "}
+                  Ep {ep?.number || ep?.episodeIndex || i} :{" "}
                 </div>{" "}
-                {ep?.title}
+                {ep?.zoro_title || ep?.animepahe_title}
               </Link>
             );
           })}
