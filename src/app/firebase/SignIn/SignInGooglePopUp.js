@@ -49,13 +49,12 @@ export default async function SignInGooglePopUp(statusCallback) {
     if (statusCallback) statusCallback("Signing In");
 
     const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken;
+    const idToken = await result.user.getIdToken()
     sessionStorage.clear()
     Cookies.set(
       "user",
       JSON.stringify({
-        token: token,
+        token: idToken,
         email: result.user.email,
         name: result.user.displayName,
         photo: result.user.photoURL,
