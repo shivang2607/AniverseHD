@@ -43,7 +43,7 @@ export default async function UpdateName({ userName }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userName: userName,
+        displayName: userName,
       })
     });
     changeUserNameCached({ userName: userName });
