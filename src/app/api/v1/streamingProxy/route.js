@@ -20,7 +20,7 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
-async function fetchWithCustomReferer(url, referer = null) {
+async function fetchWithCustomReferer(url, referer = null, rangeHeader = null) {
   if (!url) throw new Error("URL is required");
 
   if (!referer) {
@@ -33,14 +33,18 @@ async function fetchWithCustomReferer(url, referer = null) {
     }
   }
 
-  // console.log("Fetching URL:", url, "with referer:", referer);
+  const headers = {
+    referer: referer,
+    "User-Agent": "Mozilla/5.0",
+    "Connection": "keep-alive",
+  };
 
-  return fetch(url, {
-    headers: {
-      referer: referer,
-      "User-Agent": "Mozilla/5.0",
-    },
-  });
+  // Forward range requests for better streaming
+  if (rangeHeader) {
+    headers["Range"] = rangeHeader;
+  }
+
+  return fetch(url, { headers });
 }
 
 function guessContentTypeFromUrl(url) {
@@ -65,11 +69,10 @@ function guessContentTypeFromUrl(url) {
     case "webvtt":
       return "text/vtt";
     default:
-      return "application/octet-stream"; // safe fallback
+      return "application/octet-stream";
   }
 }
 
-// Helper to resolve URLs and rewrite them to use the proxy
 function rewritePlaylistUrls(playlistText, baseUrl) {
   let referer = "https://kwik.si/";
 
@@ -86,7 +89,6 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
     .map((line) => {
       const trimmed = line.trim();
       if (trimmed.startsWith("#") || trimmed === "") {
-        // return line;
         if (trimmed.startsWith("#EXT-X-KEY:METHOD=AES-128,URI=")) {
           const uriMatch = trimmed.match(/URI="([^"]+)"/);
           if (uriMatch) {
@@ -102,9 +104,7 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
         }
       }
 
-      // Resolve relative URLs to absolute
       const resolvedUrl = new URL(trimmed, base).href;
-      // Point to the proxy for subsequent requests
       return `/api/v1/streamingProxy?url=${encodeURIComponent(
         resolvedUrl
       )}&referer=${referer}`;
@@ -117,6 +117,8 @@ export async function GET(request) {
     const url = new URL(request.url).searchParams.get("url");
     const origin = request.headers.get("origin") || null;
     const referer = new URL(request.url).searchParams.get("referer") || null;
+    const range = request.headers.get("range"); // Get range header for streaming
+    
     if (!url) {
       return NextResponse.json(
         { error: "URL parameter is required" },
@@ -124,30 +126,28 @@ export async function GET(request) {
       );
     }
 
-    // we are adding check for the allowedDomains, so if the origin is not in allowedOrigins and is not null 403 will be returned, similarly if the origin is null and the host is not in allowedOrigins 403 will be returned as well. So therefore the api wont be accessible directly from the frontend however if someone sets up the server and calls our api and change the host in the headers nothing can be done in that.
     const normalize = (url) => url.replace(/^https?:\/\//, "");
 
-let isAllowedOrigin = false;
+    let isAllowedOrigin = false;
 
-if (origin) {
-  // browser request → check full origin
-  isAllowedOrigin =
-    origin.endsWith(".aniversehd.com") || allowedOrigins.includes(origin);
-} else {
-  // non-browser request → fallback to host check
-  const host = request.headers.get("host") || "";
-  isAllowedOrigin =
-    host.endsWith(".aniversehd.com") ||
-    allowedOrigins.some((o) => normalize(o) === host);
-}
+    if (origin) {
+      isAllowedOrigin =
+        origin.endsWith(".aniversehd.com") || allowedOrigins.includes(origin);
+    } else {
+      const host = request.headers.get("host") || "";
+      isAllowedOrigin =
+        host.endsWith(".aniversehd.com") ||
+        allowedOrigins.some((o) => normalize(o) === host);
+    }
 
-
-    if (!isAllowedOrigin) {  //return 403 if not in allowedOrigin
+    if (!isAllowedOrigin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const response = await fetchWithCustomReferer(url, referer);
+    // Pass range header for partial content requests
+    const response = await fetchWithCustomReferer(url, referer, range);
     const contentType = response.headers.get("Content-Type");
+    const contentLength = response.headers.get("Content-Length");
     const isM3U8 = url.endsWith(".m3u8");
 
     if (!response.ok) {
@@ -157,29 +157,41 @@ if (origin) {
       );
     }
 
+    const responseHeaders = {
+      "Content-Type": contentType || guessContentTypeFromUrl(url),
+      "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "null",
+    };
+
+    // Handle range requests properly
+    if (range && response.status === 206) {
+      responseHeaders["Accept-Ranges"] = "bytes";
+      responseHeaders["Content-Range"] = response.headers.get("Content-Range");
+      responseHeaders["Content-Length"] = response.headers.get("Content-Length");
+    } else if (contentLength) {
+      responseHeaders["Content-Length"] = contentLength;
+    }
+
     if (isM3U8) {
-      // Rewrite URLs in the playlist
+      // Handle playlists (small files)
       const playlistText = await response.text();
       const modifiedPlaylist = rewritePlaylistUrls(playlistText, url);
 
       return new NextResponse(modifiedPlaylist, {
         status: 200,
         headers: {
+          ...responseHeaders,
           "Content-Type": "application/vnd.apple.mpegurl",
-          "Cache-Control": "public, max-age=31536000, immutable",
-          "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "null",
+          "Cache-Control": "public, max-age=30",
         },
       });
     } else {
-      const buffer = Buffer.from(await response.arrayBuffer());
-      const detectedContentType = contentType || guessContentTypeFromUrl(url);
-
-      return new NextResponse(buffer, {
-        status: 200,
+      // Changes from loading data in buffer then passing the buffer to streaming directly
+      // to streaming the response body directly to reduce memory usage and latency
+      return new NextResponse(response.body, {
+        status: response.status,
         headers: {
-          "Content-Type": detectedContentType,
+          ...responseHeaders,
           "Cache-Control": "public, max-age=31536000, immutable",
-          "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "null",
         },
       });
     }
