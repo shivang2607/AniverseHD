@@ -22,13 +22,13 @@ const allowedOrigins = [
 
 // Connection pooling for better performance
 const agents = {
-  http: new (await import('http')).Agent({
+  http: new (await import("http")).Agent({
     keepAlive: true,
     maxSockets: 50,
     maxFreeSockets: 10,
     timeout: 30000,
   }),
-  https: new (await import('https')).Agent({
+  https: new (await import("https")).Agent({
     keepAlive: true,
     maxSockets: 50,
     maxFreeSockets: 10,
@@ -49,15 +49,16 @@ async function fetchWithCustomReferer(url, referer = null) {
     }
   }
 
-  const isHttps = url.startsWith('https:');
-  
+  const isHttps = url.startsWith("https:");
+
   return fetch(url, {
     headers: {
       referer: referer,
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      "Accept": "*/*",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      Accept: "*/*",
       "Accept-Encoding": "gzip, deflate, br",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     },
     // Use connection pooling
     agent: isHttps ? agents.https : agents.http,
@@ -129,46 +130,12 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
     .join("\n");
 }
 
-// Create a ReadableStream from the response for true streaming
-function createStreamingResponse(response, headers) {
-  const reader = response.body?.getReader();
-  
-  if (!reader) {
-    throw new Error("Response body is not readable");
-  }
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          
-          if (done) {
-            controller.close();
-            break;
-          }
-          
-          controller.enqueue(value);
-        }
-      } catch (error) {
-        controller.error(error);
-      }
-    },
-    
-    cancel() {
-      reader.releaseLock();
-    }
-  });
-
-  return new Response(stream, { headers });
-}
-
 export async function GET(request) {
   try {
     const url = new URL(request.url).searchParams.get("url");
     const origin = request.headers.get("origin") || null;
     const referer = new URL(request.url).searchParams.get("referer") || null;
-    
+
     if (!url) {
       return NextResponse.json(
         { error: "URL parameter is required" },
@@ -179,7 +146,7 @@ export async function GET(request) {
     // Check for cached content first (for small files like playlists)
     const cacheKey = `${url}_${referer}`;
     const cached = cache.get(cacheKey);
-    
+
     const normalize = (url) => url.replace(/^https?:\/\//, "");
 
     let isAllowedOrigin = false;
@@ -234,15 +201,17 @@ export async function GET(request) {
     const range = request.headers.get("range");
     if (range && !isM3U8) {
       responseHeaders["Accept-Ranges"] = "bytes";
-      responseHeaders["Content-Range"] = response.headers.get("Content-Range") || "";
-      responseHeaders["Content-Length"] = response.headers.get("Content-Length") || "";
+      responseHeaders["Content-Range"] =
+        response.headers.get("Content-Range") || "";
+      responseHeaders["Content-Length"] =
+        response.headers.get("Content-Length") || "";
     }
 
     if (isM3U8) {
       // Handle playlists (small files, can be buffered)
       const playlistText = await response.text();
       const modifiedPlaylist = rewritePlaylistUrls(playlistText, url);
-      
+
       // Cache the playlist
       cache.set(cacheKey, modifiedPlaylist);
 
@@ -259,12 +228,15 @@ export async function GET(request) {
       if (contentLength) {
         responseHeaders["Content-Length"] = contentLength;
       }
-      
+
       // Set appropriate cache headers for video segments
       responseHeaders["Cache-Control"] = "public, max-age=31536000, immutable";
-      
+
       // Create streaming response
-      return createStreamingResponse(response, responseHeaders);
+      return new Response(response.body, {
+        headers: responseHeaders,
+        status: response.status,
+      });
     }
   } catch (error) {
     console.log("Error fetching data:", error);
