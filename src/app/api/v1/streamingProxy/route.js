@@ -2,7 +2,7 @@ import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 
 const options = {
-  max: 2000, // Maximum 2000 segments
+  max: 2000,
   ttl: 1000 * 60 * 30, // 30 minutes
 };
 const cache = new LRUCache(options);
@@ -20,7 +20,23 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
-async function fetchWithCustomReferer(url, referer = null, rangeHeader = null) {
+// Connection pooling for better performance
+const agents = {
+  http: new (await import('http')).Agent({
+    keepAlive: true,
+    maxSockets: 50,
+    maxFreeSockets: 10,
+    timeout: 30000,
+  }),
+  https: new (await import('https')).Agent({
+    keepAlive: true,
+    maxSockets: 50,
+    maxFreeSockets: 10,
+    timeout: 30000,
+  }),
+};
+
+async function fetchWithCustomReferer(url, referer = null) {
   if (!url) throw new Error("URL is required");
 
   if (!referer) {
@@ -33,18 +49,19 @@ async function fetchWithCustomReferer(url, referer = null, rangeHeader = null) {
     }
   }
 
-  const headers = {
-    referer: referer,
-    "User-Agent": "Mozilla/5.0",
-    "Connection": "keep-alive",
-  };
-
-  // Forward range requests for better streaming
-  if (rangeHeader) {
-    headers["Range"] = rangeHeader;
-  }
-
-  return fetch(url, { headers });
+  const isHttps = url.startsWith('https:');
+  
+  return fetch(url, {
+    headers: {
+      referer: referer,
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Connection": "keep-alive",
+    },
+    // Use connection pooling
+    agent: isHttps ? agents.https : agents.http,
+  });
 }
 
 function guessContentTypeFromUrl(url) {
@@ -112,12 +129,45 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
     .join("\n");
 }
 
+// Create a ReadableStream from the response for true streaming
+function createStreamingResponse(response, headers) {
+  const reader = response.body?.getReader();
+  
+  if (!reader) {
+    throw new Error("Response body is not readable");
+  }
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) {
+            controller.close();
+            break;
+          }
+          
+          controller.enqueue(value);
+        }
+      } catch (error) {
+        controller.error(error);
+      }
+    },
+    
+    cancel() {
+      reader.releaseLock();
+    }
+  });
+
+  return new Response(stream, { headers });
+}
+
 export async function GET(request) {
   try {
     const url = new URL(request.url).searchParams.get("url");
     const origin = request.headers.get("origin") || null;
     const referer = new URL(request.url).searchParams.get("referer") || null;
-    const range = request.headers.get("range"); // Get range header for streaming
     
     if (!url) {
       return NextResponse.json(
@@ -126,6 +176,10 @@ export async function GET(request) {
       );
     }
 
+    // Check for cached content first (for small files like playlists)
+    const cacheKey = `${url}_${referer}`;
+    const cached = cache.get(cacheKey);
+    
     const normalize = (url) => url.replace(/^https?:\/\//, "");
 
     let isAllowedOrigin = false;
@@ -144,8 +198,19 @@ export async function GET(request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Pass range header for partial content requests
-    const response = await fetchWithCustomReferer(url, referer, range);
+    // For cached playlists
+    if (cached && url.endsWith(".m3u8")) {
+      return new NextResponse(cached, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/vnd.apple.mpegurl",
+          "Cache-Control": "public, max-age=30",
+          "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "null",
+        },
+      });
+    }
+
+    const response = await fetchWithCustomReferer(url, referer);
     const contentType = response.headers.get("Content-Type");
     const contentLength = response.headers.get("Content-Length");
     const isM3U8 = url.endsWith(".m3u8");
@@ -157,43 +222,49 @@ export async function GET(request) {
       );
     }
 
+    // Common headers
     const responseHeaders = {
       "Content-Type": contentType || guessContentTypeFromUrl(url),
       "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "null",
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Access-Control-Allow-Headers": "Range, Content-Range, Content-Length",
     };
 
-    // Handle range requests properly
-    if (range && response.status === 206) {
+    // Handle range requests for video segments
+    const range = request.headers.get("range");
+    if (range && !isM3U8) {
       responseHeaders["Accept-Ranges"] = "bytes";
-      responseHeaders["Content-Range"] = response.headers.get("Content-Range");
-      responseHeaders["Content-Length"] = response.headers.get("Content-Length");
-    } else if (contentLength) {
-      responseHeaders["Content-Length"] = contentLength;
+      responseHeaders["Content-Range"] = response.headers.get("Content-Range") || "";
+      responseHeaders["Content-Length"] = response.headers.get("Content-Length") || "";
     }
 
     if (isM3U8) {
-      // Handle playlists (small files)
+      // Handle playlists (small files, can be buffered)
       const playlistText = await response.text();
       const modifiedPlaylist = rewritePlaylistUrls(playlistText, url);
+      
+      // Cache the playlist
+      cache.set(cacheKey, modifiedPlaylist);
 
       return new NextResponse(modifiedPlaylist, {
-        status: 200,
-        headers: {
-          ...responseHeaders,
-          "Content-Type": "application/vnd.apple.mpegurl",
-          "Cache-Control": "public, max-age=30",
-        },
-      });
-    } else {
-      // Changes from loading data in buffer then passing the buffer to streaming directly
-      // to streaming the response body directly to reduce memory usage and latency
-      return new NextResponse(response.body, {
         status: response.status,
         headers: {
           ...responseHeaders,
-          "Cache-Control": "public, max-age=31536000, immutable",
+          "Content-Type": "application/vnd.apple.mpegurl",
+          "Cache-Control": "public, max-age=30", // Short cache for playlists
         },
       });
+    } else {
+      // Handle video segments and other binary files with TRUE STREAMING
+      if (contentLength) {
+        responseHeaders["Content-Length"] = contentLength;
+      }
+      
+      // Set appropriate cache headers for video segments
+      responseHeaders["Cache-Control"] = "public, max-age=31536000, immutable";
+      
+      // Create streaming response
+      return createStreamingResponse(response, responseHeaders);
     }
   } catch (error) {
     console.log("Error fetching data:", error);
