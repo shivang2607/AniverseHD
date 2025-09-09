@@ -2,7 +2,8 @@ import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 
 const options = {
-  max: 2000,
+  maxSize: 10 * 1024 * 1024, // 10 MB total cache size
+  sizeCalculation: (value, key) => Buffer.byteLength(value), // each entry measured in bytes
   ttl: 1000 * 60 * 30, // 30 minutes
 };
 const cache = new LRUCache(options);
