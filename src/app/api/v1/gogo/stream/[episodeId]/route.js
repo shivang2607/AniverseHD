@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 
 const option = {
-    max:500,
+    max:100,
     ttl: 1000*60*5, //5 min 
   }
 const gogoCache = new LRUCache(option);

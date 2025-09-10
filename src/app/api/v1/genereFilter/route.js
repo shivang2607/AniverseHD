@@ -5,7 +5,7 @@ import { LRUCache } from "lru-cache";
 
 
 const options = {
-  max:500,
+  max:100,
   ttl: 1000*60*60*24*30,
 }
 const genreFilterCache = new LRUCache(options);

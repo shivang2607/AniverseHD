@@ -7,7 +7,7 @@ import { LRUCache } from "lru-cache";
 
 
 const options = {
-  max:300,
+  max:50,
   ttl: 1000*60*60*24*30,
 }
 const recommendCache = new LRUCache(options)

@@ -4,7 +4,7 @@ import {LRUCache} from "lru-cache";
 
 // Initialize LRU Cache (adjust max size and TTL as needed)
 const cache = new LRUCache({
-  max: 500,                  // max 500 items
+  max: 100,                  // max 100 items
   ttl: 1000 * 60 * 60,       // cache for 1 hour
 });
 

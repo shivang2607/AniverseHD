@@ -5,7 +5,7 @@ import { create } from "zustand";
 // import { Redis } from "@upstash/redis";
 // import { REDIS_UPSTASH_URL } from "@/utils/constants";
 const options = {
-  max: 500,
+  max: 100,
   ttl: 1000 * 60 * 60 * 24,
 };
 // const redis = new Redis({

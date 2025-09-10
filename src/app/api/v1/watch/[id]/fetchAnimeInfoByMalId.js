@@ -5,7 +5,7 @@ import { LRUCache } from "lru-cache";
 
 // LRU cache config
 const animepaheInfoCache = new LRUCache({
-  max: 300,
+  max: 100,
   ttl: 1000 * 60 * 15, // 15 minutes
 });
 

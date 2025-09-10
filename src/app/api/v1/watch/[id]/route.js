@@ -8,7 +8,7 @@ import { fetchAnimepaheInfoByMalId } from "./fetchAnimeInfoByMalId";
 //? The commented code in the file is mostly of the gogo provider, since gogo has went down we can't do much about it and its not working as of writing this on 24/02/2025, the commented code for gogo is now deprecated.
 
 const watchOptions = {
-  max: 500,
+  max: 100,
   ttl: 1000 * 60 * 15, // 15 min
 };
 const watchCache = new LRUCache(watchOptions);

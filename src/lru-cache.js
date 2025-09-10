@@ -3,16 +3,16 @@
 import { LRUCache } from "lru-cache"
 
 const searchOptions = {
-    max:500,
+    max:100,
     ttl: 1000*60*60*24*30,
 }
 const recommendationOptions = {
-    max:300,
+    max:100,
     ttl: 1000*60*60*24*30,
   }
   
   const animeOptions = {
-    max:300,
+    max:100,
     ttl: 1000*60*60*12,
   }
 

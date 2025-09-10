@@ -6,7 +6,7 @@ import { syncQdrant } from "./syncWithJikan";
 import { addQdrantAnime } from "./addAnime";
 
 const animeOptions = {
-  max: 300,
+  max: 100,
   ttl: 1000 * 60 * 60 * 24 * 1, // 1 day
 };
 

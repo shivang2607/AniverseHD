@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 
 const options = {
-    max: 500,
+    max: 100,
     ttl: 1000*60* 60 * 1 //1 hour
 }
 

@@ -1,11 +1,4 @@
-import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
-
-const options = {
-  max: 2000, // Maximum 2000 segments
-  ttl: 1000 * 60 * 30, // 30 minutes
-};
-const cache = new LRUCache(options);
 
 const referer_map = {
   "tubeplx.viddsn": "https://vidwish.live/",
@@ -20,6 +13,22 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
+// Connection pooling for better performance
+const agents = {
+  http: new (await import("http")).Agent({
+    keepAlive: true,
+    maxSockets: 50,
+    maxFreeSockets: 10,
+    timeout: 30000,
+  }),
+  https: new (await import("https")).Agent({
+    keepAlive: true,
+    maxSockets: 50,
+    maxFreeSockets: 10,
+    timeout: 30000,
+  }),
+};
+
 async function fetchWithCustomReferer(url, referer = null) {
   if (!url) throw new Error("URL is required");
 
@@ -33,13 +42,18 @@ async function fetchWithCustomReferer(url, referer = null) {
     }
   }
 
-  // console.log("Fetching URL:", url, "with referer:", referer);
+  const isHttps = url.startsWith("https:");
 
   return fetch(url, {
     headers: {
-      referer: referer,
-      "User-Agent": "Mozilla/5.0",
+      referer,
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      Accept: "*/*",
+      "Accept-Encoding": "gzip, deflate, br",
+      Connection: "keep-alive",
     },
+    agent: isHttps ? agents.https : agents.http,
   });
 }
 
@@ -65,11 +79,10 @@ function guessContentTypeFromUrl(url) {
     case "webvtt":
       return "text/vtt";
     default:
-      return "application/octet-stream"; // safe fallback
+      return "application/octet-stream";
   }
 }
 
-// Helper to resolve URLs and rewrite them to use the proxy
 function rewritePlaylistUrls(playlistText, baseUrl) {
   let referer = "https://kwik.si/";
 
@@ -86,7 +99,6 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
     .map((line) => {
       const trimmed = line.trim();
       if (trimmed.startsWith("#") || trimmed === "") {
-        // return line;
         if (trimmed.startsWith("#EXT-X-KEY:METHOD=AES-128,URI=")) {
           const uriMatch = trimmed.match(/URI="([^"]+)"/);
           if (uriMatch) {
@@ -102,9 +114,7 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
         }
       }
 
-      // Resolve relative URLs to absolute
       const resolvedUrl = new URL(trimmed, base).href;
-      // Point to the proxy for subsequent requests
       return `/api/v1/streamingProxy?url=${encodeURIComponent(
         resolvedUrl
       )}&referer=${referer}`;
@@ -117,6 +127,7 @@ export async function GET(request) {
     const url = new URL(request.url).searchParams.get("url");
     const origin = request.headers.get("origin") || null;
     const referer = new URL(request.url).searchParams.get("referer") || null;
+
     if (!url) {
       return NextResponse.json(
         { error: "URL parameter is required" },
@@ -124,8 +135,27 @@ export async function GET(request) {
       );
     }
 
+    const normalize = (u) => u.replace(/^https?:\/\//, "");
+
+    let isAllowedOrigin = false;
+
+    if (origin) {
+      isAllowedOrigin =
+        origin.endsWith(".aniversehd.com") || allowedOrigins.includes(origin);
+    } else {
+      const host = request.headers.get("host") || "";
+      isAllowedOrigin =
+        host.endsWith(".aniversehd.com") ||
+        allowedOrigins.some((o) => normalize(o) === host);
+    }
+
+    if (!isAllowedOrigin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const response = await fetchWithCustomReferer(url, referer);
     const contentType = response.headers.get("Content-Type");
+    const contentLength = response.headers.get("Content-Length");
     const isM3U8 = url.endsWith(".m3u8");
 
     if (!response.ok) {
@@ -135,30 +165,45 @@ export async function GET(request) {
       );
     }
 
+    const responseHeaders = {
+      "Content-Type": contentType || guessContentTypeFromUrl(url),
+      "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "null",
+      "Access-Control-Allow-Headers": "Range, Content-Range, Content-Length",
+    };
+
+    const range = request.headers.get("range");
+    if (range && !isM3U8) {
+      responseHeaders["Accept-Ranges"] = "bytes";
+      responseHeaders["Content-Range"] =
+        response.headers.get("Content-Range") || "";
+      responseHeaders["Content-Length"] =
+        response.headers.get("Content-Length") || "";
+    }
+
     if (isM3U8) {
-      // Rewrite URLs in the playlist
       const playlistText = await response.text();
       const modifiedPlaylist = rewritePlaylistUrls(playlistText, url);
 
       return new NextResponse(modifiedPlaylist, {
-        status: 200,
+        status: response.status,
         headers: {
-          "Content-Type": contentType || "application/vnd.apple.mpegurl",
-          "Cache-Control": "public, max-age=30", // Short cache for playlists
+          ...responseHeaders,
+          "Content-Type": "application/vnd.apple.mpegurl",
+          "Cache-Control": "public, max-age=30",
         },
       });
     } else {
-      const buffer = Buffer.from(await response.arrayBuffer());
-      
-      return new NextResponse(buffer, {
-        status: 200,
-        headers: {
-          "Content-Type": contentType,
-          "Cache-Control": "public, max-age=30", // Short cache for playlists
-        },
+      if (contentLength) {
+        responseHeaders["Content-Length"] = contentLength;
+      }
+
+      responseHeaders["Cache-Control"] = "public, max-age=31536000, immutable";
+
+      return new Response(response.body, {
+        headers: responseHeaders,
+        status: response.status,
       });
     }
-    
   } catch (error) {
     console.log("Error fetching data:", error);
     return NextResponse.json(

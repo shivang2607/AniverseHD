@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 
 const option = {
-  max: 500,
+  max: 100,
   ttl: 1000 * 60* 10, //10 min
 };
 const zoroCache = new LRUCache(option);
