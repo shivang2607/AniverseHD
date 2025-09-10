@@ -2,8 +2,7 @@ import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 
 const options = {
-  maxSize: 10 * 1024 * 1024, // 10 MB total cache size
-  sizeCalculation: (value, key) => Buffer.byteLength(value), // each entry measured in bytes
+  max: 2000, // Maximum 2000 segments
   ttl: 1000 * 60 * 30, // 30 minutes
 };
 const cache = new LRUCache(options);
@@ -21,22 +20,6 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
-// Connection pooling for better performance
-const agents = {
-  http: new (await import("http")).Agent({
-    keepAlive: true,
-    maxSockets: 50,
-    maxFreeSockets: 10,
-    timeout: 30000,
-  }),
-  https: new (await import("https")).Agent({
-    keepAlive: true,
-    maxSockets: 50,
-    maxFreeSockets: 10,
-    timeout: 30000,
-  }),
-};
-
 async function fetchWithCustomReferer(url, referer = null) {
   if (!url) throw new Error("URL is required");
 
@@ -50,19 +33,13 @@ async function fetchWithCustomReferer(url, referer = null) {
     }
   }
 
-  const isHttps = url.startsWith("https:");
+  // console.log("Fetching URL:", url, "with referer:", referer);
 
   return fetch(url, {
     headers: {
       referer: referer,
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      Accept: "*/*",
-      "Accept-Encoding": "gzip, deflate, br",
-      Connection: "keep-alive",
+      "User-Agent": "Mozilla/5.0",
     },
-    // Use connection pooling
-    agent: isHttps ? agents.https : agents.http,
   });
 }
 
@@ -88,10 +65,11 @@ function guessContentTypeFromUrl(url) {
     case "webvtt":
       return "text/vtt";
     default:
-      return "application/octet-stream";
+      return "application/octet-stream"; // safe fallback
   }
 }
 
+// Helper to resolve URLs and rewrite them to use the proxy
 function rewritePlaylistUrls(playlistText, baseUrl) {
   let referer = "https://kwik.si/";
 
@@ -108,6 +86,7 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
     .map((line) => {
       const trimmed = line.trim();
       if (trimmed.startsWith("#") || trimmed === "") {
+        // return line;
         if (trimmed.startsWith("#EXT-X-KEY:METHOD=AES-128,URI=")) {
           const uriMatch = trimmed.match(/URI="([^"]+)"/);
           if (uriMatch) {
@@ -123,7 +102,9 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
         }
       }
 
+      // Resolve relative URLs to absolute
       const resolvedUrl = new URL(trimmed, base).href;
+      // Point to the proxy for subsequent requests
       return `/api/v1/streamingProxy?url=${encodeURIComponent(
         resolvedUrl
       )}&referer=${referer}`;
@@ -136,7 +117,6 @@ export async function GET(request) {
     const url = new URL(request.url).searchParams.get("url");
     const origin = request.headers.get("origin") || null;
     const referer = new URL(request.url).searchParams.get("referer") || null;
-
     if (!url) {
       return NextResponse.json(
         { error: "URL parameter is required" },
@@ -144,43 +124,8 @@ export async function GET(request) {
       );
     }
 
-    // Check for cached content first (for small files like playlists)
-    const cacheKey = `${url}_${referer}`;
-    const cached = cache.get(cacheKey);
-
-    const normalize = (url) => url.replace(/^https?:\/\//, "");
-
-    let isAllowedOrigin = false;
-
-    if (origin) {
-      isAllowedOrigin =
-        origin.endsWith(".aniversehd.com") || allowedOrigins.includes(origin);
-    } else {
-      const host = request.headers.get("host") || "";
-      isAllowedOrigin =
-        host.endsWith(".aniversehd.com") ||
-        allowedOrigins.some((o) => normalize(o) === host);
-    }
-
-    if (!isAllowedOrigin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    // For cached playlists
-    if (cached && url.endsWith(".m3u8")) {
-      return new NextResponse(cached, {
-        status: 200,
-        headers: {
-          "Content-Type": "application/vnd.apple.mpegurl",
-          "Cache-Control": "public, max-age=30",
-          "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "null",
-        },
-      });
-    }
-
     const response = await fetchWithCustomReferer(url, referer);
     const contentType = response.headers.get("Content-Type");
-    const contentLength = response.headers.get("Content-Length");
     const isM3U8 = url.endsWith(".m3u8");
 
     if (!response.ok) {
@@ -190,55 +135,30 @@ export async function GET(request) {
       );
     }
 
-    // Common headers
-    const responseHeaders = {
-      "Content-Type": contentType || guessContentTypeFromUrl(url),
-      "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "null",
-      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
-      "Access-Control-Allow-Headers": "Range, Content-Range, Content-Length",
-    };
-
-    // Handle range requests for video segments
-    const range = request.headers.get("range");
-    if (range && !isM3U8) {
-      responseHeaders["Accept-Ranges"] = "bytes";
-      responseHeaders["Content-Range"] =
-        response.headers.get("Content-Range") || "";
-      responseHeaders["Content-Length"] =
-        response.headers.get("Content-Length") || "";
-    }
-
     if (isM3U8) {
-      // Handle playlists (small files, can be buffered)
+      // Rewrite URLs in the playlist
       const playlistText = await response.text();
       const modifiedPlaylist = rewritePlaylistUrls(playlistText, url);
 
-      // Cache the playlist
-      cache.set(cacheKey, modifiedPlaylist);
-
       return new NextResponse(modifiedPlaylist, {
-        status: response.status,
+        status: 200,
         headers: {
-          ...responseHeaders,
-          "Content-Type": "application/vnd.apple.mpegurl",
+          "Content-Type": contentType || "application/vnd.apple.mpegurl",
           "Cache-Control": "public, max-age=30", // Short cache for playlists
         },
       });
     } else {
-      // Handle video segments and other binary files with TRUE STREAMING
-      if (contentLength) {
-        responseHeaders["Content-Length"] = contentLength;
-      }
-
-      // Set appropriate cache headers for video segments
-      responseHeaders["Cache-Control"] = "public, max-age=31536000, immutable";
-
-      // Create streaming response
-      return new Response(response.body, {
-        headers: responseHeaders,
-        status: response.status,
+      const buffer = Buffer.from(await response.arrayBuffer());
+      
+      return new NextResponse(buffer, {
+        status: 200,
+        headers: {
+          "Content-Type": contentType,
+          "Cache-Control": "public, max-age=30", // Short cache for playlists
+        },
       });
     }
+    
   } catch (error) {
     console.log("Error fetching data:", error);
     return NextResponse.json(
