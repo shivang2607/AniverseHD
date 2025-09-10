@@ -17,13 +17,13 @@ const allowedOrigins = [
 const agents = {
   http: new (await import("http")).Agent({
     keepAlive: true,
-    maxSockets: 50,
+    maxSockets: 300,
     maxFreeSockets: 10,
     timeout: 30000,
   }),
   https: new (await import("https")).Agent({
     keepAlive: true,
-    maxSockets: 50,
+    maxSockets: 300,
     maxFreeSockets: 10,
     timeout: 30000,
   }),
