@@ -3,10 +3,9 @@ import React from "react";
 import UserInfo from "./components/UserInfo";
 import UserWatchLists from "./components/UserWatchLists";
 import { Toaster } from "react-hot-toast";
-import { auth } from "../../firebase/utils/firebaseinit"
 
 const Profile = ({ params }) => {
-  console.log( auth?.currentUser?.getIdToken());
+
   return (
     <div className="w-full min-h-screen">
       <UserInfo id={params.id} />

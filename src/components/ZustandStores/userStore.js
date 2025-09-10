@@ -30,11 +30,8 @@ const useUserStore = create((set, get) => ({
   hideWatchlistBar : true, 
   selectedId : null,
   listData : [],
-  
-
-  setIsUserLoggedIn: (status) => set({ isUserLoggedIn: status }),
-  setLoggedInUserData: (data) => set({ loggedInUserData: data }),
-
+   
+    
   loadLoggedInUserDataAndWatchLists: async () => {
     set({ loadingData: true });
     const [respUserInfo, respUserWatchLists] = await Promise.all([
