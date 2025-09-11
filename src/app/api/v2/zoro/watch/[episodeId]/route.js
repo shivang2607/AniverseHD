@@ -1,9 +1,11 @@
+import { defaultCacheOptions } from "@/utils/lruCache";
 import axios from "axios";
 import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 
 const option = {
-  max: 500,
+  ...defaultCacheOptions,
+  max: 100,
   ttl: 1000 * 60 * 1, // 1 min
 };
 const zoroCache = new LRUCache(option);

@@ -1,11 +1,13 @@
 // lib/fetchAnimepaheInfoByMalId.js
 
+import { defaultCacheOptions } from "@/utils/lruCache";
 import axios from "axios";
 import { LRUCache } from "lru-cache";
 
 // LRU cache config
 const animepaheInfoCache = new LRUCache({
-  max: 300,
+  ...defaultCacheOptions,
+  max: 100,
   ttl: 1000 * 60 * 15, // 15 minutes
 });
 

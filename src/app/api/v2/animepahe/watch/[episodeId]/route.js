@@ -1,10 +1,13 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
 import {LRUCache} from "lru-cache";
+import { defaultCacheOptions } from "@/utils/lruCache";
 
 // Initialize LRU Cache (adjust max size and TTL as needed)
 const cache = new LRUCache({
-  max: 500,                  // max 500 items
+  ...defaultCacheOptions,
+  maxSize: 100,              // maximum size of the cache set to 100 MB
+  max: 100,                  // max 100 items
   ttl: 1000 * 60 * 60,       // cache for 1 hour
 });
 

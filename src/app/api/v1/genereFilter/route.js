@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { LRUCache } from "lru-cache";
+import { defaultCacheOptions } from "@/utils/lruCache";
 
 
 
 const options = {
-  max:500,
-  ttl: 1000*60*60*24*30,
+  ...defaultCacheOptions,
+  maxSize: 20,
+  max: 100,
+  ttl: 1000 * 60 * 60 * 24 * 30,
 }
 const genreFilterCache = new LRUCache(options);
 
