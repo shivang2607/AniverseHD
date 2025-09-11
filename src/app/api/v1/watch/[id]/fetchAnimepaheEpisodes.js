@@ -1,10 +1,12 @@
 // lib/fetchAnimepaheEpisode.ts
 
+import { defaultCacheOptions } from "@/utils/lruCache";
 import axios from "axios";
 import { LRUCache } from "lru-cache";
 
 // LRU cache config
 const episodeCache = new LRUCache({
+  ...defaultCacheOptions,
   max: 100,
   ttl: 1000 * 60 * 15, // 15 minutes
 });

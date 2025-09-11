@@ -4,8 +4,10 @@ import axios from "axios";
 import redisClient from "@/lib/redis";  // Use the singleton instance directly
 import { syncQdrant } from "./syncWithJikan";
 import { addQdrantAnime } from "./addAnime";
+import { defaultCacheOptions } from "@/utils/lruCache";
 
 const animeOptions = {
+  ...defaultCacheOptions,
   max: 100,
   ttl: 1000 * 60 * 60 * 24 * 1, // 1 day
 };
