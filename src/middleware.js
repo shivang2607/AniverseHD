@@ -1,44 +1,45 @@
 // src/middleware.js
 import { NextResponse } from 'next/server';
 
-// Root domains allowed (subdomains are also allowed)
 const allowedDomains = [
   'aniversehd.com',
   'aniversehd.in',
   'aniversehd.cc',
 ];
 
-// Exact hostnames (localhost, ports, etc.)
 const allowedExactHosts = [
   'localhost:3000',
 ];
 
 function isAllowedHost(host) {
   if (!host) return false;
-
   if (allowedExactHosts.includes(host)) return true;
-
-  return allowedDomains.some(domain =>
-    host === domain || host.endsWith(`.${domain}`)
+  return allowedDomains.some(
+    (domain) => host === domain || host.endsWith(`.${domain}`)
   );
 }
 
-// function isAllowedOrigin(value) {
-//   if (!value) return false;
-//   return allowedDomains.some(domain =>
-//     value.includes(domain)
-//   ) || allowedExactHosts.some(local =>
-//     value.includes(local)
-//   );
-// }
+function isAllowedOriginHeader(value) {
+  if (!value) return false;
+  try {
+    const { host } = new URL(value);
+    return isAllowedHost(host);
+  } catch {
+    return false;
+  }
+}
 
 export function middleware(req) {
   const host = req.headers.get('host') || '';
+  const origin = req.headers.get('origin') || '';
+  const referer = req.headers.get('referer') || '';
 
   const isValidHost = isAllowedHost(host);
-  // const isValidOrigin = isAllowedOrigin(origin);
+  const isValidOrigin = origin ? isAllowedOriginHeader(origin) : true; // allow if missing
+  const isValidReferer = referer ? isAllowedOriginHeader(referer) : true; // allow if missing
 
-  if (!isValidHost) {     //earlier here condition also included the referer and the origin, but actually the host is the sufficient condition will suffice.
+  // require host always, but origin/referer only if present
+  if (!isValidHost || (!isValidOrigin && !isValidReferer)) {
     return new NextResponse('Forbidden', { status: 403 });
   }
 
@@ -48,5 +49,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: '/:path*', 
+  matcher: '/:path*',
 };
