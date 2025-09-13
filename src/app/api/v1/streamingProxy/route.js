@@ -6,6 +6,13 @@ const referer_map = {
   "kwikie.com": "https://kwik.si/",
 };
 
+const allowedOrigins = [
+  "https://aniversehd.com",
+  "https://aniversehd.cc",
+  "https://aniversehd.in",
+  "http://localhost:3000",
+];
+
 // Connection pooling
 const agents = {
   http: new (await import("http")).Agent({
@@ -34,8 +41,7 @@ async function fetchWithCustomReferer(url, referer) {
   return fetch(url, {
     headers: {
       referer: referer || detectReferer(url),
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       Accept: "*/*",
       "Accept-Encoding": "gzip, deflate, br",
       Connection: "keep-alive",
@@ -69,7 +75,6 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
       const trimmed = line.trim();
 
       if (!trimmed || trimmed.startsWith("#")) {
-        // Rewrite AES key URI if present
         if (trimmed.startsWith("#EXT-X-KEY:")) {
           return trimmed.replace(
             /URI="([^"]+)"/,
@@ -94,10 +99,30 @@ export async function GET(request) {
   try {
     const url = new URL(request.url).searchParams.get("url");
     const referer = new URL(request.url).searchParams.get("referer");
+    const origin = request.headers.get("origin") || null;
 
     if (!url) {
       return NextResponse.json({ error: "URL parameter is required" }, { status: 400 });
     }
+
+    // ---- Allowed Origin Check ----
+    const normalize = (u) => u.replace(/^https?:\/\//, "");
+    let isAllowedOrigin = false;
+
+    if (origin) {
+      isAllowedOrigin =
+        origin.endsWith(".aniversehd.com") || allowedOrigins.includes(origin);
+    } else {
+      const host = request.headers.get("host") || "";
+      isAllowedOrigin =
+        host.endsWith(".aniversehd.com") ||
+        allowedOrigins.some((o) => normalize(o) === host);
+    }
+
+    if (!isAllowedOrigin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    // ------------------------------
 
     const response = await fetchWithCustomReferer(url, referer);
     if (!response.ok) {
@@ -109,7 +134,7 @@ export async function GET(request) {
 
     const responseHeaders = {
       "Content-Type": contentType,
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": origin || "null",
       "Access-Control-Allow-Headers": "Range, Content-Range, Content-Length",
     };
 
