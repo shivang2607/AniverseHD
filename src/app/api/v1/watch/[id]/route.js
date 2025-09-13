@@ -24,15 +24,6 @@ export async function GET(req, { params }) {
 
   console.log("Fetching watch anime data for id:", id);
   const cachedData = watchCache.get(`watch-${id}`);
-
-  //! Tracking LRU cache stats
-      console.log("=== LRU Cache Stats ===");
-      console.log("Size (entries):", watchCache.size);
-      console.log("Calculated Size:", watchCache.calculatedSize);
-      console.log("Max:", watchCache.max);
-      console.log("========================");
-
-  
   if (cachedData) {
     console.log(
       `LRU watch anime cache hit for id ${id}, animepahe key available => ${cachedData?.animepahe}`
@@ -46,7 +37,7 @@ export async function GET(req, { params }) {
       },
     });
   }
-  
+
   try {
     const redisCache = await redisClient.get(`watch-${id}`);
     if (redisCache) {
