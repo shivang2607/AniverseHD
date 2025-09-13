@@ -24,6 +24,15 @@ export async function GET(req, { params }) {
 
   console.log("Fetching watch anime data for id:", id);
   const cachedData = watchCache.get(`watch-${id}`);
+
+  //! Tracking LRU cache stats
+      console.log("=== LRU Cache Stats ===");
+      console.log("Size (entries):", watchCache.size);
+      console.log("Calculated Size:", watchCache.calculatedSize);
+      console.log("Max:", watchCache.max);
+      console.log("========================");
+
+  
   if (cachedData) {
     console.log(
       `LRU watch anime cache hit for id ${id}, animepahe key available => ${cachedData?.animepahe}`
@@ -37,7 +46,7 @@ export async function GET(req, { params }) {
       },
     });
   }
-
+  
   try {
     const redisCache = await redisClient.get(`watch-${id}`);
     if (redisCache) {
@@ -56,17 +65,17 @@ export async function GET(req, { params }) {
   } catch (redisError) {
     console.error("Redis error:", redisError);
   }
-
+  
   const scrapeUrl = process.env.SCRAPER_URL;
   const aniwatchScrapeUrl = process.env.ANIWATCH_SCRAPER_URL;
-
+  
   try {
     const animeData = await getAnime(id);
     if (!animeData?.Sites) {
       return new NextResponse(
         JSON.stringify({
           message:
-            "Sites not found. Anime may not be available in your region.",
+          "Sites not found. Anime may not be available in your region.",
         }),
         {
           status: 404,
@@ -77,17 +86,20 @@ export async function GET(req, { params }) {
         }
       );
     }
-
+    
     let maxEpisode = 0;
     let zoroEps = null;
-
-    const zoroSites = animeData.Sites?.Zoro || animeData.Sites?.zoro ||  {};
+    
+    const zoroSites = animeData.Sites?.Zoro || animeData.Sites?.zoro || {};
     await Promise.all(
       Object.keys(zoroSites).map(async (key) => {
         try {
-          const id = key === 'sub' ? zoroSites[key] : zoroSites[key]?.url?.split("/").pop();
+          const id =
+          key === "sub"
+          ? zoroSites[key]
+          : zoroSites[key]?.url?.split("/").pop();
           if (!id) return;
-
+          
           const res = await axios.get(
             `${aniwatchScrapeUrl}/api/v2/hianime/anime/${id}/episodes`
           );
@@ -102,9 +114,9 @@ export async function GET(req, { params }) {
         }
       })
     );
-
+    
     //below code is for getting the episodes from the animepahe provider!
-
+    
     let animepaheEps = null;
     console.log("Entering the fetchAnimepaheInfoByMalId");
     const animepaheData = await fetchAnimepaheInfoByMalId(id, animeData?.Sites); // Fetch animepahe data (first it will check for the id in Sites, if not found which is super rare, it will fetch from mapper)
@@ -121,7 +133,7 @@ export async function GET(req, { params }) {
       animepahe: {
         episodes: animepaheEps || [],
         totalEpisodes:
-          animepaheData?.totalEpisodes || animepaheData?.episodes?.length || 0,
+        animepaheData?.totalEpisodes || animepaheData?.episodes?.length || 0,
       },
       gogoSub: {
         episodes: [],
@@ -153,13 +165,14 @@ export async function GET(req, { params }) {
       start_year: animeData.start_year || "",
     };
 
-    if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to) &&
+    if (
+      isDateMoreThanSixMonthsOld(finalResponse?.aired?.to) &&
       id &&
       finalResponse?.zoro?.episodes?.length > 0 &&
       finalResponse?.animepahe?.episodes?.length > 0
     ) {
       console.log("Caching finished anime for 7 days in Redis");
-
+      
       await redisClient.set(
         `watch-${id}`,
         JSON.stringify(finalResponse),
@@ -167,14 +180,15 @@ export async function GET(req, { params }) {
         60 * 60 * 24 * 7
       );
     }
-
-    if (id &&
-      finalResponse?.zoro?.episodes?.length > 0 &&
-      finalResponse?.animepahe?.episodes?.length > 0
+    
+    if (
+      id &&
+      (finalResponse?.zoro?.episodes?.length > 0 ||
+      finalResponse?.animepahe?.episodes?.length > 0)
     ) {
       watchCache.set(`watch-${id}`, finalResponse);
     }
-
+    
     // Add cache control headers for 30 min server-side caching
     return new NextResponse(JSON.stringify(finalResponse), {
       status: 200,
