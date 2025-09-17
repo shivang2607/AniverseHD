@@ -26,7 +26,7 @@ function detectReferer(url) {
   for (const key in referer_map) {
     if (url.includes(key)) return referer_map[key];
   }
-  return "https://kwik.si/";
+  return "https://megacloud.blog/";
 }
 
 async function fetchWithCustomReferer(url, referer) {
@@ -70,15 +70,15 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
 
       if (!trimmed || trimmed.startsWith("#")) {
         // Rewrite AES key URI if present
-        if (trimmed.startsWith("#EXT-X-KEY:")) {
-          return trimmed.replace(
-            /URI="([^"]+)"/,
-            (_, uri) =>
-              `URI="/api/v1/streamingProxy?url=${encodeURIComponent(
-                uri
-              )}&referer=${referer}"`
-          );
-        }
+        // if (trimmed.startsWith("#EXT-X-KEY:")) {
+        //   return trimmed.replace(
+        //     /URI="([^"]+)"/,
+        //     (_, uri) =>
+        //       `URI="/api/v1/streamingProxy?url=${encodeURIComponent(
+        //         uri
+        //       )}&referer=${referer}"`
+        //   );
+        // }
         return line;
       }
 

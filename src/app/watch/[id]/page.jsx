@@ -589,7 +589,7 @@ export default function Page({ params }) {
       setDownloadLink();
       
       return `/api/v1/streamingProxy?url=${
-        streamingData?.sources?.[0]?.url
+        encodeURIComponent(streamingData?.sources?.[0]?.url)
       }`;
     
     
@@ -704,7 +704,7 @@ export default function Page({ params }) {
                             subtitles={streamingData?.tracks?.filter(tr => tr?.kind === 'captions')?.map(tr => {
                               return {
                               ...tr,
-                              file:`/api/v1/streamingProxy?url=${tr?.file}`,        // zoro api subtitles require referes as well, by using straming proxy which automatically adds the referer based on the domain of the url, we are just adding the referer to the subtitles file.
+                              file:`/api/v1/streamingProxy?url=${encodeURIComponent(tr?.file)}`,        // zoro api subtitles require referes as well, by using straming proxy which automatically adds the referer based on the domain of the url, we are just adding the referer to the subtitles file.
                             }
                           }
                         )}
