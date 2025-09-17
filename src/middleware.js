@@ -39,7 +39,7 @@ export function middleware(req) {
   const isValidReferer = referer ? isAllowedOriginHeader(referer) : true; // allow if missing
 
   // require host always, but origin/referer only if present
-  if (!isValidHost || (!isValidOrigin && !isValidReferer)) {
+  if (!isValidHost || (!isValidOrigin)) {
     return new NextResponse('Forbidden', { status: 403 });
   }
 
