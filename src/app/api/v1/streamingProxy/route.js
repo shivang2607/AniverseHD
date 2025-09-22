@@ -71,7 +71,7 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
       const trimmed = line.trim();
 
       if (!trimmed || trimmed.startsWith("#")) {
-        // Rewrite AES key URI if present
+        // Rewrite AES key URI if present //! Do not comment this if block this is handling animepahe streaming since they are sending the url in form of jpg instead of ts segments
         if (trimmed.startsWith("#EXT-X-KEY:")) {
           return trimmed.replace(
             /URI="([^"]+)"/,
