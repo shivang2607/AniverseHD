@@ -4,6 +4,8 @@ const referer_map = {
   "tubeplx.viddsn": "https://vidwish.live/",
   "dotstream.buzz": "https://megaplay.buzz/",
   "kwikie.com": "https://kwik.si/",
+  "owocdn": "https://kwik.si/",
+  "uwucdn": "https://kwik.si/",
 };
 
 // Connection pooling
@@ -33,7 +35,7 @@ async function fetchWithCustomReferer(url, referer) {
   const isHttps = url.startsWith("https:");
   return fetch(url, {
     headers: {
-      referer: referer || detectReferer(url),
+      referer:  referer || detectReferer(url),
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       Accept: "*/*",
@@ -70,15 +72,15 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
 
       if (!trimmed || trimmed.startsWith("#")) {
         // Rewrite AES key URI if present
-        // if (trimmed.startsWith("#EXT-X-KEY:")) {
-        //   return trimmed.replace(
-        //     /URI="([^"]+)"/,
-        //     (_, uri) =>
-        //       `URI="/api/v1/streamingProxy?url=${encodeURIComponent(
-        //         uri
-        //       )}&referer=${referer}"`
-        //   );
-        // }
+        if (trimmed.startsWith("#EXT-X-KEY:")) {
+          return trimmed.replace(
+            /URI="([^"]+)"/,
+            (_, uri) =>
+              `URI="/api/v1/streamingProxy?url=${encodeURIComponent(
+                uri
+              )}&referer=${referer}"`
+          );
+        }
         return line;
       }
 
