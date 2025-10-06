@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import axios from "axios";
+import http from "http";
+import https from "https";
 
 const referer_map = {
   "tubeplx.viddsn": "https://vidwish.live/",
@@ -8,15 +11,15 @@ const referer_map = {
   "uwucdn": "https://kwik.si/",
 };
 
-// Connection pooling
+// Connection pooling agents
 const agents = {
-  http: new (await import("http")).Agent({
+  http: new http.Agent({
     keepAlive: true,
     maxSockets: 300,
     maxFreeSockets: 10,
     timeout: 30000,
   }),
-  https: new (await import("https")).Agent({
+  https: new https.Agent({
     keepAlive: true,
     maxSockets: 300,
     maxFreeSockets: 10,
@@ -31,33 +34,28 @@ function detectReferer(url) {
   return "https://megacloud.blog/";
 }
 
-async function fetchWithCustomReferer(url, referer) {
-  const isHttps = url.startsWith("https:");
-  return fetch(url, {
-    headers: {
-      referer:  referer || detectReferer(url),
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      Accept: "*/*",
-      "Accept-Encoding": "gzip, deflate, br",
-      Connection: "keep-alive",
-    },
-    agent: isHttps ? agents.https : agents.http,
-  });
-}
-
 function guessContentTypeFromUrl(url) {
   const ext = url.split("?")[0].split(".").pop()?.toLowerCase();
   switch (ext) {
-    case "vtt": case "webvtt": return "text/vtt";
-    case "srt": return "application/x-subrip";
-    case "m3u8": return "application/vnd.apple.mpegurl";
-    case "mpd": return "application/dash+xml";
-    case "ts": return "video/mp2t";
-    case "mp4": return "video/mp4";
-    case "json": return "application/json";
-    case "xml": return "application/xml";
-    default: return "application/octet-stream";
+    case "vtt":
+    case "webvtt":
+      return "text/vtt";
+    case "srt":
+      return "application/x-subrip";
+    case "m3u8":
+      return "application/vnd.apple.mpegurl";
+    case "mpd":
+      return "application/dash+xml";
+    case "ts":
+      return "video/mp2t";
+    case "mp4":
+      return "video/mp4";
+    case "json":
+      return "application/json";
+    case "xml":
+      return "application/xml";
+    default:
+      return "application/octet-stream";
   }
 }
 
@@ -71,7 +69,6 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
       const trimmed = line.trim();
 
       if (!trimmed || trimmed.startsWith("#")) {
-        // Rewrite AES key URI if present //! Do not comment this if block this is handling animepahe streaming since they are sending the url in form of jpg instead of ts segments
         if (trimmed.startsWith("#EXT-X-KEY:")) {
           return trimmed.replace(
             /URI="([^"]+)"/,
@@ -92,22 +89,48 @@ function rewritePlaylistUrls(playlistText, baseUrl) {
     .join("\n");
 }
 
+async function axiosStream(url, referer, rangeHeader) {
+  const isHttps = url.startsWith("https:");
+  const headers = {
+    Referer: referer || detectReferer(url),
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    Accept: "*/*",
+    "Accept-Encoding": "gzip, deflate, br",
+    Connection: "keep-alive",
+    ...(rangeHeader ? { Range: rangeHeader } : {}),
+  };
+
+  const response = await axios({
+    method: "GET",
+    url,
+    headers,
+    responseType: "stream",
+    httpAgent: agents.http,
+    httpsAgent: agents.https,
+    validateStatus: () => true, // allow non-2xx responses
+  });
+
+  return response;
+}
+
 export async function GET(request) {
   try {
-    const url = new URL(request.url).searchParams.get("url");
-    const referer = new URL(request.url).searchParams.get("referer");
+    const { searchParams } = new URL(request.url);
+    const url = searchParams.get("url");
+    const referer = searchParams.get("referer");
+    const rangeHeader = request.headers.get("range");
 
     if (!url) {
-      return NextResponse.json({ error: "URL parameter is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "URL parameter is required" },
+        { status: 400 }
+      );
     }
 
-    const response = await fetchWithCustomReferer(url, referer);
-    if (!response.ok) {
-      return NextResponse.json({ error: response.statusText }, { status: response.status });
-    }
-
+    const response = await axiosStream(url, referer, rangeHeader);
     const isM3U8 = url.endsWith(".m3u8");
-    const contentType = response.headers.get("Content-Type") || guessContentTypeFromUrl(url);
+    const contentType =
+      response.headers["content-type"] || guessContentTypeFromUrl(url);
 
     const responseHeaders = {
       "Content-Type": contentType,
@@ -115,15 +138,23 @@ export async function GET(request) {
       "Access-Control-Allow-Headers": "Range, Content-Range, Content-Length",
     };
 
-    const range = request.headers.get("range");
-    if (range && !isM3U8) {
+    // Handle partial content
+    if (rangeHeader && !isM3U8) {
       responseHeaders["Accept-Ranges"] = "bytes";
-      responseHeaders["Content-Range"] = response.headers.get("Content-Range") || "";
-      responseHeaders["Content-Length"] = response.headers.get("Content-Length") || "";
+      if (response.headers["content-range"])
+        responseHeaders["Content-Range"] = response.headers["content-range"];
+      if (response.headers["content-length"])
+        responseHeaders["Content-Length"] = response.headers["content-length"];
     }
 
     if (isM3U8) {
-      const playlistText = await response.text();
+      const playlistText = await new Promise((resolve, reject) => {
+        let data = "";
+        response.data.on("data", (chunk) => (data += chunk.toString()));
+        response.data.on("end", () => resolve(data));
+        response.data.on("error", reject);
+      });
+
       const modifiedPlaylist = rewritePlaylistUrls(playlistText, url);
       return new NextResponse(modifiedPlaylist, {
         status: response.status,
@@ -131,15 +162,23 @@ export async function GET(request) {
       });
     }
 
-    if (response.headers.get("Content-Length")) {
-      responseHeaders["Content-Length"] = response.headers.get("Content-Length");
+    if (response.headers["content-length"]) {
+      responseHeaders["Content-Length"] = response.headers["content-length"];
     }
 
-    responseHeaders["Cache-Control"] = "public, max-age=31536000, immutable";
+    responseHeaders["Cache-Control"] =
+      "public, max-age=31536000, immutable";
 
-    return new Response(response.body, { headers: responseHeaders, status: response.status });
+    // Stream the response body
+    return new Response(response.data, {
+      status: response.status,
+      headers: responseHeaders,
+    });
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+    console.error("Error fetching data:", error?.message || error);
+    return NextResponse.json(
+      { error: "Failed to fetch data" },
+      { status: 500 }
+    );
   }
 }
