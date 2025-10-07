@@ -30,7 +30,8 @@ export async function generateMetadata({ params }, parent) {
       ...anime?.themes,
     ],
     openGraph: {
-      images: [anime?.images?.webp?.image_url || anime?.images?.jpg?.image_url, anime?.trailer?.images?.image_url],
+      images: [anime?.images?.webp?.image_url || anime?.images?.jpg?.image_url, 
+                anime?.trailer?.images?.maximum_image_url, anime?.trailer?.images?.large_image_url, anime?.trailer?.images?.image_url, anime?.trailer?.images?.medium_image_url],
     },
   };
 }
