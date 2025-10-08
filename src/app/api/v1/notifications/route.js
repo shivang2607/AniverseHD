@@ -3,7 +3,7 @@ import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
 
 const notificationCache = new LRUCache({
-  max: 200, // Maximum number of items in the cache    
+  max: 50, // Maximum number of items in the cache    
   ttl: 1000 * 60 * 20, // Time to live in milliseconds (20 minutes) 
 });
 

@@ -4,11 +4,13 @@ import { NextResponse } from "next/server";
 import getAnime from "../../anime/[id]/mainFunction";
 import redisClient from "@/lib/redis"; // Use the singleton instance directly
 import { fetchAnimepaheInfoByMalId } from "./fetchAnimeInfoByMalId";
+import { defaultCacheOptions } from "@/utils/lruCache";
 
 //? The commented code in the file is mostly of the gogo provider, since gogo has went down we can't do much about it and its not working as of writing this on 24/02/2025, the commented code for gogo is now deprecated.
 
 const watchOptions = {
-  max: 500,
+  ...defaultCacheOptions,
+  max: 100,
   ttl: 1000 * 60 * 15, // 15 min
 };
 const watchCache = new LRUCache(watchOptions);
@@ -54,17 +56,17 @@ export async function GET(req, { params }) {
   } catch (redisError) {
     console.error("Redis error:", redisError);
   }
-
+  
   const scrapeUrl = process.env.SCRAPER_URL;
   const aniwatchScrapeUrl = process.env.ANIWATCH_SCRAPER_URL;
-
+  
   try {
     const animeData = await getAnime(id);
     if (!animeData?.Sites) {
       return new NextResponse(
         JSON.stringify({
           message:
-            "Sites not found. Anime may not be available in your region.",
+          "Sites not found. Anime may not be available in your region.",
         }),
         {
           status: 404,
@@ -75,17 +77,20 @@ export async function GET(req, { params }) {
         }
       );
     }
-
+    
     let maxEpisode = 0;
     let zoroEps = null;
-
-    const zoroSites = animeData.Sites?.Zoro || animeData.Sites?.zoro ||  {};
+    
+    const zoroSites = animeData.Sites?.Zoro || animeData.Sites?.zoro || {};
     await Promise.all(
       Object.keys(zoroSites).map(async (key) => {
         try {
-          const id = key === 'sub' ? zoroSites[key] : zoroSites[key]?.url?.split("/").pop();
+          const id =
+          key === "sub"
+          ? zoroSites[key]
+          : zoroSites[key]?.url?.split("/").pop();
           if (!id) return;
-
+          
           const res = await axios.get(
             `${aniwatchScrapeUrl}/api/v2/hianime/anime/${id}/episodes`
           );
@@ -100,9 +105,9 @@ export async function GET(req, { params }) {
         }
       })
     );
-
+    
     //below code is for getting the episodes from the animepahe provider!
-
+    
     let animepaheEps = null;
     console.log("Entering the fetchAnimepaheInfoByMalId");
     const animepaheData = await fetchAnimepaheInfoByMalId(id, animeData?.Sites); // Fetch animepahe data (first it will check for the id in Sites, if not found which is super rare, it will fetch from mapper)
@@ -119,7 +124,7 @@ export async function GET(req, { params }) {
       animepahe: {
         episodes: animepaheEps || [],
         totalEpisodes:
-          animepaheData?.totalEpisodes || animepaheData?.episodes?.length || 0,
+        animepaheData?.totalEpisodes || animepaheData?.episodes?.length || 0,
       },
       gogoSub: {
         episodes: [],
@@ -151,13 +156,14 @@ export async function GET(req, { params }) {
       start_year: animeData.start_year || "",
     };
 
-    if (isDateMoreThanSixMonthsOld(finalResponse?.aired?.to) &&
+    if (
+      isDateMoreThanSixMonthsOld(finalResponse?.aired?.to) &&
       id &&
       finalResponse?.zoro?.episodes?.length > 0 &&
       finalResponse?.animepahe?.episodes?.length > 0
     ) {
       console.log("Caching finished anime for 7 days in Redis");
-
+      
       await redisClient.set(
         `watch-${id}`,
         JSON.stringify(finalResponse),
@@ -165,14 +171,15 @@ export async function GET(req, { params }) {
         60 * 60 * 24 * 7
       );
     }
-
-    if (id &&
-      finalResponse?.zoro?.episodes?.length > 0 &&
-      finalResponse?.animepahe?.episodes?.length > 0
+    
+    if (
+      id &&
+      (finalResponse?.zoro?.episodes?.length > 0 ||
+      finalResponse?.animepahe?.episodes?.length > 0)
     ) {
       watchCache.set(`watch-${id}`, finalResponse);
     }
-
+    
     // Add cache control headers for 30 min server-side caching
     return new NextResponse(JSON.stringify(finalResponse), {
       status: 200,

@@ -75,7 +75,7 @@ export default function ArtVideoPlayer({
 
       const qualities = sources?.map((source) => ({
         html: source?.quality || " ",
-        url: `/api/v1/streamingProxy?url=${source?.url}`,
+        url: `/api/v1/streamingProxy?url=${encodeURIComponent(source?.url)}`,
         default: source?.quality?.includes(defaultQuality) || false,
         width: "10px",
       }));
@@ -212,6 +212,29 @@ export default function ArtVideoPlayer({
                 enableWorker: false,
                 maxBufferLength: 100,
                 maxMaxBufferLength: 200,
+                // ADD THESE TIMEOUT SETTINGS:
+                manifestLoadingTimeOut: 100000, // 100 seconds for M3U8 manifest loading
+                manifestLoadingMaxRetry: 3, // Retry 3 times
+                manifestLoadingRetryDelay: 1000, // Wait 1 second between retries
+
+                levelLoadingTimeOut: 60000, // 60 seconds for level playlists
+                levelLoadingMaxRetry: 3,
+                levelLoadingRetryDelay: 1000,
+
+                fragLoadingTimeOut: 60000, // 60 seconds for video segments
+                fragLoadingMaxRetry: 3,
+                fragLoadingRetryDelay: 1000,
+
+                // Additional network settings
+                maxLoadingDelay: 4000, // Max delay before giving up on a fragment
+                maxBufferHole: 0.5, // Max gap in buffer (seconds)
+                highBufferWatchdogPeriod: 2, // Check buffer health every 2 seconds
+                nudgeOffset: 0.1, // Small offset to fix playback issues
+                nudgeMaxRetry: 3,
+
+                // Error recovery
+                maxBufferSize: 60 * 1000 * 1000, // 60MB buffer size
+                maxBufferHole: 0.5,
               });
 
               hls.loadSource(url);

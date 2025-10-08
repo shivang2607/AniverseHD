@@ -1,3 +1,4 @@
+import { defaultCacheOptions } from "@/utils/lruCache";
 import axios from "axios";
 import { LRUCache } from "lru-cache";
 import { NextResponse } from "next/server";
@@ -5,9 +6,10 @@ import { NextResponse } from "next/server";
 
 
 const option = {
-    max:500,
-    ttl: 1000*60*5, //5 min 
-  }
+    ...defaultCacheOptions,
+    max: 100,
+    ttl: 1000 * 60 * 5, //5 min
+}
 const gogoCache = new LRUCache(option);
 
 // available server according to docs = ["gogocdn", "streamsb", "streamtape", "vidstreaming"], others servers may also be present fetch server api for getting available servers for any episode;
