@@ -10,7 +10,7 @@ import { MEDIA_KEY_SHORTCUTS } from "@vidstack/react";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import useStreamStore from "@/components/utils/streamStore";
+import useStreamStore from "@/ZustandStores/streamStore";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
 import ListDropDown from "@/components/utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";

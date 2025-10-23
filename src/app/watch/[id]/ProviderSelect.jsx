@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IoChevronDown, IoCheckmark } from 'react-icons/io5';
 import Link from 'next/link';
-import useStreamStore from '@/components/utils/streamStore';
+import useStreamStore from '@/ZustandStores/streamStore';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 const ProviderSelect = () => {

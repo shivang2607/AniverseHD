@@ -1,4 +1,4 @@
-import useStreamStore from "@/components/utils/streamStore";
+import useStreamStore from "@/ZustandStores/streamStore";
 import axios from "axios";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import useAnimeStore from "@/components/utils/animeStore";
+import useAnimeStore from "@/ZustandStores/animeStore";
 import Image from "next/image";
 import { FaPlay, FaPlayCircle } from "react-icons/fa";
 import { MdPlayDisabled } from "react-icons/md";
