@@ -1,5 +1,5 @@
 import RangeSlider2 from "@/components/utils/RangeSlider2";
-import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
+import useAnimeSearchFilterStore from "@/ZustandStores/animeSearchFiltersStore";
 import React, { useEffect, useState } from "react";
 
 const YearRange = () => {

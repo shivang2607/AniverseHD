@@ -1,7 +1,7 @@
 import DeleteWatchListById from "@/app/firebase/WatchList/DeleteWatchList";
 import UpdatePublicPrivateWatchList from "@/app/firebase/WatchList/UpdateWatchLists/UpdatePublicPrivateWatchList";
 import ShareModal from "@/components/utils/ShareModal";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/ZustandStores/userStore";
 import {
   Constant_Var_firebase_fieldValue_private,
   Constant_Var_firebase_fieldValue_public,

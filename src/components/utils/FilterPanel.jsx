@@ -5,7 +5,7 @@ import MultipleSelect from "./MultipleSelect";
 import { colorsList, demographics, genres, themes } from "./genre-themes-list";
 import { ImCancelCircle } from "react-icons/im";
 import toast, { Toaster } from "react-hot-toast";
-import useRecommendationStore from "./store";
+import useRecommendationStore from "@/ZustandStores/recommendationStore";
 import { MdElectricBolt } from "react-icons/md";
 import { Hourglass } from "react-loader-spinner";
 import { IoMdCloseCircle } from "react-icons/io";

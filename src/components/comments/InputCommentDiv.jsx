@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Comment } from "react-loader-spinner";
 import { postComment, putComment } from "./utilFunctions";
 import toast from "react-hot-toast";
-import useGlobalLoader from "../ZustandStores/useGlobalLoader";
-import useUserStore from "../ZustandStores/userStore";
+import useGlobalLoader from "@/ZustandStores/useGlobalLoader";
+import useUserStore from "@/ZustandStores/userStore";
 
 const commentLength = 500;
 

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import ShowCards from "./components/ShowCards";
 import Filters from "./components/Filters";
-import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
+import useAnimeSearchFilterStore from "@/ZustandStores/animeSearchFiltersStore";
 import { useSearchParams } from "next/navigation";
 
 const Page = () => {

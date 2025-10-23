@@ -1,4 +1,4 @@
-import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
+import useAnimeSearchFilterStore from "@/ZustandStores/animeSearchFiltersStore";
 import { Constant_Var_genresList } from "@/utils/constants";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import React, { useEffect } from "react";

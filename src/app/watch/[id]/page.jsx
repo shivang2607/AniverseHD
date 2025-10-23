@@ -38,7 +38,7 @@ import {
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import Image from "next/image";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/ZustandStores/userStore";
 import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import HandleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";

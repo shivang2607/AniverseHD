@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/ZustandStores/userStore";
 import Image from "next/image";
 
 

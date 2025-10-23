@@ -1,7 +1,7 @@
 "use client";
 import MainCard from "@/components/mainCard";
 import Pagination from "@/components/Pagination";
-import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
+import useAnimeSearchFilterStore from "@/ZustandStores/animeSearchFiltersStore";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import React, { useEffect } from "react";

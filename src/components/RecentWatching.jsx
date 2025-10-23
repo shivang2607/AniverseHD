@@ -3,7 +3,7 @@ import React from 'react'
 import RecentCard from './RecentCard';
 import { FaAnglesRight } from 'react-icons/fa6';
 import Link from 'next/link';
-import useUserStore from './ZustandStores/userStore';
+import useUserStore from '@/ZustandStores/userStore';
 
 export default function RecentWatching() {
 

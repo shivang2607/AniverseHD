@@ -6,7 +6,7 @@ import {
 } from "@/utils/constants";
 import { IoMdClose } from "react-icons/io";
 import React, { useState } from "react";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/ZustandStores/userStore";
 import toast from "react-hot-toast";
 
 const CreateWatchListModal = ({ isOpen, onClose }) => {

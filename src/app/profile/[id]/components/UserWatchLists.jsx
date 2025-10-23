@@ -1,5 +1,5 @@
 import GetOtherUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetOtherUserWatchListsInfo";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/ZustandStores/userStore";
 import {
   Constant_Var_errorMessage_userDoesNotExistWithThisId,
   Constant_Var_starterWatchLists_recent,
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import React, { use, useEffect, useState } from "react";
 import WatchListsTabs from "./WatchListsTabs";
 import WatchListPagination from "./WatchListPagination";
-import useGlobalLoader from "@/components/ZustandStores/useGlobalLoader";
+import useGlobalLoader from "@/ZustandStores/useGlobalLoader";
 import toast from "react-hot-toast";
 import CustomLoader from "@/components/CustomLoader";
 

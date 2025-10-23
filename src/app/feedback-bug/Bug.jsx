@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import ReportBug from '../firebase/Feedback_and_Reports/reportBug';
-import useUserStore from '@/components/ZustandStores/userStore';
+import useUserStore from '@/ZustandStores/userStore';
 import { Constant_Var_success } from '@/utils/constants';
 
 export default function Bug() {

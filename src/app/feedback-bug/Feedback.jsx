@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import ReactStars from "react-rating-stars-component";
 import FeedBack from '../firebase/Feedback_and_Reports/Feedback';
-import useUserStore from '@/components/ZustandStores/userStore';
+import useUserStore from '@/ZustandStores/userStore';
 import toast from 'react-hot-toast';
 import { Constant_Var_success } from '@/utils/constants';
 

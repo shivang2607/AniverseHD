@@ -1,4 +1,4 @@
-import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
+import useAnimeSearchFilterStore from "@/ZustandStores/animeSearchFiltersStore";
 import React from "react";
 import { IoIosSearch } from "react-icons/io";
 

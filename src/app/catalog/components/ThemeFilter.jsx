@@ -1,4 +1,4 @@
-import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
+import useAnimeSearchFilterStore from "@/ZustandStores/animeSearchFiltersStore";
 import {
   Constant_Var_genresList,
   Constant_Var_themesList,

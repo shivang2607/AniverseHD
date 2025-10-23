@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import useGlobalLoader from "../ZustandStores/useGlobalLoader";
+import useGlobalLoader from "@/ZustandStores/useGlobalLoader";
 
 const GlobalLoader = () => {
   const { isLoaderVisible, imageUrl, loaderText } = useGlobalLoader();

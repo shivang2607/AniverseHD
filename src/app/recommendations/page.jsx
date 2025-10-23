@@ -12,7 +12,7 @@ import { RxReset } from "react-icons/rx";
 import { Hourglass } from "react-loader-spinner";
 import { MdFilterList, MdFilterListOff } from "react-icons/md";
 import { TypeAnimation } from "react-type-animation";
-import useRecommendationStore from "@/components/utils/store";
+import useRecommendationStore from "@/ZustandStores/recommendationStore";
 
 export default function Recommendation() {
 

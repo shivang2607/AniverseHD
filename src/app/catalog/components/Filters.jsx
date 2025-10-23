@@ -1,4 +1,4 @@
-import useAnimeSearchFilterStore from "@/components/ZustandStores/animeSearchFiltersStore";
+import useAnimeSearchFilterStore from "@/ZustandStores/animeSearchFiltersStore";
 import React, { useState } from "react";
 import GenreFilter from "./GenreFilter";
 import { useRouter, useSearchParams } from "next/navigation";

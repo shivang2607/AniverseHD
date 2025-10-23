@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { demographics, genres, themes } from "./genre-themes-list";
+import { demographics, genres, themes } from "../components/utils/genre-themes-list";
 import toast from "react-hot-toast";
 import axios from "axios";
 

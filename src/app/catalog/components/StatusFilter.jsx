@@ -1,5 +1,5 @@
 import AnimeFilterDropdown from '@/components/utils/DropDownFilter';
-import useAnimeSearchFilterStore from '@/components/ZustandStores/animeSearchFiltersStore';
+import useAnimeSearchFilterStore from '@/ZustandStores/animeSearchFiltersStore';
 import { Constant_Enum_animeSearchQueryStatus } from '@/utils/constants';
 import React from 'react'
 

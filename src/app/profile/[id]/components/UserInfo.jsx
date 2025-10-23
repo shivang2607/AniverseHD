@@ -4,14 +4,14 @@ import { FaRegEdit } from "react-icons/fa";
 import Image from "next/image";
 import CreateWatchListModal from "./CreateWatchListModal";
 import EditUserProfileModal from "./EditUserProfileModal";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/ZustandStores/userStore";
 import GetOtherUserData from "@/app/firebase/Profile/GetOtherUserData";
 import {
   Constant_Var_errorMessage_userDoesNotExistWithThisId,
   Constant_Var_success,
 } from "@/utils/constants";
 import { useRouter } from "next/navigation";
-import useGlobalLoader from "@/components/ZustandStores/useGlobalLoader";
+import useGlobalLoader from "@/ZustandStores/useGlobalLoader";
 
 const UserInfo = ({ id }) => {
   const { isUserLoggedIn, loggedInUserId, loggedInUserData } = useUserStore();

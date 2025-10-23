@@ -26,7 +26,7 @@ import {
 } from "@/utils/constants";
 import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
 import { useRouter } from "next/navigation";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/ZustandStores/userStore";
 import ShareModal from "@/components/utils/ShareModal";
 
 export default function AnimeClient({ params }) {

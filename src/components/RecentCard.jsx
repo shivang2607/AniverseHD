@@ -6,7 +6,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { FaPlay } from 'react-icons/fa'
 import { IoMdClose } from 'react-icons/io'
 import { MdMovie } from 'react-icons/md'
-import useUserStore from './ZustandStores/userStore'
+import useUserStore from '@/ZustandStores/userStore'
 import { Constant_Var_success } from '@/utils/constants'
 
 export default function RecentCard({anime, grid=false}) {

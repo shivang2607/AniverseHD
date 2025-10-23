@@ -10,7 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import CardComponent from "./CardComponent";
 import { FaChevronRight } from "react-icons/fa6";
-import useRecommendationStore from "../utils/store";
+import useRecommendationStore from "@/ZustandStores/recommendationStore";
 import { demographics, genres, themes } from "../utils/genre-themes-list";
 
 export default function DescriptionBased() {

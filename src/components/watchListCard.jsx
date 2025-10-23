@@ -6,7 +6,7 @@ import { MdMovie } from "react-icons/md";
 import { IoMdClose, IoMdTimer } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 import { MdDeleteOutline } from "react-icons/md";
-import useUserStore from "@/components/ZustandStores/userStore";
+import useUserStore from "@/ZustandStores/userStore";
 
 
 export default function WatchListCard({ anime, watchListId }) {
