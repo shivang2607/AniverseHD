@@ -41,7 +41,7 @@ async function proxyHandler(req, { params }) {
     const authResult = await verifyAuthToken(token);
     if (authResult.success) {
       headers.set("user-id", authResult.userId);
-    } else {
+    } else { 
       return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
   } else {
