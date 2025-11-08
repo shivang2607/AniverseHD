@@ -1,5 +1,4 @@
-import DeleteWatchListById from "@/app/firebase/WatchList/DeleteWatchList";
-import UpdatePublicPrivateWatchList from "@/app/firebase/WatchList/UpdateWatchLists/UpdatePublicPrivateWatchList";
+
 import ShareModal from "@/components/utils/ShareModal";
 import useUserStore from "@/ZustandStores/userStore";
 import {
@@ -20,7 +19,7 @@ const WatchListsTabs = ({
   selectedWatchList,
   paramsUserId,
 }) => {
-  const { isUserLoggedIn, loggedInUserId, loadLoggedInUserWatchLists } =
+  const { isUserLoggedIn, loggedInUserId, loadLoggedInUserWatchLists, deleteWatchList, updateWatchListPrivacy } =
     useUserStore();
   const [publicOrPrivate, setPublicOrPrivate] = useState(
     selectedWatchList.type
@@ -28,35 +27,18 @@ const WatchListsTabs = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   async function DeleteCurrentWatchList() {
-    const resp = await DeleteWatchListById({
+    await deleteWatchList({
       watchListId: selectedWatchList.id,
     });
-
-    if (resp.status === Constant_Var_success) {
-      
-      loadLoggedInUserWatchLists();
-    } else {
-      console.error("error", resp.response);
-    }
   }
 
   async function UpdatePublicPrivate(e) {
     const type = e.target.value;
     setPublicOrPrivate(type);
-    const resp = await UpdatePublicPrivateWatchList({
+    await updateWatchListPrivacy({
       watchListId: selectedWatchList.id,
       type: type,
     });
-
-    if (resp.status === Constant_Var_success) {
-      
-      loadLoggedInUserWatchLists();
-    } else {
-      toast.error("Error Updating Type", {
-        id: "3",
-        duration: 3000,
-      });
-    }
   }
 
 

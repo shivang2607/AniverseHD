@@ -11,6 +11,9 @@ import DeleteWatchListById from "@/app/firebase/WatchList/DeleteWatchList";
 import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
 import GetWatchListDataById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
+import ChangeWatchListName from "@/app/firebase/WatchList/UpdateWatchLists/ChangeWatchListName";
+import UpdatePublicPrivateWatchList from "@/app/firebase/WatchList/UpdateWatchLists/UpdatePublicPrivateWatchList";
 
 // Hybrid imports (new)
 import { 
@@ -25,8 +28,29 @@ import {
   createWatchlist as createHybridWatchlist, 
   deleteWatchlist as deleteHybridWatchlist, 
   removeAnimeFromWatchlist as removeHybridAnimeFromWatchlist, 
-  getWatchlistById as getHybridWatchlistById 
+  getWatchlistById as getHybridWatchlistById,
+  addAnimeToWatchlist as addHybridAnimeToWatchlist,
+  updateWatchlistName as updateHybridWatchlistName,
+  updateWatchlistPrivacy as updateHybridWatchlistPrivacy
 } from "@/services/hybrid/watchlistService";
+
+// Cloudflare imports (for future cloudflare-only mode)
+import { 
+  getLoggedUserData as getCloudflareUserData,
+  createOrUpdateUserProfile as createCloudflareUserProfile,
+  updateUserName as updateCloudflareUserName,
+  updateUserProfileImage as updateCloudflareUserProfileImage,
+  updateUserCoverImage as updateCloudflareUserCoverImage
+} from "@/services/api/userService";
+import { 
+  getUserWatchlists as getCloudflareWatchlists,
+  createWatchlist as createCloudflareWatchlist,
+  deleteWatchlist as deleteCloudflareWatchlist,
+  removeAnimeFromWatchlist as removeCloudflareAnimeFromWatchlist,
+  getWatchlistById as getCloudflareWatchlistById,
+  addAnimeToWatchlist as addCloudflareAnimeToWatchlist,
+  updateWatchlist as updateCloudflareWatchlist
+} from "@/services/api/watchlistService";
 
 import {
   Constant_Var_starterWatchLists_recent,
@@ -42,26 +66,25 @@ import { create } from "zustand";
  * - 'cloudflare': Cloudflare-only mode (future)
  */
 const getMigrationMode = () => {
-  // Check environment variable first
-  if (process.env.NEXT_PUBLIC_MIGRATION_MODE) {
-    return process.env.NEXT_PUBLIC_MIGRATION_MODE;
-  }
-  
-  // Check localStorage for runtime switching
-  const localMode = localStorage.getItem('MIGRATION_MODE');
-  if (localMode) {
-    return localMode;
-  }
-  
-  // Check for emergency fallback
-  if (localStorage.getItem('USE_FIREBASE_FALLBACK') === 'true') {
-    return 'firebase';
-  }
-  
-  // Default to firebase for safety
-  return 'firebase';
+  // Use environment variable
+  return process.env.NEXT_PUBLIC_MIGRATION_MODE || 'firebase';
 };
 
+const uploadImageToStorage = async (blob, type) => {
+  // For now, use Firebase Storage even in Cloudflare mode
+  // You can replace this with Cloudflare R2 or other storage later
+  const { default: UploadImageToFirebaseStorage } = await import('@/app/firebase/utils/UploadImageToFirebaseStorage');
+  const result = await UploadImageToFirebaseStorage({ 
+    blob, 
+    folderName: type === 'profile' ? 'profileImages' : 'coverImages' 
+  });
+  
+  if (result.status === Constant_Var_success) {
+    return result.response;
+  } else {
+    throw new Error('Image upload failed');
+  }
+};
 
 
 const useUserStore = create((set, get) => ({
@@ -102,6 +125,12 @@ const useUserStore = create((set, get) => ({
             watchlists: respUserWatchLists.hybridResults
           }
         });
+      } else if (mode === 'cloudflare') {
+        // Cloudflare mode: use Cloudflare-only services
+        [respUserInfo, respUserWatchLists] = await Promise.all([
+          getCloudflareUserData(),
+          getCloudflareWatchlists(),
+        ]);
       } else {
         // Firebase mode: use original Firebase services
         [respUserInfo, respUserWatchLists] = await Promise.all([
@@ -175,6 +204,8 @@ const useUserStore = create((set, get) => ({
       if (mode === 'hybrid') {
         respUserInfo = await getHybridUserData();
         set({ lastHybridResults: { userInfo: respUserInfo.hybridResults } });
+      } else if (mode === 'cloudflare') {
+        respUserInfo = await getCloudflareUserData();
       } else {
         respUserInfo = await GetLoggedUserData();
       }
@@ -224,6 +255,8 @@ const useUserStore = create((set, get) => ({
       if (mode === 'hybrid') {
         respWatchLists = await getHybridWatchlists();
         set({ lastHybridResults: { watchlists: respWatchLists.hybridResults } });
+      } else if (mode === 'cloudflare') {
+        respWatchLists = await getCloudflareWatchlists();
       } else {
         respWatchLists = await GetLoggedUserWatchListsInfo();
       }
@@ -275,6 +308,8 @@ const useUserStore = create((set, get) => ({
             watchListId: RecentWatchListId,
             getAll: true,
           });
+        } else if (migrationMode === 'cloudflare') {
+          resp = await getCloudflareWatchlistById(RecentWatchListId);
         } else {
           resp = await GetWatchListDataById({
             watchListId: RecentWatchListId,
@@ -312,6 +347,8 @@ const useUserStore = create((set, get) => ({
             duration: 5000,
           });
         }
+      } else if (mode === 'cloudflare') {
+        resp = await updateCloudflareUserName(userName);
       } else {
         resp = await UpdateName({ userName: userName });
       }
@@ -356,6 +393,11 @@ const useUserStore = create((set, get) => ({
             duration: 5000,
           });
         }
+      } else if (mode === 'cloudflare') {
+        // For Cloudflare mode, we need to upload image first, then update profile
+        // This is a simplified version - you might want to implement proper image upload
+        const imageUrl = await uploadImageToStorage(blob, 'profile');
+        resp = await updateCloudflareUserProfileImage(imageUrl);
       } else {
         resp = await UpdateProfileImage({ blob: blob });
       }
@@ -400,6 +442,10 @@ const useUserStore = create((set, get) => ({
             duration: 5000,
           });
         }
+      } else if (mode === 'cloudflare') {
+        // For Cloudflare mode, we need to upload image first, then update profile
+        const imageUrl = await uploadImageToStorage(blob, 'cover');
+        resp = await updateCloudflareUserCoverImage(imageUrl);
       } else {
         resp = await UpdateCoverImage({ blob: blob });
       }
@@ -447,6 +493,11 @@ const useUserStore = create((set, get) => ({
             duration: 5000,
           });
         }
+      } else if (mode === 'cloudflare') {
+        resp = await createCloudflareWatchlist({
+          watchListName: watchListName,
+          type: type,
+        });
       } else {
         resp = await CreateWatchList({
           type: type,
@@ -494,6 +545,8 @@ const useUserStore = create((set, get) => ({
             duration: 5000,
           });
         }
+      } else if (mode === 'cloudflare') {
+        resp = await deleteCloudflareWatchlist(watchListId);
       } else {
         resp = await DeleteWatchListById({ watchListId: watchListId });
       }
@@ -541,6 +594,8 @@ const useUserStore = create((set, get) => ({
             duration: 5000,
           });
         }
+      } else if (mode === 'cloudflare') {
+        resp = await removeCloudflareAnimeFromWatchlist(watchListId, animeId);
       } else {
         resp = await RemoveAnimeFromWatchList({
           watchListId: watchListId,
@@ -604,72 +659,128 @@ const useUserStore = create((set, get) => ({
 
   setListData: (listData) => set({ listData }),
 
-  // Migration control functions
-  setMigrationMode: (mode) => {
-    localStorage.setItem('MIGRATION_MODE', mode);
-    set({ migrationMode: mode });
-    toast.info(`Switched to ${mode} mode`, {
-      id: "migration-mode",
-      duration: 3000,
-    });
-  },
-
-  getMigrationMode: () => get().migrationMode,
-
-  getLastHybridResults: () => get().lastHybridResults,
-
-  // Emergency controls
-  enableEmergencyFallback: () => {
-    localStorage.setItem('USE_FIREBASE_FALLBACK', 'true');
-    localStorage.setItem('USE_FIREBASE_FALLBACK_WATCHLISTS', 'true');
-    set({ migrationMode: 'firebase' });
-    toast.error("Emergency fallback enabled - using Firebase only", {
-      id: "emergency-fallback",
-      duration: 10000,
-    });
-  },
-
-  disableEmergencyFallback: () => {
-    localStorage.removeItem('USE_FIREBASE_FALLBACK');
-    localStorage.removeItem('USE_FIREBASE_FALLBACK_WATCHLISTS');
-    const mode = localStorage.getItem('MIGRATION_MODE') || 'firebase';
-    set({ migrationMode: mode });
-    toast.success("Emergency fallback disabled", {
-      id: "emergency-fallback-disabled",
-      duration: 5000,
-    });
-  },
-
-  // Health check function
-  checkSystemHealth: async () => {
+  // Additional watchlist operations
+  addAnimeToWatchList: async ({ watchListId, animeId, animeData, url = null }) => {
     const mode = get().migrationMode;
     
-    if (mode === 'hybrid') {
-      try {
-        // Import health monitor dynamically
-        const { healthMonitor } = await import('@/utils/hybridMigrationHelper');
-        const health = await healthMonitor.performHealthCheck();
+    try {
+      let resp;
+      
+      if (mode === 'hybrid') {
+        resp = await addHybridAnimeToWatchlist({ watchListId, animeData, url });
+        set({ lastHybridResults: { addAnime: resp.hybridResults } });
         
-        toast.info(`System Health - Firebase: ${health.firebase ? '✅' : '❌'}, Cloudflare: ${health.cloudflare ? '✅' : '❌'}`, {
-          id: "health-check",
-          duration: 5000,
-        });
+        if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
+          const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
+          toast.warning(`Warning: ${failedSystem} add failed, but operation succeeded`, {
+            id: "hybrid-warning",
+            duration: 5000,
+          });
+        }
+      } else if (mode === 'cloudflare') {
+        resp = await addCloudflareAnimeToWatchlist(watchListId, animeData, url);
+      } else {
+        resp = await AddAnimeToWatchList({ watchListId, animeId, animeData, url });
+      }
+
+      return resp;
+    } catch (error) {
+      console.error('Error adding anime to watchlist:', error);
+      return { status: Constant_Var_error, response: error.message };
+    }
+  },
+
+  changeWatchListName: async ({ watchListId, newName }) => {
+    const mode = get().migrationMode;
+    
+    try {
+      let resp;
+      
+      if (mode === 'hybrid') {
+        resp = await updateHybridWatchlistName({ watchListId, newName });
+        set({ lastHybridResults: { changeName: resp.hybridResults } });
         
-        return health;
-      } catch (error) {
-        console.error('Health check failed:', error);
-        toast.error("Health check failed", {
-          id: "health-check-error",
+        if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
+          const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
+          toast.warning(`Warning: ${failedSystem} name change failed, but operation succeeded`, {
+            id: "hybrid-warning",
+            duration: 5000,
+          });
+        }
+      } else if (mode === 'cloudflare') {
+        resp = await updateCloudflareWatchlist(watchListId, { watchListName: newName });
+      } else {
+        resp = await ChangeWatchListName({ watchListId, newName });
+      }
+
+      if (resp.status === Constant_Var_success) {
+        toast.success("Watchlist name updated successfully", {
+          id: "1",
           duration: 3000,
         });
-        return null;
+        await get().loadLoggedInUserWatchLists();
+      } else {
+        toast.error("Error updating watchlist name", {
+          id: "1",
+          duration: 3000,
+        });
       }
-    } else {
-      toast.info(`Currently in ${mode} mode - no health check needed`, {
-        id: "health-check",
+
+      return resp;
+    } catch (error) {
+      console.error('Error changing watchlist name:', error);
+      toast.error("Error updating watchlist name", {
+        id: "1",
         duration: 3000,
       });
-      return null;
+      return { status: Constant_Var_error, response: error.message };
+    }
+  },
+
+  updateWatchListPrivacy: async ({ watchListId, type }) => {
+    const mode = get().migrationMode;
+    
+    try {
+      let resp;
+      
+      if (mode === 'hybrid') {
+        resp = await updateHybridWatchlistPrivacy({ watchListId, type });
+        set({ lastHybridResults: { updatePrivacy: resp.hybridResults } });
+        
+        if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
+          const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
+          toast.warning(`Warning: ${failedSystem} privacy update failed, but operation succeeded`, {
+            id: "hybrid-warning",
+            duration: 5000,
+          });
+        }
+      } else if (mode === 'cloudflare') {
+        resp = await updateCloudflareWatchlist(watchListId, { type });
+      } else {
+        resp = await UpdatePublicPrivateWatchList({ watchListId, type });
+      }
+
+      if (resp.status === Constant_Var_success) {
+        toast.success("Watchlist privacy updated successfully", {
+          id: "1",
+          duration: 3000,
+        });
+        await get().loadLoggedInUserWatchLists();
+      } else {
+        toast.error("Error updating watchlist privacy", {
+          id: "1",
+          duration: 3000,
+        });
+      }
+
+      return resp;
+    } catch (error) {
+      console.error('Error updating watchlist privacy:', error);
+      toast.error("Error updating watchlist privacy", {
+        id: "1",
+        duration: 3000,
+      });
+      return { status: Constant_Var_error, response: error.message };
     }
   },
 }));

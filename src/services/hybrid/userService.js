@@ -33,12 +33,13 @@ export async function getUserData() {
     // Primary: Try Cloudflare first
     const cloudflareResult = await getCloudflareUserData();
     
+    console.log("hellloo",cloudflareResult)
     if (cloudflareResult.status === Constant_Var_success) {
       return cloudflareResult;
     }
     
     // Fallback: If Cloudflare fails, try Firebase
-    console.warn('Cloudflare user data fetch failed, falling back to Firebase');
+    console.log('Cloudflare user data fetch failed, falling back to Firebase');
     const firebaseResult = await GetLoggedUserData();
     
     if (firebaseResult.status === Constant_Var_success) {
@@ -336,22 +337,4 @@ export async function updateCoverImage(blob) {
       hybridResults: results
     };
   }
-}
-
-/**
- * Emergency fallback - switch all reads to Firebase
- * Call this function if Cloudflare is having issues
- */
-export async function enableFirebaseFallback() {
-  console.warn('EMERGENCY: Switching to Firebase fallback mode');
-  // You could set a flag in localStorage or environment to use Firebase for reads
-  localStorage.setItem('USE_FIREBASE_FALLBACK', 'true');
-}
-
-/**
- * Check if we should use Firebase fallback
- */
-export function shouldUseFirebaseFallback() {
-  return localStorage.getItem('USE_FIREBASE_FALLBACK') === 'true' || 
-         process.env.NEXT_PUBLIC_USE_FIREBASE_FALLBACK === 'true';
 }

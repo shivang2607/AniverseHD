@@ -1,4 +1,4 @@
-import RemoveAnimeFromWatchList from '@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList'
+import useUserStore from '@/ZustandStores/userStore'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -6,28 +6,22 @@ import toast, { Toaster } from 'react-hot-toast'
 import { FaPlay } from 'react-icons/fa'
 import { IoMdClose } from 'react-icons/io'
 import { MdMovie } from 'react-icons/md'
-import useUserStore from '@/ZustandStores/userStore'
 import { Constant_Var_success } from '@/utils/constants'
 
 export default function RecentCard({anime, grid=false}) {
 
-    const {RecentWatchListId, loadLoggedInUserRecentWatchList, loadLoggedInUserWatchLists} = useUserStore();
+    const {RecentWatchListId, loadLoggedInUserRecentWatchList, loadLoggedInUserWatchLists, removeAnimeFromWatchList} = useUserStore();
 
     
 
     const handleOnRemove = async(e)=>{
         e.preventDefault();
         e.stopPropagation();
-        const result = await RemoveAnimeFromWatchList({
+        await removeAnimeFromWatchList({
             watchListId: RecentWatchListId,
             animeId: anime?.animeId,
           });
         loadLoggedInUserRecentWatchList();
-        loadLoggedInUserWatchLists();
-        
-        if (result.status !== Constant_Var_success){
-            toast.error("Can't Remove Anime from Recent Watch list")
-        }
     }
 
 

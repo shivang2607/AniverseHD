@@ -1,4 +1,4 @@
-import CreateWatchList from "@/app/firebase/WatchList/CreateWatchList";
+
 import {
   Constant_Var_firebase_fieldValue_private,
   Constant_Var_firebase_fieldValue_public,
@@ -8,12 +8,12 @@ import { IoMdClose } from "react-icons/io";
 import React, { useEffect, useState } from "react";
 import useUserStore from "@/ZustandStores/userStore";
 import toast from "react-hot-toast";
-import ChangeWatchListName from "@/app/firebase/WatchList/UpdateWatchLists/ChangeWatchListName";
+
 
 export default function EditWatchlistModal({isOpen, onClose, id, oldName}) {
 
 
-    const {loadLoggedInUserWatchLists} = useUserStore();
+    const {loadLoggedInUserWatchLists, changeWatchListName} = useUserStore();
   const [watchlistName, setWatchlistName] = useState();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,22 +47,14 @@ export default function EditWatchlistModal({isOpen, onClose, id, oldName}) {
     formData.set("watchlist-name", watchlistName);
 
     // Start loader for creating
-    const resp = await ChangeWatchListName({
+    await changeWatchListName({
            watchListId: id,
-           watchListName: watchlistName,
+           newName: watchlistName,
          });
 
-    if (resp.status === Constant_Var_success) {
-      // Show Toast (Success)
-      console.log("Success", resp.response);
-    } else {
-      // Show Toast (Error)
-      console.log("Error", resp.response);
-    }
     setError("");
     setWatchlistName("");
     setLoading(false);
-    loadLoggedInUserWatchLists();
     onClose();
   }
 

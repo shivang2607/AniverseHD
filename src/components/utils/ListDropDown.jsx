@@ -1,10 +1,9 @@
-import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
-import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { TiTick } from "react-icons/ti";
 import { RxCross1 } from "react-icons/rx";
-import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
+
 import { Constant_Var_success } from "@/utils/constants";
 import useUserStore from "@/ZustandStores/userStore";
 
@@ -16,13 +15,13 @@ export default function ListDropDown({
   watchListData,
 }) {
 
-  const {loadLoggedInUserWatchLists} = useUserStore();
+  const {loadLoggedInUserWatchLists, addAnimeToWatchList, removeAnimeFromWatchList} = useUserStore();
 
   const handleOnClickList = async (id, listName, isAnimeInList) => {
     // console.log("list has been clicked",listName, isAnimeInList, anime);
     if(isAnimeInList){
       console.log(listName);
-      const result = await RemoveAnimeFromWatchList({
+      const result = await removeAnimeFromWatchList({
            watchListId: id,
            animeId: `${anime?.mal_id}`,
          });
@@ -39,20 +38,22 @@ export default function ListDropDown({
     }
     else{
       // console.log("these are images",anime?.images);
-    const result = await AddAnimeToWatchList({
+    const result = await addAnimeToWatchList({
       watchListId: id,
       animeId: `${anime?.mal_id}`,
-      animeName: anime?.title_english || anime?.title,
-      animePhoto: anime?.main_picture || anime?.images || {},
-      animeGenre: anime?.genres || [],
-      animeType: anime?.type || "NA",
-      animeScore: anime?.score || "NA",
-      animeAgeRating: anime?.rating || "NA",
-      animeStartYear:
-        Math.floor(
+      animeData: {
+        anime_id: `${anime?.mal_id}`,
+        title: anime?.title_english || anime?.title,
+        image_url: anime?.main_picture?.large || anime?.images?.jpg?.large_image_url,
+        genres: anime?.genres || [],
+        type: anime?.type || "NA",
+        score: anime?.score || "NA",
+        rating: anime?.rating || "NA",
+        start_year: Math.floor(
           anime?.aired?.prop?.from?.year || anime?.start_year || anime?.year
         ) || "NA",
-      animeLength: anime?.episodes || anime?.episode || null,
+        episodes: anime?.episodes || anime?.episode || null,
+      }
     });
 
     if (result?.status === Constant_Var_success) {
@@ -82,7 +83,7 @@ export default function ListDropDown({
       // console.log(anime);
       // Create an array of promises for removing the anime from each watchlist
       const removalPromises = listsToRemoveFrom.map((list) => {
-        return RemoveAnimeFromWatchList({
+        return removeAnimeFromWatchList({
           watchListId: list?.id,
           animeId: `${anime?.mal_id}`,
         });

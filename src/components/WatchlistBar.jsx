@@ -5,7 +5,7 @@ import { FaRegCirclePlay } from "react-icons/fa6";
 import Link from "next/link";
 import { MdCancel } from "react-icons/md";
 import { BiSolidHide } from "react-icons/bi";
-import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
+
 import { Constant_Var_success } from "@/utils/constants";
 import toast from "react-hot-toast";
 
@@ -21,6 +21,7 @@ export default function WatchlistBar() {
     listData,
     setListData,
     hideWatchlistBar,
+    removeAnimeFromWatchList,
   } = useUserStore();
 
   const count = 20;
@@ -44,15 +45,10 @@ export default function WatchlistBar() {
   const handleRemove = async (e, id) => {
     e.preventDefault();
     e.stopPropagation();
-    const result = await RemoveAnimeFromWatchList({
+    await removeAnimeFromWatchList({
       watchListId: selectedId,
       animeId: id,
     });
-    loadLoggedInUserWatchLists();
-
-    if (result.status !== Constant_Var_success) {
-      toast.error("Can't Remove Anime from Recent Watch list");
-    }
   };
 
   return (

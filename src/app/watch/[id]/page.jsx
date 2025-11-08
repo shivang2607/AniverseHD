@@ -42,7 +42,7 @@ import useUserStore from "@/ZustandStores/userStore";
 import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
 import HandleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
-import AddAnimeToWatchList from "@/app/firebase/WatchList/UpdateWatchLists/AddAnimeToWatchList";
+
 import { getAbsoluteURLPath, mergeAnimeEpisodesData } from "./utilFunctions";
 import { TbPlayerTrackNextFilled } from "react-icons/tb";
 import ShareModal from "@/components/utils/ShareModal";
@@ -110,6 +110,7 @@ export default function Page({ params }) {
     RecentWatchListId,
     loadLoggedInUserRecentWatchList,
     loadLoggedInUserWatchLists,
+    addAnimeToWatchList,
   } = useUserStore();
 
   const [showSkipButton, setShowSkipButton] = useState("");
@@ -143,25 +144,27 @@ export default function Page({ params }) {
       const f = async () => {
         const content = contentRef.current;
         
-        const result = await AddAnimeToWatchList({
+        const result = await addAnimeToWatchList({
           watchListId: RecentWatchListId,
           url: currentAbsoluteURL.current,
-          episodeTimestamp: recentTimestampRef.current,
-          duration: durationRef.current,
           animeId: `${params?.id}`,
-          animeName: content?.title_english || content?.title,
-          animePhoto: content?.main_picture || content?.images || {},
-          animeGenre: content?.genres || [],
-          animeType: content?.type || "NA",
-          animeScore: content?.score || "NA",
-          animeAgeRating: content?.rating || "NA",
-          animeStartYear:
-            Math.floor(
+          animeData: {
+            anime_id: `${params?.id}`,
+            title: content?.title_english || content?.title,
+            image_url: content?.main_picture?.large || content?.images?.jpg?.large_image_url,
+            genres: content?.genres || [],
+            type: content?.type || "NA",
+            score: content?.score || "NA",
+            rating: content?.rating || "NA",
+            start_year: Math.floor(
               content?.aired?.prop?.from?.year ||
                 content?.start_year ||
                 content?.year
             ) || "NA",
-          animeLength: content?.episodes || content?.episode || null,
+            episodes: content?.episodes || content?.episode || null,
+            episodeTimestamp: recentTimestampRef.current,
+            duration: durationRef.current,
+          }
         });
         // if (result?.status === Constant_Var_success) {
         //   toast.success("Watchlist Updated Successfully!!", {

@@ -55,6 +55,7 @@ async function proxyHandler(req, { params }) {
     redirect: "manual",
   };
 
+  console.log("fetch_options", fetchOptions )
   // Attach body for all methods except GET and HEAD
   if (!["GET", "HEAD"].includes(req.method)) {
     fetchOptions.body = req.body ? req.body : await req.arrayBuffer();
@@ -63,7 +64,10 @@ async function proxyHandler(req, { params }) {
 
   // Proxy the request
   const proxiedResponse = await fetch(targetUrl, fetchOptions);
+
+  console.log("url", targetUrl, "response",await proxiedResponse.json())
   const body = await proxiedResponse.arrayBuffer();
+
 
   // Forward all response headers except hop-by-hop headers
   const resHeaders = new Headers(proxiedResponse.headers);

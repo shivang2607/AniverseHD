@@ -2,9 +2,7 @@ import { Constant_Var_success } from "@/utils/constants";
 import { IoMdClose } from "react-icons/io";
 import React, { useState } from "react";
 import Image from "next/image";
-import UpdateProfileImage from "@/app/firebase/Profile/UpdateProfileImage";
-import UpdateCoverImage from "@/app/firebase/Profile/UpdateCoverImage";
-import UpdateName from "@/app/firebase/Profile/UpdateName";
+
 import useUserStore from "@/ZustandStores/userStore";
 import toast from "react-hot-toast";
 
@@ -12,7 +10,7 @@ const EditUserProfileModal = ({
   isOpen,
   onClose,
 }) => {
-  const {loadLoggedInUserData,loggedInUserData,updateUserName} = useUserStore();
+  const {loadLoggedInUserData,loggedInUserData,updateUserName,updateProfileImaeg,updateCoverImage} = useUserStore();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const tabs = ["Profile", "Cover", "Name"];
   const [selectedUserName, setSelectedUserName] = useState(loggedInUserData.userName);
@@ -58,29 +56,11 @@ const EditUserProfileModal = ({
     }
     setProfileError(null);
     setLoading(true);
-    const resp = await UpdateProfileImage({
+    await updateProfileImaeg({
       blob: profileImage.file,
-      imageUrl: false,
     });
 
-    if (resp.status === Constant_Var_success) {
-      //success Toast
-      setProfileImage({ file: null, preview: resp.response });
-      toast.success("Profile ImageUpdated Successfully", {
-        id: "10",
-        duration: 2000,
-      });
-      // console.log("Image Uploaded Succesfully", resp.response);
-    } else {
-      //error toast
-      setProfileImage({ ...profileImage, file: null });
-      toast.error("Error Updating Profile Image", {
-        id: "8",
-        duration: 3000,
-      });
-    }
-
-    loadLoggedInUserData();
+    setProfileImage({ file: null, preview: loggedInUserData.photoUrl });
     setLoading(false);
     onClose();
   }
@@ -93,28 +73,11 @@ const EditUserProfileModal = ({
     }
     setCoverError(null);
     setLoading(true);
-    const resp = await UpdateCoverImage({
+    await updateCoverImage({
       blob: coverImage.file,
-      imageUrl: false,
     });
 
-    if (resp.status === Constant_Var_success) {
-      //success Toast
-      setCoverImage({ file: null, preview: resp.response });
-      toast.success("Cover ImageUpdated Successfully", {
-        id: "11",
-        duration: 2000,
-      });
-      // console.log("Image Uploaded Succesfully", resp.response);
-    } else {
-      //error toast
-      setCoverImage({ ...coverImage, file: null });
-      toast.error("Error Updating Cover Image", {
-        id: "9",
-        duration: 3000,
-      });
-    }
-    loadLoggedInUserData();
+    setCoverImage({ file: null, preview: loggedInUserData.coverUrl });
     setLoading(false);
     onClose();
   }
@@ -124,7 +87,7 @@ const EditUserProfileModal = ({
 
     if (!selectedUserName.trim() || selectedUserName.trim() === "") return;
     setLoading(true);
-    const resp = await updateUserName({ userName: selectedUserName });
+    await updateUserName({ userName: selectedUserName });
     setLoading(false);
     onClose();
   }

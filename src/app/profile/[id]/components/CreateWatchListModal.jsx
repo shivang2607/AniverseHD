@@ -1,4 +1,4 @@
-import CreateWatchList from "@/app/firebase/WatchList/CreateWatchList";
+
 import {
   Constant_Var_firebase_fieldValue_private,
   Constant_Var_firebase_fieldValue_public,
@@ -10,7 +10,7 @@ import useUserStore from "@/ZustandStores/userStore";
 import toast from "react-hot-toast";
 
 const CreateWatchListModal = ({ isOpen, onClose }) => {
-  const {loadLoggedInUserWatchLists} = useUserStore();
+  const {loadLoggedInUserWatchLists, createWatchList} = useUserStore();
   const [watchlistName, setWatchlistName] = useState("");
   const [watchlistType, setWatchlistType] = useState(
     Constant_Var_firebase_fieldValue_public
@@ -44,22 +44,15 @@ const CreateWatchListModal = ({ isOpen, onClose }) => {
     formData.set("watchlist-type", watchlistType);
 
     // Start loader for creating
-    const resp = await CreateWatchList({
+    await createWatchList({
      watchListName:formData.get("watchlist-name").trim(),
       type:formData.get("watchlist-type")
   });
 
-    if (resp.status === Constant_Var_success) {
-      // Show Toast (Success)
-    } else {
-      // Show Toast (Error)
-      console.log("Error", resp.response);
-    }
     setError("");
     setWatchlistName("");
     setWatchlistType(Constant_Var_firebase_fieldValue_public);
     setLoading(false);
-    loadLoggedInUserWatchLists();
     onClose();
   }
 

@@ -493,20 +493,3 @@ export async function updateWatchlistPrivacy({ watchListId, type }) {
     };
   }
 }
-
-/**
- * Emergency fallback - switch all reads to Firebase
- * Call this function if Cloudflare is having issues
- */
-export async function enableFirebaseFallback() {
-  console.warn('EMERGENCY: Switching to Firebase fallback mode for watchlists');
-  localStorage.setItem('USE_FIREBASE_FALLBACK_WATCHLISTS', 'true');
-}
-
-/**
- * Check if we should use Firebase fallback for watchlists
- */
-export function shouldUseFirebaseFallback() {
-  return localStorage.getItem('USE_FIREBASE_FALLBACK_WATCHLISTS') === 'true' || 
-         process.env.NEXT_PUBLIC_USE_FIREBASE_FALLBACK === 'true';
-}
