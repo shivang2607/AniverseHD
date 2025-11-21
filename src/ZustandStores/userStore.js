@@ -16,18 +16,18 @@ import ChangeWatchListName from "@/app/firebase/WatchList/UpdateWatchLists/Chang
 import UpdatePublicPrivateWatchList from "@/app/firebase/WatchList/UpdateWatchLists/UpdatePublicPrivateWatchList";
 
 // Hybrid imports (new)
-import { 
-  getUserData as getHybridUserData, 
-  createUserProfile as createHybridUserProfile, 
-  updateUserName as updateHybridUserName, 
-  updateProfileImage as updateHybridProfileImage, 
-  updateCoverImage as updateHybridCoverImage 
+import {
+  getUserData as getHybridUserData,
+  createUserProfile as createHybridUserProfile,
+  updateUserName as updateHybridUserName,
+  updateProfileImage as updateHybridProfileImage,
+  updateCoverImage as updateHybridCoverImage
 } from "@/services/hybrid/userService";
-import { 
-  getUserWatchlists as getHybridWatchlists, 
-  createWatchlist as createHybridWatchlist, 
-  deleteWatchlist as deleteHybridWatchlist, 
-  removeAnimeFromWatchlist as removeHybridAnimeFromWatchlist, 
+import {
+  getUserWatchlists as getHybridWatchlists,
+  createWatchlist as createHybridWatchlist,
+  deleteWatchlist as deleteHybridWatchlist,
+  removeAnimeFromWatchlist as removeHybridAnimeFromWatchlist,
   getWatchlistById as getHybridWatchlistById,
   addAnimeToWatchlist as addHybridAnimeToWatchlist,
   updateWatchlistName as updateHybridWatchlistName,
@@ -35,14 +35,14 @@ import {
 } from "@/services/hybrid/watchlistService";
 
 // Cloudflare imports (for future cloudflare-only mode)
-import { 
+import {
   getLoggedUserData as getCloudflareUserData,
   createOrUpdateUserProfile as createCloudflareUserProfile,
   updateUserName as updateCloudflareUserName,
   updateUserProfileImage as updateCloudflareUserProfileImage,
   updateUserCoverImage as updateCloudflareUserCoverImage
 } from "@/services/api/userService";
-import { 
+import {
   getUserWatchlists as getCloudflareWatchlists,
   createWatchlist as createCloudflareWatchlist,
   deleteWatchlist as deleteCloudflareWatchlist,
@@ -58,27 +58,24 @@ import {
 } from "@/utils/constants";
 import toast from "react-hot-toast";
 import { create } from "zustand";
+import { getDataSource } from "@/config/dataSource";
 
 /**
- * Migration modes:
+ * Data source modes:
  * - 'firebase': Original Firebase-only mode (default)
- * - 'hybrid': Dual-write to both Firebase and Cloudflare, read from Cloudflare with Firebase fallback
+ * - 'hybrid': Dual-write to both Firebase and Cloudflare, read from Cloudflare only (no fallback)
  * - 'cloudflare': Cloudflare-only mode (future)
  */
-const getMigrationMode = () => {
-  // Use environment variable
-  return process.env.NEXT_PUBLIC_MIGRATION_MODE || 'firebase';
-};
 
 const uploadImageToStorage = async (blob, type) => {
   // For now, use Firebase Storage even in Cloudflare mode
   // You can replace this with Cloudflare R2 or other storage later
   const { default: UploadImageToFirebaseStorage } = await import('@/app/firebase/utils/UploadImageToFirebaseStorage');
-  const result = await UploadImageToFirebaseStorage({ 
-    blob, 
-    folderName: type === 'profile' ? 'profileImages' : 'coverImages' 
+  const result = await UploadImageToFirebaseStorage({
+    blob,
+    folderName: type === 'profile' ? 'profileImages' : 'coverImages'
   });
-  
+
   if (result.status === Constant_Var_success) {
     return result.response;
   } else {
@@ -95,31 +92,31 @@ const useUserStore = create((set, get) => ({
   loadingData: false,
   RecentWatchListId: null,
   RecentWatchListData: null,
-  hideWatchlistBar: true, 
+  hideWatchlistBar: true,
   selectedId: null,
   listData: [],
-  
-  // Migration state
-  migrationMode: getMigrationMode(),
+
+  // Data source state
+  dataSource: getDataSource(),
   lastHybridResults: null,
-   
-    
+
+
   loadLoggedInUserDataAndWatchLists: async () => {
     set({ loadingData: true });
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let respUserInfo, respUserWatchLists;
-      
+
       if (mode === 'hybrid') {
         // Hybrid mode: use dual-write services
         [respUserInfo, respUserWatchLists] = await Promise.all([
           getHybridUserData(),
           getHybridWatchlists(),
         ]);
-        
+
         // Store hybrid results for debugging
-        set({ 
+        set({
           lastHybridResults: {
             userInfo: respUserInfo.hybridResults,
             watchlists: respUserWatchLists.hybridResults
@@ -148,7 +145,7 @@ const useUserStore = create((set, get) => ({
         for (let i = 0; i < respUserWatchLists.response.length; ++i) {
           let ele = respUserWatchLists.response[i];
 
-          const isRecentWatchlist = 
+          const isRecentWatchlist =
             (ele.isSpecialStarter && ele.watchListName === Constant_Var_starterWatchLists_recent) ||
             (ele.isStarter === 1 && ele.name === Constant_Var_starterWatchLists_recent) ||
             ele.isRecentWatchlist === 1;
@@ -196,11 +193,13 @@ const useUserStore = create((set, get) => ({
 
   loadLoggedInUserData: async () => {
     set({ loadingData: true });
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let respUserInfo;
-      
+
+      console.log("jelloooooooo", mode);
+
       if (mode === 'hybrid') {
         respUserInfo = await getHybridUserData();
         set({ lastHybridResults: { userInfo: respUserInfo.hybridResults } });
@@ -247,11 +246,11 @@ const useUserStore = create((set, get) => ({
 
   loadLoggedInUserWatchLists: async () => {
     set({ loadingData: true });
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let respWatchLists;
-      
+
       if (mode === 'hybrid') {
         respWatchLists = await getHybridWatchlists();
         set({ lastHybridResults: { watchlists: respWatchLists.hybridResults } });
@@ -297,18 +296,18 @@ const useUserStore = create((set, get) => ({
   },
 
   loadLoggedInUserRecentWatchList: async () => {
-    let { RecentWatchListId, migrationMode } = get();
+    let { RecentWatchListId, dataSource } = get();
 
     if (RecentWatchListId) {
       try {
         let resp;
-        
-        if (migrationMode === 'hybrid') {
+
+        if (dataSource === 'hybrid') {
           resp = await getHybridWatchlistById({
             watchListId: RecentWatchListId,
             getAll: true,
           });
-        } else if (migrationMode === 'cloudflare') {
+        } else if (dataSource === 'cloudflare') {
           resp = await getCloudflareWatchlistById(RecentWatchListId);
         } else {
           resp = await GetWatchListDataById({
@@ -330,15 +329,15 @@ const useUserStore = create((set, get) => ({
   },
 
   updateUserName: async ({ userName }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await updateHybridUserName(userName);
         set({ lastHybridResults: { updateName: resp.hybridResults } });
-        
+
         // Show warning if only one system succeeded
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
@@ -376,15 +375,15 @@ const useUserStore = create((set, get) => ({
   },
 
   updateProfileImaeg: async ({ blob }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await updateHybridProfileImage(blob);
         set({ lastHybridResults: { updateProfileImage: resp.hybridResults } });
-        
+
         // Show warning if only one system succeeded
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
@@ -425,15 +424,15 @@ const useUserStore = create((set, get) => ({
   },
 
   updateCoverImage: async ({ blob }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await updateHybridCoverImage(blob);
         set({ lastHybridResults: { updateCoverImage: resp.hybridResults } });
-        
+
         // Show warning if only one system succeeded
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
@@ -473,18 +472,18 @@ const useUserStore = create((set, get) => ({
   },
 
   createWatchList: async ({ type, watchListName }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await createHybridWatchlist({
           type: type,
           watchListName: watchListName,
         });
         set({ lastHybridResults: { createWatchlist: resp.hybridResults } });
-        
+
         // Show warning if only one system succeeded
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
@@ -528,15 +527,15 @@ const useUserStore = create((set, get) => ({
   },
 
   deleteWatchList: async ({ watchListId }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await deleteHybridWatchlist(watchListId);
         set({ lastHybridResults: { deleteWatchlist: resp.hybridResults } });
-        
+
         // Show warning if only one system succeeded
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
@@ -574,18 +573,18 @@ const useUserStore = create((set, get) => ({
   },
 
   removeAnimeFromWatchList: async ({ animeId, watchListId }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await removeHybridAnimeFromWatchlist({
           watchListId: watchListId,
           animeId: animeId,
         });
         set({ lastHybridResults: { removeAnime: resp.hybridResults } });
-        
+
         // Show warning if only one system succeeded
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
@@ -641,8 +640,8 @@ const useUserStore = create((set, get) => ({
   },
 
   login: async (callback) => {
-   
-    const res = await SignInGooglePopUp((res)=> {callback(res)});
+
+    const res = await SignInGooglePopUp((res) => { callback(res) });
 
     if (res.status === Constant_Var_success) {
       await get().loadLoggedInUserDataAndWatchLists(); // Use get() to call the function
@@ -661,15 +660,15 @@ const useUserStore = create((set, get) => ({
 
   // Additional watchlist operations
   addAnimeToWatchList: async ({ watchListId, animeId, animeData, url = null }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await addHybridAnimeToWatchlist({ watchListId, animeData, url });
         set({ lastHybridResults: { addAnime: resp.hybridResults } });
-        
+
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
           toast.warning(`Warning: ${failedSystem} add failed, but operation succeeded`, {
@@ -691,15 +690,15 @@ const useUserStore = create((set, get) => ({
   },
 
   changeWatchListName: async ({ watchListId, newName }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await updateHybridWatchlistName({ watchListId, newName });
         set({ lastHybridResults: { changeName: resp.hybridResults } });
-        
+
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
           toast.warning(`Warning: ${failedSystem} name change failed, but operation succeeded`, {
@@ -738,15 +737,15 @@ const useUserStore = create((set, get) => ({
   },
 
   updateWatchListPrivacy: async ({ watchListId, type }) => {
-    const mode = get().migrationMode;
-    
+    const mode = get().dataSource;
+
     try {
       let resp;
-      
+
       if (mode === 'hybrid') {
         resp = await updateHybridWatchlistPrivacy({ watchListId, type });
         set({ lastHybridResults: { updatePrivacy: resp.hybridResults } });
-        
+
         if (resp.hybridResults && (!resp.hybridResults.firebase || !resp.hybridResults.cloudflare)) {
           const failedSystem = !resp.hybridResults.firebase ? 'Firebase' : 'Cloudflare';
           toast.warning(`Warning: ${failedSystem} privacy update failed, but operation succeeded`, {

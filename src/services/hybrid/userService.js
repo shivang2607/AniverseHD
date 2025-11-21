@@ -1,4 +1,4 @@
-import { 
+import {
   getLoggedUserData as getCloudflareUserData,
   createOrUpdateUserProfile as createCloudflareUserProfile,
   updateUserName as updateCloudflareUserName,
@@ -14,9 +14,9 @@ import UpdateName from '@/app/firebase/Profile/UpdateName';
 import UpdateProfileImage from '@/app/firebase/Profile/UpdateProfileImage';
 import UpdateCoverImage from '@/app/firebase/Profile/UpdateCoverImage';
 
-import { 
-  Constant_Var_success, 
-  Constant_Var_error 
+import {
+  Constant_Var_success,
+  Constant_Var_error
 } from '@/utils/constants';
 
 /**
@@ -30,34 +30,11 @@ import {
  */
 export async function getUserData() {
   try {
-    // Primary: Try Cloudflare first
+    // Read from Cloudflare only - no fallback
     const cloudflareResult = await getCloudflareUserData();
-    
-    console.log("hellloo",cloudflareResult)
-    if (cloudflareResult.status === Constant_Var_success) {
-      return cloudflareResult;
-    }
-    
-    // Fallback: If Cloudflare fails, try Firebase
-    console.log('Cloudflare user data fetch failed, falling back to Firebase');
-    const firebaseResult = await GetLoggedUserData();
-    
-    if (firebaseResult.status === Constant_Var_success) {
-      // Transform Firebase data to match Cloudflare format
-      return {
-        status: Constant_Var_success,
-        response: {
-          userId: firebaseResult.response.uid,
-          displayName: firebaseResult.response.userName,
-          userProfileUrl: firebaseResult.response.photoUrl,
-          userBannerUrl: firebaseResult.response.coverUrl,
-          email: firebaseResult.response.email,
-          playerOptions: firebaseResult.response.playerOptions
-        }
-      };
-    }
-    
-    return firebaseResult;
+
+    console.log("getUserData from Cloudflare:", cloudflareResult);
+    return cloudflareResult;
   } catch (error) {
     console.error('Error in hybrid getUserData:', error);
     return { status: Constant_Var_error, response: error };
@@ -103,7 +80,7 @@ export async function createUserProfile(userProfile) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -125,8 +102,8 @@ export async function createUserProfile(userProfile) {
     }
   } catch (error) {
     console.error('Error in hybrid createUserProfile:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
@@ -171,7 +148,7 @@ export async function updateUserName(userName) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -185,8 +162,8 @@ export async function updateUserName(userName) {
     }
   } catch (error) {
     console.error('Error in hybrid updateUserName:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
@@ -209,9 +186,9 @@ export async function updateProfileImage(blob) {
   try {
     // Upload image to Firebase Storage first (since both systems will use the same URL)
     const { default: UploadImageToFirebaseStorage } = await import('@/app/firebase/utils/UploadImageToFirebaseStorage');
-    const imageUploadResult = await UploadImageToFirebaseStorage({ 
-      blob, 
-      folderName: 'profileImages' 
+    const imageUploadResult = await UploadImageToFirebaseStorage({
+      blob,
+      folderName: 'profileImages'
     });
 
     if (imageUploadResult.status !== Constant_Var_success) {
@@ -244,7 +221,7 @@ export async function updateProfileImage(blob) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -258,8 +235,8 @@ export async function updateProfileImage(blob) {
     }
   } catch (error) {
     console.error('Error in hybrid updateProfileImage:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
@@ -282,9 +259,9 @@ export async function updateCoverImage(blob) {
   try {
     // Upload image to Firebase Storage first
     const { default: UploadImageToFirebaseStorage } = await import('@/app/firebase/utils/UploadImageToFirebaseStorage');
-    const imageUploadResult = await UploadImageToFirebaseStorage({ 
-      blob, 
-      folderName: 'coverImages' 
+    const imageUploadResult = await UploadImageToFirebaseStorage({
+      blob,
+      folderName: 'coverImages'
     });
 
     if (imageUploadResult.status !== Constant_Var_success) {
@@ -317,7 +294,7 @@ export async function updateCoverImage(blob) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -331,8 +308,8 @@ export async function updateCoverImage(blob) {
     }
   } catch (error) {
     console.error('Error in hybrid updateCoverImage:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };

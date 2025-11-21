@@ -1,4 +1,4 @@
-import { 
+import {
   getUserWatchlists as getCloudflareWatchlists,
   createWatchlist as createCloudflareWatchlist,
   getWatchlistById as getCloudflareWatchlistById,
@@ -19,9 +19,9 @@ import RemoveAnimeFromWatchList from '@/app/firebase/WatchList/UpdateWatchLists/
 import ChangeWatchListName from '@/app/firebase/WatchList/UpdateWatchLists/ChangeWatchListName';
 import UpdatePublicPrivateWatchList from '@/app/firebase/WatchList/UpdateWatchLists/UpdatePublicPrivateWatchList';
 
-import { 
-  Constant_Var_success, 
-  Constant_Var_error 
+import {
+  Constant_Var_success,
+  Constant_Var_error
 } from '@/utils/constants';
 
 /**
@@ -35,39 +35,9 @@ import {
  */
 export async function getUserWatchlists() {
   try {
-    // Primary: Try Cloudflare first
+    // Read from Cloudflare only - no fallback
     const cloudflareResult = await getCloudflareWatchlists();
-    
-    if (cloudflareResult.status === Constant_Var_success) {
-      return cloudflareResult;
-    }
-    
-    // Fallback: If Cloudflare fails, try Firebase
-    console.warn('Cloudflare watchlists fetch failed, falling back to Firebase');
-    const firebaseResult = await GetLoggedUserWatchListsInfo();
-    
-    if (firebaseResult.status === Constant_Var_success) {
-      // Transform Firebase data to match Cloudflare format
-      const transformedWatchlists = firebaseResult.response.map(watchlist => ({
-        watchlistId: watchlist.id,
-        name: watchlist.watchListName,
-        description: '',
-        visibility: watchlist.type === 'public' ? 1 : 0,
-        ownerUid: watchlist.ownerUid,
-        isStarter: watchlist.isSpecialStarter ? 1 : 0,
-        isRecentWatchlist: watchlist.watchListName === 'Recent' ? 1 : 0,
-        animeList: watchlist.animeList || [],
-        createdAt: watchlist.createdAt,
-        updatedAt: watchlist.updatedAt
-      }));
-
-      return {
-        status: Constant_Var_success,
-        response: transformedWatchlists
-      };
-    }
-    
-    return firebaseResult;
+    return cloudflareResult;
   } catch (error) {
     console.error('Error in hybrid getUserWatchlists:', error);
     return { status: Constant_Var_error, response: error };
@@ -113,7 +83,7 @@ export async function createWatchlist({ watchListName, type }) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -127,8 +97,8 @@ export async function createWatchlist({ watchListName, type }) {
     }
   } catch (error) {
     console.error('Error in hybrid createWatchlist:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
@@ -143,38 +113,9 @@ export async function createWatchlist({ watchListName, type }) {
  */
 export async function getWatchlistById({ watchlistId, getAll = false }) {
   try {
-    // Primary: Try Cloudflare first
+    // Read from Cloudflare only - no fallback
     const cloudflareResult = await getCloudflareWatchlistById(watchlistId);
-    
-    if (cloudflareResult.status === Constant_Var_success) {
-      return cloudflareResult;
-    }
-    
-    // Fallback: If Cloudflare fails, try Firebase
-    console.warn('Cloudflare watchlist fetch failed, falling back to Firebase');
-    const firebaseResult = await GetWatchListDataById({ watchlistId, getAll });
-    
-    if (firebaseResult.status === Constant_Var_success) {
-      // Transform Firebase data to match Cloudflare format
-      const watchlist = firebaseResult.response;
-      return {
-        status: Constant_Var_success,
-        response: {
-          watchlistId: watchlist.id,
-          name: watchlist.watchListName,
-          description: '',
-          visibility: watchlist.type === 'public' ? 1 : 0,
-          ownerUid: watchlist.ownerUid,
-          isStarter: watchlist.isSpecialStarter ? 1 : 0,
-          isRecentWatchlist: watchlist.watchListName === 'Recent' ? 1 : 0,
-          animeList: watchlist.animeList || [],
-          createdAt: watchlist.createdAt,
-          updatedAt: watchlist.updatedAt
-        }
-      };
-    }
-    
-    return firebaseResult;
+    return cloudflareResult;
   } catch (error) {
     console.error('Error in hybrid getWatchlistById:', error);
     return { status: Constant_Var_error, response: error };
@@ -219,7 +160,7 @@ export async function deleteWatchlist(watchlistId) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -233,8 +174,8 @@ export async function deleteWatchlist(watchlistId) {
     }
   } catch (error) {
     console.error('Error in hybrid deleteWatchlist:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
@@ -289,7 +230,7 @@ export async function addAnimeToWatchlist({ watchListId, animeData, url = null }
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -303,8 +244,8 @@ export async function addAnimeToWatchlist({ watchListId, animeData, url = null }
     }
   } catch (error) {
     console.error('Error in hybrid addAnimeToWatchlist:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
@@ -350,7 +291,7 @@ export async function removeAnimeFromWatchlist({ watchListId, animeId }) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -364,8 +305,8 @@ export async function removeAnimeFromWatchlist({ watchListId, animeId }) {
     }
   } catch (error) {
     console.error('Error in hybrid removeAnimeFromWatchlist:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
@@ -411,7 +352,7 @@ export async function updateWatchlistName({ watchListId, newName }) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -425,8 +366,8 @@ export async function updateWatchlistName({ watchListId, newName }) {
     }
   } catch (error) {
     console.error('Error in hybrid updateWatchlistName:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
@@ -472,7 +413,7 @@ export async function updateWatchlistPrivacy({ watchListId, type }) {
     // Consider success if at least one system succeeded
     const firebaseSuccess = results.firebase?.status === Constant_Var_success;
     const cloudflareSuccess = results.cloudflare?.status === Constant_Var_success;
-    
+
     results.success = firebaseSuccess || cloudflareSuccess;
 
     if (results.success) {
@@ -486,8 +427,8 @@ export async function updateWatchlistPrivacy({ watchListId, type }) {
     }
   } catch (error) {
     console.error('Error in hybrid updateWatchlistPrivacy:', error);
-    return { 
-      status: Constant_Var_error, 
+    return {
+      status: Constant_Var_error,
       response: error.message,
       hybridResults: results
     };
