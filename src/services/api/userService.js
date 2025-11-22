@@ -1,8 +1,8 @@
-import apiClient from './client';
-import { 
-  Constant_Var_success, 
+import apiClient from './interceptor';
+import {
+  Constant_Var_success,
   Constant_Var_error,
-  Constant_Var_errorMessage_notAuthenticatedUser 
+  Constant_Var_errorMessage_notAuthenticatedUser
 } from '@/utils/constants';
 import getUserAuth from '@/app/firebase/utils/GetUserAuth';
 
@@ -26,15 +26,15 @@ export async function getLoggedUserData() {
       params: { userId: userData.details.uid }
     });
 
-    return { 
-      status: Constant_Var_success, 
+    return {
+      status: Constant_Var_success,
       response: response.data.data // Based on your sendSuccess format
     };
   } catch (error) {
     console.error('Error fetching user data:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -60,15 +60,15 @@ export async function createOrUpdateUserProfile(userProfile) {
 
     const response = await apiClient.post('/user', profileData);
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error creating/updating user profile:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -89,15 +89,15 @@ export async function updateUserName(userName) {
       displayName: userName
     });
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error updating user name:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -118,15 +118,15 @@ export async function updateUserProfileImage(photoUrl) {
       userProfileUrl: photoUrl
     });
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error updating profile image:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -147,15 +147,15 @@ export async function updateUserCoverImage(coverUrl) {
       userBannerUrl: coverUrl
     });
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error updating cover image:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -176,15 +176,15 @@ export async function updateUserBio(userBio) {
       userBio: userBio
     });
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error updating user bio:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -202,15 +202,15 @@ export async function deleteUserProfile() {
 
     const response = await apiClient.delete('/user');
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error deleting user profile:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }

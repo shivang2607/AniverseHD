@@ -1,8 +1,8 @@
-import apiClient from './client';
-import { 
-  Constant_Var_success, 
+import apiClient from './interceptor';
+import {
+  Constant_Var_success,
   Constant_Var_error,
-  Constant_Var_errorMessage_notAuthenticatedUser 
+  Constant_Var_errorMessage_notAuthenticatedUser
 } from '@/utils/constants';
 import getUserAuth from '@/app/firebase/utils/GetUserAuth';
 
@@ -26,15 +26,15 @@ export async function getUserWatchlists() {
       params: { userId: userData.details.uid }
     });
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data || [] 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data || []
     };
   } catch (error) {
     console.error('Error fetching user watchlists:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -61,15 +61,15 @@ export async function createWatchlist({ watchListName, type }) {
 
     const response = await apiClient.post('/createWatchList', watchlistData);
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error creating watchlist:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -92,15 +92,15 @@ export async function getWatchlistById(watchlistId, page = 1, pageSize = 10) {
       params: { page, pageSize }
     });
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error fetching watchlist:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -126,15 +126,15 @@ export async function updateWatchlist(watchlistId, updateData) {
 
     const response = await apiClient.patch(`/updateWatchlist/${watchlistId}`, mappedData);
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error updating watchlist:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -153,15 +153,15 @@ export async function deleteWatchlist(watchlistId) {
 
     const response = await apiClient.delete(`/deleteWatchlist/${watchlistId}`);
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error deleting watchlist:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -192,15 +192,15 @@ export async function addAnimeToWatchlist(watchlistId, animeData, url = null) {
 
     const response = await apiClient.post(`/addAnimeToWatchlist/${watchlistId}`, requestData);
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error adding anime to watchlist:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -221,15 +221,15 @@ export async function addAnimeListToWatchlist(mergedDataObj) {
       mergedDataObj: mergedDataObj
     });
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error adding anime list to watchlist:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -251,15 +251,15 @@ export async function removeAnimeFromWatchlist(watchlistId, animeId) {
       data: { animeId: animeId }
     });
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error removing anime from watchlist:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -277,15 +277,15 @@ export async function getRecentWatchlist() {
 
     const response = await apiClient.get('/getRecentWatchlist');
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error fetching recent watchlist:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }
@@ -304,15 +304,15 @@ export async function addAnimeToTable(animeData) {
 
     const response = await apiClient.post('/addAnime', animeData);
 
-    return { 
-      status: Constant_Var_success, 
-      response: response.data.data 
+    return {
+      status: Constant_Var_success,
+      response: response.data.data
     };
   } catch (error) {
     console.error('Error adding anime to table:', error);
-    return { 
-      status: Constant_Var_error, 
-      response: error.response?.data || error.message 
+    return {
+      status: Constant_Var_error,
+      response: error.response?.data || error.message
     };
   }
 }

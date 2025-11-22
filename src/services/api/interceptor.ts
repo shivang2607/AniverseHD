@@ -4,7 +4,8 @@ import { auth } from "../../app/firebase/utils/firebaseinit"
 
 // Request interceptor - Add auth token for Next.js proxy
 apiClient.interceptors.request.use(
- async (config) => {
+  async (config) => {
+    await auth.authStateReady();
     const token = await auth?.currentUser?.getIdToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

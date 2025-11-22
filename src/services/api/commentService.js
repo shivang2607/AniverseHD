@@ -1,4 +1,4 @@
-import apiClient from './client';
+import apiClient from './interceptor';
 import {
     Constant_Var_success,
     Constant_Var_error,
