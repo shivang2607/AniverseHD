@@ -1,4 +1,4 @@
-import GetOtherUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetOtherUserWatchListsInfo";
+
 import useUserStore from "@/ZustandStores/userStore";
 import {
   Constant_Var_errorMessage_userDoesNotExistWithThisId,
@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
 import CustomLoader from "@/components/CustomLoader";
 
 const UserWatchLists = ({ id }) => {
-  const { isUserLoggedIn, loggedInUserId, loggedInUserWatchListsInfo } =
+  const { isUserLoggedIn, loggedInUserId, loggedInUserWatchListsInfo, getOtherUserWatchlists } =
     useUserStore();
   const { setLoaderText, setIsLoaderVisible, setImageUrl } = useGlobalLoader();
   const [userStarterWatchLists, setUserStarterWatchLists] = useState(null);
@@ -25,7 +25,7 @@ const UserWatchLists = ({ id }) => {
 
   async function loadOtherUser() {
     try {
-      const respUserWatchLists = await GetOtherUserWatchListsInfo({
+      const respUserWatchLists = await getOtherUserWatchlists({
         userId: id,
       });
       // console.log(respUserWatchLists, "hello");
@@ -77,7 +77,7 @@ const UserWatchLists = ({ id }) => {
       }
     }
     loadUserData();
-  }, [loggedInUserId,isUserLoggedIn]);
+  }, [loggedInUserId, isUserLoggedIn]);
 
   useEffect(() => {
     // loading loggedInuser Data
@@ -102,7 +102,7 @@ const UserWatchLists = ({ id }) => {
         if (
           selectedWatchList === null ||
           custom.length + starter.length !==
-            userCustomWatchLists.length + userStarterWatchLists.length
+          userCustomWatchLists.length + userStarterWatchLists.length
         ) {
           setSelectedWatchList(starter[0]);
         } else {

@@ -1,4 +1,4 @@
-import GetWatchListDataById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
+import useUserStore from "@/ZustandStores/userStore";
 import CustomLoader from "@/components/CustomLoader";
 import Pagination from "@/components/Pagination";
 import WatchListCard from "@/components/watchListCard";
@@ -11,6 +11,7 @@ const WatchListPagination = ({ selectedWatchList }) => {
   const [offset, setOffset] = useState(0);
   const [error, setError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const { getWatchlistDataById } = useUserStore();
   let prevWatchListId = useRef(null);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ const WatchListPagination = ({ selectedWatchList }) => {
       }
       setList(null);
       // console.log("watchlist changed",offset,selectedWatchList);
-      const resp = await GetWatchListDataById({
+      const resp = await getWatchlistDataById({
         watchListId: selectedWatchList.id,
         offset: newOffset,
         pageSize: pageSize,
@@ -55,7 +56,7 @@ const WatchListPagination = ({ selectedWatchList }) => {
     setOffset((currentPage - 1) * pageSize);
   }, [currentPage]);
 
-  const reloadWatchListData = async () => {};
+  const reloadWatchListData = async () => { };
 
   return (
     <div className="flex flex-col justify-center  sm:mx-10 mx-4  my-10">
@@ -73,14 +74,14 @@ const WatchListPagination = ({ selectedWatchList }) => {
             ))}
           </div>
         ) : (
-          <div className="w-full h-[60vh]"> <CustomLoader imageUrl={"/NoData.gif"} loaderText={"Empty List"}/></div>
+          <div className="w-full h-[60vh]"> <CustomLoader imageUrl={"/NoData.gif"} loaderText={"Empty List"} /></div>
         )
       ) : !error ? (
         <div className="h-[70vh] -my-10 -mx-4">
-          <CustomLoader imageUrl={"/userProfileImage5.jpg"} loaderText={"Loading WatchList..."}/>
+          <CustomLoader imageUrl={"/userProfileImage5.jpg"} loaderText={"Loading WatchList..."} />
         </div>
       ) : (
-        <div className="w-full h-[60vh]"> <CustomLoader imageUrl={"/NoData.gif"} loaderText={"Error Loading WatchList"}/></div>
+        <div className="w-full h-[60vh]"> <CustomLoader imageUrl={"/NoData.gif"} loaderText={"Error Loading WatchList"} /></div>
       )}
 
       {selectedWatchList && selectedWatchList.animeList.length > 0 && (

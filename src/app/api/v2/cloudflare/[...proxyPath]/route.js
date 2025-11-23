@@ -76,7 +76,8 @@ async function proxyHandler(req, { params }) {
     // Log the request
     console.log(`[Proxy] ${req.method} ${targetUrl}`, {
       userId: userId || "anonymous",
-      hasBody: !!fetchOptions.body,
+      headers: fetchOptions.headers,
+      body: fetchOptions.body,
     });
 
     // Proxy the request

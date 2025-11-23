@@ -16,7 +16,7 @@ import Relations from "./Relations";
 import Suggested from "./Suggested";
 import Skeleton from "react-loading-skeleton";
 import toast, { Toaster } from "react-hot-toast";
-import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+
 import ListDropDown from "@/components/utils/ListDropDown";
 import {
   Constant_Var_errorMessage_loggedInUserDoesNostExistsYet,
@@ -24,7 +24,7 @@ import {
   Constant_Var_errorMessage_userDoesNotExistWithThisId,
   Constant_Var_success,
 } from "@/utils/constants";
-import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
+
 import { useRouter } from "next/navigation";
 import useUserStore from "@/ZustandStores/userStore";
 import ShareModal from "@/components/utils/ShareModal";
@@ -41,7 +41,7 @@ export default function AnimeClient({ params }) {
 
   const router = useRouter();
 
-  const { RecentWatchListData } = useUserStore();
+  const { RecentWatchListData, loggedInUserWatchListsInfo, login } = useUserStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,7 +57,7 @@ export default function AnimeClient({ params }) {
 
     fetchData();
 
-    return () => {};
+    return () => { };
   }, [params?.id, anime]);
 
   useEffect(() => {
@@ -78,23 +78,20 @@ export default function AnimeClient({ params }) {
     .filter((item) => item.entry.length > 0);
 
   const handleOnClickWatchList = async () => {
-    const result = await GetLoggedUserWatchListsInfo();
-
-    if (result.status === Constant_Var_success) {
-      setWatchListData(result?.response);
+    // Use watchlist data from Zustand store
+    if (loggedInUserWatchListsInfo && loggedInUserWatchListsInfo.length > 0) {
+      setWatchListData(loggedInUserWatchListsInfo);
       setIsWatchListOpen((prev) => !prev);
       return;
-    } else if (
-      result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
-    ) {
-      const signInResp = await SignInGooglePopUp((status) => {
+    } else if (!loggedInUserWatchListsInfo) {
+      const signInResp = await login((status) => {
         console.log("login status:", status);
       });
 
       if (signInResp.status === Constant_Var_success) return;
       else toast.error(signInResp?.response?.message, { duration: 3000 });
     }
-    toast.error(result?.response?.message, { duration: 3000 });
+    toast.error("Please sign in to add to watchlist", { duration: 3000 });
   };
 
   return (
@@ -102,9 +99,8 @@ export default function AnimeClient({ params }) {
       {
         // anime &&
         <div
-          className={`trailer w-full ${
-            isPlaying ? "md:h-[90vh] h-60" : "h-64"
-          } relative`}
+          className={`trailer w-full ${isPlaying ? "md:h-[90vh] h-60" : "h-64"
+            } relative`}
         >
           {!isPlaying ? (
             <>
@@ -162,11 +158,10 @@ export default function AnimeClient({ params }) {
           <div className="first-container w-full md:gap-16 gap-12 flex md:flex-row flex-col  md:px-12 px-4">
             <div className="image-and-details md:w-[28%] w-3/5 mx-auto md:mx-1 flex flex-col">
               <div
-                className={`relative mt-12 md:mt-auto md:mb-8 self-center  image flex h-96 ${
-                  isPlaying
+                className={`relative mt-12 md:mt-auto md:mb-8 self-center  image flex h-96 ${isPlaying
                     ? "md:translate-y-0 mb-4 md:mb-12"
                     : "md:-translate-y-32"
-                }  z-10 w-full shadow-xl to-cbg-100/65  overflow-hidden rounded-md   `}
+                  }  z-10 w-full shadow-xl to-cbg-100/65  overflow-hidden rounded-md   `}
               >
                 {anime?.title ? (
                   <Image
@@ -230,9 +225,8 @@ export default function AnimeClient({ params }) {
                         href={
                           recentData
                             ? `${recentData?.url}&t=${recentData?.episodeTimestamp}`
-                            : `/watch/${params?.id}?provider=${
-                                process.env.NEXT_PUBLIC_PROVIDER || "zoro"
-                              }`
+                            : `/watch/${params?.id}?provider=${process.env.NEXT_PUBLIC_PROVIDER || "zoro"
+                            }`
                         }
                         className="watchnow flex gap-2 items-center bg-primary-500  rounded-full font-sembold px-3 py-1 text-cbg-100 text-lg"
                       >
@@ -356,10 +350,9 @@ export default function AnimeClient({ params }) {
               <div
                 className="bgimage  bg-cover bg-bottom object-cover w-full h-full bg-no-repeat"
                 style={{
-                  backgroundImage: `url(${
-                    anime?.trailer?.images?.large_image_url ||
+                  backgroundImage: `url(${anime?.trailer?.images?.large_image_url ||
                     anime?.images?.webp?.large_image_url
-                  })`,
+                    })`,
                 }}
               >
                 <div className="second-container py-4  md:bg-cbg-100 bg-black md:bg-opacity-80 backdrop-blur-lg justify-around md:flex px-4 md:px-12 w-full my-8">

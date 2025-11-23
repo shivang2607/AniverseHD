@@ -11,7 +11,7 @@ import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ProviderContainer from "./ProviderContainer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import useStreamStore from "@/ZustandStores/streamStore";
-import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+
 import ListDropDown from "@/components/utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
 import "@vidstack/react/player/styles/default/theme.css";
@@ -36,10 +36,10 @@ import {
   Constant_Var_errorMessage_notAuthenticatedUser,
   Constant_Var_success,
 } from "@/utils/constants";
-import SignInGooglePopUp from "@/app/firebase/SignIn/SignInGooglePopUp";
+
 import Image from "next/image";
 import useUserStore from "@/ZustandStores/userStore";
-import UpdatePlayerOptions from "@/app/firebase/Profile/UpdatePlayerOptions";
+
 import HandleUpdateMediaPlayerOptions from "./handleMediaPlayerOptions";
 import Suggested from "@/app/anime/[id]/Suggested";
 
@@ -111,6 +111,8 @@ export default function Page({ params }) {
     loadLoggedInUserRecentWatchList,
     loadLoggedInUserWatchLists,
     addAnimeToWatchList,
+    loggedInUserWatchListsInfo,
+    login,
   } = useUserStore();
 
   const [showSkipButton, setShowSkipButton] = useState("");
@@ -143,7 +145,7 @@ export default function Page({ params }) {
     return () => {
       const f = async () => {
         const content = contentRef.current;
-        
+
         const result = await addAnimeToWatchList({
           watchListId: RecentWatchListId,
           url: currentAbsoluteURL.current,
@@ -158,8 +160,8 @@ export default function Page({ params }) {
             rating: content?.rating || "NA",
             start_year: Math.floor(
               content?.aired?.prop?.from?.year ||
-                content?.start_year ||
-                content?.year
+              content?.start_year ||
+              content?.year
             ) || "NA",
             episodes: content?.episodes || content?.episode || null,
             episodeTimestamp: recentTimestampRef.current,
@@ -233,7 +235,7 @@ export default function Page({ params }) {
 
     // console.log("Hello world!!",provider, episodeId, selectedEpisodeId);
 
-    return () => {};
+    return () => { };
   }, [provider, zoroId, animepaheId, gogoSubId, gogoDubId, serverV, dubV]);
 
   //below functions gets the necessary data from both provider like episodes content at the page load, mergeProviderData is used in this useEffect
@@ -265,7 +267,7 @@ export default function Page({ params }) {
         const response = await axios.get(`/api/v1/watch/${params?.id}`);
         const data = response?.data;
 
-          
+
         // Check if the data object has an 'error' key
         if (data?.error) {
           console.error(`Error in response data for ${provider}:`, data.error);
@@ -277,7 +279,7 @@ export default function Page({ params }) {
         const refinedData = await mergeAnimeEpisodesData(data);
         setContent(refinedData);
         setEpisodesData(refinedData?.episodesData || []);
-        
+
 
         // Set session with 30-minute expiry
         setSessionWithExpiry(`watch-${params.id}`, refinedData, 1000 * 60 * 30);
@@ -351,7 +353,7 @@ export default function Page({ params }) {
           if (!serverV)
             setServer(
               cachedServerData?.sub?.[2]?.serverName ||
-                cachedServerData?.raw?.[0]?.serverName
+              cachedServerData?.raw?.[0]?.serverName
             );
           // return;
         } else {
@@ -383,7 +385,7 @@ export default function Page({ params }) {
                 setServerData(serverData?.data);
                 setServer(
                   serverData?.data?.sub?.[2]?.serverName ||
-                    serverData?.data?.raw?.[0]?.serverName
+                  serverData?.data?.raw?.[0]?.serverName
                 );
 
                 // Cache the server data with an expiry of 2 hours
@@ -521,21 +523,18 @@ export default function Page({ params }) {
 
   //self explainatory
   const handleOnClickWatchList = async () => {
-    const result = await GetLoggedUserWatchListsInfo();
-
-    if (result.status === Constant_Var_success) {
-      setWatchListData(result?.response);
+    // Use watchlist data from Zustand store
+    if (loggedInUserWatchListsInfo && loggedInUserWatchListsInfo.length > 0) {
+      setWatchListData(loggedInUserWatchListsInfo);
       setIsWatchListOpen((prev) => !prev);
       return;
-    } else if (
-      result.response.message === Constant_Var_errorMessage_notAuthenticatedUser
-    ) {
-      const signInResp = await SignInGooglePopUp((status) => {});
+    } else if (!isUserLoggedIn) {
+      const signInResp = await login((status) => { });
 
       if (signInResp.status === Constant_Var_success) return;
       else toast.error(signInResp?.response?.message, { duration: 3000 });
     }
-    toast.error(result?.response?.message, { duration: 3000 });
+    toast.error("Please sign in to add to watchlist", { duration: 3000 });
   };
 
   //for each timestamp this function is triggered
@@ -590,12 +589,11 @@ export default function Page({ params }) {
     const config = providersConfig[provider];
     if (config.needsServerSideStreaming) {
       setDownloadLink();
-      
-      return `/api/v1/streamingProxy?url=${
-        encodeURIComponent(streamingData?.sources?.[0]?.url)
-      }`;
-    
-    
+
+      return `/api/v1/streamingProxy?url=${encodeURIComponent(streamingData?.sources?.[0]?.url)
+        }`;
+
+
 
     } else {
       const qualityOrder = ["1080p", "720p", "480p", "360p"];
@@ -603,7 +601,7 @@ export default function Page({ params }) {
         const match = streamingData?.sources?.find((src) =>
           src?.quality?.includes(quality)
         );
-        
+
         if (match?.url) return match.url;
       }
 
@@ -685,37 +683,37 @@ export default function Page({ params }) {
               ) : (
                 streamingSrc && (
                   <>
-                    <div  className="pm_video flex h-fit">
+                    <div className="pm_video flex h-fit">
                       <div className="stream block bg-black md:h-[85vh] h-[40vh] w-full justify-center items-center rounded my-4">
                         <ArtVideoPlayer
-                        key={uniqueId("art-video-")}
-                        getNextEpisode={getNextEpisode}
-                        getPrevEpisode={getPrevEpisode}
+                          key={uniqueId("art-video-")}
+                          getNextEpisode={getNextEpisode}
+                          getPrevEpisode={getPrevEpisode}
                           src={streamingSrc}
                           setDuration={setDuration}
-                          sources = {streamingData?.sources}
+                          sources={streamingData?.sources}
                           intro={streamingData?.intro}
                           outro={streamingData?.outro}
                           isAutoSkip={mediaPlayerState?.isAutoSkip}
-                          title={"Monster Ep3" || content?.episodesData?.[epNo-1]?.zoro_title}
+                          title={"Monster Ep3" || content?.episodesData?.[epNo - 1]?.zoro_title}
                           thumbnail={
                             process.env.NEXT_PUBLIC_GOOD_PROXY +
-                              streamingData?.tracks?.filter(
-                                (t) => t.kind === "thumbnails"
-                              )?.[0]?.file
-                            }
-                            subtitles={streamingData?.tracks?.filter(tr => tr?.kind === 'captions')?.map(tr => {
-                              return {
+                            streamingData?.tracks?.filter(
+                              (t) => t.kind === "thumbnails"
+                            )?.[0]?.file
+                          }
+                          subtitles={streamingData?.tracks?.filter(tr => tr?.kind === 'captions')?.map(tr => {
+                            return {
                               ...tr,
-                              file:`/api/v1/streamingProxy?url=${encodeURIComponent(tr?.file)}`,        // zoro api subtitles require referes as well, by using straming proxy which automatically adds the referer based on the domain of the url, we are just adding the referer to the subtitles file.
+                              file: `/api/v1/streamingProxy?url=${encodeURIComponent(tr?.file)}`,        // zoro api subtitles require referes as well, by using straming proxy which automatically adds the referer based on the domain of the url, we are just adding the referer to the subtitles file.
                             }
                           }
-                        )}
-                            startTime={startTime}
-                            recentTimestampRef={recentTimestampRef}
-                            setAnimeNotAvailable = {setAnimeNotAvailable}
-                            mediaPlayerState={mediaPlayerState}
-                          
+                          )}
+                          startTime={startTime}
+                          recentTimestampRef={recentTimestampRef}
+                          setAnimeNotAvailable={setAnimeNotAvailable}
+                          mediaPlayerState={mediaPlayerState}
+
                         />
 
                         {/* <MediaPlayer
@@ -911,11 +909,10 @@ export default function Page({ params }) {
 
                 {provider === "zoro" && (
                   <button
-                    className={`md:mx-1 ${
-                      mediaPlayerState?.isAutoSkip
+                    className={`md:mx-1 ${mediaPlayerState?.isAutoSkip
                         ? "text-sky-400 font-semibold"
                         : "font-[300]"
-                    } `}
+                      } `}
                     onClick={() =>
                       updatePlayerOptions({
                         ...mediaPlayerState,
@@ -929,11 +926,10 @@ export default function Page({ params }) {
                 )}
 
                 <button
-                  className={`md:mx-1 ${
-                    mediaPlayerState?.isAutoNext
+                  className={`md:mx-1 ${mediaPlayerState?.isAutoNext
                       ? "text-sky-400 font-semibold"
                       : "font-[300]"
-                  } `}
+                    } `}
                   onClick={() =>
                     updatePlayerOptions({
                       ...mediaPlayerState,
@@ -945,11 +941,10 @@ export default function Page({ params }) {
                 </button>
 
                 <button
-                  className={`md:mx-1 ${
-                    mediaPlayerState?.isAutoPlay
+                  className={`md:mx-1 ${mediaPlayerState?.isAutoPlay
                       ? "text-sky-400 font-semibold"
                       : "font-[300]"
-                  } `}
+                    } `}
                   onClick={() =>
                     updatePlayerOptions({
                       ...mediaPlayerState,
@@ -978,9 +973,8 @@ export default function Page({ params }) {
                   )} */}
                   <ShareModal
                     buttonText="Share this episode"
-                    title={`Checkout this Amazing Episode from ${
-                      content?.title_english || content?.title
-                    }`}
+                    title={`Checkout this Amazing Episode from ${content?.title_english || content?.title
+                      }`}
                   />
                 </div>
               </div>
@@ -1001,7 +995,7 @@ export default function Page({ params }) {
             </div>
           </div>
 
-          
+
           {/* {params?.id  && <CommentsContainer animeId={params?.id} loggedInUserId={loggedInUserId} loggedInUserData={loggedInUserData} epNo={epNo} zoroEpId={zoroEpisodeId} gogoEpId={`${gogoSubId ? gogoSubId:''}|${gogoDubId?gogoDubId:''}`}/>} */}
         </div>
 
@@ -1017,9 +1011,8 @@ export default function Page({ params }) {
             epNo={epNo}
             zoroEpId={episodeIds.zoro}
             animepaheEpId={episodeIds.animepahe} //!new
-            gogoEpId={`${gogoSubId ? gogoSubId : ""}|${
-              gogoDubId ? gogoDubId : ""
-            }`}
+            gogoEpId={`${gogoSubId ? gogoSubId : ""}|${gogoDubId ? gogoDubId : ""
+              }`}
           />
         )}
 

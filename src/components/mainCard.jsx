@@ -7,29 +7,29 @@ import { IoMdTimer } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ListDropDown from "./utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
-import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+import useUserStore from "@/ZustandStores/userStore";
 
-export default function MainCard({ anime , imageHeight=72}) {
+export default function MainCard({ anime, imageHeight = 72 }) {
   const [isWatchListOpen, setIsWatchListOpen] = useState(false);
   const [watchListData, setWatchListData] = useState();
+  const { loggedInUserWatchListsInfo } = useUserStore();
 
 
   const handleOnClickWatchList = async () => {
-    const result = await GetLoggedUserWatchListsInfo();
-    // console.log(result?.response);
-    if (result.status === "success") {
-      setWatchListData(result?.response);
+    // Use watchlist data from Zustand store
+    if (loggedInUserWatchListsInfo && loggedInUserWatchListsInfo.length > 0) {
+      setWatchListData(loggedInUserWatchListsInfo);
       setIsWatchListOpen((prev) => !prev);
       return;
     }
-    toast.error(result?.response?.message, { duration: 3000 });
+    toast.error("Please sign in to add to watchlist", { duration: 3000 });
   };
   // console.log("this is an anime ",anime);
   return (
     <div className="image-container  my-1 w-full  h-fit pb-3 rounded-md  flex flex-col  hover:shadow-m overflow-hidden">
       <Link
         href={`/anime/${anime?.mal_id || anime?.animeId}`}
-        className={ `flex relative flex-col gap-2 h-${imageHeight}  rounded-md overflow-hidden duration-300 transition-all w-full   `}
+        className={`flex relative flex-col gap-2 h-${imageHeight}  rounded-md overflow-hidden duration-300 transition-all w-full   `}
       >
         <div className="image relative rounded-md overflow-hidden  h-full w-full ">
           <Image
@@ -38,7 +38,7 @@ export default function MainCard({ anime , imageHeight=72}) {
               anime?.main_picture ||
               anime?.images?.webp?.large_image_url ||
               anime?.images?.webp?.large_image_url ||
-               anime?.animePhoto?.webp?.large_image_url ||
+              anime?.animePhoto?.webp?.large_image_url ||
               anime?.animePhoto?.webp?.large_image_url || anime?.animePhoto || ""
             }
             alt={anime?.title_english || anime?.animeName || "Anime title"}
@@ -55,7 +55,7 @@ export default function MainCard({ anime , imageHeight=72}) {
                     e.preventDefault();
                     e.stopPropagation();
                     handleOnClickWatchList();
-                    
+
                   }}
                 >
                   <PiBookmarkSimpleBold />
@@ -70,7 +70,7 @@ export default function MainCard({ anime , imageHeight=72}) {
                 )}
               </div>
 
-             
+
               <div className="flex ml-auto m-2 bg-red-500 px-1 rounded-sm items-center text-sm">
                 {anime?.animeAgeRating?.split(" ")[0].toUpperCase() || anime?.rating?.split(" ")[0].toUpperCase() || "NA"}
               </div>
@@ -80,7 +80,7 @@ export default function MainCard({ anime , imageHeight=72}) {
             </div>
             <div className="flex mt-auto m-2 gap-1 text-xs">
               <div className="score bg-sky-700 text-gray-200 font-semibold px-1   rounded-sm">
-                { typeof anime?.score === "number" ? anime.score.toFixed(2) :( anime?.score || "NA")}
+                {typeof anime?.score === "number" ? anime.score.toFixed(2) : (anime?.score || "NA")}
               </div>
               <div className="bg-primary-300 text-cbg-100 font-semibold px-1  rounded-sm">
                 {anime?.animeStartYear || Math.floor(
@@ -117,16 +117,16 @@ export default function MainCard({ anime , imageHeight=72}) {
         </div>
       </div>
       <Toaster
-                toastOptions={{
-                  style: {
-                    borderRadius: "10px",
-                    background: "#b6d7d4",
-                    border: "1px solid ",
-                    color: "#041C32",
-              
-                  },
-                }}
-              />
+        toastOptions={{
+          style: {
+            borderRadius: "10px",
+            background: "#b6d7d4",
+            border: "1px solid ",
+            color: "#041C32",
+
+          },
+        }}
+      />
     </div>
   );
 }

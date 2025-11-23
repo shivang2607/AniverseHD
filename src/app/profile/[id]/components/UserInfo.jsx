@@ -5,7 +5,7 @@ import Image from "next/image";
 import CreateWatchListModal from "./CreateWatchListModal";
 import EditUserProfileModal from "./EditUserProfileModal";
 import useUserStore from "@/ZustandStores/userStore";
-import GetOtherUserData from "@/app/firebase/Profile/GetOtherUserData";
+
 import {
   Constant_Var_errorMessage_userDoesNotExistWithThisId,
   Constant_Var_success,
@@ -14,9 +14,9 @@ import { useRouter } from "next/navigation";
 import useGlobalLoader from "@/ZustandStores/useGlobalLoader";
 
 const UserInfo = ({ id }) => {
-  const { isUserLoggedIn, loggedInUserId, loggedInUserData } = useUserStore();
-  const { setLoaderText, setIsLoaderVisible,setImageUrl } = useGlobalLoader();
-    
+  const { isUserLoggedIn, loggedInUserId, loggedInUserData, getOtherUserData } = useUserStore();
+  const { setLoaderText, setIsLoaderVisible, setImageUrl } = useGlobalLoader();
+
   const [isCreateWatchListModalOpen, setIsCreateWatchListModalOpen] =
     useState(false);
   const [iseditUserProfileModalOpen, setIsEditUserProfileModalOpen] =
@@ -26,7 +26,7 @@ const UserInfo = ({ id }) => {
 
   async function loadOtherUser() {
     try {
-      const respUserInfo = await GetOtherUserData({ userId: id });
+      const respUserInfo = await getOtherUserData({ userId: id });
 
       // # Setting User Info #
       if (respUserInfo.status === Constant_Var_success)
@@ -86,20 +86,20 @@ const UserInfo = ({ id }) => {
     setIsCreateWatchListModalOpen(false);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     // console.log(userInfo)
-    if(userInfo){
+    if (userInfo) {
       // console.log("userInfo not null")
       setIsLoaderVisible(false);
       setImageUrl(null)
       setLoaderText(null)
-    }else{
+    } else {
       // console.log("userInfo null")
       setIsLoaderVisible(true);
       setImageUrl(" /userProfileImage7.jpg")
-      setLoaderText("Loading User Data")      
+      setLoaderText("Loading User Data")
     }
-  },[userInfo])
+  }, [userInfo])
 
   return (
     <>
@@ -173,12 +173,12 @@ const UserInfo = ({ id }) => {
             </>
           )}
         </div>
-      ) 
-      // : (
-      //   <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
-      //     {"...Loading"}
-      //   </div>
-      // )
+      )
+        // : (
+        //   <div className="fixed inset-0 flex items-center justify-center text-center z-40 bg-white/30 backdrop-blur-sm text-white text-3xl ">
+        //     {"...Loading"}
+        //   </div>
+        // )
       }
     </>
   );

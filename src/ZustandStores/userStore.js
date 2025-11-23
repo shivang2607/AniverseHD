@@ -782,6 +782,90 @@ const useUserStore = create((set, get) => ({
       return { status: Constant_Var_error, response: error.message };
     }
   },
+
+  /**
+   * Get other user's profile data (for viewing other users' profiles)
+   * @param {string} userId - User ID to fetch
+   * @returns {Promise<{status: string, response: any}>}
+   */
+  getOtherUserData: async ({ userId }) => {
+    const mode = get().dataSource;
+
+    try {
+      // Import Firebase function for other user data
+      const { default: GetOtherUserData } = await import('@/app/firebase/Profile/GetOtherUserData');
+
+      // For now, always use Firebase for other user data (read-only operation)
+      // TODO: Add Cloudflare support when public user profiles API is ready
+      const resp = await GetOtherUserData({ userId });
+      return resp;
+    } catch (error) {
+      console.error('Error getting other user data:', error);
+      return { status: Constant_Var_error, response: error.message };
+    }
+  },
+
+  /**
+   * Get other user's public watchlists (for viewing other users' profiles)
+   * @param {string} userId - User ID to fetch watchlists for
+   * @returns {Promise<{status: string, response: any}>}
+   */
+  getOtherUserWatchlists: async ({ userId }) => {
+    const mode = get().dataSource;
+
+    try {
+      // Import Firebase function for other user watchlists
+      const { default: GetOtherUserWatchListsInfo } = await import('@/app/firebase/WatchList/WatchListDocument/GetOtherUserWatchListsInfo');
+
+      // For now, always use Firebase for other user watchlists (read-only operation)
+      // TODO: Add Cloudflare support when public watchlists API is ready
+      const resp = await GetOtherUserWatchListsInfo({ userId });
+      return resp;
+    } catch (error) {
+      console.error('Error getting other user watchlists:', error);
+      return { status: Constant_Var_error, response: error.message };
+    }
+  },
+
+  /**
+   * Get watchlist data by ID with pagination support
+   * @param {Object} params - Parameters
+   * @param {string} params.watchListId - Watchlist ID
+   * @param {number} params.offset - Offset for pagination (optional)
+   * @param {number} params.pageSize - Page size for pagination (optional)
+   * @param {boolean} params.getAll - Whether to get all data
+   * @returns {Promise<{status: string, response: any}>}
+   */
+  getWatchlistDataById: async ({ watchListId, offset = null, pageSize = null, getAll = false }) => {
+    const mode = get().dataSource;
+
+    try {
+      let resp;
+
+      if (mode === 'hybrid') {
+        resp = await getHybridWatchlistById({ watchListId, offset, pageSize, getAll });
+      } else if (mode === 'cloudflare') {
+        resp = await getCloudflareWatchlistById(watchListId);
+
+        // Apply client-side pagination if needed
+        if (!getAll && offset !== null && pageSize !== null && resp.status === Constant_Var_success) {
+          const animeList = resp.response?.animeList || resp.response || [];
+          const paginatedList = animeList.slice(offset, offset + pageSize);
+          resp = {
+            status: Constant_Var_success,
+            response: paginatedList
+          };
+        }
+      } else {
+        resp = await GetWatchListDataById({ watchListId, offset, pageSize, getAll });
+      }
+
+      return resp;
+    } catch (error) {
+      console.error('Error getting watchlist data by ID:', error);
+      return { status: Constant_Var_error, response: error.message };
+    }
+  },
 }));
 
 export default useUserStore;
