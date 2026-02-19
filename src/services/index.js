@@ -176,18 +176,18 @@ export async function createWatchlist({ watchListName, type }) {
  * @param {Object} params - Parameters
  * @returns {Promise<{status: string, response: any}>}
  */
-export async function getWatchlistById({ watchlistId, getAll = false }) {
+export async function getWatchlistById({ watchListId, offset = 0, pageSize = 10, getAll = false }) {
     const dataSource = getDataSource();
 
     if (dataSource === DATA_SOURCE_FIREBASE) {
         const { default: GetWatchListDataById } = await import('@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById');
-        return GetWatchListDataById({ watchlistId, getAll });
+        return GetWatchListDataById({ watchListId, offset, pageSize, getAll });
     } else if (dataSource === DATA_SOURCE_HYBRID) {
         const { getWatchlistById } = await import('./hybrid/watchlistService');
-        return getWatchlistById({ watchlistId, getAll });
+        return getWatchlistById({ watchListId, offset, pageSize, getAll });
     } else {
         const { getWatchlistById } = await import('./api/watchlistService');
-        return getWatchlistById(watchlistId);
+        return getWatchlistById(watchListId, offset, pageSize);
     }
 }
 

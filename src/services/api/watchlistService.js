@@ -77,16 +77,19 @@ export async function createWatchlist({ watchListName, type }) {
 /**
  * Get watchlist by ID
  * @param {string} watchlistId - Watchlist ID
- * @param {number} page - Page number for pagination
+ * @param {number} offset - Offset for pagination (will be converted to page number)
  * @param {number} pageSize - Number of items per page
  * @returns {Promise<{status: string, response: any}>}
  */
-export async function getWatchlistById(watchlistId, page = 1, pageSize = 10) {
+export async function getWatchlistById(watchlistId, offset = 0, pageSize = 10) {
   try {
     const userData = await getUserAuth();
     if (!userData) {
       throw new Error(Constant_Var_errorMessage_notAuthenticatedUser);
     }
+
+    // Convert offset to page number (CF worker uses 1-based page numbers)
+    const page = Math.floor(offset / pageSize) + 1;
 
     const response = await apiClient.get(`/getWatchlistById/${watchlistId}`, {
       params: { page, pageSize }

@@ -114,22 +114,22 @@ export async function createWatchlist({ watchListName, type }) {
  * @param {boolean} params.getAll - Whether to get all data
  * @returns {Promise<{status: string, response: any}>}
  */
+/**
+ * Get watchlist by ID - reads from Cloudflare only
+ * @param {Object} params - Parameters for fetching watchlist
+ * @param {string} params.watchListId - Watchlist ID
+ * @param {number} params.offset - Offset for pagination (optional)
+ * @param {number} params.pageSize - Page size for pagination (optional)
+ * @param {boolean} params.getAll - Whether to get all data (offset=0, large pageSize)
+ * @returns {Promise<{status: string, response: any}>}
+ */
 export async function getWatchlistById({ watchListId, offset = 0, pageSize = 10, getAll = false }) {
   try {
-    // Read from Cloudflare only - no fallback
-    // Note: Cloudflare API doesn't support pagination yet, so we fetch all and slice client-side
-    const cloudflareResult = await getCloudflareWatchlistById(watchListId, offset);
+    // When getAll is true, fetch from page 1 with a very large pageSize
+    const effectiveOffset = getAll ? 0 : offset;
+    const effectivePageSize = getAll ? 10000 : pageSize;
 
-    if (cloudflareResult.status === Constant_Var_success && !getAll && offset !== null && pageSize !== null) {
-      // Apply client-side pagination if requested
-      const animeList = cloudflareResult.response?.animeList || cloudflareResult.response || [];
-      const paginatedList = animeList.slice(offset, offset + pageSize);
-      return {
-        status: Constant_Var_success,
-        response: paginatedList
-      };
-    }
-
+    const cloudflareResult = await getCloudflareWatchlistById(watchListId, effectiveOffset, effectivePageSize);
     return cloudflareResult;
   } catch (error) {
     console.error('Error in hybrid getWatchlistById:', error);
