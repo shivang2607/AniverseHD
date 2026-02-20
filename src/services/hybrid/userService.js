@@ -13,6 +13,10 @@ import CreateNewProfile from '@/app/firebase/Profile/CreateNewProfile';
 import UpdateName from '@/app/firebase/Profile/UpdateName';
 import UpdateProfileImage from '@/app/firebase/Profile/UpdateProfileImage';
 import UpdateCoverImage from '@/app/firebase/Profile/UpdateCoverImage';
+import UploadImageToFirebaseStorage from '@/app/firebase/utils/UploadImageToFirebaseStorage';
+
+// Formatter
+import { formatUser } from '../cloudflareFormatter';
 
 import {
   Constant_Var_success,
@@ -31,10 +35,13 @@ import {
 export async function getUserData() {
   try {
     // Read from Cloudflare only - no fallback
-    const cloudflareResult = await getCloudflareUserData();
+    const res = await getCloudflareUserData();
 
-    console.log("getUserData from Cloudflare:", cloudflareResult);
-    return cloudflareResult;
+    if (res.status === Constant_Var_success) {
+      res.response = formatUser(res.response);
+    }
+
+    return res;
   } catch (error) {
     console.error('Error in hybrid getUserData:', error);
     return { status: Constant_Var_error, response: error };
@@ -185,7 +192,6 @@ export async function updateProfileImage(blob) {
 
   try {
     // Upload image to Firebase Storage first (since both systems will use the same URL)
-    const { default: UploadImageToFirebaseStorage } = await import('@/app/firebase/utils/UploadImageToFirebaseStorage');
     const imageUploadResult = await UploadImageToFirebaseStorage({
       blob,
       folderName: 'profileImages'
@@ -258,7 +264,6 @@ export async function updateCoverImage(blob) {
 
   try {
     // Upload image to Firebase Storage first
-    const { default: UploadImageToFirebaseStorage } = await import('@/app/firebase/utils/UploadImageToFirebaseStorage');
     const imageUploadResult = await UploadImageToFirebaseStorage({
       blob,
       folderName: 'coverImages'

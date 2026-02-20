@@ -19,6 +19,9 @@ import RemoveAnimeFromWatchList from '@/app/firebase/WatchList/UpdateWatchLists/
 import ChangeWatchListName from '@/app/firebase/WatchList/UpdateWatchLists/ChangeWatchListName';
 import UpdatePublicPrivateWatchList from '@/app/firebase/WatchList/UpdateWatchLists/UpdatePublicPrivateWatchList';
 
+// Formatter
+import { formatWatchlists, formatWatchlistDetail } from '../cloudflareFormatter';
+
 import {
   Constant_Var_success,
   Constant_Var_error
@@ -36,8 +39,13 @@ import {
 export async function getUserWatchlists() {
   try {
     // Read from Cloudflare only - no fallback
-    const cloudflareResult = await getCloudflareWatchlists();
-    return cloudflareResult;
+    const res = await getCloudflareWatchlists();
+    
+    if (res.status === Constant_Var_success) {
+      res.response = formatWatchlists(res.response);
+    }
+    
+    return res;
   } catch (error) {
     console.error('Error in hybrid getUserWatchlists:', error);
     return { status: Constant_Var_error, response: error };
@@ -129,8 +137,13 @@ export async function getWatchlistById({ watchListId, offset = 0, pageSize = 10,
     const effectiveOffset = getAll ? 0 : offset;
     const effectivePageSize = getAll ? 10000 : pageSize;
 
-    const cloudflareResult = await getCloudflareWatchlistById(watchListId, effectiveOffset, effectivePageSize);
-    return cloudflareResult;
+    const res = await getCloudflareWatchlistById(watchListId, effectiveOffset, effectivePageSize);
+    
+    if (res.status === Constant_Var_success) {
+      res.response = formatWatchlistDetail(res.response);
+    }
+    
+    return res;
   } catch (error) {
     console.error('Error in hybrid getWatchlistById:', error);
     return { status: Constant_Var_error, response: error };
