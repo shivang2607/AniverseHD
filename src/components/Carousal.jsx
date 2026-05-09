@@ -16,26 +16,19 @@ const ResponsiveCarousal = () => {
   const [topAiring, setTopAiring] = useState();
 
   useEffect(() => {
-    // Check if data exists in session storage
-    const sessionData = sessionStorage.getItem("top_airing");
-    if (sessionData) {
-      // console.log("this is session data", JSON.parse(sessionData)); 
-      setTopAiring(JSON.parse(sessionData)?.value);
-      return;
-    } 
-      axios.get("/api/v1/get-top-anime?filter=airing")
-        .then((response) => {
-          const data = response?.data?.data;
-          //! IMPLEMENT TRY CATCH HERE FOR ERRORS IN SESSION STORAGE PARSING
+    sessionStorage.removeItem("top_airing");
+
+    axios
+      .get("/api/v1/get-top-anime?filter=airing")
+      .then((response) => {
+        const data = response?.data?.data;
+        if (Array.isArray(data) && data.length > 0) {
           setTopAiring(data);
-          if(data){
-          sessionStorage.setItem("top_airing",  JSON.stringify(data));  
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching top anime:", error);
-        });
-    
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching top anime:", error?.message);
+      });
   }, []);
 
   function formatDate(dateString) {

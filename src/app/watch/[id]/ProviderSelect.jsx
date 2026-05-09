@@ -6,15 +6,17 @@ import { usePathname, useSearchParams } from 'next/navigation';
 
 const ProviderSelect = () => {
   const searchParams = useSearchParams();
-  const provider = searchParams.get("provider") || "zoro";
+  const provider = searchParams.get("provider") || "hnembed";
   const pathname = usePathname();
 
   const [isOpen, setIsOpen] = useState(false);
   
   // Example providers - replace with your actual providers
   const providers = [
-    { id: "zoro", name: "Provider-Z", displayName: "Zoro Provider" },
-    { id: "animepahe", name: "Provider-A", displayName: "Animepahe Provider" },
+    { id: "hnembed", name: "Provider-H", displayName: "HNEmbed Provider" },
+    { id: "vidsrc", name: "Provider-V", displayName: "VidSrc Provider" },
+    // { id: "animepahe", name: "Provider-A", displayName: "Animepahe Provider" },
+    // { id: "zoro", name: "Provider-Z", displayName: "Zoro Provider" },
     // { id: "aniwatch", name: "Provider-A", displayName: "AniWatch Provider" },
     // { id: "gogoanime", name: "Provider-G", displayName: "GogoAnime Provider" },
     // { id: "9anime", name: "Provider-9", displayName: "9Anime Provider" },

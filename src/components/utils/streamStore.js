@@ -2,10 +2,12 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 const streamStore = (set, get)=>({
-    selectedProvider : "zoro",
+    selectedProvider : "hnembed",
     episodeIds: {
         'zoro': null,
         'animepahe': null,
+        'vidsrc': null,
+        'hnembed': null,
     },
     zoroEpisodeId : null,
     gogoSubEpisodeId: null,

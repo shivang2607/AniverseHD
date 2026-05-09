@@ -31,6 +31,9 @@ import {
   DefaultVideoLayout,
 } from "@vidstack/react/player/layouts/default";
 import { ImCross } from "react-icons/im";
+import { MdRefresh, MdSwapHoriz } from "react-icons/md";
+import { HiOutlineExclamationTriangle } from "react-icons/hi2";
+import { LuExternalLink } from "react-icons/lu";
 import { ThreeCircles } from "react-loader-spinner";
 import {
   Constant_Var_errorMessage_notAuthenticatedUser,
@@ -60,9 +63,11 @@ export default function Page({ params }) {
   const searchParams = useSearchParams();
   const zoroId = searchParams.get("z-id") || null;
   const animepaheId = searchParams.get("apahe-id") || null;
+  const vidsrcEp = searchParams.get("vidsrc-ep") || null;
+  const hnembedEp = searchParams.get("hn-ep") || null;
   const gogoSubId = searchParams.get("g-sub-id") || null;
   const gogoDubId = searchParams.get("g-dub-id") || null;
-  const provider = searchParams.get("provider") || "zoro";
+  const provider = searchParams.get("provider") || "hnembed";
   const serverV = searchParams.get("server");
   const dubV = searchParams.get("dub") || "";
   const startTime = Number(searchParams.get("t")) || 0;
@@ -124,6 +129,8 @@ export default function Page({ params }) {
   const [downloadLink, setDownloadLink] = useState();
   const [duration, setDuration] = useState();
   const [epNo, setEpNo] = useState(1);
+  const [embedStatus, setEmbedStatus] = useState("loading");
+  const [iframeReloadKey, setIframeReloadKey] = useState(0);
   const currentAbsoluteURL = useRef("");
   const recentTimestampRef = useRef(recentTimestamp);
   const durationRef = useRef(duration);
@@ -220,6 +227,8 @@ export default function Page({ params }) {
     setEpisodeIds({
       zoro: zoroId,
       animepahe: animepaheId,
+      vidsrc: vidsrcEp || (provider === "vidsrc" ? "1" : null),
+      hnembed: hnembedEp || (provider === "hnembed" ? "1" : null),
     });
     setZoroEpisodeId(zoroId);
     setGogoDubEpisodeId(gogoDubId);
@@ -228,10 +237,8 @@ export default function Page({ params }) {
     setDub(dubV);
     setRecentTimestamp(0);
 
-    // console.log("Hello world!!",provider, episodeId, selectedEpisodeId);
-
     return () => {};
-  }, [provider, zoroId, animepaheId, gogoSubId, gogoDubId, serverV, dubV]);
+  }, [provider, zoroId, animepaheId, vidsrcEp, hnembedEp, gogoSubId, gogoDubId, serverV, dubV]);
 
   //below functions gets the necessary data from both provider like episodes content at the page load, mergeProviderData is used in this useEffect
   useEffect(() => {
@@ -240,69 +247,60 @@ export default function Page({ params }) {
     setStreamingData(null);
 
     (async () => {
-      const cachedData = getSessionWithExpiry(`watch-${params.id}`);
+      const cachedData = getSessionWithExpiry(`watch-v2-${params.id}`);
       if (cachedData) {
         setContent(cachedData);
-        console.log("Using cached data for watch page:", cachedData);
         setEpisodesData(cachedData?.episodesData || []);
 
-        if (!zoroId && !animepaheId) {
-          //!new
+        if (!zoroId && !animepaheId && !vidsrcEp && !hnembedEp) {
           setEpisodeIds({
             zoro: cachedData?.episodesData?.[0]?.zoro_episodeId,
             animepahe: cachedData?.episodesData?.[0]?.animepahe_id,
+            vidsrc: "1",
+            hnembed: "1",
           });
         }
-        // console.log(cachedData);
 
         return;
       }
-      // console.log(params?.id)
       try {
-        const response = await axios.get(`/api/v1/watch/${params?.id}`);
+        const response = await axios.get(`/api/v2/vidsrc/watch/${params?.id}`);
         const data = response?.data;
 
-          
-        // Check if the data object has an 'error' key
         if (data?.error) {
-          console.error(`Error in response data for ${provider}:`, data.error);
+          console.error("vidsrc watch error:", data.error);
           setAnimeNotAvailable(true);
-          // Optionally, you could set some error state here or throw an error to handle it elsewhere
           return;
         }
 
-        const refinedData = await mergeAnimeEpisodesData(data);
+        const refinedData = {
+          ...data,
+          episodesData: (data?.episodeList || []).map((ep, i) => ({
+            number: ep.number,
+            episodeIndex: i + 1,
+            zoro_title: null,
+            animepahe_title: null,
+            vidsrc_id: ep.id,
+          })),
+        };
+
         setContent(refinedData);
-        setEpisodesData(refinedData?.episodesData || []);
-        
+        setEpisodesData(refinedData.episodesData);
+        setSessionWithExpiry(`watch-v2-${params.id}`, refinedData, 1000 * 60 * 30);
 
-        // Set session with 30-minute expiry
-        setSessionWithExpiry(`watch-${params.id}`, refinedData, 1000 * 60 * 30);
-
-        // Merge provider data only if keys are available in data
-        // mergeProviderData(data?.zoro, data?.gogoDub, data?.gogoSub);
-
-        if (!zoroId && !animepaheId) {
-          //!new
+        if (!zoroId && !animepaheId && !vidsrcEp && !hnembedEp) {
           setEpisodeIds({
-            zoro: refinedData?.episodesData?.[0]?.zoro_episodeId,
-            animepahe: refinedData?.episodesData?.[0]?.animepahe_id,
-          });
-          console.log("new episode ids --> ", {
-            zoro: refinedData?.episodesData?.[0]?.zoro_episodeId,
-            animepahe: refinedData?.episodesData?.[0]?.animepahe_id,
+            zoro: null,
+            animepahe: null,
+            vidsrc: "1",
+            hnembed: "1",
           });
         }
         setAnimeNotAvailable(false);
       } catch (error) {
-        // Log the error and handle it gracefully
-        console.error(
-          `Failed to fetch data for /watch/${params?.id}:`,
-          error.message
-        );
+        console.error(`Failed to fetch /api/v2/vidsrc/watch/${params?.id}:`, error.message);
         setAnimeNotAvailable(true);
         return;
-        // Optionally, update state to reflect error or notify the user
       }
 
       // console.log(data?.data);
@@ -317,7 +315,9 @@ export default function Page({ params }) {
         (ep) =>
           //!new
           (episodeIds.zoro && ep.zoro_episodeId === episodeIds.zoro) ||
-          (episodeIds.animepahe && ep.animepahe_id === episodeIds.animepahe)
+          (episodeIds.animepahe && ep.animepahe_id === episodeIds.animepahe) ||
+          (provider === "vidsrc" && episodeIds.vidsrc && String(ep?.number || ep?.episodeIndex) === String(episodeIds.vidsrc)) ||
+          (provider === "hnembed" && episodeIds.hnembed && String(ep?.number || ep?.episodeIndex) === String(episodeIds.hnembed))
         //!new
       );
 
@@ -444,6 +444,8 @@ export default function Page({ params }) {
       const url = updateParams([
         { key: "z-id", val: ep?.zoro_episodeId },
         { key: "apahe-id", val: ep?.animepahe_id },
+        { key: "vidsrc-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
+        { key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "n", val: currentIndex - 1 },
       ]);
 
@@ -468,6 +470,8 @@ export default function Page({ params }) {
       const url = updateParams([
         { key: "z-id", val: ep?.zoro_episodeId },
         { key: "apahe-id", val: ep?.animepahe_id },
+        { key: "vidsrc-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
+        { key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "n", val: currentIndex - 1 },
       ]);
       router.push(url);
@@ -585,14 +589,18 @@ export default function Page({ params }) {
   //below function and usememo is to get src url of m3u8 file according to the provider
   const getStreamingSource = () => {
     const config = providersConfig[provider];
+    if (config?.isEmbed || streamingData?.isEmbed) {
+      setDownloadLink();
+      return streamingData?.sources?.[0]?.url || null;
+    }
     if (config.needsServerSideStreaming) {
       setDownloadLink();
-      
+
       return `/api/v1/streamingProxy?url=${
         encodeURIComponent(streamingData?.sources?.[0]?.url)
       }`;
-    
-    
+
+
 
     } else {
       const qualityOrder = ["1080p", "720p", "480p", "360p"];
@@ -612,6 +620,48 @@ export default function Page({ params }) {
     () => getStreamingSource(),
     [provider, streamingData]
   );
+
+  const isEmbed = providersConfig[provider]?.isEmbed || streamingData?.isEmbed;
+
+  useEffect(() => {
+    if (!isEmbed || !streamingSrc) {
+      setEmbedStatus("loading");
+      return;
+    }
+    setEmbedStatus("loading");
+
+    const TIMEOUT_MS = 8000;
+    const watchdog = setTimeout(() => {
+      setEmbedStatus((prev) => (prev === "loading" ? "unavailable" : prev));
+    }, TIMEOUT_MS);
+
+    const onMessage = (event) => {
+      try {
+        const origin = event?.origin || "";
+        if (
+          origin.includes("hnembed.cc") ||
+          origin.includes("hnembed.com") ||
+          origin.includes("vidsrc.icu") ||
+          origin.includes("vidsrc.cc") ||
+          origin.includes("vidsrc.to")
+        ) {
+          setEmbedStatus("loaded");
+          clearTimeout(watchdog);
+        }
+      } catch {}
+    };
+    window.addEventListener("message", onMessage);
+
+    return () => {
+      clearTimeout(watchdog);
+      window.removeEventListener("message", onMessage);
+    };
+  }, [isEmbed, streamingSrc, iframeReloadKey]);
+
+  const retryEmbed = () => {
+    setEmbedStatus("loading");
+    setIframeReloadKey((k) => k + 1);
+  };
 
 
   //In case if dub is not available for a episode the we will automatically change the router to the sub..this function utility handles the dub val (either 1, 0, -1)
@@ -679,11 +729,112 @@ export default function Page({ params }) {
                 <div className="self-center flex gap-2 bg-black text-xl tracking-wider items-center justify-center text-sky-400 w-full h-72">
                   <ImCross color="red" /> {streamingData?.message}
                 </div>
+              ) : !streamingSrc ? (
+                <div className="self-center flex flex-col gap-4 bg-black text-base md:text-lg tracking-wider items-center justify-center text-gray-200 w-full h-72 px-4 text-center">
+                  <ImCross color="#f87171" />
+                  <div>
+                    Couldn&apos;t load this episode on{" "}
+                    <span className="text-primary-300 font-semibold">
+                      {providersConfig[provider]?.displayName || provider}
+                    </span>
+                    .
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    Source might be missing for this title or episode. Try another provider.
+                  </div>
+                  <div className="flex gap-2 flex-wrap justify-center">
+                    {Object.values(providersConfig)
+                      .filter((p) => p.id !== provider)
+                      .map((p) => (
+                        <Link
+                          key={p.id}
+                          href={updateParams([{ key: "provider", val: p.id }], false)}
+                          className="px-3 py-1 rounded bg-primary-100 text-cbg-100 text-sm font-medium hover:bg-primary-200"
+                        >
+                          Try {p.name}
+                        </Link>
+                      ))}
+                  </div>
+                </div>
               ) : (
                 streamingSrc && (
                   <>
                     <div  className="pm_video flex h-fit">
                       <div className="stream block bg-black md:h-[85vh] h-[40vh] w-full justify-center items-center rounded my-4">
+                        {isEmbed ? (
+                          <div className="relative w-full h-full bg-black">
+                            <iframe
+                              key={`${provider}-${streamingSrc}-${iframeReloadKey}`}
+                              src={streamingSrc}
+                              title={`${providersConfig[provider]?.displayName || provider} - ${content?.title_english || content?.title || "Watch"}${epNo ? ` Ep${epNo}` : ""}`}
+                              className="w-full h-full border-0"
+                              allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
+                              allowFullScreen
+                              referrerPolicy="no-referrer"
+                              onLoad={() => {
+                                setTimeout(() => {
+                                  setEmbedStatus((prev) => prev === "loading" ? "loaded-unverified" : prev);
+                                }, 1500);
+                              }}
+                            />
+                            {embedStatus === "loading" && (
+                              <>
+                                <style>{`@keyframes embedShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }`}</style>
+                                <div className="pointer-events-none absolute top-0 left-0 right-0 h-1 overflow-hidden bg-cbg-300/40 z-10">
+                                  <div className="h-full w-1/3 bg-primary-300" style={{ animation: "embedShimmer 1.2s ease-in-out infinite" }} />
+                                </div>
+                              </>
+                            )}
+                            {embedStatus === "unavailable" && (
+                              <div className="absolute inset-0 bg-black/95 flex flex-col items-center justify-center text-gray-100 px-6 text-center gap-4 z-10">
+                                <HiOutlineExclamationTriangle className="text-amber-400 text-6xl" />
+                                <div className="text-xl md:text-2xl font-semibold">
+                                  This anime isn&apos;t available right now
+                                </div>
+                                <div className="text-sm md:text-base text-gray-400 max-w-xl">
+                                  <span className="text-primary-300 font-medium">
+                                    {providersConfig[provider]?.displayName || provider}
+                                  </span>{" "}
+                                  couldn&apos;t find a source for this episode. This usually
+                                  happens with very new releases or niche titles that
+                                  haven&apos;t been indexed yet.
+                                </div>
+                                <div className="text-xs text-gray-500 max-w-md">
+                                  Note: When playback works, audio is whatever the provider serves
+                                  (usually English dub). Original Japanese audio with
+                                  subtitles isn&apos;t selectable on these embed providers.
+                                </div>
+                                <div className="flex gap-2 flex-wrap justify-center mt-2">
+                                  <button
+                                    onClick={retryEmbed}
+                                    className="flex items-center gap-2 px-4 py-2 rounded bg-cbg-300 text-gray-100 text-sm font-medium hover:bg-cbg-400"
+                                  >
+                                    <MdRefresh className="text-lg" /> Retry
+                                  </button>
+                                  {Object.values(providersConfig)
+                                    .filter((p) => p.id !== provider)
+                                    .map((p) => (
+                                      <Link
+                                        key={p.id}
+                                        href={updateParams([{ key: "provider", val: p.id }], false)}
+                                        className="flex items-center gap-2 px-4 py-2 rounded bg-primary-100 text-cbg-100 text-sm font-medium hover:bg-primary-200"
+                                      >
+                                        <MdSwapHoriz className="text-lg" /> Try {p.displayName || p.name}
+                                      </Link>
+                                    ))}
+                                  <a
+                                    href={streamingSrc}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 px-4 py-2 rounded bg-cbg-200 text-gray-300 text-sm font-medium hover:text-gray-100 hover:bg-cbg-300 border border-cbg-400"
+                                  >
+                                    <LuExternalLink /> Open in new tab
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
                         <ArtVideoPlayer
                         key={uniqueId("art-video-")}
                         getNextEpisode={getNextEpisode}
@@ -712,8 +863,9 @@ export default function Page({ params }) {
                             recentTimestampRef={recentTimestampRef}
                             setAnimeNotAvailable = {setAnimeNotAvailable}
                             mediaPlayerState={mediaPlayerState}
-                          
+
                         />
+                        )}
 
                         {/* <MediaPlayer
                           load="eager"

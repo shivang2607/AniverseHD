@@ -1,18 +1,34 @@
-// lib/fetchAnimepaheInfoByMalId.js
-
 import { defaultCacheOptions } from "@/utils/lruCache";
-import axios from "axios";
 import { LRUCache } from "lru-cache";
+import {
+  buildEpisodeId,
+  getPaheEpisodes,
+  searchPaheByTitle,
+} from "@/app/api/v2/animepahe/paheAdapter";
+import {
+  getPaheSessionFromSites,
+  persistPaheSessionToQdrant,
+} from "@/app/api/v2/animepahe/paheQdrantSync";
 
-// LRU cache config
 const animepaheInfoCache = new LRUCache({
   ...defaultCacheOptions,
-  max: 100,
-  ttl: 1000 * 60 * 15, // 15 minutes
+  max: 200,
+  ttl: 1000 * 60 * 30,
 });
 
-export async function fetchAnimepaheInfoByMalId(malId, Sites) {
-  if (!malId){
+function shapeEpisodes(rawEpisodes, animeSession) {
+  return (rawEpisodes || []).map((ep) => ({
+    id: buildEpisodeId(animeSession, ep?.session),
+    number: ep?.number,
+    title: ep?.title || `Episode ${ep?.number}`,
+    image: ep?.snapshot || null,
+    snapshot: ep?.snapshot || null,
+    session: ep?.session,
+  }));
+}
+
+export async function fetchAnimepaheInfoByMalId(malId, Sites, animeMeta = {}) {
+  if (!malId) {
     console.warn("No MAL ID Provided in fetchAnimepaheInfoByMalId!");
     return null;
   }
@@ -20,41 +36,56 @@ export async function fetchAnimepaheInfoByMalId(malId, Sites) {
   const cacheKey = `animepahe-info-${malId}`;
   const cached = animepaheInfoCache.get(cacheKey);
   if (cached) {
-    console.log("✅ LRU Cache hit for Animepahe info:", malId);
-    console.log("Cached data:", cached);
+    console.log("LRU Cache hit for AnimePahe info:", malId);
     return cached;
   }
 
   try {
-    // Step 1: Get AnimePahe ID
-    let animepaheId = null;
+    let animeSession = getPaheSessionFromSites(Sites);
+    let pickedTitle = Sites?.animepahe?.paheTitle || null;
+    let pickedId = Sites?.animepahe?.sub || null;
+    let foundFresh = false;
 
-    if (Sites?.animepahe?.sub !== null) {
-      animepaheId = Sites.animepahe.sub;
-    } else {
-      const mapRes = await axios.get(
-        `${process.env.MAPPER_URL}/anime/mappings/mal_id/${malId}`
-      );
-      animepaheId = mapRes?.data?.animepahe?.sub || null;
+    if (!animeSession) {
+      const titleForSearch =
+        animeMeta?.title_english || animeMeta?.title || pickedTitle;
+      const found = await searchPaheByTitle(titleForSearch);
+      if (found?.session) {
+        animeSession = found.session;
+        pickedTitle = found.title || titleForSearch;
+        pickedId = found.id || pickedId;
+        foundFresh = true;
+      }
     }
 
-    if (!animepaheId) {
-      console.log("Animepahe ID not found for this MAL ID =>", malId);
-    }
-
-    // Step 2: Fetch AnimePahe info
-    const infoUrl = `${process.env.SCRAPER_URL}/anime/animepahe/info/${animepaheId}`;
-    const infoRes = await axios.get(infoUrl);
-
-    if (infoRes?.data) {
-      animepaheInfoCache.set(cacheKey, infoRes.data);
-      return infoRes.data;
-    } else {
-      console.error("Animepahe info not found.");
+    if (!animeSession) {
+      console.log("AnimePahe session not resolvable for MAL ID:", malId);
       return null;
     }
+
+    const rawEpisodes = await getPaheEpisodes(animeSession);
+    const episodes = shapeEpisodes(rawEpisodes, animeSession);
+
+    if (foundFresh && episodes.length > 0) {
+      persistPaheSessionToQdrant({
+        malId,
+        animeSession,
+        paheTitle: pickedTitle,
+        paheId: pickedId,
+      }).catch(() => {});
+    }
+
+    const result = {
+      title: pickedTitle,
+      animeSession,
+      episodes,
+      totalEpisodes: episodes.length,
+    };
+
+    if (episodes.length > 0) animepaheInfoCache.set(cacheKey, result);
+    return result;
   } catch (error) {
-    console.error("❌ Failed to fetch AnimePahe info:", error?.message);
-    return null
+    console.error("Failed to fetch AnimePahe info:", error?.message);
+    return null;
   }
 }

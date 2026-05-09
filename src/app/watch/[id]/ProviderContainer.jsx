@@ -60,7 +60,7 @@ export default function ProviderContainer({
 }) {
 
   const searchParams = useSearchParams();
-  const provider = searchParams.get("provider") || "zoro";
+  const provider = searchParams.get("provider") || "hnembed";
   const n = searchParams.get("n") || 0;
   const pathname = usePathname();
   const episodesPerWindow = 50;
@@ -87,9 +87,10 @@ export default function ProviderContainer({
     episodes : state.episodesData
   }));
 
-  // console.log(episodes);
   const serverV = searchParams.get('server');
   const dub = searchParams.get('dub');
+  const activeEpFromUrl = searchParams.get('hn-ep') || searchParams.get('vidsrc-ep') || null;
+  const activeEpNum = activeEpFromUrl ? Number(activeEpFromUrl) : null;
   // const [server, setServer] = useState(searchParams.get('server'));
   // const [serverLoading, setServerLoading] = useState(false);
   
@@ -113,71 +114,52 @@ export default function ProviderContainer({
   // console.log("This is server data",serverData);
 
   useDebouncedEffect(() => {
-    if (Object.values(episodeIds).every(val => val == null)) return; //this will check if all of the episodeIds are null
+    if (!provider || !episodeIds?.[provider]) {
+      setStreamingData(null);
+      return;
+    }
+    setStreamingData(null);
+    fetchStreamingData();
+  }, [episodeIds, provider, dub, server], 100, setStreamingData);
 
-    // console.log("entering fetchingStreamingData with provider:", provider, "and episodeIds:", episodeIds);
-    
-    fetchStreamingData({
-      episodeId: episodeIds.zoro,
-      animepahe_id: episodeIds.animepahe,
-    });
-  }, [episodeIds, provider, dub, server], 100, setStreamingData); // 50ms delay
-  
-  
-  const fetchStreamingData = async(ep)=>{
 
+  const fetchStreamingData = async () => {
     setStreamLoading(true);
     try {
+      if (!provider || !episodeIds?.[provider]) return;
+      setAnimeNotAvailable(false);
 
-        if(provider && episodeIds[provider]){
-          setAnimeNotAvailable(false);
+      const cfg = providersConfig[provider];
+      let data = null;
 
-          if(providersConfig[provider]?.hasServersApi){
-          const data = await providersConfig[provider].streamingData(
-            episodeIds[provider], 
-            { dub: dub || '', server: providersConfig[provider].hasServersApi ? server || providersConfig[provider].defaultServer : undefined }
-          );
-          setStreamingData(data);
-        }
-        else { //for block providers like animepahe which don't have servers api
-          const data = await providersConfig[provider].streamingData(
-            episodeIds[provider], 
-            { dub: dub === "-1" ? false : dub } //if dub is false means its raw means dub will be false, if dub is null then means its false also if dub is non empty or non null value then atutomatically means its true
-          );
-          // console.log("Streaming data fetched for provider:", provider, "data:", data);
-          // console.log("This is the episode id for streaming data => ", episodeIds[provider]);
-          setStreamingData(data);
-        }
-          setStreamLoading(false);
-        }
+      if (cfg?.hasServersApi) {
+        data = await cfg.streamingData(
+          episodeIds[provider],
+          { dub: dub || '', server: server || cfg.defaultServer }
+        );
+      } else if (cfg?.isEmbed) {
+        data = await cfg.streamingData(
+          episodeIds[provider],
+          { dub: dub === "-1" ? false : dub, malId: id }
+        );
+      } else {
+        data = await cfg.streamingData(
+          episodeIds[provider],
+          { dub: dub === "-1" ? false : dub }
+        );
+      }
 
-
-
-
-      // if(provider==="zoro" && ep?.zoro_episodeId){
-      //   setAnimeNotAvailable(false);
-      //   const data = await axios.get(`/api/v1/${provider}/stream/${ep?.zoro_episodeId}`, {
-      //     params: {
-      //       category: dub ? dub==="-1" ? "raw" : "dub" : "sub",
-      //       server: server || 'hd-2'
-      //     }
-      //   });
-        
-      //   if(data?.data?.status){
-      //     return;
-      //   }
-      //   setStreamingData(data?.data);
-      // }
-      
-      
-    } catch (error) {
-      console.log("couldn't fetch streaming data, ",error);
+      setStreamingData(data);
+    } catch (err) {
+      console.error("fetchStreamingData failed:", err?.message);
+      setStreamingData(null);
+    } finally {
+      setStreamLoading(false);
     }
-    setStreamLoading(false);
-  }
+  };
 
 
-  
+
 
   const updateParams = (paramsList, resetT=true)=>{
     // console.log("this is paramsList :", paramsList);
@@ -312,7 +294,6 @@ export default function ProviderContainer({
           onChange={(e) => setEpisodeRangeIndex(parseInt(e.target.value))}
         >
           {[...Array(Math.ceil(episodes?.length / episodesPerWindow))].map((e, i) => {
-            // console.log(i);
             return (
               <option key={i} value={i} className="p-2 m-2">
                 Eps {episodesPerWindow * i + 1} - {Math.min(episodes?.length, episodesPerWindow * (i + 1))}
@@ -323,6 +304,15 @@ export default function ProviderContainer({
       </div>
 
       
+
+      {activeEpNum !== null && (provider === "hnembed" || provider === "vidsrc") && (
+        <div className="text-sm text-gray-300 mx-5 mb-1">
+          Now playing:{" "}
+          <span className="text-primary-200 font-semibold">
+            Episode {activeEpNum}
+          </span>
+        </div>
+      )}
 
       <div className="episode-list grid md:grid-cols-4 grid-cols-2 gap-2 m-3 md:max-h-screen max-h-[40vh]  overflow-y-scroll p-2 md:scrollbar-thin md:scrollbar-thumb-slate-500">
         {episodes
@@ -338,30 +328,47 @@ export default function ProviderContainer({
                 href={updateParams([
                   {key: "z-id", val: ep?.zoro_episodeId},
                   {key: "apahe-id", val: ep?.animepahe_id},
+                  {key: "vidsrc-ep", val: String(ep?.number || ep?.episodeIndex || (i + 1))},
+                  {key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || (i + 1))},
                   {key: "g-sub-id", val: ep?.gogoSubId},
                   {key: "g-dub-id", val: ep?.gogoDubId},
                   {key: "server", val:server},
                 ])}
-                key={ep?.zoro_episodeId}
-                className={`w-full   text-xs p-4 cursor-pointer my-1 rounded-md  tracking-wider  flex gap-2 ${
-                  (episodeIds.zoro === ep?.zoro_episodeId  && episodeIds.zoro) ||
-                  (episodeIds.animepahe === ep?.animepahe_id && episodeIds.animepahe)
-                  
-                    ? (ep?.isFiller || ep?.zoro_isFiller) ? "bg-sky-400/80 " : "text-primary-100 font-semibold bg-black/60" 
-                    : "font-[350] bg-black/30"
+                key={ep?.zoro_episodeId || ep?.animepahe_id || `ep-${ep?.number || i}`}
+                data-active={
+                  (episodeIds.zoro === ep?.zoro_episodeId && !!episodeIds.zoro) ||
+                  (episodeIds.animepahe === ep?.animepahe_id && !!episodeIds.animepahe) ||
+                  ((provider === "vidsrc" || provider === "hnembed") &&
+                    activeEpNum !== null &&
+                    Number(ep?.number || ep?.episodeIndex || (i + 1)) === activeEpNum)
                 }
-                    ${(ep?.isFiller || ep?.zoro_isFiller) ? "bg-sky-400/30 " : ""} `}
+                className={`w-full text-xs p-4 cursor-pointer my-1 rounded-md tracking-wider flex gap-2 transition-colors ${
+                  (episodeIds.zoro === ep?.zoro_episodeId && !!episodeIds.zoro) ||
+                  (episodeIds.animepahe === ep?.animepahe_id && !!episodeIds.animepahe) ||
+                  ((provider === "vidsrc" || provider === "hnembed") &&
+                    activeEpNum !== null &&
+                    Number(ep?.number || ep?.episodeIndex || (i + 1)) === activeEpNum)
+                    ? (ep?.isFiller || ep?.zoro_isFiller)
+                      ? "bg-sky-400 text-cbg-100 ring-2 ring-primary-100"
+                      : "bg-primary-100 text-cbg-100 font-semibold ring-2 ring-primary-300"
+                    : (ep?.isFiller || ep?.zoro_isFiller)
+                      ? "bg-sky-400/30 hover:bg-sky-400/50"
+                      : "font-[350] bg-black/30 hover:bg-black/60"
+                }`}
                 onClick={() =>{
                   // fetchStreamingData(ep);
                 }
                   
                 }
               >
-                <div className="font-medium text-nowrap ">
-                  {" "}
-                  Ep {ep?.number || ep?.episodeIndex || i} :{" "}
-                </div>{" "}
-                {ep?.zoro_title || ep?.animepahe_title}
+                <div className="font-medium text-nowrap">
+                  Ep {ep?.number || ep?.episodeIndex || (i + 1)}
+                </div>
+                {(ep?.zoro_title || ep?.animepahe_title) && (
+                  <span className="truncate text-gray-300">
+                    : {ep?.zoro_title || ep?.animepahe_title}
+                  </span>
+                )}
               </Link>
             );
           })}

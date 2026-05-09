@@ -40,8 +40,8 @@ export async function GET(req, { params }) {
   }
 
   try {
-    // console.log("type=>", type)
     const url = `${process.env.ZORO_SCRAPER_URL}/api/stream?id=${episodeId}&server=${server}&type=${type}`;
+    console.log("Url of zoro_scraper_url", url);
     console.log(url);
 
     const res = await axios.get(url);

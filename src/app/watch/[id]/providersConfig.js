@@ -1,50 +1,15 @@
 import axios from "axios";
 
-
-/**
- * Transforms an array of server entries into an object grouped by type.
- *
- * Server api Output format:
- * {
- *     sub: [ // All 'sub' type entries
- *       {
- *         type: "sub",           // original type
- *         serverName: "HD-1"     // human-readable server name
- *        ...other data 
- *       },
- *       ...
- *     ],
- *     dub: [ // All 'dub' type entries
- *       {
- *         type: "dub",           // original type
- *         serverName: "HD-1"     // human-readable server name
- *        ...other data 
- *       },
- *       ...
- *     ],
- *     raw: [ // All 'raw' type entries if available 
- *       {
- *         type: "raw",           // original type
- *         serverName: "HD-1"     // human-readable server name
- *        ...other data 
- *       ...
- *      }], 
- *  }
- *   
- * 
- */
-
-
 export const providersConfig = {
   'zoro' : {
     id: 'zoro',
     name: 'Provider-Z',
     displayName: 'Zoro Provider',
     hasServersApi: true,
-    isSubtitleNeedReferer: true, // Zoro requires referer for subtitles
+    isSubtitleNeedReferer: true,
     defaultServer: 'HD-2',
     hasMultipleIdsPerEpisode: false,
-    needsServerSideStreaming: true, // Zoro requires server-side streaming
+    needsServerSideStreaming: true,
     serverApiUrl: (episodeId) =>   `/api/v2/zoro/servers/${episodeId}`,
     streamingData : async (episodeId, { dub = '', server = 'hd-2' } = {}) => {
       try {
@@ -52,15 +17,8 @@ export const providersConfig = {
         const response = await axios.get(`/api/v2/zoro/watch/${episodeId}`, {
           params: { type: category, server }
         });
-
-        //below is the response from the api of v1 version which was aniwatch-api scraper by Ritesh
-        // const response = await axios.get(`/api/v1/zoro/stream/${episodeId}`, {
-        //   params: { category, server }
-        // });
-        // console.log("Zoro Streaming Response from providers config:", response?.data);
         const data = response?.data;
-        
-        
+
         if (data?.sources?.length>0) {
           return {
             sources: data?.sources || [],
@@ -71,7 +29,7 @@ export const providersConfig = {
           };
         }
 
-        return null; // anime not available
+        return null;
       } catch (err) {
         console.error("Zoro Streaming Error:", err);
         return null;
@@ -84,34 +42,103 @@ export const providersConfig = {
     name: 'Provider-A',
     displayName: 'Animepahe Provider',
     hasServersApi: false,
-    defaultServer: null, 
-    isSubtitleNeedReferer: false, // Animepahe does not require subtitles let alone subtitles
+    defaultServer: null,
+    isSubtitleNeedReferer: false,
     hasMultipleIdsPerEpisode: false,
-    serverApiUrl: null, // Animepahe does not have a servers API, it uses episode IDs directly,
+    serverApiUrl: null,
     needsServerSideStreaming: true,
     streamingData: async (episodeId, {dub = false} = {}) => {
       try {
-        const response = await axios.get(`/api/v2/animepahe/watch/${encodeURIComponent(episodeId)}`, {
-          
-        });
+        const dubFlag = dub === '1' || dub === true ? '1' : '0';
+        const response = await axios.get(
+          `/api/v2/animepahe/watch/${encodeURIComponent(episodeId)}`,
+          { params: { dub: dubFlag } }
+        );
 
         const data = response?.data;
-        if (data) {
+        if (data?.sources?.length > 0) {
           return {
-            sources: data?.sources?.filter(src=>  src.isDub === (dub ==='1')) || [],
-            tracks: data?.tracks || [],
-            intro: data?.intro || null,
-            outro: data?.outro || null,
+            sources: data.sources,
+            tracks: [],
+            intro: null,
+            outro: null,
             headers: data?.headers || null,
           };
         }
-
-        return null; // anime not available
+        return null;
       } catch (err) {
         console.error("AnimePahe Streaming Error:", err);
         return null;
       }
     }
-
+  },
+  'vidsrc': {
+    id: 'vidsrc',
+    name: 'Provider-V',
+    displayName: 'VidSrc Provider',
+    hasServersApi: false,
+    defaultServer: null,
+    isSubtitleNeedReferer: false,
+    hasMultipleIdsPerEpisode: false,
+    serverApiUrl: null,
+    needsServerSideStreaming: false,
+    isEmbed: true,
+    streamingData: async (episodeRef, { dub = false, malId } = {}) => {
+      try {
+        if (!malId) return null;
+        const dubFlag = dub === '1' || dub === true ? '1' : '0';
+        const ep = typeof episodeRef === 'object' ? episodeRef?.episodeNumber : Number(episodeRef);
+        const epNum = Number.isFinite(ep) && ep > 0 ? ep : 1;
+        const { data } = await axios.get(`/api/v2/vidsrc/embed/${malId}`, {
+          params: { ep: epNum, dub: dubFlag },
+        });
+        if (!data?.embedUrl) return null;
+        return {
+          sources: [{ url: data.embedUrl, type: 'iframe', isDub: data.dub }],
+          tracks: [],
+          intro: null,
+          outro: null,
+          headers: null,
+          isEmbed: true,
+        };
+      } catch (err) {
+        console.error("VidSrc Embed Error:", err);
+        return null;
+      }
+    }
+  },
+  'hnembed': {
+    id: 'hnembed',
+    name: 'Provider-H',
+    displayName: 'HNEmbed Provider',
+    hasServersApi: false,
+    defaultServer: null,
+    isSubtitleNeedReferer: false,
+    hasMultipleIdsPerEpisode: false,
+    serverApiUrl: null,
+    needsServerSideStreaming: false,
+    isEmbed: true,
+    streamingData: async (episodeRef, { dub = false, malId } = {}) => {
+      try {
+        if (!malId) return null;
+        const ep = typeof episodeRef === 'object' ? episodeRef?.episodeNumber : Number(episodeRef);
+        const epNum = Number.isFinite(ep) && ep > 0 ? ep : 1;
+        const { data } = await axios.get(`/api/v2/hnembed/embed/${malId}`, {
+          params: { ep: epNum },
+        });
+        if (!data?.embedUrl) return null;
+        return {
+          sources: [{ url: data.embedUrl, type: 'iframe', isDub: Boolean(dub) }],
+          tracks: [],
+          intro: null,
+          outro: null,
+          headers: null,
+          isEmbed: true,
+        };
+      } catch (err) {
+        console.error("HNEmbed Error:", err);
+        return null;
+      }
+    }
   },
 };

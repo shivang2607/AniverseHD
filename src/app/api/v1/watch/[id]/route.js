@@ -110,11 +110,26 @@ export async function GET(req, { params }) {
     
     let animepaheEps = null;
     console.log("Entering the fetchAnimepaheInfoByMalId");
-    const animepaheData = await fetchAnimepaheInfoByMalId(id, animeData?.Sites); // Fetch animepahe data (first it will check for the id in Sites, if not found which is super rare, it will fetch from mapper)
+    const animepaheData = await fetchAnimepaheInfoByMalId(id, animeData?.Sites, {
+      title: animeData?.title,
+      title_english: animeData?.title_english,
+    }); // Resolves AnimePahe session via Qdrant Sites cache or title search; persists newly-found sessions back to Qdrant
     // console.log("animepahe data in the watch api is => ", animepaheData);
     if (animepaheData?.episodes) {
       animepaheEps = animepaheData.episodes;
     }
+
+    const synthesizedCount = Math.max(
+      zoroEps?.totalEpisodes || 0,
+      animepaheData?.totalEpisodes || animepaheData?.episodes?.length || 0,
+      animeData.episodes || 0,
+      1
+    );
+    const vidsrcEps = Array.from({ length: synthesizedCount }, (_, i) => ({
+      number: i + 1,
+      id: String(i + 1),
+      title: `Episode ${i + 1}`,
+    }));
 
     const finalResponse = {
       zoro: {
@@ -125,6 +140,10 @@ export async function GET(req, { params }) {
         episodes: animepaheEps || [],
         totalEpisodes:
         animepaheData?.totalEpisodes || animepaheData?.episodes?.length || 0,
+      },
+      vidsrc: {
+        episodes: vidsrcEps,
+        totalEpisodes: synthesizedCount,
       },
       gogoSub: {
         episodes: [],

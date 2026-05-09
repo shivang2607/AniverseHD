@@ -4,7 +4,7 @@ export async function mergeAnimeEpisodesData(animeData) {
   // console.log(animeData);
   
   try {
-    const providerKeys = ['zoro', 'animepahe'];
+    const providerKeys = ['zoro', 'animepahe', 'vidsrc'];
 
     // Input validation
     if (!animeData || typeof animeData !== 'object') {
