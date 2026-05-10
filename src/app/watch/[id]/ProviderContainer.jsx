@@ -60,7 +60,7 @@ export default function ProviderContainer({
 }) {
 
   const searchParams = useSearchParams();
-  const provider = searchParams.get("provider") || "hnembed";
+  const provider = searchParams.get("provider") || "megaplay";
   const n = searchParams.get("n") || 0;
   const pathname = usePathname();
   const episodesPerWindow = 50;
@@ -89,8 +89,17 @@ export default function ProviderContainer({
 
   const serverV = searchParams.get('server');
   const dub = searchParams.get('dub');
-  const activeEpFromUrl = searchParams.get('hn-ep') || searchParams.get('vidsrc-ep') || null;
-  const activeEpNum = activeEpFromUrl ? Number(activeEpFromUrl) : null;
+  const activeEpFromUrl = searchParams.get('hn-ep') || searchParams.get('megaplay-ep') || null;
+  // Fall back to episodeIds[provider] (which page.jsx defaults to "1" for the
+  // active embed provider) so the episode list shows the correct selection on
+  // initial load even when no episode URL param is present yet.
+  const activeEpFromIds = ["megaplay", "hnembed"].includes(provider)
+    ? episodeIds?.[provider]
+    : null;
+  const activeEpRaw = activeEpFromUrl || activeEpFromIds;
+  const activeEpNum = activeEpRaw && /^\d+$/.test(String(activeEpRaw)) ? Number(activeEpRaw) : null;
+  const hnSeasonOverride = searchParams.get('hn-season');
+  const hnSeasonOverrideNum = hnSeasonOverride && /^\d+$/.test(hnSeasonOverride) ? Number(hnSeasonOverride) : null;
   // const [server, setServer] = useState(searchParams.get('server'));
   // const [serverLoading, setServerLoading] = useState(false);
   
@@ -120,7 +129,7 @@ export default function ProviderContainer({
     }
     setStreamingData(null);
     fetchStreamingData();
-  }, [episodeIds, provider, dub, server], 100, setStreamingData);
+  }, [episodeIds, provider, dub, server, hnSeasonOverrideNum], 100, setStreamingData);
 
 
   const fetchStreamingData = async () => {
@@ -138,10 +147,11 @@ export default function ProviderContainer({
           { dub: dub || '', server: server || cfg.defaultServer }
         );
       } else if (cfg?.isEmbed) {
-        data = await cfg.streamingData(
-          episodeIds[provider],
-          { dub: dub === "-1" ? false : dub, malId: id }
-        );
+        const embedOpts = { dub: dub === "-1" ? false : dub, malId: id };
+        if (provider === "hnembed" && hnSeasonOverrideNum) {
+          embedOpts.season = hnSeasonOverrideNum;
+        }
+        data = await cfg.streamingData(episodeIds[provider], embedOpts);
       } else {
         data = await cfg.streamingData(
           episodeIds[provider],
@@ -282,6 +292,54 @@ export default function ProviderContainer({
       </div>
     )
   }
+
+  {provider === "hnembed" && streamingData?.kind !== "movie" && (() => {
+    const autoSeason = Number(streamingData?.season) || 1;
+    const activeSeason = hnSeasonOverrideNum || autoSeason;
+    // Show 1..max(autoSeason+1, 5) so the user has at least 5 options and a buffer
+    // past the auto-resolved season in case the resolver under-counted.
+    const maxShown = Math.max(autoSeason + 1, 5);
+    const seasonOptions = Array.from({ length: maxShown }, (_, i) => i + 1);
+    return (
+      <div className="sub flex font-semibold text-sm items-center p-2 gap-4 flex-wrap">
+        <h2 className="flex gap-2 items-center whitespace-nowrap">
+          <PiVideoFill className="text-lg text-primary-300" />
+          Season:
+        </h2>
+        <div className="flex gap-2 flex-wrap items-center">
+          {seasonOptions.map((s) => (
+            <Link
+              key={s}
+              href={updateParams([{ key: "hn-season", val: String(s) }], false)}
+              scroll={false}
+              className={`rounded px-2 py-1 bg-cbg-400 ${
+                s === activeSeason ? "bg-primary-100 text-gray-100" : ""
+              }`}
+            >
+              S{s}
+            </Link>
+          ))}
+          {hnSeasonOverrideNum && (
+            <Link
+              href={updateParams([{ key: "hn-season", val: "" }], false)}
+              scroll={false}
+              className="rounded px-2 py-1 bg-cbg-400 text-xs text-gray-400 hover:text-gray-200"
+              title="Clear override and use auto-detected season"
+            >
+              Auto (S{autoSeason})
+            </Link>
+          )}
+        </div>
+        {streamingData?.seasonSource && (
+          <span className="text-xs text-gray-400 font-normal">
+            {hnSeasonOverrideNum
+              ? `override active`
+              : `auto: ${streamingData.seasonSource}`}
+          </span>
+        )}
+      </div>
+    );
+  })()}
 </div>
 
       </div>
@@ -305,7 +363,7 @@ export default function ProviderContainer({
 
       
 
-      {activeEpNum !== null && (provider === "hnembed" || provider === "vidsrc") && (
+      {activeEpNum !== null && (provider === "hnembed" || provider === "megaplay") && (
         <div className="text-sm text-gray-300 mx-5 mb-1">
           Now playing:{" "}
           <span className="text-primary-200 font-semibold">
@@ -328,8 +386,8 @@ export default function ProviderContainer({
                 href={updateParams([
                   {key: "z-id", val: ep?.zoro_episodeId},
                   {key: "apahe-id", val: ep?.animepahe_id},
-                  {key: "vidsrc-ep", val: String(ep?.number || ep?.episodeIndex || (i + 1))},
                   {key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || (i + 1))},
+                  {key: "megaplay-ep", val: String(ep?.number || ep?.episodeIndex || (i + 1))},
                   {key: "g-sub-id", val: ep?.gogoSubId},
                   {key: "g-dub-id", val: ep?.gogoDubId},
                   {key: "server", val:server},
@@ -338,14 +396,14 @@ export default function ProviderContainer({
                 data-active={
                   (episodeIds.zoro === ep?.zoro_episodeId && !!episodeIds.zoro) ||
                   (episodeIds.animepahe === ep?.animepahe_id && !!episodeIds.animepahe) ||
-                  ((provider === "vidsrc" || provider === "hnembed") &&
+                  ((provider === "hnembed" || provider === "megaplay") &&
                     activeEpNum !== null &&
                     Number(ep?.number || ep?.episodeIndex || (i + 1)) === activeEpNum)
                 }
                 className={`w-full text-xs p-4 cursor-pointer my-1 rounded-md tracking-wider flex gap-2 transition-colors ${
                   (episodeIds.zoro === ep?.zoro_episodeId && !!episodeIds.zoro) ||
                   (episodeIds.animepahe === ep?.animepahe_id && !!episodeIds.animepahe) ||
-                  ((provider === "vidsrc" || provider === "hnembed") &&
+                  ((provider === "hnembed" || provider === "megaplay") &&
                     activeEpNum !== null &&
                     Number(ep?.number || ep?.episodeIndex || (i + 1)) === activeEpNum)
                     ? (ep?.isFiller || ep?.zoro_isFiller)

@@ -72,10 +72,10 @@ export const providersConfig = {
       }
     }
   },
-  'vidsrc': {
-    id: 'vidsrc',
-    name: 'Provider-V',
-    displayName: 'VidSrc Provider',
+  'megaplay': {
+    id: 'megaplay',
+    name: 'Provider-M',
+    displayName: 'MegaPlay Provider',
     hasServersApi: false,
     defaultServer: null,
     isSubtitleNeedReferer: false,
@@ -89,12 +89,12 @@ export const providersConfig = {
         const dubFlag = dub === '1' || dub === true ? '1' : '0';
         const ep = typeof episodeRef === 'object' ? episodeRef?.episodeNumber : Number(episodeRef);
         const epNum = Number.isFinite(ep) && ep > 0 ? ep : 1;
-        const { data } = await axios.get(`/api/v2/vidsrc/embed/${malId}`, {
+        const { data } = await axios.get(`/api/v2/megaplay/embed/${malId}`, {
           params: { ep: epNum, dub: dubFlag },
         });
         if (!data?.embedUrl) return null;
         return {
-          sources: [{ url: data.embedUrl, type: 'iframe', isDub: data.dub }],
+          sources: [{ url: data.embedUrl, type: 'iframe', isDub: Boolean(dub) }],
           tracks: [],
           intro: null,
           outro: null,
@@ -102,7 +102,7 @@ export const providersConfig = {
           isEmbed: true,
         };
       } catch (err) {
-        console.error("VidSrc Embed Error:", err);
+        console.error("MegaPlay Embed Error:", err);
         return null;
       }
     }
@@ -118,13 +118,17 @@ export const providersConfig = {
     serverApiUrl: null,
     needsServerSideStreaming: false,
     isEmbed: true,
-    streamingData: async (episodeRef, { dub = false, malId } = {}) => {
+    streamingData: async (episodeRef, { dub = false, malId, season } = {}) => {
       try {
         if (!malId) return null;
         const ep = typeof episodeRef === 'object' ? episodeRef?.episodeNumber : Number(episodeRef);
         const epNum = Number.isFinite(ep) && ep > 0 ? ep : 1;
+        const params = { ep: epNum };
+        if (Number.isFinite(Number(season)) && Number(season) > 0) {
+          params.season = Number(season);
+        }
         const { data } = await axios.get(`/api/v2/hnembed/embed/${malId}`, {
-          params: { ep: epNum },
+          params,
         });
         if (!data?.embedUrl) return null;
         return {
@@ -134,6 +138,9 @@ export const providersConfig = {
           outro: null,
           headers: null,
           isEmbed: true,
+          season: data?.season ?? null,
+          seasonSource: data?.seasonSource ?? null,
+          kind: data?.kind ?? null,
         };
       } catch (err) {
         console.error("HNEmbed Error:", err);

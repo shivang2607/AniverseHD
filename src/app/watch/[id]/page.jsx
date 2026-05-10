@@ -63,11 +63,11 @@ export default function Page({ params }) {
   const searchParams = useSearchParams();
   const zoroId = searchParams.get("z-id") || null;
   const animepaheId = searchParams.get("apahe-id") || null;
-  const vidsrcEp = searchParams.get("vidsrc-ep") || null;
   const hnembedEp = searchParams.get("hn-ep") || null;
+  const megaplayEp = searchParams.get("megaplay-ep") || null;
   const gogoSubId = searchParams.get("g-sub-id") || null;
   const gogoDubId = searchParams.get("g-dub-id") || null;
-  const provider = searchParams.get("provider") || "hnembed";
+  const provider = searchParams.get("provider") || "megaplay";
   const serverV = searchParams.get("server");
   const dubV = searchParams.get("dub") || "";
   const startTime = Number(searchParams.get("t")) || 0;
@@ -132,6 +132,16 @@ export default function Page({ params }) {
   const [embedStatus, setEmbedStatus] = useState("loading");
   const [iframeReloadKey, setIframeReloadKey] = useState(0);
   const currentAbsoluteURL = useRef("");
+  const iframeLoadTimerRef = useRef(null);
+  // Track auto-retry attempts per (provider, src). Embed providers (megaplay/hnembed)
+  // sometimes proxy to upstreams that fail DNS or 5xx — a quick reload usually picks
+  // a different upstream and works. We allow ONE silent auto-retry before surfacing
+  // the "unavailable" overlay, so transient routing flakes don't show users an error.
+  const autoRetryAttemptsRef = useRef({ key: null, count: 0 });
+  // Timestamp when the current iframe attempt was mounted. An onLoad firing very
+  // quickly after mount usually means the iframe served an error page (DNS fail,
+  // CORS, instant 4xx) rather than a real player bootstrap.
+  const iframeMountedAtRef = useRef(0);
   const recentTimestampRef = useRef(recentTimestamp);
   const durationRef = useRef(duration);
   const contentRef = useRef(content);
@@ -227,8 +237,8 @@ export default function Page({ params }) {
     setEpisodeIds({
       zoro: zoroId,
       animepahe: animepaheId,
-      vidsrc: vidsrcEp || (provider === "vidsrc" ? "1" : null),
       hnembed: hnembedEp || (provider === "hnembed" ? "1" : null),
+      megaplay: megaplayEp || (provider === "megaplay" ? "1" : null),
     });
     setZoroEpisodeId(zoroId);
     setGogoDubEpisodeId(gogoDubId);
@@ -238,7 +248,7 @@ export default function Page({ params }) {
     setRecentTimestamp(0);
 
     return () => {};
-  }, [provider, zoroId, animepaheId, vidsrcEp, hnembedEp, gogoSubId, gogoDubId, serverV, dubV]);
+  }, [provider, zoroId, animepaheId, hnembedEp, megaplayEp, gogoSubId, gogoDubId, serverV, dubV]);
 
   //below functions gets the necessary data from both provider like episodes content at the page load, mergeProviderData is used in this useEffect
   useEffect(() => {
@@ -252,12 +262,12 @@ export default function Page({ params }) {
         setContent(cachedData);
         setEpisodesData(cachedData?.episodesData || []);
 
-        if (!zoroId && !animepaheId && !vidsrcEp && !hnembedEp) {
+        if (!zoroId && !animepaheId && !hnembedEp && !megaplayEp) {
           setEpisodeIds({
             zoro: cachedData?.episodesData?.[0]?.zoro_episodeId,
             animepahe: cachedData?.episodesData?.[0]?.animepahe_id,
-            vidsrc: "1",
             hnembed: "1",
+            megaplay: "1",
           });
         }
 
@@ -288,12 +298,12 @@ export default function Page({ params }) {
         setEpisodesData(refinedData.episodesData);
         setSessionWithExpiry(`watch-v2-${params.id}`, refinedData, 1000 * 60 * 30);
 
-        if (!zoroId && !animepaheId && !vidsrcEp && !hnembedEp) {
+        if (!zoroId && !animepaheId && !hnembedEp && !megaplayEp) {
           setEpisodeIds({
             zoro: null,
             animepahe: null,
-            vidsrc: "1",
             hnembed: "1",
+            megaplay: "1",
           });
         }
         setAnimeNotAvailable(false);
@@ -316,8 +326,8 @@ export default function Page({ params }) {
           //!new
           (episodeIds.zoro && ep.zoro_episodeId === episodeIds.zoro) ||
           (episodeIds.animepahe && ep.animepahe_id === episodeIds.animepahe) ||
-          (provider === "vidsrc" && episodeIds.vidsrc && String(ep?.number || ep?.episodeIndex) === String(episodeIds.vidsrc)) ||
-          (provider === "hnembed" && episodeIds.hnembed && String(ep?.number || ep?.episodeIndex) === String(episodeIds.hnembed))
+          (provider === "hnembed" && episodeIds.hnembed && String(ep?.number || ep?.episodeIndex) === String(episodeIds.hnembed)) ||
+          (provider === "megaplay" && episodeIds.megaplay && String(ep?.number || ep?.episodeIndex) === String(episodeIds.megaplay))
         //!new
       );
 
@@ -444,8 +454,8 @@ export default function Page({ params }) {
       const url = updateParams([
         { key: "z-id", val: ep?.zoro_episodeId },
         { key: "apahe-id", val: ep?.animepahe_id },
-        { key: "vidsrc-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
+        { key: "megaplay-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "n", val: currentIndex - 1 },
       ]);
 
@@ -470,8 +480,8 @@ export default function Page({ params }) {
       const url = updateParams([
         { key: "z-id", val: ep?.zoro_episodeId },
         { key: "apahe-id", val: ep?.animepahe_id },
-        { key: "vidsrc-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
+        { key: "megaplay-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "n", val: currentIndex - 1 },
       ]);
       router.push(url);
@@ -590,25 +600,19 @@ export default function Page({ params }) {
   const getStreamingSource = () => {
     const config = providersConfig[provider];
     if (config?.isEmbed || streamingData?.isEmbed) {
-      setDownloadLink();
       return streamingData?.sources?.[0]?.url || null;
     }
     if (config.needsServerSideStreaming) {
-      setDownloadLink();
-
       return `/api/v1/streamingProxy?url=${
         encodeURIComponent(streamingData?.sources?.[0]?.url)
       }`;
-
-
-
     } else {
       const qualityOrder = ["1080p", "720p", "480p", "360p"];
       for (const quality of qualityOrder) {
         const match = streamingData?.sources?.find((src) =>
           src?.quality?.includes(quality)
         );
-        
+
         if (match?.url) return match.url;
       }
 
@@ -621,6 +625,16 @@ export default function Page({ params }) {
     [provider, streamingData]
   );
 
+  // Clear download link whenever provider/streamingData changes — embed providers
+  // don't expose downloadable URLs. Doing this in an effect avoids a setState-in-render
+  // anti-pattern (the previous version called setDownloadLink() inside useMemo).
+  useEffect(() => {
+    const config = providersConfig[provider];
+    if (config?.isEmbed || streamingData?.isEmbed || config?.needsServerSideStreaming) {
+      setDownloadLink();
+    }
+  }, [provider, streamingData]);
+
   const isEmbed = providersConfig[provider]?.isEmbed || streamingData?.isEmbed;
 
   useEffect(() => {
@@ -630,20 +644,57 @@ export default function Page({ params }) {
     }
     setEmbedStatus("loading");
 
-    const TIMEOUT_MS = 8000;
+    // 20s instead of 8s. Embed providers (megaplay especially) often load the
+    // wrapper iframe quickly but take time to bootstrap their internal player —
+    // a tighter watchdog flips the UI to "unavailable" while the player is
+    // genuinely still loading. iframe `onLoad` will mark loaded-unverified well
+    // before this timeout in the normal case.
+    // Reset the retry counter when the streamingSrc itself changes (new episode,
+    // new provider, or sub/dub flip). Within a single src we allow ONE silent
+    // auto-retry; iframeReloadKey changes alone don't reset the counter, so a
+    // user-clicked "Retry" after the auto-retry already used its budget will
+    // still go through the normal manual flow.
+    if (autoRetryAttemptsRef.current.key !== streamingSrc) {
+      autoRetryAttemptsRef.current = { key: streamingSrc, count: 0 };
+    }
+    iframeMountedAtRef.current = Date.now();
+
+    const TIMEOUT_MS = 20000;
     const watchdog = setTimeout(() => {
-      setEmbedStatus((prev) => (prev === "loading" ? "unavailable" : prev));
+      setEmbedStatus((prev) => {
+        if (prev !== "loading") return prev;
+        const attempts = autoRetryAttemptsRef.current;
+        if (attempts.key === streamingSrc && attempts.count < 1) {
+          // First failure for this src — try one silent reload before showing
+          // the error overlay. Embed providers like megaplay sometimes route
+          // to upstreams (e.g. hnembed.cc) that DNS-fail; reloading the iframe
+          // typically picks a different upstream that works.
+          attempts.count += 1;
+          setIframeReloadKey((k) => k + 1);
+          return "loading";
+        }
+        return "unavailable";
+      });
     }, TIMEOUT_MS);
+
+    // Clear any leftover onLoad timer from a previous iframe — when the user
+    // switches episodes/providers mid-load, the previous iframe's queued
+    // setTimeout would otherwise fire on the new iframe and mistakenly flip
+    // its still-loading state to "loaded-unverified".
+    if (iframeLoadTimerRef.current) {
+      clearTimeout(iframeLoadTimerRef.current);
+      iframeLoadTimerRef.current = null;
+    }
 
     const onMessage = (event) => {
       try {
         const origin = event?.origin || "";
         if (
+          origin.includes("2embed.cc") ||
           origin.includes("hnembed.cc") ||
           origin.includes("hnembed.com") ||
-          origin.includes("vidsrc.icu") ||
-          origin.includes("vidsrc.cc") ||
-          origin.includes("vidsrc.to")
+          origin.includes("megaplay.buzz") ||
+          origin.includes("anikotoapi.site")
         ) {
           setEmbedStatus("loaded");
           clearTimeout(watchdog);
@@ -770,11 +821,33 @@ export default function Page({ params }) {
                               className="w-full h-full border-0"
                               allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
                               allowFullScreen
-                              referrerPolicy="no-referrer"
+                              referrerPolicy="origin"
                               onLoad={() => {
-                                setTimeout(() => {
-                                  setEmbedStatus((prev) => prev === "loading" ? "loaded-unverified" : prev);
-                                }, 1500);
+                                // Suspiciously fast onLoad (< 250ms) usually means the iframe
+                                // served an instant error page — DNS fail on a sub-iframe, CORS
+                                // block, instant 4xx — rather than a real player bootstrap.
+                                // Trigger one silent retry instead of marking the iframe as loaded.
+                                const elapsed = Date.now() - (iframeMountedAtRef.current || 0);
+                                if (elapsed > 0 && elapsed < 250) {
+                                  const attempts = autoRetryAttemptsRef.current;
+                                  if (attempts.key === streamingSrc && attempts.count < 1) {
+                                    attempts.count += 1;
+                                    setIframeReloadKey((k) => k + 1);
+                                    return;
+                                  }
+                                }
+
+                                if (iframeLoadTimerRef.current) {
+                                  clearTimeout(iframeLoadTimerRef.current);
+                                }
+                                iframeLoadTimerRef.current = setTimeout(() => {
+                                  setEmbedStatus((prev) =>
+                                    prev === "loading" || prev === "unavailable"
+                                      ? "loaded-unverified"
+                                      : prev
+                                  );
+                                  iframeLoadTimerRef.current = null;
+                                }, 800);
                               }}
                             />
                             {embedStatus === "loading" && (

@@ -4,6 +4,7 @@ import jikan from "@mateoaranda/jikanjs";
 import redisClient from "@/lib/redis"; // Use the singleton instance directly
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import { fetchMappingsByMalId } from "./mappings";
+import { resolveSeasonNumber } from "./seasonResolver";
 
 // Function to fetch data from MalSync API
 async function fetchMalSyncData(id, limiter) {
@@ -186,8 +187,42 @@ export async function syncQdrant(id, resPayload) {
         };
     }
 
-    
-    //? below code is for adding giphy images to the qdrant database 
+    //? Resolve and cache the TMDB-equivalent season number for the hnembed provider.
+    //  hnembed streams keyed by IMDB/TMDB id, which collapses all MAL "seasons" of a
+    //  franchise to a single id — so we walk the prequel chain once and persist the
+    //  resolved season under Sites.hnembed.season.
+    try {
+        const effectiveSites = updatePayload.Sites || resPayload?.Sites || {};
+        const cachedSeason = Number(effectiveSites?.hnembed?.season);
+        const isTv = !["MOVIE", "Movie", "movie"].includes(String(jikanData?.type));
+        if (isTv && !(Number.isFinite(cachedSeason) && cachedSeason > 0)) {
+            const payloadForResolver = {
+                ...resPayload,
+                ...updatePayload,
+                title: jikanData?.title || resPayload?.title,
+                title_english: jikanData?.title_english || resPayload?.title_english,
+                titles: jikanData?.titles || resPayload?.titles,
+                title_synonyms: jikanData?.title_synonyms || resPayload?.title_synonyms,
+                relations: updatePayload?.relations || resPayload?.relations || jikanData?.relations,
+            };
+            const season = await resolveSeasonNumber(id, payloadForResolver);
+            if (Number.isFinite(season) && season > 0) {
+                updatePayload.Sites = {
+                    ...effectiveSites,
+                    hnembed: {
+                        ...(effectiveSites.hnembed || {}),
+                        season,
+                        lastSync: new Date().toISOString(),
+                    },
+                };
+                console.log(`✅ Resolved hnembed season ${season} for anime ${id}`);
+            }
+        }
+    } catch (err) {
+        console.error(`❌ Failed to resolve hnembed season for anime ${id}:`, err?.message);
+    }
+
+    //? below code is for adding giphy images to the qdrant database
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
     if (!(resPayload?.gif_images) || !(resPayload?.gif_images?.last_updated) || (Date.now() - new Date(resPayload.gif_images.last_updated).getTime()) > oneWeek) {
         const giphy_keys = process.env.GIPHY_API_KEYS.split('|') || [];

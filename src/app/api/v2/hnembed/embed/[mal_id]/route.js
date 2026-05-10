@@ -2,8 +2,9 @@ import axios from "axios";
 import { NextResponse } from "next/server";
 import { LRUCache } from "lru-cache";
 import { defaultCacheOptions } from "@/utils/lruCache";
+import { resolveSeasonNumber } from "@/app/api/v1/anime/[id]/seasonResolver";
 
-const HNEMBED_BASE = process.env.HNEMBED_BASE || "https://hnembed.cc/embed";
+const HNEMBED_BASE = process.env.HNEMBED_BASE || "https://hnmbed.cc/embed";
 
 const responseCache = new LRUCache({
   ...defaultCacheOptions,
@@ -19,26 +20,34 @@ const idLookupCache = new LRUCache({
 
 const MOVIE_TYPES = new Set(["MOVIE", "Movie", "movie"]);
 
-async function fetchExternalIdsFromQdrant(malId) {
+async function fetchPointFromQdrant(malId) {
   try {
     const { data } = await axios.post(
       `${process.env.QDRANT_URL}/collections/Anime/points`,
       { ids: [Number(malId)], with_payload: true },
       { headers: { "api-key": process.env.QDRANT_API_KEY }, timeout: 8000 }
     );
-    const point = data?.result?.[0];
-    if (!point) return null;
-    const sites = point?.payload?.Sites || {};
-    const type = point?.payload?.type || null;
-    return {
-      imdb_id: sites?.imdb_id || sites?.hnembed?.imdb_id || null,
-      tmdb_id: sites?.themoviedb_id || sites?.hnembed?.tmdb_id || null,
-      type,
-      cachedFromQdrant: Boolean(sites?.hnembed?.imdb_id || sites?.hnembed?.tmdb_id),
-    };
+    return data?.result?.[0] || null;
   } catch {
     return null;
   }
+}
+
+function extractIdsFromPoint(point) {
+  if (!point) return null;
+  const sites = point?.payload?.Sites || {};
+  const type = point?.payload?.type || null;
+  return {
+    imdb_id: sites?.imdb_id || sites?.hnembed?.imdb_id || null,
+    tmdb_id: sites?.themoviedb_id || sites?.hnembed?.tmdb_id || null,
+    type,
+  };
+}
+
+function extractCachedSeason(point) {
+  const cached = point?.payload?.Sites?.hnembed?.season;
+  const n = Number(cached);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 async function fetchExternalIdsFromMapper(malId) {
@@ -61,39 +70,6 @@ async function fetchExternalIdsFromMapper(malId) {
   }
 }
 
-async function persistHnembedIdsToQdrant(malId, { imdb_id, tmdb_id }) {
-  if (!malId || (!imdb_id && !tmdb_id)) return;
-  try {
-    const { data } = await axios.post(
-      `${process.env.QDRANT_URL}/collections/Anime/points`,
-      { ids: [Number(malId)], with_payload: true },
-      { headers: { "api-key": process.env.QDRANT_API_KEY }, timeout: 8000 }
-    );
-    const point = data?.result?.[0];
-    if (!point) return;
-    const existingSites = point?.payload?.Sites || {};
-    const existingHn = existingSites?.hnembed || {};
-    if (existingHn?.imdb_id === imdb_id && existingHn?.tmdb_id === tmdb_id) return;
-    await axios.post(
-      `${process.env.QDRANT_URL}/collections/Anime/points/payload`,
-      {
-        payload: {
-          Sites: {
-            ...existingSites,
-            hnembed: {
-              imdb_id: imdb_id || existingHn?.imdb_id || null,
-              tmdb_id: tmdb_id || existingHn?.tmdb_id || null,
-              lastSync: new Date().toISOString(),
-            },
-          },
-        },
-        points: [Number(malId)],
-      },
-      { headers: { "api-key": process.env.QDRANT_API_KEY }, timeout: 8000 }
-    );
-  } catch {}
-}
-
 function isMovie(type) {
   return type ? MOVIE_TYPES.has(String(type)) : false;
 }
@@ -104,23 +80,27 @@ export async function GET(req, { params }) {
   const ep = parseInt(url.searchParams.get("ep") || "1", 10);
   const preferTmdb = url.searchParams.get("prefer") === "tmdb";
   const forceKind = url.searchParams.get("kind");
-  const HNEMBED_DEFAULT_SEASON = 1;
+  const seasonOverrideRaw = url.searchParams.get("season");
+  const seasonOverride = seasonOverrideRaw ? parseInt(seasonOverrideRaw, 10) : null;
 
   if (!malId) {
     return NextResponse.json({ error: "mal_id required" }, { status: 400 });
   }
 
-  const cacheKey = `hnembed-${malId}-${ep}-${preferTmdb ? "t" : "i"}-${forceKind || "auto"}`;
+  const overrideKey = Number.isFinite(seasonOverride) && seasonOverride > 0
+    ? `s${seasonOverride}`
+    : "auto";
+  const cacheKey = `hnembed-${malId}-${ep}-${preferTmdb ? "t" : "i"}-${forceKind || "auto"}-${overrideKey}`;
   const cached = responseCache.get(cacheKey);
   if (cached) return NextResponse.json(cached);
 
   try {
-    let ids = await fetchExternalIdsFromQdrant(malId);
-    let fromQdrant = ids?.cachedFromQdrant;
+    const point = await fetchPointFromQdrant(malId);
+    let ids = extractIdsFromPoint(point);
 
     if (!ids?.imdb_id && !ids?.tmdb_id) {
       const mapped = await fetchExternalIdsFromMapper(malId);
-      if (mapped) ids = { ...ids, ...mapped, cachedFromQdrant: false };
+      if (mapped) ids = { ...ids, ...mapped };
     }
 
     if (!ids?.imdb_id && !ids?.tmdb_id) {
@@ -131,10 +111,6 @@ export async function GET(req, { params }) {
         },
         { status: 404 }
       );
-    }
-
-    if (!fromQdrant) {
-      persistHnembedIdsToQdrant(malId, ids).catch(() => {});
     }
 
     const idForEmbed = preferTmdb
@@ -148,10 +124,35 @@ export async function GET(req, { params }) {
         ? "movie"
         : "tv";
 
+    let season = 1;
+    let seasonSource = "default";
+    if (kind === "tv") {
+      if (Number.isFinite(seasonOverride) && seasonOverride > 0) {
+        season = seasonOverride;
+        seasonSource = "override";
+      } else {
+        // The /api/v1/anime/[id] sync persists Sites.hnembed.season — read it here.
+        const cachedSeason = extractCachedSeason(point);
+        if (cachedSeason) {
+          season = cachedSeason;
+          seasonSource = "qdrant";
+        } else if (point?.payload) {
+          // Fallback: anime predates the sync change, resolve once on the fly.
+          // No persistence here — the next /api/v1/anime/[id] hit will cache it.
+          try {
+            season = await resolveSeasonNumber(malId, point.payload);
+            seasonSource = "resolved";
+          } catch {
+            season = 1;
+          }
+        }
+      }
+    }
+
     const embedUrl =
       kind === "movie"
         ? `${HNEMBED_BASE}/movie/${idForEmbed}`
-        : `${HNEMBED_BASE}/tv/${idForEmbed}/${HNEMBED_DEFAULT_SEASON}/${ep}`;
+        : `${HNEMBED_BASE}/tv/${idForEmbed}/${season}/${ep}`;
 
     const response = {
       type: "iframe",
@@ -159,6 +160,8 @@ export async function GET(req, { params }) {
       kind,
       idType,
       idValue: idForEmbed,
+      season: kind === "tv" ? season : null,
+      seasonSource: kind === "tv" ? seasonSource : null,
       episode: kind === "tv" ? ep : null,
       animeType: ids.type || null,
     };
