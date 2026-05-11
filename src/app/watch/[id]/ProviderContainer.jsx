@@ -1,7 +1,7 @@
 import useStreamStore from "@/components/utils/streamStore";
 import axios from "axios";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { useEffect } from "react";
 import Skeleton from "react-loading-skeleton";
@@ -60,6 +60,7 @@ export default function ProviderContainer({
 }) {
 
   const searchParams = useSearchParams();
+  const router = useRouter();
   const provider = searchParams.get("provider") || "megaplay";
   const n = searchParams.get("n") || 0;
   const pathname = usePathname();
@@ -104,6 +105,7 @@ export default function ProviderContainer({
   // const [serverLoading, setServerLoading] = useState(false);
   
   const [episodeRangeIndex, setEpisodeRangeIndex] = useState(0); //according to this index range of episodes in the window will be shown , this will be changed through the dropdown of the select box, and the range is episodesPerWindow by default and is static for now, you can change this range statically or can make this range dynamic as well.
+  const [manualEpInput, setManualEpInput] = useState("");
 
 
   useEffect(()=>{
@@ -345,20 +347,71 @@ export default function ProviderContainer({
       </div>
       </div>
 
-      <div className="w-52">
-        <select
-          className="rounded-md p-2 bg-cbg-300 mx-5 text-sm scrollbar-thin"
-          value={episodeRangeIndex}
-          onChange={(e) => setEpisodeRangeIndex(parseInt(e.target.value))}
-        >
-          {[...Array(Math.ceil(episodes?.length / episodesPerWindow))].map((e, i) => {
-            return (
-              <option key={i} value={i} className="p-2 m-2">
-                Eps {episodesPerWindow * i + 1} - {Math.min(episodes?.length, episodesPerWindow * (i + 1))}
-              </option>
-            );
-          })}
-        </select>
+      <div className="flex flex-wrap items-center gap-3 mx-5">
+        <div className="w-52">
+          <select
+            className="rounded-md p-2 bg-cbg-300 text-sm scrollbar-thin w-full"
+            value={episodeRangeIndex}
+            onChange={(e) => setEpisodeRangeIndex(parseInt(e.target.value))}
+          >
+            {[...Array(Math.ceil(episodes?.length / episodesPerWindow))].map((e, i) => {
+              return (
+                <option key={i} value={i} className="p-2 m-2">
+                  Eps {episodesPerWindow * i + 1} - {Math.min(episodes?.length, episodesPerWindow * (i + 1))}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
+        {/* Manual episode-number jump. The episode list is built from MAL/Jikan
+            which returns episodes:null for ongoing/long-running shows (One Piece,
+            Conan, etc.) — our route now estimates from air date, but the estimate
+            won't be exact. This input lets users jump to any episode regardless
+            of what the list shows. Also useful when MAL's count is stale. */}
+        {(provider === "megaplay" || provider === "hnembed") && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const n = parseInt(manualEpInput, 10);
+              if (!Number.isFinite(n) || n < 1) return;
+              const updates = [
+                { key: "hn-ep", val: String(n) },
+                { key: "megaplay-ep", val: String(n) },
+                { key: "n", val: String(Math.max(0, n - 1)) },
+              ];
+              router.push(updateParams(updates, false), { scroll: false });
+              setManualEpInput("");
+            }}
+            className="flex items-center gap-2"
+          >
+            <label className="text-sm text-gray-300 whitespace-nowrap">
+              Jump to ep:
+            </label>
+            <input
+              type="number"
+              min="1"
+              inputMode="numeric"
+              placeholder="e.g. 1089"
+              value={manualEpInput}
+              onChange={(e) => setManualEpInput(e.target.value)}
+              className="rounded-md p-2 bg-cbg-300 text-sm w-24 border-0 outline-none focus:ring-2 focus:ring-primary-300"
+            />
+            <button
+              type="submit"
+              className="rounded-md px-3 py-2 bg-primary-100 text-cbg-100 text-sm font-semibold hover:bg-primary-200 disabled:opacity-50"
+              disabled={!manualEpInput || !/^\d+$/.test(manualEpInput)}
+            >
+              Go
+            </button>
+          </form>
+        )}
+
+        {content?.episodesEstimated && (
+          <span className="text-xs text-amber-300/90 italic">
+            Episode count is estimated — use &quot;Jump to ep&quot; for any episode beyond the list.
+          </span>
+        )}
       </div>
 
       

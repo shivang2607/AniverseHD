@@ -58,14 +58,94 @@ async function persistAnilistIdToQdrant(malId, anilistId) {
   } catch {}
 }
 
+async function getJikanEpisodeCount(malId) {
+  // Jikan's /anime/{id}/episodes is paginated (100 per page) and exposes the
+  // real episode count even when /anime/{id}/full returns episodes:null. This
+  // is the canonical MAL source for shows like One Piece, Detective Conan, etc.
+  // where the show is ongoing and the "total episodes" field isn't set.
+  try {
+    // Hit the last page hint via page=1; Jikan returns pagination.last_visible_page.
+    const { data } = await axios.get(
+      `https://api.jikan.moe/v4/anime/${malId}/episodes`,
+      { params: { page: 1 }, timeout: 12000 }
+    );
+    const lastPage = Number(data?.pagination?.last_visible_page) || 0;
+    const pageSize = Array.isArray(data?.data) ? data.data.length : 0;
+    if (lastPage <= 0 || pageSize <= 0) return null;
+
+    // If only one page, the page itself is the full count.
+    if (lastPage === 1) return pageSize;
+
+    // For >1 page, fetch the last page to get its real size and combine.
+    try {
+      const { data: lastData } = await axios.get(
+        `https://api.jikan.moe/v4/anime/${malId}/episodes`,
+        { params: { page: lastPage }, timeout: 12000 }
+      );
+      const lastPageSize = Array.isArray(lastData?.data) ? lastData.data.length : 0;
+      const total = (lastPage - 1) * 100 + lastPageSize;
+      return total > 0 ? total : null;
+    } catch {
+      // Couldn't reach last page — fall back to an upper-bound estimate from
+      // page count alone. Slight overcount (up to 99) is fine; better than 1.
+      return lastPage * 100;
+    }
+  } catch {
+    return null;
+  }
+}
+
+function estimateAiredEpisodes(animeData) {
+  // For shows with no fixed episode count (One Piece, Detective Conan, etc.)
+  // and shows still airing, MAL/Jikan often returns episodes:null. Falling back
+  // to 1 hides hundreds/thousands of real episodes. Estimate from air start date
+  // assuming weekly cadence — that's the cadence for the vast majority of TV
+  // anime, and the few non-weekly shows just get a slightly looser upper bound
+  // (still better than rendering a single episode card).
+  const fromStr = animeData?.aired?.from || animeData?.aired?.prop?.from
+    ? animeData.aired.from
+    : null;
+  const fromDate = fromStr ? new Date(fromStr) : null;
+  if (!fromDate || Number.isNaN(fromDate.getTime())) return null;
+  const weeks = Math.floor((Date.now() - fromDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+  if (!Number.isFinite(weeks) || weeks < 1) return null;
+  // Cap at 1500 to avoid runaway numbers for very old long-runners; that still
+  // covers everything up to early-2030s One Piece.
+  return Math.min(weeks + 2, 1500);
+}
+
 async function getEpisodeCount(malId, animeData) {
-  if (animeData?.episodes && animeData.episodes > 0) return animeData.episodes;
+  if (animeData?.episodes && animeData.episodes > 0) {
+    return { count: animeData.episodes, estimated: false };
+  }
+
+  let jikanFull = null;
   try {
     const r = await jikan.loadAnime(malId, "full");
-    return r?.data?.episodes || 1;
-  } catch {
-    return 1;
+    jikanFull = r?.data || null;
+    if (jikanFull?.episodes && jikanFull.episodes > 0) {
+      return { count: jikanFull.episodes, estimated: false };
+    }
+  } catch {}
+
+  // MAL's "total episodes" is null — usually an ongoing show. Jikan's paginated
+  // /episodes endpoint still knows the real aired count even when the summary
+  // field is empty, so try that next. This is the canonical source for One Piece,
+  // Detective Conan, and other long-runners.
+  const jikanPaged = await getJikanEpisodeCount(malId);
+  if (jikanPaged && jikanPaged > 0) {
+    return { count: jikanPaged, estimated: false };
   }
+
+  // Jikan didn't help (rate limit, network) — fall back to estimating from air
+  // start date assuming weekly cadence.
+  const merged = { ...(animeData || {}), ...(jikanFull || {}) };
+  const estimated = estimateAiredEpisodes(merged);
+  if (estimated) return { count: estimated, estimated: true };
+
+  // Last resort: 12 (one cour). Better than 1 — at least gives the user a list
+  // to pick from, and they can use the manual episode input for anything beyond.
+  return { count: 12, estimated: true };
 }
 
 export async function GET(req, { params }) {
@@ -96,7 +176,7 @@ export async function GET(req, { params }) {
       );
     }
 
-    const totalEpisodes = await getEpisodeCount(malId, animeData);
+    const { count: totalEpisodes, estimated: episodesEstimated } = await getEpisodeCount(malId, animeData);
     const episodeList = Array.from({ length: totalEpisodes }, (_, i) => ({
       number: i + 1,
       id: String(i + 1),
@@ -122,6 +202,7 @@ export async function GET(req, { params }) {
       start_year: animeData?.start_year || "",
       episodes: totalEpisodes,
       totalEpisodes,
+      episodesEstimated,
       episodeList,
     };
 

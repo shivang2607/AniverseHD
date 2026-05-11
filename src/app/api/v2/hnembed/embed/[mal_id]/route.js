@@ -4,7 +4,7 @@ import { LRUCache } from "lru-cache";
 import { defaultCacheOptions } from "@/utils/lruCache";
 import { resolveSeasonNumber } from "@/app/api/v1/anime/[id]/seasonResolver";
 
-const HNEMBED_BASE = process.env.HNEMBED_BASE || "https://hnmbed.cc/embed";
+const HNEMBED_BASE = process.env.HNEMBED_BASE || "https://hnembed.cc/embed";
 
 const responseCache = new LRUCache({
   ...defaultCacheOptions,
