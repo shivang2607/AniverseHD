@@ -107,6 +107,41 @@ export const providersConfig = {
       }
     }
   },
+  'tryembed': {
+    id: 'tryembed',
+    name: 'Provider-T',
+    displayName: 'TryEmbed Provider',
+    hasServersApi: false,
+    defaultServer: null,
+    isSubtitleNeedReferer: false,
+    hasMultipleIdsPerEpisode: false,
+    serverApiUrl: null,
+    needsServerSideStreaming: false,
+    isEmbed: true,
+    streamingData: async (episodeRef, { dub = false, malId, startTime = 0 } = {}) => {
+      try {
+        if (!malId) return null;
+        const dubFlag = dub === '1' || dub === true ? '1' : '0';
+        const ep = typeof episodeRef === 'object' ? episodeRef?.episodeNumber : Number(episodeRef);
+        const epNum = Number.isFinite(ep) && ep > 0 ? ep : 1;
+        const params = { ep: epNum, dub: dubFlag };
+        if (startTime > 0) params.t = Math.floor(startTime);
+        const { data } = await axios.get(`/api/v2/tryembed/embed/${malId}`, { params });
+        if (!data?.embedUrl) return null;
+        return {
+          sources: [{ url: data.embedUrl, type: 'iframe', isDub: Boolean(dub) }],
+          tracks: [],
+          intro: null,
+          outro: null,
+          headers: null,
+          isEmbed: true,
+        };
+      } catch (err) {
+        console.error("TryEmbed Error:", err);
+        return null;
+      }
+    }
+  },
   'hnembed': {
     id: 'hnembed',
     name: 'Provider-H',

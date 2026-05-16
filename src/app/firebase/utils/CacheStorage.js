@@ -247,6 +247,7 @@ export const addAnimeToUserWatchListCached = ({
   let watchListAnimeList = getWatchListAnimeListByIdCached({
     watchListId: watchListId,
   });
+  if (!watchListInfo) return;
   watchListInfo.updatedAt = updatedAt;
   const isRecent =
     watchListInfo.isSpecialStarter &&
@@ -365,6 +366,7 @@ export const removeAnimeFromUserWatchListCached = ({
   let watchListAnimeList = getWatchListAnimeListByIdCached({
     watchListId: watchListId,
   });
+  if (!watchListInfo) return;
   watchListInfo.updatedAt = updatedAt;
 
   // Remove anime from WatchListAnimeListById cache

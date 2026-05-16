@@ -152,7 +152,7 @@ export default async function AddAnimeToWatchList({
         ) {
           // for special recent watch list, it have a fixed size
 
-          if (url === null || episodeTimestamp == null || duration == null)
+          if (url === null || episodeTimestamp == null)
             throw new Error(
               "Url and episodeTimestamp cannot be null when watchlist is starter recent"
             );
@@ -511,7 +511,10 @@ async function updateAnimeInWatchList({
       newanime.url= animeObject.url;
       newanime.episodeTimestamp=animeObject.episodeTimestamp
     }
-    newanime.addedAt=animeObject.addedAt;
+    // Do NOT update addedAt — the watchList document and subcollection doc must stay
+    // in sync on addedAt. The subcollection update (filteredAnimeObject) intentionally
+    // excludes addedAt, so changing it here would cause a mismatch that breaks
+    // the Search() lookup in GetWatchListDataById.Helper.
 
     updatedAnimeList.push(newanime);
    

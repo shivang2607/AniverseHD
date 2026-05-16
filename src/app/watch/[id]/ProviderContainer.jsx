@@ -61,7 +61,7 @@ export default function ProviderContainer({
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const provider = searchParams.get("provider") || "megaplay";
+  const provider = searchParams.get("provider") || "tryembed";
   const n = searchParams.get("n") || 0;
   const pathname = usePathname();
   const episodesPerWindow = 50;
@@ -90,13 +90,14 @@ export default function ProviderContainer({
 
   const serverV = searchParams.get('server');
   const dub = searchParams.get('dub');
-  const activeEpFromUrl = searchParams.get('hn-ep') || searchParams.get('megaplay-ep') || null;
+  const activeEpFromUrl = searchParams.get('hn-ep') || searchParams.get('megaplay-ep') || searchParams.get('tryembed-ep') || null;
   // Fall back to episodeIds[provider] (which page.jsx defaults to "1" for the
   // active embed provider) so the episode list shows the correct selection on
   // initial load even when no episode URL param is present yet.
-  const activeEpFromIds = ["megaplay", "hnembed"].includes(provider)
+  const activeEpFromIds = ["megaplay", "hnembed", "tryembed"].includes(provider)
     ? episodeIds?.[provider]
     : null;
+  const startTime = Number(searchParams.get("t")) || 0;
   const activeEpRaw = activeEpFromUrl || activeEpFromIds;
   const activeEpNum = activeEpRaw && /^\d+$/.test(String(activeEpRaw)) ? Number(activeEpRaw) : null;
   const hnSeasonOverride = searchParams.get('hn-season');
@@ -152,6 +153,9 @@ export default function ProviderContainer({
         const embedOpts = { dub: dub === "-1" ? false : dub, malId: id };
         if (provider === "hnembed" && hnSeasonOverrideNum) {
           embedOpts.season = hnSeasonOverrideNum;
+        }
+        if (provider === "tryembed" && startTime > 0) {
+          embedOpts.startTime = startTime;
         }
         data = await cfg.streamingData(episodeIds[provider], embedOpts);
       } else {
@@ -276,7 +280,7 @@ export default function ProviderContainer({
             href={updateParams([{ key: "dub", val: "" }, { key: "server", val: "" }], false)}
             scroll={false}
             className={`rounded px-2 py-1 items-center bg-cbg-400 ${
-              !dub ? "bg-primary-100 text-gray-100" : ""
+              dub !== "1" ? "bg-primary-100 text-gray-100" : ""
             }`}
           >
             Sub
@@ -285,7 +289,7 @@ export default function ProviderContainer({
             href={updateParams([{ key: "dub", val: "1" }, { key: "server", val: "" }], false)}
             scroll={false}
             className={`rounded px-2 py-1 items-center bg-cbg-400 ${
-              dub ? "bg-primary-100 text-gray-100" : ""
+              dub === "1" ? "bg-primary-100 text-gray-100" : ""
             }`}
           >
             Dub
@@ -369,7 +373,7 @@ export default function ProviderContainer({
             Conan, etc.) — our route now estimates from air date, but the estimate
             won't be exact. This input lets users jump to any episode regardless
             of what the list shows. Also useful when MAL's count is stale. */}
-        {(provider === "megaplay" || provider === "hnembed") && (
+        {(provider === "megaplay" || provider === "hnembed" || provider === "tryembed") && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -378,6 +382,7 @@ export default function ProviderContainer({
               const updates = [
                 { key: "hn-ep", val: String(n) },
                 { key: "megaplay-ep", val: String(n) },
+                { key: "tryembed-ep", val: String(n) },
                 { key: "n", val: String(Math.max(0, n - 1)) },
               ];
               router.push(updateParams(updates, false), { scroll: false });
@@ -416,7 +421,7 @@ export default function ProviderContainer({
 
       
 
-      {activeEpNum !== null && (provider === "hnembed" || provider === "megaplay") && (
+      {activeEpNum !== null && (provider === "hnembed" || provider === "megaplay" || provider === "tryembed") && (
         <div className="text-sm text-gray-300 mx-5 mb-1">
           Now playing:{" "}
           <span className="text-primary-200 font-semibold">
@@ -441,6 +446,7 @@ export default function ProviderContainer({
                   {key: "apahe-id", val: ep?.animepahe_id},
                   {key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || (i + 1))},
                   {key: "megaplay-ep", val: String(ep?.number || ep?.episodeIndex || (i + 1))},
+                  {key: "tryembed-ep", val: String(ep?.number || ep?.episodeIndex || (i + 1))},
                   {key: "g-sub-id", val: ep?.gogoSubId},
                   {key: "g-dub-id", val: ep?.gogoDubId},
                   {key: "server", val:server},
@@ -449,14 +455,14 @@ export default function ProviderContainer({
                 data-active={
                   (episodeIds.zoro === ep?.zoro_episodeId && !!episodeIds.zoro) ||
                   (episodeIds.animepahe === ep?.animepahe_id && !!episodeIds.animepahe) ||
-                  ((provider === "hnembed" || provider === "megaplay") &&
+                  ((provider === "hnembed" || provider === "megaplay" || provider === "tryembed") &&
                     activeEpNum !== null &&
                     Number(ep?.number || ep?.episodeIndex || (i + 1)) === activeEpNum)
                 }
                 className={`w-full text-xs p-4 cursor-pointer my-1 rounded-md tracking-wider flex gap-2 transition-colors ${
                   (episodeIds.zoro === ep?.zoro_episodeId && !!episodeIds.zoro) ||
                   (episodeIds.animepahe === ep?.animepahe_id && !!episodeIds.animepahe) ||
-                  ((provider === "hnembed" || provider === "megaplay") &&
+                  ((provider === "hnembed" || provider === "megaplay" || provider === "tryembed") &&
                     activeEpNum !== null &&
                     Number(ep?.number || ep?.episodeIndex || (i + 1)) === activeEpNum)
                     ? (ep?.isFiller || ep?.zoro_isFiller)

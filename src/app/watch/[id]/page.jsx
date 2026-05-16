@@ -65,9 +65,10 @@ export default function Page({ params }) {
   const animepaheId = searchParams.get("apahe-id") || null;
   const hnembedEp = searchParams.get("hn-ep") || null;
   const megaplayEp = searchParams.get("megaplay-ep") || null;
+  const tryembedEp = searchParams.get("tryembed-ep") || null;
   const gogoSubId = searchParams.get("g-sub-id") || null;
   const gogoDubId = searchParams.get("g-dub-id") || null;
-  const provider = searchParams.get("provider") || "megaplay";
+  const provider = searchParams.get("provider") || "tryembed";
   const serverV = searchParams.get("server");
   const dubV = searchParams.get("dub") || "";
   const startTime = Number(searchParams.get("t")) || 0;
@@ -145,6 +146,8 @@ export default function Page({ params }) {
   const recentTimestampRef = useRef(recentTimestamp);
   const durationRef = useRef(duration);
   const contentRef = useRef(content);
+  const isUserLoggedInRef = useRef(isUserLoggedIn);
+  const RecentWatchListIdRef = useRef(RecentWatchListId);
   // const [isAutoSkip, setIsAutoSkip] = useState(true);
 
   //cleanup function saves the timestamp and url to the user Recent watchlist thereby adding the current episode with current timestamp in the Recent watchlist of the user
@@ -159,14 +162,16 @@ export default function Page({ params }) {
     return () => {
       const f = async () => {
         const content = contentRef.current;
-        
+        const animeName = content?.title_english || content?.title;
+        if (!animeName) return;
+
         const result = await AddAnimeToWatchList({
-          watchListId: RecentWatchListId,
+          watchListId: RecentWatchListIdRef.current,
           url: currentAbsoluteURL.current,
           episodeTimestamp: recentTimestampRef.current,
           duration: durationRef.current,
           animeId: `${params?.id}`,
-          animeName: content?.title_english || content?.title,
+          animeName: animeName,
           animePhoto: content?.main_picture || content?.images || {},
           animeGenre: content?.genres || [],
           animeType: content?.type || "NA",
@@ -180,22 +185,21 @@ export default function Page({ params }) {
             ) || "NA",
           animeLength: content?.episodes || content?.episode || null,
         });
-        // if (result?.status === Constant_Var_success) {
-        //   toast.success("Watchlist Updated Successfully!!", {
-        //     id: "1",
-        //     duration: 3000,
-        //   });
-        //   setIsOpen(false);
-        // } else {
-        //   toast.error(result?.response?.message, { duration: 3000, id: "2 " });
-        // }
 
         loadLoggedInUserRecentWatchList();
         loadLoggedInUserWatchLists();
       };
-      if (isUserLoggedIn) f();
+      if (isUserLoggedInRef.current) f();
     };
   }, []);
+
+  useEffect(() => {
+    isUserLoggedInRef.current = isUserLoggedIn;
+  }, [isUserLoggedIn]);
+
+  useEffect(() => {
+    RecentWatchListIdRef.current = RecentWatchListId;
+  }, [RecentWatchListId]);
 
   useEffect(() => {
     recentTimestampRef.current = recentTimestamp;
@@ -239,6 +243,7 @@ export default function Page({ params }) {
       animepahe: animepaheId,
       hnembed: hnembedEp || (provider === "hnembed" ? "1" : null),
       megaplay: megaplayEp || (provider === "megaplay" ? "1" : null),
+      tryembed: tryembedEp || (provider === "tryembed" ? "1" : null),
     });
     setZoroEpisodeId(zoroId);
     setGogoDubEpisodeId(gogoDubId);
@@ -248,7 +253,7 @@ export default function Page({ params }) {
     setRecentTimestamp(0);
 
     return () => {};
-  }, [provider, zoroId, animepaheId, hnembedEp, megaplayEp, gogoSubId, gogoDubId, serverV, dubV]);
+  }, [provider, zoroId, animepaheId, hnembedEp, megaplayEp, tryembedEp, gogoSubId, gogoDubId, serverV, dubV]);
 
   //below functions gets the necessary data from both provider like episodes content at the page load, mergeProviderData is used in this useEffect
   useEffect(() => {
@@ -262,12 +267,13 @@ export default function Page({ params }) {
         setContent(cachedData);
         setEpisodesData(cachedData?.episodesData || []);
 
-        if (!zoroId && !animepaheId && !hnembedEp && !megaplayEp) {
+        if (!zoroId && !animepaheId && !hnembedEp && !megaplayEp && !tryembedEp) {
           setEpisodeIds({
             zoro: cachedData?.episodesData?.[0]?.zoro_episodeId,
             animepahe: cachedData?.episodesData?.[0]?.animepahe_id,
             hnembed: "1",
             megaplay: "1",
+            tryembed: "1",
           });
         }
 
@@ -298,12 +304,13 @@ export default function Page({ params }) {
         setEpisodesData(refinedData.episodesData);
         setSessionWithExpiry(`watch-v2-${params.id}`, refinedData, 1000 * 60 * 30);
 
-        if (!zoroId && !animepaheId && !hnembedEp && !megaplayEp) {
+        if (!zoroId && !animepaheId && !hnembedEp && !megaplayEp && !tryembedEp) {
           setEpisodeIds({
             zoro: null,
             animepahe: null,
             hnembed: "1",
             megaplay: "1",
+            tryembed: "1",
           });
         }
         setAnimeNotAvailable(false);
@@ -327,7 +334,8 @@ export default function Page({ params }) {
           (episodeIds.zoro && ep.zoro_episodeId === episodeIds.zoro) ||
           (episodeIds.animepahe && ep.animepahe_id === episodeIds.animepahe) ||
           (provider === "hnembed" && episodeIds.hnembed && String(ep?.number || ep?.episodeIndex) === String(episodeIds.hnembed)) ||
-          (provider === "megaplay" && episodeIds.megaplay && String(ep?.number || ep?.episodeIndex) === String(episodeIds.megaplay))
+          (provider === "megaplay" && episodeIds.megaplay && String(ep?.number || ep?.episodeIndex) === String(episodeIds.megaplay)) ||
+          (provider === "tryembed" && episodeIds.tryembed && String(ep?.number || ep?.episodeIndex) === String(episodeIds.tryembed))
         //!new
       );
 
@@ -456,6 +464,7 @@ export default function Page({ params }) {
         { key: "apahe-id", val: ep?.animepahe_id },
         { key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "megaplay-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
+        { key: "tryembed-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "n", val: currentIndex - 1 },
       ]);
 
@@ -482,6 +491,7 @@ export default function Page({ params }) {
         { key: "apahe-id", val: ep?.animepahe_id },
         { key: "hn-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "megaplay-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
+        { key: "tryembed-ep", val: String(ep?.number || ep?.episodeIndex || 1) },
         { key: "n", val: currentIndex - 1 },
       ]);
       router.push(url);
@@ -694,7 +704,8 @@ export default function Page({ params }) {
           origin.includes("hnembed.cc") ||
           origin.includes("hnembed.com") ||
           origin.includes("megaplay.buzz") ||
-          origin.includes("anikotoapi.site")
+          origin.includes("anikotoapi.site") ||
+          origin.includes("tryembed.us.cc")
         ) {
           setEmbedStatus("loaded");
           clearTimeout(watchdog);

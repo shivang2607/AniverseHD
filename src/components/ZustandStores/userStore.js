@@ -10,6 +10,7 @@ import DeleteWatchListById from "@/app/firebase/WatchList/DeleteWatchList";
 import RemoveAnimeFromWatchList from "@/app/firebase/WatchList/UpdateWatchLists/RemoveAnimeFromWatchList";
 import GetWatchListDataById from "@/app/firebase/WatchList/WatchListAnimeList/GetWatchListDataById";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
+import { removeWatchlistAnimeListCached } from "@/app/firebase/utils/CacheStorage";
 import {
   Constant_Var_starterWatchLists_recent,
   Constant_Var_success,
@@ -131,6 +132,11 @@ const useUserStore = create((set, get) => ({
     let { RecentWatchListId } = get();
 
     if (RecentWatchListId) {
+      // Always clear the animeList cache so Firestore is consulted for fresh data.
+      // Without this, compareTimestamp in GetWatchListDataById sees equal timestamps
+      // (cache was just updated optimistically) and serves stale cached data.
+      removeWatchlistAnimeListCached({ watchListId: RecentWatchListId });
+
       const resp = await GetWatchListDataById({
         watchListId: RecentWatchListId,
         getAll: true,

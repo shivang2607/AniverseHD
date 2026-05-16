@@ -13,8 +13,9 @@ const ProviderSelect = () => {
   
   // Example providers - replace with your actual providers
   const providers = [
+    { id: "tryembed", name: "Provider-T", displayName: "TryEmbed Provider" },
     { id: "megaplay", name: "Provider-M", displayName: "MegaPlay Provider" },
-    { id: "hnembed", name: "Provider-H", displayName: "HNEmbed Provider" },
+    // { id: "hnembed", name: "Provider-H", displayName: "HNEmbed Provider" },
     // { id: "animepahe", name: "Provider-A", displayName: "Animepahe Provider" },
     // { id: "zoro", name: "Provider-Z", displayName: "Zoro Provider" },
     // { id: "aniwatch", name: "Provider-A", displayName: "AniWatch Provider" },
