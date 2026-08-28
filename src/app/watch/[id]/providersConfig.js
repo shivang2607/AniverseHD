@@ -1,4 +1,5 @@
 import axios from "axios";
+import { resolveEpisodeNumber, toDubFlag, buildEmbedStream } from "@/utils/embedStreaming";
 
 export const providersConfig = {
   'zoro' : {
@@ -86,21 +87,10 @@ export const providersConfig = {
     streamingData: async (episodeRef, { dub = false, malId } = {}) => {
       try {
         if (!malId) return null;
-        const dubFlag = dub === '1' || dub === true ? '1' : '0';
-        const ep = typeof episodeRef === 'object' ? episodeRef?.episodeNumber : Number(episodeRef);
-        const epNum = Number.isFinite(ep) && ep > 0 ? ep : 1;
         const { data } = await axios.get(`/api/v2/megaplay/embed/${malId}`, {
-          params: { ep: epNum, dub: dubFlag },
+          params: { ep: resolveEpisodeNumber(episodeRef), dub: toDubFlag(dub) },
         });
-        if (!data?.embedUrl) return null;
-        return {
-          sources: [{ url: data.embedUrl, type: 'iframe', isDub: Boolean(dub) }],
-          tracks: [],
-          intro: null,
-          outro: null,
-          headers: null,
-          isEmbed: true,
-        };
+        return buildEmbedStream(data, dub);
       } catch (err) {
         console.error("MegaPlay Embed Error:", err);
         return null;
@@ -121,21 +111,13 @@ export const providersConfig = {
     streamingData: async (episodeRef, { dub = false, malId, startTime = 0 } = {}) => {
       try {
         if (!malId) return null;
-        const dubFlag = dub === '1' || dub === true ? '1' : '0';
-        const ep = typeof episodeRef === 'object' ? episodeRef?.episodeNumber : Number(episodeRef);
-        const epNum = Number.isFinite(ep) && ep > 0 ? ep : 1;
-        const params = { ep: epNum, dub: dubFlag };
+        const params = {
+          ep: resolveEpisodeNumber(episodeRef),
+          dub: toDubFlag(dub),
+        };
         if (startTime > 0) params.t = Math.floor(startTime);
         const { data } = await axios.get(`/api/v2/tryembed/embed/${malId}`, { params });
-        if (!data?.embedUrl) return null;
-        return {
-          sources: [{ url: data.embedUrl, type: 'iframe', isDub: Boolean(dub) }],
-          tracks: [],
-          intro: null,
-          outro: null,
-          headers: null,
-          isEmbed: true,
-        };
+        return buildEmbedStream(data, dub);
       } catch (err) {
         console.error("TryEmbed Error:", err);
         return null;
@@ -156,23 +138,15 @@ export const providersConfig = {
     streamingData: async (episodeRef, { dub = false, malId, season } = {}) => {
       try {
         if (!malId) return null;
-        const ep = typeof episodeRef === 'object' ? episodeRef?.episodeNumber : Number(episodeRef);
-        const epNum = Number.isFinite(ep) && ep > 0 ? ep : 1;
-        const params = { ep: epNum };
+        const params = { ep: resolveEpisodeNumber(episodeRef) };
         if (Number.isFinite(Number(season)) && Number(season) > 0) {
           params.season = Number(season);
         }
         const { data } = await axios.get(`/api/v2/hnembed/embed/${malId}`, {
           params,
         });
-        if (!data?.embedUrl) return null;
         return {
-          sources: [{ url: data.embedUrl, type: 'iframe', isDub: Boolean(dub) }],
-          tracks: [],
-          intro: null,
-          outro: null,
-          headers: null,
-          isEmbed: true,
+          ...buildEmbedStream(data, dub),
           season: data?.season ?? null,
           seasonSource: data?.seasonSource ?? null,
           kind: data?.kind ?? null,
