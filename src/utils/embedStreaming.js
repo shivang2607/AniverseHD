@@ -46,7 +46,12 @@ export function buildEmbedStream(data, dub) {
   if (!data?.embedUrl) return null;
 
   return {
-    sources: [{ url: data.embedUrl, type: "iframe", isDub: Boolean(dub) }],
+    sources: [{
+      url: data.embedUrl,
+      type: "iframe",
+      isDub: Boolean(dub),
+      ...(data.referer ? { referer: data.referer } : {}),
+    }],
     tracks: [],
     intro: null,
     outro: null,
