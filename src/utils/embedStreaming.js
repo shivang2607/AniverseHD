@@ -20,7 +20,7 @@ export function resolveEpisodeNumber(episodeRef) {
   const ep =
     typeof episodeRef === "object" && episodeRef !== null
       ? episodeRef?.episodeNumber
-      : Number(episodeRef);
+      : Number(typeof episodeRef === "string" ? episodeRef.trim() : episodeRef);
   return Number.isFinite(ep) && ep > 0 ? ep : 1;
 }
 
