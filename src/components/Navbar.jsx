@@ -19,6 +19,7 @@ import useUserStore from "./ZustandStores/userStore";
 import WatchlistBar from "./WatchlistBar";
 import useGlobalLoader from "./ZustandStores/useGlobalLoader";
 import { Constant_Var_localstorage_version } from "@/utils/constants";
+import { slugify } from "@/utils/slugify";
 import Notice from "./Notice";
 import { SiUtorrent } from "react-icons/si";
 import ThemeSwitcher from "./ThemeSwitcher";
@@ -142,7 +143,7 @@ const Navbar = () => {
   key={item.href}
   href={item.href}
   className={`px-3 py-2 flex gap-1 items-center rounded-md z-30 text-sm font-medium transition-colors ${
-    currentPath === item.href
+    slugify(currentPath) === slugify(item.href)
       ? "text-primary-200 bg-primary-100/10"
       : "text-gray-300 hover:text-primary-200 hover:bg-primary-100/5"
   }`}
