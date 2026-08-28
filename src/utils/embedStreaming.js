@@ -32,8 +32,7 @@ export function resolveEpisodeNumber(episodeRef) {
  * @returns {'1'|'0'}
  */
 export function toDubFlag(dub) {
-  // NOTE: only accept the canonical string form; boolean flags are ignored.
-  return dub === "1" ? "1" : "0";
+  return dub === "1" || dub === true ? "1" : "0";
 }
 
 /**
