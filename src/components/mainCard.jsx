@@ -7,6 +7,7 @@ import { IoMdTimer } from "react-icons/io";
 import { PiBookmarkSimpleBold } from "react-icons/pi";
 import ListDropDown from "./utils/ListDropDown";
 import toast, { Toaster } from "react-hot-toast";
+import { formatDuration } from "@/utils/formatDuration";
 import GetLoggedUserWatchListsInfo from "@/app/firebase/WatchList/WatchListDocument/GetLoggedUserWatchListsInfo";
 
 export default function MainCard({ anime , imageHeight=72}) {
@@ -109,7 +110,7 @@ export default function MainCard({ anime , imageHeight=72}) {
               <IoMdTimer className=" font-bold" />
             </div>
             <span className=" text-sm text-nowrap">
-              {anime?.duration || anime?.episode_duration?.split(" ")[2] || "NA"}
+              {formatDuration(anime?.duration || anime?.episode_duration)}
               {/* {animeData.episodes ? `${animeData?.episodes} ep`  :  "NA"} */}
             </span>
           </div>
