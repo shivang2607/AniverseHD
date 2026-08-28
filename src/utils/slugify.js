@@ -13,3 +13,11 @@ export function slugify(value) {
     .replace(/[^a-z0-9]+/g, "-")       // collapse runs of non-alphanumerics to '-'
     .replace(/^-+|-+$/g, "");          // trim leading/trailing '-'
 }
+
+// Returns a humanized version: trims and collapses whitespace, and capitalizes
+// the first letter. Used for display labels derived from routes/slugs.
+export function humanize(value) {
+  if (value == null) return "";
+  const str = String(value).trim().replace(/\s+/g, " ");
+  return str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+}
